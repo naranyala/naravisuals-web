@@ -1,25 +1,3 @@
-<template>
-  <div class="offerings-container">
-    <h2 class="section-title">Our Offerings</h2>
-
-    <div class="offerings-grid">
-      <div
-        v-for="(item, index) in offerings"
-        :key="index"
-        class="offering-card"
-      >
-        <h3 class="offering-title">{{ item.title }}</h3>
-        <p class="offering-type">{{ item.type }}</p>
-        <p class="offering-description">{{ item.description }}</p>
-        <p class="offering-price" v-if="item.price">
-          {{ formatPrice(item.price) }}
-        </p>
-        <button class="cta-button">Learn More</button>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
 export default {
   name: "Offerings",
@@ -63,6 +41,30 @@ export default {
   },
 };
 </script>
+
+
+<template>
+  <div class="offerings-container">
+    <h2 class="section-title">Our Offerings</h2>
+
+    <div class="offerings-grid">
+      <div
+        v-for="(item, index) in offerings"
+        :key="index"
+        class="offering-card"
+      >
+        <h3 class="offering-title">{{ item.title }}</h3>
+        <p class="offering-type">{{ item.type }}</p>
+        <p class="offering-description">{{ item.description }}</p>
+        <p class="offering-price" v-if="item.price">
+          {{ formatPrice(item.price) }}
+        </p>
+        <button class="cta-button">Learn More</button>
+      </div>
+    </div>
+  </div>
+</template>
+
 
 <style scoped>
 .offerings-container {

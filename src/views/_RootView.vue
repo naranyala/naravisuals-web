@@ -1,22 +1,25 @@
-<script>
+<script setup>
 
-import ProductAndServicesView from "./ProductAndServicesView.vue"
+import {ref} from "vue"
+
+import GhReposView from "./GhReposView.vue"
 import ProfileView from "./ProfileView.vue"
 import CreativeView from "./CreativeView.vue"
+import Creative3DView from "./Creative3DView.vue"
+import ArticleView from "./ArticleView.vue"
 
-export default {
-  name: "TabsView",
-  data() {
-    return {
-      activeTab: 0,
-      tabs: [
-        { label: "HOME", component: ProductAndServicesView },
-        { label: "CREATIVE", component: CreativeView },
+const activeTab = ref(0)
+const tabs = ref([
+        { label: "ARTICLES", component: ArticleView },
+        { label: "CREATIVE-2D", component: CreativeView },
+        { label: "CREATIVE-3D", component: Creative3DView },
+        { label: "GH-REPOS", component: GhReposView },
         { label: "PROFILE", component: ProfileView },
-      ],
-    };
-  },
-};
+      ]);
+    
+  const changeRoute = (idx) => {
+        activeTab.value = idx
+    }
 </script>
 
 
@@ -28,7 +31,7 @@ export default {
         v-for="(tab, index) in tabs"
         :key="index"
         :class="{ active: activeTab === index }"
-        @click="activeTab = index"
+        @click="changeRoute(index)"
       >
         {{ tab.label }}
       </button>

@@ -14,7 +14,7 @@ export default {
     text: { type: String, default: '' },
     speed: { type: Number, default: 20 },
     theme: { type: String, default: 'dark' },
-    height: { type: String, default: '50px' }
+    height: { type: String, default: '30px' }
   },
   data() {
     return { reps: 3 };
@@ -79,7 +79,7 @@ export default {
 
 .top-btn {
   position: absolute;
-  right: 16px;
+  right: 0px;
   /* background: rgba(255, 255, 255, 0.2); */
   border: none;
   color: inherit;

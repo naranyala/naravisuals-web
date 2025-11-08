@@ -8,9 +8,15 @@ import StickyBottomBar from "./views/StickyBottomBar.vue"
 <template>
   <RouterView />
 
+    <!-- <StickyBottomBar  -->
+    <!--   direction="right" -->
+    <!--   text="OPEN FOR WORK BTW ..." -->
+    <!-- /> -->
+
+
     <StickyBottomBar 
       direction="right"
-      text="OPEN FOR WORK BTW ..."
+      text="COMING SOON! WORK IN PROGRESS ..."
     />
 
 </template>
