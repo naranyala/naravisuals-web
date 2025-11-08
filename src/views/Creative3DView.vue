@@ -1,195 +1,364 @@
+<template>
+  <div class="container">
+    <h1>3D Model Gallery</h1>
+    
+    <div class="model-grid">
+      <div 
+        v-for="model in models" 
+        :key="model.id"
+        class="model-box"
+        @click="viewModel(model)"
+      >
+        <h3>{{ model.name }}</h3>
+        <p>{{ model.description }}</p>
+        <span v-if="model.error" class="error-badge">Load Failed</span>
+      </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div v-if="isLightboxOpen" class="lightbox-overlay" @click.self="closeLightbox">
+      <div class="lightbox-content">
+        <button class="back-button" @click="closeLightbox">← Go Back</button>
+        <canvas ref="lightboxCanvasRef" class="lightbox-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script>
-import { ref, nextTick } from "vue"
+import { ref, nextTick, onUnmounted } from "vue"
 import * as THREE from "three"
-// FIX 1: Correctly import GLTFLoader from three/examples/jsm/loaders
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
 export default {
-    name: "App",
-    setup() {
-        const models = ref([
-            {
-                id: 1,
-                name: "Damaged Helmet",
-                url: "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
-                description: "Khronos PBR reference",
-                loaded: false
-            },
-            {
-                id: 2,
-                name: "Fox",
-                url: "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Fox/glTF/Fox.gltf",
-                description: "Animated creature model",
-                loaded: false
-            },
-            {
-                id: 3,
-                name: "Drone",
-                url: "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Drone.glb",
-                description: "Three.js example drone",
-                loaded: false
-            },
-            {
-                id: 4,
-                name: "Robot Expressive",
-                url: "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/RobotExpressive.glb",
-                description: "Expressive animation robot",
-                loaded: false
-            },
-            {
-                id: 5,
-                name: "BoomBox",
-                url: "https://cdn.jsdelivr.net/npm/@babylonjs/assets@latest/BoomBox/glTF/BoomBox.glb",
-                description: "BabylonJS sample model",
-                loaded: false
-            },
-            {
-                id: 6,
-                name: "Low Poly Tree",
-                url: "https://cdn.poly.pizza/assets/5mDqlZrVtQO.glb",
-                description: "Poly Pizza low-poly tree",
-                loaded: false
-            }
-        ])
-        const canvasRefs = ref({})
-        const setCanvasRef = (el, id) => {
-            if (!el) return
-            canvasRefs.value[id] = el
-            nextTick(() => initPreview(el, id))
-        }
+  name: "App",
+  setup() {
+    const models = ref([
+  {
+    "id": 3,
+    "name": "Damaged Helmet",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
+    "description": "Khronos PBR reference",
+    "source": "Khronos Group",
+    "error": false
+  },
+  {
+    "id": 4,
+    "name": "Fox",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Fox/glTF/Fox.gltf",
+    "description": "Animated creature model (glTF format)",
+    "source": "Khronos Group",
+    "error": false
+  },
+  {
+    "id": 5,
+    "name": "Water Bottle",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/WaterBottle/glTF-Binary/WaterBottle.glb",
+    "description": "PBR test model",
+    "source": "Khronos Group",
+    "error": false
+  },
+  {
+    "id": 6,
+    "name": "Cesium Man",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb",
+    "description": "Animated character model",
+    "source": "Khronos Group",
+    "error": false
+  },
+  {
+    "id": 7,
+    "name": "Box",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Box/glTF-Binary/Box.glb",
+    "description": "Simplest geometry test",
+    "source": "Khronos Group",
+    "error": false
+  },
+  {
+    "id": 9,
+    "name": "Flamingo",
+    "url": "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Flamingo.glb",
+    "description": "Animated bird model",
+    "source": "three.js Examples",
+    "error": false
+  },
+  {
+    "id": 10,
+    "name": "Parrot",
+    "url": "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Parrot.glb",
+    "description": "Animated bird model",
+    "source": "three.js Examples",
+    "error": false
+  },
+  {
+    "id": 11,
+    "name": "Stork",
+    "url": "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Stork.glb",
+    "description": "Animated bird model",
+    "source": "three.js Examples",
+    "error": false
+  },
+    ])
 
-        const initPreview = (canvas, id) => {
-            const scene = new THREE.Scene()
-            scene.background = new THREE.Color(0x1a1a2e)
-            
-            // Use the canvas size for aspect ratio
-            const width = canvas.clientWidth
-            const height = canvas.clientHeight
+    const isLightboxOpen = ref(false)
+    const selectedModel = ref(null)
+    const lightboxCanvasRef = ref(null)
+    
+    // Store Three.js instances for cleanup
+    let scene = null
+    let renderer = null
+    let camera = null
+    let controls = null
+    let animationFrameId = null
 
-            const cam = new THREE.PerspectiveCamera(
-                75,
-                width / height, // Use width/height directly
-                0.1,
-                1000
-            )
-            cam.position.z = 2
-
-            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
-            renderer.setSize(width, height)
-            
-            // Lighting
-            scene.add(new THREE.AmbientLight(0xffffff, 0.6))
-            const dl = new THREE.DirectionalLight(0xffffff, 0.8)
-            dl.position.set(1, 1, 1)
-            scene.add(dl)
-
-            // Placeholder Torus (will be removed when GLTF loads)
-            const geo = new THREE.TorusGeometry(0.8, 0.3, 16, 100)
-            const mat = new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff })
-            const mesh = new THREE.Mesh(geo, mat)
-            scene.add(mesh)
-            const wire = new THREE.LineSegments(new THREE.WireframeGeometry(geo))
-            wire.material.transparent = true
-            wire.material.opacity = 0.25
-            scene.add(wire)
-
-            // Variable to hold the loaded GLTF scene object for animation
-            let loadedModel = null
-
-            new GLTFLoader().load(
-                models.value.find(m => m.id === id).url,
-                gltf => {
-                    // Remove placeholder objects
-                    scene.remove(mesh, wire)
-                    
-                    // Add loaded model
-                    loadedModel = gltf.scene 
-                    scene.add(loadedModel)
-
-                    // FIT Model to View (Optional but recommended for consistent previews)
-                    const box = new THREE.Box3().setFromObject(loadedModel)
-                    const center = box.getCenter(new THREE.Vector3())
-                    const size = box.getSize(new THREE.Vector3())
-                    const maxDim = Math.max(size.x, size.y, size.z)
-                    const fov = cam.fov * (Math.PI / 180)
-                    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.5 // Multiplier for padding
-
-                    cam.position.set(center.x, center.y, center.z + cameraZ)
-                    cam.lookAt(center)
-
-                    models.value.find(m => m.id === id).loaded = true
-                },
-                undefined, // onProgress
-                (error) => {
-                    console.error('An error happened loading model:', id, error)
-                    // You might want to display an error state in the UI here
-                }
-            )
-
-            // FIX 2: Check if GLTF is loaded (loadedModel is set) and only rotate that, 
-            // otherwise, rotate the placeholder mesh.
-            const animate = () => {
-                requestAnimationFrame(animate)
-                
-                if (loadedModel) {
-                    // Rotate the loaded model group
-                    loadedModel.rotation.y += 0.005
-                } else {
-                    // Rotate the placeholder
-                    mesh.rotation.x += 0.005
-                    mesh.rotation.y += 0.005
-                }
-
-                renderer.render(scene, cam)
-            }
-            animate()
-
-            // Handle resizing
-            window.addEventListener("resize", () => {
-                const newWidth = canvas.clientWidth
-                const newHeight = canvas.clientHeight
-                cam.aspect = newWidth / newHeight
-                cam.updateProjectionMatrix()
-                renderer.setSize(newWidth, newHeight)
-            })
-        }
-
-        // The viewModel function is already correct and robust.
-        const viewModel = model => {
-            const w = window.open("", "_blank")
-            w.document.write(`
-                <html><body style="margin:0">
-                <div id="c"></div>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>
-                <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"><\/script>
-                <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"><\/script>
-                <script>
-                    // ... (original content)
-                    const s=new THREE.Scene(); s.background=new THREE.Color(0x1a1a2e);
-                    const c=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1e3); c.position.z=3;
-                    const r=new THREE.WebGLRenderer({antialias:true}); r.setSize(innerWidth,innerHeight);
-                    document.getElementById("c").appendChild(r.domElement)
-                    s.add(new THREE.AmbientLight(0xffffff,.6))
-                    const d=new THREE.DirectionalLight(0xffffff,.8); d.position.set(1,1,1); s.add(d)
-                    const o=new THREE.OrbitControls(c,r.domElement)
-                    new THREE.GLTFLoader().load("${model.url}",g=>{
-                        s.add(g.scene)
-                        const box=new THREE.Box3().setFromObject(g.scene)
-                        const ctr=box.getCenter(new THREE.Vector3())
-                        const size=box.getSize(new THREE.Vector3()).length()
-                        const fov = c.fov * (Math.PI / 180)
-                        let cameraZ = Math.abs(size / 2 / Math.tan(fov / 2)) * 1.5 // Added multiplier for padding
-                        c.position.set(ctr.x, ctr.y, ctr.z + Math.max(cameraZ, 3)) // Use calculated Z, min 3
-                        o.target.copy(ctr); o.update()
-                    })
-                    ;(function loop(){requestAnimationFrame(loop);o.update();r.render(s,c)})()
-                    onresize=()=>{c.aspect=innerWidth/innerHeight;c.updateProjectionMatrix();r.setSize(innerWidth,innerHeight)}
-                <\/script>
-                </body></html>
-            `)
-        }
-
-        return { models, setCanvasRef, viewModel }
+    const viewModel = async (model) => {
+      selectedModel.value = model
+      isLightboxOpen.value = true
+      
+      // Wait for canvas to be rendered
+      await nextTick()
+      
+      if (!lightboxCanvasRef.value) return
+      
+      initLightboxViewer(lightboxCanvasRef.value, model)
     }
+
+    const closeLightbox = () => {
+      isLightboxOpen.value = false
+      
+      // Cleanup Three.js
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+      
+      if (scene) {
+        scene.traverse(object => {
+          if (object.geometry) object.geometry.dispose()
+          if (object.material) {
+            if (Array.isArray(object.material)) {
+              object.material.forEach(m => m.dispose())
+            } else {
+              object.material.dispose()
+            }
+          }
+        })
+      }
+      
+      if (renderer) {
+        renderer.dispose()
+      }
+      
+      if (controls) {
+        controls.dispose()
+      }
+      
+      selectedModel.value = null
+    }
+
+    const initLightboxViewer = (canvas, model) => {
+      // Scene setup
+      scene = new THREE.Scene()
+      scene.background = new THREE.Color(0x1a1a2e)
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(
+        75,
+        canvas.clientWidth / canvas.clientHeight,
+        0.1,
+        1000
+      )
+
+      // Renderer
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
+      renderer.setSize(canvas.clientWidth, canvas.clientHeight)
+
+      // Lighting
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6))
+      const light = new THREE.DirectionalLight(0xffffff, 0.8)
+      light.position.set(1, 1, 1)
+      scene.add(light)
+
+      // Controls
+      controls = new OrbitControls(camera, canvas)
+      controls.enableDamping = true
+
+      // Load model
+      const loader = new GLTFLoader()
+      loader.load(
+        model.url,
+        gltf => {
+          const model = gltf.scene
+          scene.add(model)
+
+          // Auto-fit
+          const box = new THREE.Box3().setFromObject(model)
+          const center = box.getCenter(new THREE.Vector3())
+          const size = box.getSize(new THREE.Vector3()).length()
+          const fov = camera.fov * (Math.PI / 180)
+          const cameraZ = Math.abs(size / 2 / Math.tan(fov / 2)) * 1.5
+          
+          camera.position.set(center.x, center.y, center.z + Math.max(cameraZ, 3))
+          camera.lookAt(center)
+          controls.target.copy(center)
+          controls.update()
+        },
+        undefined,
+        error => {
+          console.error('Error loading model:', error)
+          model.error = true
+          closeLightbox()
+        }
+      )
+
+      // Animation loop
+      const animate = () => {
+        animationFrameId = requestAnimationFrame(animate)
+        controls.update()
+        renderer.render(scene, camera)
+      }
+      animate()
+
+      // Handle resize
+      const handleResize = () => {
+        if (!canvas) return
+        camera.aspect = canvas.clientWidth / canvas.clientHeight
+        camera.updateProjectionMatrix()
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight)
+      }
+      
+      window.addEventListener('resize', handleResize)
+      
+      // Store cleanup function
+      canvas._cleanupResize = () => window.removeEventListener('resize', handleResize)
+    }
+
+    onUnmounted(() => {
+      if (lightboxCanvasRef.value?._cleanupResize) {
+        lightboxCanvasRef.value._cleanupResize()
+      }
+      closeLightbox()
+    })
+
+    return { models, isLightboxOpen, lightboxCanvasRef, viewModel, closeLightbox, selectedModel }
+  }
 }
 </script>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: #0a0a0a;
+  color: white;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2.5em;
+  color: #fff;
+}
+
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.model-box {
+  background: #16213e;
+  border: 2px solid #0f4c75;
+  border-radius: 8px;
+  padding: 30px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.model-box:hover {
+  border-color: #4a90e2;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(74, 144, 226, 0.2);
+}
+
+.model-box h3 {
+  font-size: 1.3em;
+  margin-bottom: 8px;
+}
+
+.model-box p {
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+.error-badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 8px;
+  background: #ff6b6b;
+  color: white;
+  border-radius: 4px;
+  font-size: 0.8em;
+}
+
+/* Lightbox styles */
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lightbox-content {
+  position: relative;
+  width: 90%;
+  height: 90%;
+  max-width: 1200px;
+  background: #0a0a0a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lightbox-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 10;
+  transition: background 0.2s;
+}
+
+.back-button:hover {
+  background: #5ba0f2;
+}
+</style>

@@ -37,7 +37,7 @@ const loading = ref(true);
 onMounted(async () => {
   try {
     // Vite glob import – raw content as string
-    const modules = import.meta.glob('../assets/markdown/*.md', { as: 'raw', eager: false });
+    const modules = import.meta.glob('../articles/*.md', { as: 'raw', eager: false });
 
     const promises = Object.keys(modules).map(async (path) => {
       const markdown = await modules[path](); // ← string, NOT .default

@@ -1,76 +1,67 @@
 <script setup>
 // Flat data source
-const flatOfferings = [
+const flatProjects = [
   {
-    title: "Premium Laptop",
-    type: "Product",
-    description: "A high-performance laptop designed for professionals and creators.",
-    price: 1299,
-    rating: 5, // Five Star
+    title: "Project Alpha",
+    type: "Web Development",
+    rating: 4.2,
   },
   {
-    title: "Web Development Service",
-    type: "Service",
-    description: "Custom websites built with modern frameworks and responsive design.",
-    price: 2500,
-    rating: 4.5, // Half Star Five Star
+    title: "Project Beta",
+    type: "Mobile App",
+    rating: 4.9,
   },
   {
-    title: "Cloud Hosting",
-    type: "Service",
-    description: "Reliable, scalable hosting solutions with 24/7 support.",
-    price: 99,
-    rating: 4, // One Star from Five
+    title: "Project Gamma",
+    type: "Web Development",
+    rating: 3.5,
   },
   {
-    title: "Noise-Cancelling Headphones",
-    type: "Product",
-    description: "Immersive sound experience with active noise cancellation.",
-    price: 299,
-    rating: 4.5, // Half Star Five Star
+    title: "Project Delta",
+    type: "UI/UX Design",
+    rating: 4.6,
+  },
+  {
+    title: "Project Epsilon",
+    type: "Machine Learning",
+    rating: 4.1,
+  },
+  {
+    title: "Project Zeta",
+    type: "Data Science",
+    rating: 4.8,
   },
 ];
 
 // Grouping logic
 const groupsMap = {
   5: {
-    title: "⭐️⭐️⭐️⭐️⭐️ | Premium Tier (5.0)",
+    title: "Top Rated",
     items: [],
-    class: 'group-five-star',
-    color: '#42b983'
-  },
-  4.5: {
-    title: "⭐️⭐️⭐️⭐️½ | Excellent Value (4.5)",
-    items: [],
-    class: 'group-half-star',
-    color: '#00bcd4'
   },
   4: {
-    title: "⭐️⭐️⭐️⭐️ | Solid Performance (4.0)",
+    title: "Highly Recommended",
     items: [],
-    class: 'group-four-star',
-    color: '#ffc107'
+  },
+  3: {
+    title: "Good Effort",
+    items: [],
   }
 };
 
 // Populate groups
-flatOfferings.forEach(item => {
-    if (groupsMap[item.rating]) {
-        groupsMap[item.rating].items.push(item);
-    }
+flatProjects.forEach(item => {
+  if (item.rating >= 4.5) {
+    groupsMap[5].items.push(item);
+  } else if (item.rating >= 3.5) {
+    groupsMap[4].items.push(item);
+  } else {
+    groupsMap[3].items.push(item);
+  }
 });
 
-// Convert the map to a sorted array (5 -> 4.5 -> 4) and filter out empty groups
-const sortedGroups = [groupsMap[5], groupsMap[4.5], groupsMap[4]].filter(g => g.items.length > 0);
-
-
-// Methods defined as simple functions, automatically exposed to the template
-const formatPrice = (value) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(value);
-};
+// Convert the map to a sorted array and filter out empty groups
+const sortedGroups = [groupsMap[5], groupsMap[4], groupsMap[3]].filter(g => g.items.length > 0);
 
 // Renders star icons based on the rating value
 const renderStars = (rating) => {
@@ -105,41 +96,19 @@ const renderStars = (rating) => {
 </script>
 
 <template>
-  <div class="offerings-container">
-    <h2 class="section-title">Our Offerings</h2>
-
-    <div class="offerings-grid-groups">
-      <div v-for="(group, groupIndex) in sortedGroups" :key="group.rating" class="rating-group">
-        <!-- Group Separator (The clear border the user asked for) -->
-        <h3 
-          class="group-separator" 
-          :style="{ borderColor: group.color, color: group.color }"
-        >
-          {{ group.title }}
-        </h3>
-        
-        <!-- Grid of Cards within this specific group -->
+  <div class="projects-container">
+    <h1 class="section-title">Our Projects</h1>
+    <div class="projects-grid">
+      <div v-for="(group, groupIndex) in sortedGroups" :key="groupIndex" class="project-group">
+        <h2 class="group-title">{{ group.title }}</h2>
         <div class="group-cards">
-          <div
-            v-for="(item, itemIndex) in group.items"
-            :key="itemIndex"
-            class="offering-card"
-            :class="group.class"
-          >
-            <h3 class="offering-title">{{ item.title }}</h3>
-            
-            <!-- Star Rating Display -->
-            <div class="offering-rating">
+          <div v-for="(item, itemIndex) in group.items" :key="itemIndex" class="project-card">
+            <h3 class="project-name">{{ item.title }}</h3>
+            <p class="project-type">{{ item.type }}</p>
+            <div class="project-rating">
               <span class="stars">{{ renderStars(item.rating) }}</span>
               <span class="rating-value">({{ item.rating }}/5)</span>
             </div>
-
-            <p class="offering-type">{{ item.type }}</p>
-            <p class="offering-description">{{ item.description }}</p>
-            <p class="offering-price" v-if="item.price">
-              {{ formatPrice(item.price) }}
-            </p>
-            <button class="cta-button">Learn More</button>
           </div>
         </div>
       </div>
@@ -148,161 +117,89 @@ const renderStars = (rating) => {
 </template>
 
 <style scoped>
-.offerings-container {
-  background-color: #121212; /* dark theme */
-  color: #ffffff;
+.projects-container {
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 2rem;
   font-family: 'Inter', sans-serif;
+  background-color: #121212;
+  color: #fff;
 }
 
 .section-title {
-  text-align: center;
-  margin-bottom: 2rem;
   font-size: 2rem;
   font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
-.offerings-grid-groups {
-  max-width: 1200px;
-  margin: 0 auto;
+.projects-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.project-group {
+  padding: 1rem;
+}
+
+.group-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
 .group-cards {
-  display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
-  gap: 1.5rem; 
-  padding-bottom: 3rem; /* Padding at the bottom of the group */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
-/* Group Separator/Border Style */
-.group-separator {
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 3rem 0 2rem 0; /* Clear vertical space */
-  padding-bottom: 0.5rem;
-  
-  /* The "Separation Border" */
-  border-bottom: 4px solid; 
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.offering-card {
+.project-card {
   background-color: #1e1e1e;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  border: 2px solid transparent; /* Base border */
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-.offering-card:hover {
-  transform: translateY(-8px);
-}
-
-/* --- Individual Card Styles (Kept for visual distinction within groups) --- */
-
-.group-five-star {
-  border-color: #42b983; 
-}
-.group-five-star:hover {
-  box-shadow: 0 10px 30px rgba(66, 185, 131, 0.8);
-}
-
-.group-half-star {
-  border-color: #00bcd4; 
-}
-.group-half-star:hover {
-  box-shadow: 0 10px 30px rgba(0, 188, 212, 0.6);
-}
-
-.group-four-star {
-  border-color: #ffc107; 
-}
-.group-four-star:hover {
-  box-shadow: 0 10px 30px rgba(255, 193, 7, 0.4);
-}
-
-/* --- General Card Content Styles --- */
-
-.offering-title {
-  font-size: 1.4rem;
+.project-name {
+  font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #42b983;
 }
 
-.offering-rating {
-  margin-bottom: 0.75rem;
+.project-type {
+  font-size: 1rem;
+  color: #ccc;
+  margin-bottom: 0.5rem;
+}
+
+.project-rating {
   display: flex;
   align-items: center;
 }
 
 .stars {
-  font-size: 1.5rem;
-  color: #FFD700; 
-  letter-spacing: 0.1rem; 
+  font-size: 1rem;
+  color: #FFD700;
   margin-right: 0.5rem;
 }
 
 .rating-value {
   font-size: 0.9rem;
-  color: #cccccc;
-}
-
-.offering-type {
-  font-size: 0.9rem;
-  color: #aaaaaa;
-  margin-bottom: 1rem;
-}
-
-.offering-description {
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
-  flex-grow: 1; 
-}
-
-.offering-price {
-  font-weight: bold;
-  font-size: 1.5rem;
-  color: #42b983; 
-  margin-bottom: 1.5rem;
-}
-
-.cta-button {
-  background-color: #42b983;
-  color: #1e1e1e;
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.5rem;
-  cursor: pointer;
-  font-weight: 700;
-  transition: background-color 0.3s, transform 0.1s;
-  box-shadow: 0 4px 10px rgba(66, 185, 131, 0.4);
-}
-
-.cta-button:hover {
-  background-color: #63d297;
-  transform: translateY(-2px);
+  color: #ccc;
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 600px) {
-  .offerings-container {
+  .projects-container {
     padding: 1rem;
   }
   .section-title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
-  .group-separator {
-    font-size: 1.2rem;
-    margin: 2rem 0 1.5rem 0;
-  }
-  .offering-card {
-    padding: 1.25rem;
+  .group-cards {
+    grid-template-columns: 1fr;
   }
 }
 </style>
