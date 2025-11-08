@@ -1,0 +1,98 @@
+/* Base setup */
+:root {
+  --bg-color: #121212;
+  /* deep dark background */
+  --surface-color: #1e1e1e;
+  /* slightly lighter panels */
+  --text-color: #ffffff;
+  /* primary text */
+  --muted-text: #aaaaaa;
+  /* secondary text */
+  --accent-color: #42b983;
+  /* Vue green or your brand accent */
+  --border-color: #333333;
+  /* subtle borders */
+  --radius: 0px;
+  /* rounded corners */
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 0.5em;
+}
+
+/* Links */
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #63d297;
+  /* lighter accent on hover */
+}
+
+/* Cards / panels */
+.card {
+  background-color: var(--surface-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  margin: 1rem 0;
+}
+
+/* Buttons */
+button {
+  background-color: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s, transform 0.2s;
+}
+
+button:hover {
+  background-color: #63d297;
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Inputs */
+input,
+textarea,
+select {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(66, 185, 131, 0.4);
+}
