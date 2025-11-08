@@ -1,3 +1,29 @@
+<template>
+  <div class="container">
+    <h1>3D Model Gallery</h1>
+    
+    <div class="model-grid">
+      <div 
+        v-for="model in models" 
+        :key="model.id"
+        class="model-box"
+        @click="viewModel(model)"
+      >
+        <h3>{{ model.name }}</h3>
+        <p>{{ model.description }}</p>
+        <span v-if="model.error" class="error-badge">Load Failed</span>
+      </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div v-if="isLightboxOpen" class="lightbox-overlay" @click.self="closeLightbox">
+      <div class="lightbox-content">
+        <button class="back-button" @click="closeLightbox">← Go Back</button>
+        <canvas ref="lightboxCanvasRef" class="lightbox-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+</template>
 
 <script>
 import { ref, nextTick, onUnmounted } from "vue"
@@ -9,7 +35,7 @@ export default {
   name: "App",
   setup() {
     const models = ref([
-{
+  {
     "id": 3,
     "name": "Damaged Helmet",
     "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
@@ -73,12 +99,9 @@ export default {
     "source": "three.js Examples",
     "error": false
   },
-
-
     ])
 
     const isLightboxOpen = ref(false)
-    const isModelLoading = ref(false)
     const selectedModel = ref(null)
     const lightboxCanvasRef = ref(null)
     
@@ -92,7 +115,6 @@ export default {
     const viewModel = async (model) => {
       selectedModel.value = model
       isLightboxOpen.value = true
-      isModelLoading.value = true // Show spinner immediately
       
       // Wait for canvas to be rendered
       await nextTick()
@@ -104,7 +126,6 @@ export default {
 
     const closeLightbox = () => {
       isLightboxOpen.value = false
-      isModelLoading.value = false // Reset loading state
       
       // Cleanup Three.js
       if (animationFrameId) {
@@ -181,14 +202,11 @@ export default {
           camera.lookAt(center)
           controls.target.copy(center)
           controls.update()
-          
-          isModelLoading.value = false // Hide spinner when model loads
         },
         undefined,
         error => {
           console.error('Error loading model:', error)
-          selectedModel.value.error = true // Fixed bug: use selectedModel instead of inner model variable
-          isModelLoading.value = false // Hide spinner on error
+          model.error = true
           closeLightbox()
         }
       )
@@ -222,57 +240,10 @@ export default {
       closeLightbox()
     })
 
-    return { 
-      models, 
-      isLightboxOpen, 
-      isModelLoading,
-      lightboxCanvasRef, 
-      viewModel, 
-      closeLightbox, 
-      selectedModel 
-    }
+    return { models, isLightboxOpen, lightboxCanvasRef, viewModel, closeLightbox, selectedModel }
   }
 }
 </script>
-
-
-<template>
-  <div class="container">
-    <h1>3D Model Gallery</h1>
-    
-    <div class="model-grid">
-      <div 
-        v-for="model in models" 
-        :key="model.id"
-        class="model-box"
-        @click="viewModel(model)"
-      >
-        <h3>{{ model.name }}</h3>
-        <p>{{ model.description }}</p>
-        <span v-if="model.error" class="error-badge">Load Failed</span>
-      </div>
-    </div>
-
-    <!-- Lightbox -->
-    <div v-if="isLightboxOpen" class="lightbox-overlay" @click.self="closeLightbox">
-      <div class="lightbox-content">
-        <button class="back-button" @click="closeLightbox">← Go Back</button>
-        
-        <!-- Loading Spinner -->
-        <div v-if="isModelLoading" class="spinner-overlay">
-          <div class="spinner"></div>
-          <p class="loading-text">Loading 3D Model...</p>
-        </div>
-        
-        <canvas 
-          ref="lightboxCanvasRef" 
-          class="lightbox-canvas"
-          :class="{ 'hidden': isModelLoading }"
-        ></canvas>
-      </div>
-    </div>
-  </div>
-</template>
 
 <style>
 * {
@@ -370,43 +341,6 @@ h1 {
   width: 100%;
   height: 100%;
   display: block;
-}
-
-.lightbox-canvas.hidden {
-  opacity: 0;
-}
-
-/* Spinner styles */
-.spinner-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  z-index: 100;
-}
-
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid rgba(255, 255, 255, 0.1);
-  border-top: 5px solid #4a90e2;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-.loading-text {
-  color: #fff;
-  font-size: 16px;
-  text-align: center;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 
 .back-button {
