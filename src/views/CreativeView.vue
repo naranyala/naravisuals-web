@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>My Vue.js Stock Image Gallery</h1>
+    <h1>Mostly created with Inkscape 2D Editor</h1>
     <div class="gallery">
       <div v-for="(image, index) in images" :key="image.url" class="item">
         <img 
