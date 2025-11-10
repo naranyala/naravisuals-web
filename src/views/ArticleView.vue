@@ -2,6 +2,10 @@
 import { ref, computed, onMounted } from 'vue';
 import { marked } from 'marked';
 
+import { 
+  saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams 
+} from "./utils.js"
+
 // ===== State =====
 const markdownFiles = ref([]);
 const selectedFile = ref(null);
@@ -24,6 +28,8 @@ const groupedArticles = computed(() => {
 // ===== Lifecycle =====
 onMounted(async () => {
   await loadMarkdownFiles();
+
+  viewSelectedArticle()
 });
 
 // ===== Methods =====
@@ -72,10 +78,19 @@ function formatArticleTitle(filename) {
   return `${numbering} ${formattedText}`;
 }
 
+function viewSelectedArticle(){
+    setQueryParams({ page: "article", articleId: "some-article-id"  }, true)
+}
+
 function selectFile(file) {
   isParentTitleVisible.value = false;
   selectedFile.value = file;
-  
+
+  const selectedArticleTitle  = slugify(file.title)
+  console.log("article: ", selectedArticleTitle);
+  setQueryParams({ page: "article", articleId: selectedArticleTitle  }, true)
+  console.log(location.href)
+
   // Scroll to top when article is selected
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -85,6 +100,16 @@ function deselectFile() {
   selectedFile.value = null;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+function slugify(str) {
+  return str
+    .toLowerCase() // Convert to lowercase
+    .trim() // Remove leading/trailing whitespace
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/[^\w\-]+/g, "") // Remove non-word characters (except hyphens)
+    .replace(/\-\-+/g, "-"); // Replace multiple hyphens with a single hyphen
+}
+
 </script>
 
 <template>

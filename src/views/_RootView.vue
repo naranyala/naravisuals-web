@@ -1,5 +1,10 @@
 <script setup>
-import { ref } from "vue"
+import { ref, onMounted, watch, watchEffect} from "vue"
+
+
+import { 
+  saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams 
+} from "./utils.js"
 
 import GhReposView from "./GhReposView.vue"
 import ProfileView from "./ProfileView.vue"
@@ -18,7 +23,50 @@ const tabs = ref([
 
 const changeRoute = (idx) => {
   activeTab.value = idx
+
+  // console.log(history)
+  // console.log("current page: ", idx)
+  switch(idx){
+    case 0: 
+      setQueryParams({ page: "article", articleId: ""  }, true)
+      break;
+    case 1:
+      setQueryParams({ page: "creative-2d", artId: ""  }, true)
+      break;
+    case 2:
+      setQueryParams({ page: "creative-3d", artId: "" }, true)
+      break;
+    case 3: 
+      setQueryParams({ page: "gh-repos", repoLink: ""  }, true)
+      break;
+    case 4: 
+      setQueryParams({ page: "profile", msg: "support me"  }, true)
+      break;
+  }
+
+  setActiveUrl()
 }
+
+const setActiveUrl = () => {
+    const fullUrl = window.location.href // includes ?search=vue&page=69#section
+    console.log(fullUrl)
+}
+
+
+setInterval(() => {
+  // saveCurrentUrl()
+}, 1000)
+
+
+
+onMounted(() => {
+
+  setQueryParams({ page: "welcome", state: null  }, true)
+
+  setActiveUrl()
+  // restoreLastUrl();
+})
+
 </script>
 
 <template>
@@ -39,6 +87,7 @@ const changeRoute = (idx) => {
     <select
       class="tabs-dropdown no-print"
       v-model="activeTab"
+      @change="setActiveUrl"
     >
       <option v-for="(tab, index) in tabs" :key="index" :value="index">
         {{ tab.label }}

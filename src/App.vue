@@ -3,6 +3,8 @@ import { RouterLink, RouterView } from 'vue-router'
 
 import StickyBottomBar from "./views/StickyBottomBar.vue"
 
+
+
 </script>
 
 <template>
