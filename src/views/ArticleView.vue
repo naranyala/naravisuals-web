@@ -2,6 +2,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { marked } from 'marked';
 
+import ArticleTOC from "./reusables/ArticleTOC.vue"
+
 import { 
   saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams 
 } from "./utils.js"
@@ -47,6 +49,7 @@ async function loadMarkdownFiles() {
       return {
         name,
         path,
+        raw: markdown,
         content: marked(markdown),
         title: formatArticleTitle(name)
       };
@@ -181,6 +184,8 @@ function slugify(str) {
           ← Back to Articles
         </button>
 
+      <ArticleTOC :markdown="selectedFile.raw" />
+      <!-- <pre>{{JSON.stringify(markdownFiles, null, 2)}}</pre> -->
 
       <div 
         v-html="selectedFile.content" 

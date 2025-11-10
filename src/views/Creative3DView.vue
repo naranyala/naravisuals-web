@@ -9,71 +9,126 @@ export default {
   name: "App",
   setup() {
     const models = ref([
-{
-    "id": 3,
+  {
+    "id": 1,
     "name": "Damaged Helmet",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
-    "description": "Khronos PBR reference",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
+    "description": "PBR reference king, 2.1 MB",
+    "source": "Khronos Group",
+    "error": false
+  },
+  {
+    "id": 2,
+    "name": "Fox (Running)",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Fox/glTF-Binary/Fox.glb",
+    "description": "Fully rigged + skinned animation, 3.8 MB",
+    "source": "Khronos Group",
+    "error": false
+  },
+  {
+    "id": 3,
+    "name": "Water Bottle",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/WaterBottle/glTF-Binary/WaterBottle.glb",
+    "description": "Transmission + clearcoat test, 1.5 MB",
     "source": "Khronos Group",
     "error": false
   },
   {
     "id": 4,
-    "name": "Fox",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Fox/glTF/Fox.gltf",
-    "description": "Animated creature model (glTF format)",
+    "name": "Boom Box",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/BoomBox/glTF-Binary/BoomBox.glb",
+    "description": "Emissive + PBR retro vibe, 800 KB",
     "source": "Khronos Group",
     "error": false
   },
   {
     "id": 5,
-    "name": "Water Bottle",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/WaterBottle/glTF-Binary/WaterBottle.glb",
-    "description": "PBR test model",
+    "name": "Sponza",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Sponza/glTF/Sponza.gltf",
+    "description": "Classic scene for IBL testing, 4.2 MB",
     "source": "Khronos Group",
     "error": false
   },
   {
     "id": 6,
-    "name": "Cesium Man",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb",
-    "description": "Animated character model",
+    "name": "Lantern",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Lantern/glTF-Binary/Lantern.glb",
+    "description": "Emissive + transmission glass, 1.9 MB",
     "source": "Khronos Group",
     "error": false
   },
   {
     "id": 7,
-    "name": "Box",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Box/glTF-Binary/Box.glb",
-    "description": "Simplest geometry test",
+    "name": "Flight Helmet",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/FlightHelmet/glTF/FlightHelmet.gltf",
+    "description": "Ultra-detailed PBR helmet, 4.8 MB",
+    "source": "Khronos Group",
+    "error": false
+  },
+  {
+    "id": 8,
+    "name": "Avocado",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Avocado/glTF-Binary/Avocado.glb",
+    "description": "Cutest PBR fruit ever, 220 KB",
     "source": "Khronos Group",
     "error": false
   },
   {
     "id": 9,
     "name": "Flamingo",
-    "url": "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Flamingo.glb",
-    "description": "Animated bird model",
-    "source": "three.js Examples",
+    "url": "https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/models/gltf/Flamingo.glb",
+    "description": "Animated pink boi, loops perfectly",
+    "source": "three.js",
     "error": false
   },
   {
     "id": 10,
-    "name": "Parrot",
-    "url": "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Parrot.glb",
-    "description": "Animated bird model",
-    "source": "three.js Examples",
+    "name": "Horse",
+    "url": "https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/models/gltf/Horse.glb",
+    "description": "Galloping animation, 1.1 MB",
+    "source": "three.js",
     "error": false
   },
   {
     "id": 11,
-    "name": "Stork",
-    "url": "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Stork.glb",
-    "description": "Animated bird model",
-    "source": "three.js Examples",
+    "name": "RobotExpressive",
+    "url": "https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/RobotExpressive.glb",
+    "description": "Full facial + body rig, 2.9 MB",
+    "source": "three.js",
     "error": false
   },
-
+  {
+    "id": 12,
+    "name": "BrainStem",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/BrainStem/glTF-Binary/BrainStem.glb",
+    "description": "Anatomy PBR model, 1.3 MB",
+    "source": "Khronos Group",
+    "error": false
+  },
+  {
+    "id": 13,
+    "name": "Suzanne (Monkey)",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Suzanne/glTF-Binary/Suzanne.glb",
+    "description": "Blender mascot, 280 KB",
+    "source": "Khronos Group",
+    "error": false
+  },
+  {
+    "id": 14,
+    "name": "Cesium Milk Truck",
+    "url": "https://cdn.jsdelivr.net/gh/CesiumGS/glTF-Sample-Models@master/2.0/CesiumMilkTruck/glTF-Binary/CesiumMilkTruck.glb",
+    "description": "Classic animated truck, 2.5 MB",
+    "source": "CesiumGS",
+    "error": false
+  },
+  {
+    "id": 15,
+    "name": "Gearbox Assay",
+    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/GearboxAssy/glTF-Binary/GearboxAssy.glb",
+    "description": "Mechanical cutaway, 3.7 MB",
+    "source": "Khronos Group",
+    "error": false
+  }
 
     ])
 
