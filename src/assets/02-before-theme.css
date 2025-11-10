@@ -1,0 +1,13 @@
+/* Hide elements with class "no-print" in print mode */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    page-break-inside: avoid;
+  }
+}

@@ -1,0 +1,79 @@
+/* Paper Clean Light Theme */
+:root {
+  --bg-color: #fafafa;
+  --surface-color: #ffffff;
+  --text-color: #1a1a1a;
+  --muted-text: #666666;
+  --accent-color: #42b983;
+  --accent-hover: #52d49a;
+  --border-color: #e1e1e1;
+  --radius: 16px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: "Inter", system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  color: #222222;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+a:hover {
+  border-bottom-color: var(--accent-color);
+}
+
+.card {
+  background-color: var(--surface-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  border: 1px solid #f0f0f0;
+}
+
+button {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.8rem 1.8rem;
+  font-weight: 600;
+}
+
+button:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+input,
+textarea,
+select {
+  background-color: #f8f9fa;
+  color: var(--text-color);
+  border: 1px solid #ddd;
+  border-radius: var(--radius);
+  padding: 0.75rem;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 4px rgba(66, 185, 131, 0.15);
+}

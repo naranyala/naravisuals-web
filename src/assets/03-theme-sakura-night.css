@@ -1,0 +1,75 @@
+/* Sakura Night Theme */
+:root {
+  --bg-color: #1a1a2e;
+  --surface-color: #24243e;
+  --text-color: #e8e8ff;
+  --muted-text: #b583b9;
+  --accent-color: #ee6d9a;
+  --accent-hover: #ff8fb8;
+  --border-color: #3d375e;
+  --radius: 20px;
+  --shadow: 0 15px 35px rgba(238, 109, 154, 0.25);
+}
+
+body {
+  background: linear-gradient(to bottom, #1a1a2e, #16213e);
+  color: var(--text-color);
+  font-family: "Nunito", "Inter", sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 800;
+  color: #ffb7d5;
+}
+
+a {
+  color: #ee6d9a;
+  text-decoration: none;
+  position: relative;
+}
+
+a::before {
+  content: '🌸';
+  margin-right: 6px;
+  opacity: 0.7;
+}
+
+.card {
+  background-color: rgba(36, 36, 62, 0.8);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  border: 2px solid rgba(238, 109, 154, 0.2);
+}
+
+button {
+  background: linear-gradient(45deg, #ee6d9a, #ff8fb8);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 0.8rem 2rem;
+  font-weight: 700;
+}
+
+button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 30px rgba(238, 109, 154, 0.5);
+}
+
+input,
+textarea,
+select {
+  background-color: rgba(61, 55, 94, 0.6);
+  color: #e8e8ff;
+  border: 2px dashed rgba(238, 109, 154, 0.3);
+  border-radius: var(--radius);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-style: solid;
+  border-color: var(--accent-color);
+}

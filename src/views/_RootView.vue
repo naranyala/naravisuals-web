@@ -24,7 +24,7 @@ const changeRoute = (idx) => {
 <template>
   <div class="tabs-container dark">
     <!-- Tabs -->
-    <div class="tabs">
+    <div class="tabs no-print">
       <button
         v-for="(tab, index) in tabs"
         :key="index"
@@ -37,7 +37,7 @@ const changeRoute = (idx) => {
 
     <!-- Optional mobile dropdown -->
     <select
-      class="tabs-dropdown"
+      class="tabs-dropdown no-print"
       v-model="activeTab"
     >
       <option v-for="(tab, index) in tabs" :key="index" :value="index">

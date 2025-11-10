@@ -1,0 +1,69 @@
+/* GitHub Dark Dimmed+ */
+:root {
+  --bg-color: #22272e;
+  --surface-color: #2d333b;
+  --text-color: #adbac7;
+  --muted-text: #768390;
+  --accent-color: #539bf5;
+  --accent-hover: #6bb1ff;
+  --border-color: #444c56;
+  --radius: 10px;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  color: #cdd9e5;
+  font-weight: 600;
+}
+
+a {
+  color: #539bf5;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.card {
+  background-color: var(--surface-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  border: 1px solid #444c56;
+}
+
+button {
+  background-color: #316dca;
+  color: white;
+  border-radius: var(--radius);
+  padding: 0.6rem 1.2rem;
+}
+
+button:hover {
+  background-color: var(--accent-hover);
+}
+
+input,
+textarea,
+select {
+  background-color: #2d333b;
+  color: #adbac7;
+  border: 1px solid #444c56;
+  border-radius: var(--radius);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(83, 155, 245, 0.3);
+}

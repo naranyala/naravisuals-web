@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Mostly created with Inkscape 2D Editor</h1>
+    <h1>Art Gallery</h1>
     <div class="gallery">
       <div v-for="(image, index) in images" :key="image.url" class="item">
         <div class="image-wrapper">
@@ -94,17 +94,16 @@ function nextImage() {
 }
 </script>
 
-<style>
+<style scoped>
+/* === YOUR ORIGINAL STYLES (unchanged until print media) === */
 .gallery {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 15px;
 }
-
 .item {
   position: relative;
 }
-
 .image-wrapper {
   position: relative;
   width: 100%;
@@ -113,8 +112,6 @@ function nextImage() {
   border-radius: 8px;
   overflow: hidden;
 }
-
-/* Gallery images */
 .item img {
   width: 100%;
   height: 200px;
@@ -123,12 +120,9 @@ function nextImage() {
   opacity: 0;
   transition: opacity 0.3s ease;
 }
-
 .item img.loaded {
   opacity: 1;
 }
-
-/* Spinner */
 .spinner {
   position: absolute;
   top: 50%;
@@ -142,13 +136,10 @@ function nextImage() {
   animation: spin 1s linear infinite;
   z-index: 1;
 }
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
-/* Lightbox styles */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -159,7 +150,6 @@ function nextImage() {
   justify-content: center;
   z-index: 1000;
 }
-
 .lightbox img {
   max-width: 90vw;
   max-height: 90vh;
@@ -170,21 +160,12 @@ function nextImage() {
   opacity: 0;
   transition: opacity 0.3s ease;
 }
-
-.lightbox img.loaded {
-  opacity: 1;
-}
-
+.lightbox img.loaded { opacity: 1; }
 .lightbox-spinner {
   border: 4px solid rgba(255, 255, 255, 0.1);
   border-top: 4px solid #fff;
 }
-
-.lightbox .caption {
-  color: #fff;
-  margin-top: 15px;
-}
-
+.lightbox .caption { color: #fff; margin-top: 15px; }
 .lightbox .nav {
   position: absolute;
   top: 50%;
@@ -195,10 +176,8 @@ function nextImage() {
   cursor: pointer;
   transform: translateY(-50%);
 }
-
 .lightbox .prev { left: 20px; }
 .lightbox .next { right: 20px; }
-
 .lightbox .close {
   position: absolute;
   top: 20px;
@@ -208,5 +187,126 @@ function nextImage() {
   background: none;
   border: none;
   cursor: pointer;
+}
+
+/* === PRINT STYLES – THIS IS THE MAGIC === */
+@media print {
+  @page {
+    margin: 1.5cm;
+    size: A4 portrait;
+  }
+
+  body, html {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  /* Hide everything except the gallery */
+  .lightbox,
+  .nav,
+  .close,
+  .spinner,
+  button,
+  nav,
+  header, footer, aside {
+    display: none !important;
+  }
+
+  /* Show only the gallery */
+  .gallery {
+    display: block !important;
+    grid-template-columns: none !important;
+    gap: 40px !important;
+    page-break-after: always;
+  }
+
+  .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    page-break-inside: avoid;
+    margin-bottom: 40px;
+  }
+
+  .image-wrapper {
+    width: 100% !important;
+    height: auto !important;
+    background: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+  }
+
+  .item img {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 70vh !important;
+    object-fit: contain !important;
+    opacity: 1 !important;
+    cursor: default !important;
+    display: block;
+    margin: 0 auto;
+    page-break-inside: avoid;
+    border: 1px solid #ddd;
+  }
+
+  .caption {
+    font-size: 14pt !important;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 15px !important;
+    color: #000 !important;
+    page-break-before: avoid;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 24pt;
+    margin-bottom: 30px;
+    page-break-after: avoid;
+  }
+
+  /* Optional: Add image number */
+  .item::before {
+    counter-increment: image;
+    content: "Image " counter(image) " of " counter(images);
+    font-size: 10pt;
+    color: #555;
+    margin-bottom: 8px;
+  }
+
+  /* Counter setup */
+  body {
+    counter-reset: image images;
+  }
+  .gallery {
+    counter-reset: images 15; /* Change 15 to your actual image count */
+  }
+}
+
+/* === OPTIONAL: Add a nice Print button === */
+.print-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #000;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 50px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 999;
+  transition: all 0.3s;
+}
+.print-button:hover {
+  background: #333;
+  transform: scale(1.05);
+}
+@media print {
+  .print-button { display: none !important; }
 }
 </style>
