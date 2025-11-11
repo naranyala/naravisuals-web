@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 
-import StickyBottomBar from "./views/StickyBottomBar.vue"
+import StickyBottomBar from "./views/reusables/StickyBottomBar.vue"
+// import PrintAction from "./views/reusables/PrintAction.vue"
 
-
+import { isPrintAll } from "./router.ts"
 
 </script>
 
@@ -16,11 +17,16 @@ import StickyBottomBar from "./views/StickyBottomBar.vue"
     <!-- /> -->
 
   <div class="no-print">
+  
+    <!-- <PrintAction :isPrintAll="isPrintAll"/> -->
+
   <h2>
     <small>semoga</small>
     <br/>
-    TOTALITAS & SISTEMATIS
+    <!-- TOTALITAS & SISTEMATIS -->
+    VISIBLE & SUSTAINABLE
   </h2>
+
 
     <StickyBottomBar 
       direction="right"

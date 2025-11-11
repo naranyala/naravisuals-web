@@ -1,6 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import _RootView from './views/_RootView.vue'
 
+import { ref } from 'vue'
+
+export const isPrintAll = ref(false)
+// export const isPrintAll = ref(true)
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -8,6 +13,7 @@ const router = createRouter({
       path: '/',
       name: 'root-article',
       component: _RootView,
+      props: { isPrintAll },
     },
     { path: '/creative', name: 'creative', component: () => import('./views/CreativeView.vue') },
     {

@@ -12,13 +12,20 @@ import CreativeView from "./CreativeView.vue"
 import Creative3DView from "./Creative3DView.vue"
 import ArticleView from "./ArticleView.vue"
 
+// const isPrintAll = ref(false)
+// const isPrintAll = ref(true)
+
+const props = defineProps(["isPrintAll"])
+
+const isPrintAll = ref(props?.isPrintAll || true)
+
 const activeTab = ref(0)
 const tabs = ref([
+  { label: "PROFILE", component: ProfileView },
+  { label: "GH-REPOS", component: GhReposView },
   { label: "ARTICLES", component: ArticleView },
   { label: "CREATIVE-2D", component: CreativeView },
   { label: "CREATIVE-3D", component: Creative3DView },
-  { label: "GH-REPOS", component: GhReposView },
-  { label: "PROFILE", component: ProfileView },
 ])
 
 const changeRoute = (idx) => {
@@ -95,8 +102,19 @@ onMounted(() => {
     </select>
 
     <!-- Content -->
-    <div class="tab-content">
+    <div v-if="!isPrintAll" class="tab-content">
       <component :is="tabs[activeTab].component"></component>
+    </div>
+    <div v-else>
+      <ProfileView/>
+      <hr/>
+      <GhReposView/>
+      <hr/>
+      <ArticleView/>
+      <hr/>
+      <CreativeView/>
+      <hr/>
+      <Creative3DView/>
     </div>
   </div>
 </template>

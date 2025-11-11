@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "gltf-loader": "^1.0.0",
+    "highlight.js": "^11.11.1",
     "marked": "^17.0.0",
     "orbit-controls": "^1.2.4",
     "three": "^0.181.0",
