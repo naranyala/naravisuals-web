@@ -1,3 +1,48 @@
+
+<script setup>
+
+import IconVue from "./icons/IconVue.vue"
+import IconInkscape from "./icons/IconInkscape.vue"
+import IconBlender from "./icons/IconBlender.vue"
+import IconLinux from "./icons/IconLinux.vue"
+
+const cv = {
+  exp: [
+    {
+      title: 'Senior Frontend Developer',
+      company: 'InnovateTech',
+      loc: 'Los Angeles, CA',
+      date: '2021 - Present',
+      points: [
+        'Led Vue 3 migration for 50k+ MAU app → improved Lighthouse score 35%',
+        'Built reusable component library (50+ components) used by 5 teams',
+        'Mentored 3 junior developers → 100% retention rate'
+      ],
+      tech: ['Vue 3', 'TypeScript', 'Pinia', 'Tailwind', 'Vitest']
+    },
+    {
+      title: 'Frontend Developer',
+      company: 'Digital Solutions Inc',
+      loc: 'Remote',
+      date: '2019 - 2021',
+      points: [
+        'Developed 20+ client projects using React + Next.js',
+        'Implemented CI/CD pipeline → reduced deployment time 60%',
+        'Integrated GraphQL APIs with Apollo Client'
+      ],
+      tech: ['React', 'Next.js', 'GraphQL', 'Apollo', 'Jest']
+    }
+  ],
+  skills: ['vue.js', 'inkscape', 'blender']
+}
+
+const actionSearchGoogle = (keyword) => {
+  const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(keyword)}`;
+  window.open(searchUrl, '_blank');
+}
+
+</script>
+
 <template>
   <div class="resume">
     <header class="header">
@@ -48,46 +93,37 @@
       <section class="section">
         <h2>Skills</h2>
         <div class="skills-grid">
-          <span v-for="skill in cv.skills" :key="skill" class="skill-item">{{ skill }}</span>
+          <div class="skill-item" @click="actionSearchGoogle('Vue.js')">
+            <IconVue :size="60"/><br/>{{"Vue.js"}}
+          </div>
+          <div class="skill-item" @click="actionSearchGoogle('Inkscape Editor')">
+            <IconInkscape :size="60"/><br/>{{"Inkscape"}}
+          </div>
+          <div class="skill-item" @click="actionSearchGoogle('Blender 3D')">
+            <IconBlender :size="60"/><br/>{{"Blender"}}
+          </div>
+          <div class="skill-item" @click="actionSearchGoogle('Linux')">
+            <IconLinux :size="60"/><br/>{{"Linux"}}
+          </div>
+
+          <!-- <span v-for="skill in cv.skills" :key="skill" class="skill-item" -->
+          <!--   :class=""> -->
+          <!--   <div v-if="skill == 'vue.js'"><IconVue :size="60"/><br/>{{skill}}</div> -->
+          <!--   <div v-if="skill == 'inkscape'"><IconInkscape :size="60"/><br/>{{skill}}</div> -->
+          <!--   <div v-else class="hidden"></div> -->
+          <!-- </span> -->
         </div>
       </section>
     </main>
   </div>
 </template>
 
-<script setup>
-const cv = {
-  exp: [
-    {
-      title: 'Senior Frontend Developer',
-      company: 'InnovateTech',
-      loc: 'Los Angeles, CA',
-      date: '2021 - Present',
-      points: [
-        'Led Vue 3 migration for 50k+ MAU app → improved Lighthouse score 35%',
-        'Built reusable component library (50+ components) used by 5 teams',
-        'Mentored 3 junior developers → 100% retention rate'
-      ],
-      tech: ['Vue 3', 'TypeScript', 'Pinia', 'Tailwind', 'Vitest']
-    },
-    {
-      title: 'Frontend Developer',
-      company: 'Digital Solutions Inc',
-      loc: 'Remote',
-      date: '2019 - 2021',
-      points: [
-        'Developed 20+ client projects using React + Next.js',
-        'Implemented CI/CD pipeline → reduced deployment time 60%',
-        'Integrated GraphQL APIs with Apollo Client'
-      ],
-      tech: ['React', 'Next.js', 'GraphQL', 'Apollo', 'Jest']
-    }
-  ],
-  skills: ['Vue.js', 'React', 'TypeScript', 'JavaScript', 'Tailwind CSS', 'Node.js', 'Git', 'Figma', 'Jest', 'Vitest', 'Pinia', 'Vue Router']
-}
-</script>
 
 <style scoped>
+
+
+.hidden { display: none; }
+
 /* ============================================================= */
 /* DARK THEME – WEB VIEW (PERFECT CONTRAST, INDONESIA 2025)    */
 /* ============================================================= */
@@ -259,10 +295,15 @@ const cv = {
     font-size: 1rem;
   }
   .skill-item {
-    background: #334155;
+    /* background: #334155; */
+    border: 1px solid gray;
+      border-radius: 20px;
     padding: 8px 12px;
     border-radius: 8px;
     text-align: center;
+    cursor: pointer;
+
+    &:hover { background: gray; text: white; }
   }
 }
 

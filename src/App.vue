@@ -20,7 +20,7 @@ import { isPrintAll } from "./router.ts"
   
     <!-- <PrintAction :isPrintAll="isPrintAll"/> -->
 
-  <h2>
+  <h2 class="message">
     <small>semoga</small>
     <br/>
     <!-- TOTALITAS & SISTEMATIS -->
@@ -39,5 +39,7 @@ import { isPrintAll } from "./router.ts"
 
 small, h2 { text-align: center; font-style: italic; padding-bottom: 200px;
   background: rgba(0 0 0 0); text: white; }
+
+.message { padding-top: 200px; }
 
 </style>
