@@ -114,7 +114,7 @@ watch(() => props.markdown, (newMd) => {
   padding: 1.5rem;
   margin: 2rem 0;
   font-family: 'Inter', system-ui, sans-serif;
-  position: sticky;
+  /* position: sticky; */
   top: 2rem;
   max-height: calc(100vh - 4rem);
   overflow-y: auto;

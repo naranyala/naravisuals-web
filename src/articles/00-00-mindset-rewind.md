@@ -1,3 +1,6 @@
+---
+isReadyToPublish: false
+---
 
 # 🧠 The Power of Mindset: How You See the World Shapes Your Life
 

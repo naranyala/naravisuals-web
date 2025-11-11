@@ -1,3 +1,6 @@
+---
+isReadyToPublish: false
+---
 
 # 💻 Processes, Memory, and System Calls: Inside the OS Platform
 

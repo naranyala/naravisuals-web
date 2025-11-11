@@ -27,13 +27,6 @@ const groupedArticles = computed(() => {
   })).filter(group => group.files.length > 0);
 });
 
-// ===== Lifecycle =====
-onMounted(async () => {
-  await loadMarkdownFiles();
-
-  viewSelectedArticle()
-});
-
 // ===== Methods =====
 async function loadMarkdownFiles() {
   try {
@@ -80,6 +73,14 @@ function formatArticleTitle(filename) {
   
   return `${numbering} ${formattedText}`;
 }
+
+
+// ===== Lifecycle =====
+onMounted(async () => {
+  await loadMarkdownFiles();
+
+  viewSelectedArticle()
+});
 
 function viewSelectedArticle(){
     setQueryParams({ page: "article", articleId: "some-article-id"  }, true)

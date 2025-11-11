@@ -1,134 +1,101 @@
 
-<script>
+<script setup>
 import { ref, nextTick, onUnmounted } from "vue"
 import * as THREE from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
-export default {
-  name: "App",
-  setup() {
+import GlbViewerWithPreview from "./reusables/GlbViewerWithPreview.vue"
+
+const glbModules = import.meta.glob('../assets/**/*.glb', { eager: true, query: '?url' });
+
+const glbFilePaths = Object.entries(glbModules).map(([path, module]) => {
+  return {
+    originalPath: path,
+    resolvedPath: module.default
+  }
+});
+
+const getFilename = (path) => {
+  const parts = path.split('/');
+  const lastPart = parts[parts.length - 1];
+  return lastPart;
+}
+
+const getGithubRaw = (assetName) => {
+  return "https://raw.githubusercontent.com/naranyala/naravisuals-web"
+}
+
+
+const localGlbFiles = ref([])
+// console.log(glbFilePaths);
+
+localGlbFiles.value = glbFilePaths.map((item) => {
+  return {
+    // url: item.originalPath,
+    url: "",
+    name: getFilename(item.resolvedPath)
+  }
+});
+
+console.log(localGlbFiles.value)
+
     const models = ref([
   {
     "id": 1,
     "name": "Damaged Helmet",
     "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
-    "description": "PBR reference king, 2.1 MB",
-    "source": "Khronos Group",
-    "error": false
   },
   {
     "id": 2,
     "name": "Fox (Running)",
     "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Fox/glTF-Binary/Fox.glb",
-    "description": "Fully rigged + skinned animation, 3.8 MB",
-    "source": "Khronos Group",
-    "error": false
   },
   {
     "id": 3,
     "name": "Water Bottle",
     "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/WaterBottle/glTF-Binary/WaterBottle.glb",
-    "description": "Transmission + clearcoat test, 1.5 MB",
-    "source": "Khronos Group",
-    "error": false
   },
   {
     "id": 4,
     "name": "Boom Box",
     "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/BoomBox/glTF-Binary/BoomBox.glb",
-    "description": "Emissive + PBR retro vibe, 800 KB",
-    "source": "Khronos Group",
-    "error": false
   },
   {
     "id": 5,
     "name": "Sponza",
     "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Sponza/glTF/Sponza.gltf",
-    "description": "Classic scene for IBL testing, 4.2 MB",
-    "source": "Khronos Group",
-    "error": false
   },
   {
     "id": 6,
     "name": "Lantern",
     "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Lantern/glTF-Binary/Lantern.glb",
-    "description": "Emissive + transmission glass, 1.9 MB",
-    "source": "Khronos Group",
-    "error": false
   },
   {
     "id": 7,
     "name": "Flight Helmet",
     "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/FlightHelmet/glTF/FlightHelmet.gltf",
-    "description": "Ultra-detailed PBR helmet, 4.8 MB",
-    "source": "Khronos Group",
-    "error": false
   },
   {
     "id": 8,
     "name": "Avocado",
     "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Avocado/glTF-Binary/Avocado.glb",
-    "description": "Cutest PBR fruit ever, 220 KB",
-    "source": "Khronos Group",
-    "error": false
   },
   {
     "id": 9,
     "name": "Flamingo",
     "url": "https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/models/gltf/Flamingo.glb",
-    "description": "Animated pink boi, loops perfectly",
-    "source": "three.js",
-    "error": false
   },
   {
     "id": 10,
     "name": "Horse",
     "url": "https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/models/gltf/Horse.glb",
-    "description": "Galloping animation, 1.1 MB",
-    "source": "three.js",
-    "error": false
-  },
-  {
-    "id": 11,
-    "name": "RobotExpressive",
-    "url": "https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/RobotExpressive.glb",
-    "description": "Full facial + body rig, 2.9 MB",
-    "source": "three.js",
-    "error": false
   },
   {
     "id": 12,
     "name": "BrainStem",
     "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/BrainStem/glTF-Binary/BrainStem.glb",
-    "description": "Anatomy PBR model, 1.3 MB",
-    "source": "Khronos Group",
-    "error": false
   },
-  {
-    "id": 13,
-    "name": "Suzanne (Monkey)",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Suzanne/glTF-Binary/Suzanne.glb",
-    "description": "Blender mascot, 280 KB",
-    "source": "Khronos Group",
-    "error": false
-  },
-  {
-    "id": 14,
-    "name": "Cesium Milk Truck",
-    "url": "https://cdn.jsdelivr.net/gh/CesiumGS/glTF-Sample-Models@master/2.0/CesiumMilkTruck/glTF-Binary/CesiumMilkTruck.glb",
-    "description": "Classic animated truck, 2.5 MB",
-    "source": "CesiumGS",
-    "error": false
-  },
-  {
-    "id": 15,
-    "name": "Gearbox Assay",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/GearboxAssy/glTF-Binary/GearboxAssy.glb",
-    "description": "Mechanical cutaway, 3.7 MB",
-    "source": "Khronos Group",
-    "error": false
-  }
 
     ])
 
@@ -277,24 +244,25 @@ export default {
       closeLightbox()
     })
 
-    return { 
-      models, 
-      isLightboxOpen, 
-      isModelLoading,
-      lightboxCanvasRef, 
-      viewModel, 
-      closeLightbox, 
-      selectedModel 
-    }
-  }
-}
 </script>
 
 
 <template>
   <div class="container">
     <h1>3D Model Gallery</h1>
-    
+
+
+      
+      <!-- <GlbViewerWithPreview  -->
+      <!--   v-for="model in models"  -->
+      <!--   :key="model.id" -->
+      <!--   :glb-url="model?.url" :label="model?.name" -->
+      <!--   class="new-model-grid-parent" -->
+      <!--   /> -->
+
+    <pre>{{JSON.stringify(models, null, 2)}}</pre>
+    <pre>{{JSON.stringify(localGlbFiles, null, 2)}}</pre>
+
     <div class="model-grid">
       <div 
         v-for="model in models" 
@@ -308,12 +276,10 @@ export default {
       </div>
     </div>
 
-    <!-- Lightbox -->
     <div v-if="isLightboxOpen" class="lightbox-overlay" @click.self="closeLightbox">
       <div class="lightbox-content">
         <button class="back-button" @click="closeLightbox">← Go Back</button>
         
-        <!-- Loading Spinner -->
         <div v-if="isModelLoading" class="spinner-overlay">
           <div class="spinner"></div>
           <p class="loading-text">Loading 3D Model...</p>
@@ -326,6 +292,7 @@ export default {
         ></canvas>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -340,6 +307,31 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: #0a0a0a;
   color: white;
+}
+
+
+.new-model-grid-parent {
+  display: grid;
+  /* display: flex; */
+  /* Define the number and size of columns */
+  grid-template-columns: repeat(3, 1fr);
+  /* Define the gap between items */
+  gap: 10px;
+  /* Optional: Add padding or margin */
+  padding: 10px;
+  /* Optional: Set a background color for the container */
+  /* background-color: #f0f0f0; */
+}
+
+.new-model-grid-child {
+  /* Style the child items */
+  /* background-color: #4CAF50; */
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 20px;
+  /* Optional: Add rounded corners */
+  border-radius: 5px;
 }
 
 .container {

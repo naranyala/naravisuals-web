@@ -9,6 +9,8 @@ import './assets/03-theme-default.css'
 // import './assets/03-theme-github-dark.css'
 // import './assets/03-theme-sakura-night.css'
 
+import './assets/04-print-friendly-preset.css'
+
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router.ts'

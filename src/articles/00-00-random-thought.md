@@ -1,5 +1,5 @@
 ---
-title: sample
+isReadyToPublish: false
 ---
 
 # random thought
