@@ -8,6 +8,7 @@
 - [ ] polishes style
 - [ ] article codeblock with clipboard copy
 - [ ] fix article toc navigation
+- [ ] sorting/grouping articles/2d/3d assets
 
 ## previous TODOS 
 

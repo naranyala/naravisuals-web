@@ -30,7 +30,7 @@ const socialLinks = ref([
 
 <style scoped>
 .social-section {
-  padding-bottom: 100px;
+  padding-bottom: 150px;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -66,7 +66,7 @@ const socialLinks = ref([
 
 @media (max-width: 640px) {
   .social-section {
-    padding: 15px;
+    padding: 150px;
   }
 
   .social-links {

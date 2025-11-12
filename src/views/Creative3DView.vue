@@ -29,13 +29,15 @@ localGlbFiles.value = glbFilePaths.map((item) => {
   const name = getFilename(item.resolvedPath)
   const finalName = name.substr(0, name.length - 4)
 
+  console.log(finalName)
+  // console.log(item.resolvedPath)
+
   return {
     url: item.resolvedPath,
     name: finalName
   }
 });
 
-console.log(localGlbFiles.value)
 
 
     const isLightboxOpen = ref(false)
