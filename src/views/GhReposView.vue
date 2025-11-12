@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 
+import GhReposAccordion from "./GhReposAccordion.vue"
+
 // Flat data source with external URLs
 const flatProjects = [
   { title: "NaraVisuals Web", type: "Random", rating: 4.2, url: "https://github.com/naranyala/naravisuals-web" },
@@ -60,6 +62,8 @@ const handleKeydown = (e) => {
 <template>
   <div class="projects-container" @keydown="handleKeydown">
     <h1 class="section-title">Our Projects</h1>
+
+    <!-- <GhReposAccordion/> -->
 
     <div class="projects-grid">
       <div v-for="(group, groupIndex) in sortedGroups" :key="groupIndex" class="project-group">

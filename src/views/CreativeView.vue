@@ -2,6 +2,7 @@
 <script setup>
 import { ref } from 'vue';
 
+
 const images = ref([
   { url: "https://loremflickr.com/480/360/sunset,aurora", caption: "LoremFlickr - Sunset Aurora Mix", loaded: false },
   { url: "https://loremflickr.com/480/360/northernlights", caption: "LoremFlickr - Pure Aurora", loaded: false },
@@ -56,6 +57,8 @@ function nextImage() {
 <template>
   <div>
     <h1>Art Gallery</h1>
+
+
     <div class="gallery">
       <div v-for="(image, index) in images" :key="image.url" class="item">
         <div class="image-wrapper">

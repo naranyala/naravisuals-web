@@ -22,82 +22,21 @@ const getFilename = (path) => {
   return lastPart;
 }
 
-const getGithubRaw = (assetName) => {
-  return "https://raw.githubusercontent.com/naranyala/naravisuals-web"
-}
-
-
 const localGlbFiles = ref([])
 // console.log(glbFilePaths);
 
 localGlbFiles.value = glbFilePaths.map((item) => {
+  const name = getFilename(item.resolvedPath)
+  const finalName = name.substr(0, name.length - 4)
+
   return {
-    // url: item.originalPath,
-    url: "",
-    name: getFilename(item.resolvedPath)
+    url: item.resolvedPath,
+    name: finalName
   }
 });
 
 console.log(localGlbFiles.value)
 
-    const models = ref([
-  {
-    "id": 1,
-    "name": "Damaged Helmet",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
-  },
-  {
-    "id": 2,
-    "name": "Fox (Running)",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Fox/glTF-Binary/Fox.glb",
-  },
-  {
-    "id": 3,
-    "name": "Water Bottle",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/WaterBottle/glTF-Binary/WaterBottle.glb",
-  },
-  {
-    "id": 4,
-    "name": "Boom Box",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/BoomBox/glTF-Binary/BoomBox.glb",
-  },
-  {
-    "id": 5,
-    "name": "Sponza",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Sponza/glTF/Sponza.gltf",
-  },
-  {
-    "id": 6,
-    "name": "Lantern",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Lantern/glTF-Binary/Lantern.glb",
-  },
-  {
-    "id": 7,
-    "name": "Flight Helmet",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/FlightHelmet/glTF/FlightHelmet.gltf",
-  },
-  {
-    "id": 8,
-    "name": "Avocado",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/Avocado/glTF-Binary/Avocado.glb",
-  },
-  {
-    "id": 9,
-    "name": "Flamingo",
-    "url": "https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/models/gltf/Flamingo.glb",
-  },
-  {
-    "id": 10,
-    "name": "Horse",
-    "url": "https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/models/gltf/Horse.glb",
-  },
-  {
-    "id": 12,
-    "name": "BrainStem",
-    "url": "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/BrainStem/glTF-Binary/BrainStem.glb",
-  },
-
-    ])
 
     const isLightboxOpen = ref(false)
     const isModelLoading = ref(false)
@@ -260,12 +199,12 @@ console.log(localGlbFiles.value)
       <!--   class="new-model-grid-parent" -->
       <!--   /> -->
 
-    <pre>{{JSON.stringify(models, null, 2)}}</pre>
-    <pre>{{JSON.stringify(localGlbFiles, null, 2)}}</pre>
+    <!-- <pre>{{JSON.stringify(models, null, 2)}}</pre> -->
+    <!-- <pre>{{JSON.stringify(localGlbFiles, null, 2)}}</pre> -->
 
     <div class="model-grid">
       <div 
-        v-for="model in models" 
+        v-for="model in localGlbFiles" 
         :key="model.id"
         class="model-box"
         @click="viewModel(model)"

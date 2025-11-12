@@ -11,6 +11,7 @@ import ProfileView from "./ProfileView.vue"
 import CreativeView from "./CreativeView.vue"
 import Creative3DView from "./Creative3DView.vue"
 import ArticleView from "./ArticleView.vue"
+import GeneralFaqView from "./GeneralFaqView.vue"
 
 // const isPrintAll = ref(false)
 // const isPrintAll = ref(true)
@@ -22,8 +23,9 @@ const isPrintAll = ref(props?.isPrintAll || true)
 const activeTab = ref(0)
 const tabs = ref([
   { label: "PROFILE", component: ProfileView },
-  { label: "GH-REPOS", component: GhReposView },
+  { label: "FAQ", component: GeneralFaqView },
   { label: "ARTICLES", component: ArticleView },
+  { label: "GH-REPOS", component: GhReposView },
   { label: "CREATIVE-2D", component: CreativeView },
   { label: "CREATIVE-3D", component: Creative3DView },
 ])

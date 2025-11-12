@@ -3,6 +3,7 @@ import { RouterLink, RouterView } from 'vue-router'
 
 import StickyBottomBar from "./views/reusables/StickyBottomBar.vue"
 // import PrintAction from "./views/reusables/PrintAction.vue"
+import SocialMediaLinks from "./views/reusables/SocialMediaLinks.vue"
 
 import { isPrintAll } from "./router.ts"
 
@@ -27,6 +28,7 @@ import { isPrintAll } from "./router.ts"
     VISIBLE & SUSTAINABLE
   </h2>
 
+    <SocialMediaLinks/>
 
     <StickyBottomBar 
       direction="right"
