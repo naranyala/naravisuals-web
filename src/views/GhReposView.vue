@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 
-import GhReposAccordion from "./GhReposAccordion.vue"
+// import GhReposAccordion from "./GhReposAccordion.vue"
 
 // Flat data source with external URLs
 const flatProjects = [

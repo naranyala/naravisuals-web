@@ -1,6 +1,5 @@
 <template>
   <button @click="printPage" class="print-button">
-  <!-- <button @click="togglePrintState" class="print-button"> -->
     print
   </button>
 </template>
@@ -8,10 +7,9 @@
 <script setup>
 import { onMounted, onBeforeUnmount } from 'vue';
 
-import {isPrintAll} from "../../router.ts"
+import {isPrintAll} from "./router.ts"
 
 const props = defineProps(["isPrintAll"])
-
 
 const printPage = () => {
   isPrintAll.value = !isPrintAll.value

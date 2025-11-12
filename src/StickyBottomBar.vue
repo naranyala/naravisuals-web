@@ -2,7 +2,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 
-import PrintAction from "./PrintAction.vue"
+// import PrintAction from "./PrintAction.vue"
 
 const props = defineProps({
   text: { type: String, default: '' },
@@ -48,10 +48,10 @@ onBeforeUnmount(() => {
       <span v-for="i in reps - 1" :key="i" class="text duplicate"><slot>{{ text }}</slot></span>
     </div>
     <div class="buttons-container">
-      <button class="top-btn" @click="scrollToTop">Scroll to Top</button>
+      <!-- <button class="top-btn" @click="scrollToTop">Scroll to Top</button> -->
       <!-- New button -->
       <!-- <button class="new-btn" @click="newButtonAction">New Action</button> -->
-      <PrintAction class="new-btn"/>
+      <!-- <PrintAction class="new-btn"/> -->
     </div>
   </div>
 </template>

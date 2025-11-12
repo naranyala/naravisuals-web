@@ -4,11 +4,11 @@ import { ref } from 'vue';
 
 
 const images = ref([
-  { url: "https://loremflickr.com/480/360/sunset,aurora", caption: "LoremFlickr - Sunset Aurora Mix", loaded: false },
-  { url: "https://loremflickr.com/480/360/northernlights", caption: "LoremFlickr - Pure Aurora", loaded: false },
-  { url: "https://loremflickr.com/480/360/stars,night", caption: "LoremFlickr - Starry Night", loaded: false },
-  { url: "https://loremflickr.com/480/360/landscape", caption: "LoremFlickr - Random Landscape", loaded: false },
-  { url: "https://loremflickr.com/480/360/forest", caption: "LoremFlickr - Misty Forest", loaded: false },
+  // { url: "https://loremflickr.com/480/360/sunset,aurora", caption: "LoremFlickr - Sunset Aurora Mix", loaded: false },
+  // { url: "https://loremflickr.com/480/360/northernlights", caption: "LoremFlickr - Pure Aurora", loaded: false },
+  // { url: "https://loremflickr.com/480/360/stars,night", caption: "LoremFlickr - Starry Night", loaded: false },
+  // { url: "https://loremflickr.com/480/360/landscape", caption: "LoremFlickr - Random Landscape", loaded: false },
+  // { url: "https://loremflickr.com/480/360/forest", caption: "LoremFlickr - Misty Forest", loaded: false },
   { url: "https://picsum.photos/seed/gema2025/500/400", caption: "Lorem Picsum - Seed Gema #1", loaded: false },
   { url: "https://picsum.photos/seed/gema2025_2/500/400", caption: "Lorem Picsum - Seed Gema #2", loaded: false },
   { url: "https://picsum.photos/seed/gema2025_3/500/400", caption: "Lorem Picsum - Seed Gema #3", loaded: false },

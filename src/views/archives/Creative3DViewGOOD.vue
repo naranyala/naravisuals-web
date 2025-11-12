@@ -1,3 +1,4 @@
+
 <script setup>
 import { ref, nextTick, onUnmounted } from "vue"
 import * as THREE from "three"
@@ -42,14 +43,13 @@ localGlbFiles.value = glbFilePaths.map((item) => {
     let camera = null
     let controls = null
     let animationFrameId = null
-    let modelCenter = null
-    let modelSize = null
 
     const viewModel = async (model) => {
       selectedModel.value = model
       isLightboxOpen.value = true
-      isModelLoading.value = true
+      isModelLoading.value = true // Show spinner immediately
       
+      // Wait for canvas to be rendered
       await nextTick()
       
       if (!lightboxCanvasRef.value) return
@@ -59,8 +59,9 @@ localGlbFiles.value = glbFilePaths.map((item) => {
 
     const closeLightbox = () => {
       isLightboxOpen.value = false
-      isModelLoading.value = false
+      isModelLoading.value = false // Reset loading state
       
+      // Cleanup Three.js
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId)
       }
@@ -87,46 +88,14 @@ localGlbFiles.value = glbFilePaths.map((item) => {
       }
       
       selectedModel.value = null
-      modelCenter = null
-      modelSize = null
-    }
-
-    const switchView = (view) => {
-      if (!camera || !controls || !modelCenter || !modelSize) return
-      
-      const distance = Math.abs(modelSize / 2 / Math.tan((camera.fov * Math.PI / 180) / 2)) * 1.5
-      const maxDistance = Math.max(distance, 3)
-      
-      switch(view) {
-        case 'front':
-          camera.position.set(modelCenter.x, modelCenter.y, modelCenter.z + maxDistance)
-          break
-        case 'back':
-          camera.position.set(modelCenter.x, modelCenter.y, modelCenter.z - maxDistance)
-          break
-        case 'top':
-          camera.position.set(modelCenter.x, modelCenter.y + maxDistance, modelCenter.z)
-          break
-        case 'bottom':
-          camera.position.set(modelCenter.x, modelCenter.y - maxDistance, modelCenter.z)
-          break
-        case 'left':
-          camera.position.set(modelCenter.x - maxDistance, modelCenter.y, modelCenter.z)
-          break
-        case 'right':
-          camera.position.set(modelCenter.x + maxDistance, modelCenter.y, modelCenter.z)
-          break
-      }
-      
-      camera.lookAt(modelCenter)
-      controls.target.copy(modelCenter)
-      controls.update()
     }
 
     const initLightboxViewer = (canvas, model) => {
+      // Scene setup
       scene = new THREE.Scene()
       scene.background = new THREE.Color(0x1a1a2e)
 
+      // Camera
       camera = new THREE.PerspectiveCamera(
         75,
         canvas.clientWidth / canvas.clientHeight,
@@ -134,17 +103,21 @@ localGlbFiles.value = glbFilePaths.map((item) => {
         1000
       )
 
+      // Renderer
       renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
       renderer.setSize(canvas.clientWidth, canvas.clientHeight)
 
+      // Lighting
       scene.add(new THREE.AmbientLight(0xffffff, 0.6))
       const light = new THREE.DirectionalLight(0xffffff, 0.8)
       light.position.set(1, 1, 1)
       scene.add(light)
 
+      // Controls
       controls = new OrbitControls(camera, canvas)
       controls.enableDamping = true
 
+      // Load model
       const loader = new GLTFLoader()
       loader.load(
         model.url,
@@ -152,28 +125,30 @@ localGlbFiles.value = glbFilePaths.map((item) => {
           const model = gltf.scene
           scene.add(model)
 
+          // Auto-fit
           const box = new THREE.Box3().setFromObject(model)
-          modelCenter = box.getCenter(new THREE.Vector3())
-          modelSize = box.getSize(new THREE.Vector3()).length()
+          const center = box.getCenter(new THREE.Vector3())
+          const size = box.getSize(new THREE.Vector3()).length()
           const fov = camera.fov * (Math.PI / 180)
-          const cameraZ = Math.abs(modelSize / 2 / Math.tan(fov / 2)) * 1.5
+          const cameraZ = Math.abs(size / 2 / Math.tan(fov / 2)) * 1.5
           
-          camera.position.set(modelCenter.x, modelCenter.y, modelCenter.z + Math.max(cameraZ, 3))
-          camera.lookAt(modelCenter)
-          controls.target.copy(modelCenter)
+          camera.position.set(center.x, center.y, center.z + Math.max(cameraZ, 3))
+          camera.lookAt(center)
+          controls.target.copy(center)
           controls.update()
           
-          isModelLoading.value = false
+          isModelLoading.value = false // Hide spinner when model loads
         },
         undefined,
         error => {
           console.error('Error loading model:', error)
-          selectedModel.value.error = true
-          isModelLoading.value = false
+          selectedModel.value.error = true // Fixed bug: use selectedModel instead of inner model variable
+          isModelLoading.value = false // Hide spinner on error
           closeLightbox()
         }
       )
 
+      // Animation loop
       const animate = () => {
         animationFrameId = requestAnimationFrame(animate)
         controls.update()
@@ -181,6 +156,7 @@ localGlbFiles.value = glbFilePaths.map((item) => {
       }
       animate()
 
+      // Handle resize
       const handleResize = () => {
         if (!canvas) return
         camera.aspect = canvas.clientWidth / canvas.clientHeight
@@ -190,6 +166,7 @@ localGlbFiles.value = glbFilePaths.map((item) => {
       
       window.addEventListener('resize', handleResize)
       
+      // Store cleanup function
       canvas._cleanupResize = () => window.removeEventListener('resize', handleResize)
     }
 
@@ -222,18 +199,7 @@ localGlbFiles.value = glbFilePaths.map((item) => {
 
     <div v-if="isLightboxOpen" class="lightbox-overlay" @click.self="closeLightbox">
       <div class="lightbox-content">
-        <div class="control-bar">
-          <button class="back-button" @click="closeLightbox">← Go Back</button>
-          
-          <div class="view-buttons">
-            <button @click="switchView('front')" class="view-btn">Front</button>
-            <button @click="switchView('back')" class="view-btn">Back</button>
-            <button @click="switchView('top')" class="view-btn">Top</button>
-            <button @click="switchView('bottom')" class="view-btn">Bottom</button>
-            <button @click="switchView('left')" class="view-btn">Left</button>
-            <button @click="switchView('right')" class="view-btn">Right</button>
-          </div>
-        </div>
+        <button class="back-button" @click="closeLightbox">← Go Back</button>
         
         <div v-if="isModelLoading" class="spinner-overlay">
           <div class="spinner"></div>
@@ -262,6 +228,31 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: #0a0a0a;
   color: white;
+}
+
+
+.new-model-grid-parent {
+  display: grid;
+  /* display: flex; */
+  /* Define the number and size of columns */
+  grid-template-columns: repeat(3, 1fr);
+  /* Define the gap between items */
+  gap: 10px;
+  /* Optional: Add padding or margin */
+  padding: 10px;
+  /* Optional: Set a background color for the container */
+  /* background-color: #f0f0f0; */
+}
+
+.new-model-grid-child {
+  /* Style the child items */
+  /* background-color: #4CAF50; */
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 20px;
+  /* Optional: Add rounded corners */
+  border-radius: 5px;
 }
 
 .container {
@@ -341,65 +332,11 @@ h1 {
   background: #0a0a0a;
   border-radius: 8px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Control bar at the top */
-.control-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: #16213e;
-  border-bottom: 2px solid #0f4c75;
-  flex-shrink: 0;
-  z-index: 10;
-}
-
-.back-button {
-  background: #4a90e2;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.2s;
-}
-
-.back-button:hover {
-  background: #5ba0f2;
-}
-
-.view-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.view-btn {
-  background: #0f4c75;
-  color: white;
-  border: 1px solid #4a90e2;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.view-btn:hover {
-  background: #4a90e2;
-  transform: translateY(-2px);
-}
-
-.view-btn:active {
-  transform: translateY(0);
 }
 
 .lightbox-canvas {
   width: 100%;
-  flex: 1;
+  height: 100%;
   display: block;
 }
 
@@ -438,5 +375,24 @@ h1 {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 10;
+  transition: background 0.2s;
+}
+
+.back-button:hover {
+  background: #5ba0f2;
 }
 </style>
