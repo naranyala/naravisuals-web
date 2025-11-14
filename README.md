@@ -9,6 +9,7 @@
 - [ ] article codeblock with clipboard copy
 - [ ] fix article toc navigation
 - [ ] sorting/grouping articles/2d/3d assets
+- [ ] search bar for content
 
 ## previous TODOS 
 

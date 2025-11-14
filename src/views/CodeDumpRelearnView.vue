@@ -7,7 +7,7 @@ import { ref } from 'vue'
 const flatProjects = [
   { title: "NaraVisuals Web", type: "Random", rating: 4.2, url: "https://github.com/naranyala/naravisuals-web" },
   { title: "Modular Dotfiles", type: "Random", rating: 4.9, url: "https://github.com/naranyala/modular-dotfiles" },
-  { title: "Google", type: "", rating: 3.5, url: "https://google.com" },
+  { title: "SIPENA", type: "", rating: 3.5, url: "https://google.com" },
   { title: "Project Delta", type: "", rating: 4.6, url: "https://example.com/project-delta" },
   { title: "Project Epsilon", type: "", rating: 4.1, url: "https://example.com/project-epsilon" },
   { title: "Project Zeta", type: "", rating: 4.8, url: "https://example.com/project-zeta" },

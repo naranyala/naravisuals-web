@@ -6,12 +6,13 @@ import {
   saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams 
 } from "./utils.js"
 
-import GhReposView from "./GhReposView.vue"
+import CodeDumpRelearnView from "./CodeDumpRelearnView.vue"
 import ProfileView from "./ProfileView.vue"
 import CreativeView from "./CreativeView.vue"
 import Creative3DView from "./Creative3DView.vue"
 import ArticleView from "./ArticleView.vue"
-import GeneralFaqView from "./GeneralFaqView.vue"
+// import GeneralFaqView from "./GeneralFaqView.vue"
+import GrabnGoVueView from "./GrabnGoVueView.vue"
 
 // const isPrintAll = ref(false)
 // const isPrintAll = ref(true)
@@ -23,9 +24,10 @@ const isPrintAll = ref(props?.isPrintAll || true)
 const activeTab = ref(0)
 const tabs = ref([
   { label: "PROFILE", component: ProfileView },
-  { label: "FAQ", component: GeneralFaqView },
+  // { label: "FAQ", component: GeneralFaqView },
   { label: "ARTICLES", component: ArticleView },
-  { label: "GH-REPOS", component: GhReposView },
+  { label: "GRABN-GO-VUE", component: GrabnGoVueView },
+  { label: "COREDUMP-RELEARN", component: CodeDumpRelearnView },
   { label: "CREATIVE-2D", component: CreativeView },
   { label: "CREATIVE-3D", component: Creative3DView },
 ])
@@ -110,7 +112,7 @@ onMounted(() => {
     <div v-else>
       <ProfileView/>
       <hr/>
-      <GhReposView/>
+      <CodeDumpRelearnView/>
       <hr/>
       <ArticleView/>
       <hr/>

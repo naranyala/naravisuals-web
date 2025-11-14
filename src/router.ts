@@ -11,7 +11,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'root-article',
+      name: 'articles',
       component: _RootView,
       props: { isPrintAll },
     },
@@ -21,7 +21,11 @@ const router = createRouter({
       name: 'creative-3d',
       component: () => import('./views/Creative3DView.vue'),
     },
-    { path: '/gh-repos', name: 'gh-repos', component: () => import('./views/GhReposView.vue') },
+    {
+      path: '/coredump-relearn',
+      name: 'coredump-relearn',
+      component: () => import('./views/CodeDumpRelearnView.vue'),
+    },
     { path: '/profile', name: 'profile', component: () => import('./views/ProfileView.vue') },
   ],
 })

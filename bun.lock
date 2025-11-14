@@ -10,9 +10,11 @@
         "highlight.js": "^11.11.1",
         "marked": "^17.0.0",
         "orbit-controls": "^1.2.4",
+        "prismjs": "^1.30.0",
         "three": "^0.181.1",
         "unplugin-vue-markdown": "^29.2.0",
         "vue": "^3.5.24",
+        "vue-prism": "^1.0.5",
         "vue-router": "^4.6.3",
       },
       "devDependencies": {
@@ -546,6 +548,8 @@
 
     "prettier": ["prettier@3.6.2", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ=="],
 
+    "prismjs": ["prismjs@1.30.0", "", {}, "sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw=="],
+
     "punycode.js": ["punycode.js@2.3.1", "", {}, "sha512-uxFIHU0YlHYhDQtV4R9J6a52SLx28BCjT+4ieh7IGbgwVJWO+km431c4yRlREUAsAmt/uMjQUyQHNEPf0M39CA=="],
 
     "quat-from-unit-vec3": ["quat-from-unit-vec3@1.0.0", "", { "dependencies": { "gl-quat": "^1.0.0", "gl-vec3": "^1.0.3" } }, "sha512-YafBjP7aQn4bAAloXlOezI1M7Yh1HpjkZOVTUwd7jn/jG2XlZ8JYkxuAuCq92+sxwwCgtpW1VT5fo71rWV1usQ=="],
@@ -645,6 +649,8 @@
     "vscode-uri": ["vscode-uri@3.1.0", "", {}, "sha512-/BpdSx+yCQGnCvecbyXdxHDkuk55/G3xwnC0GqY4gmQ3j+A+g8kzzgB4Nk/SINjqn6+waqw3EgbVF2QKExkRxQ=="],
 
     "vue": ["vue@3.5.24", "", { "dependencies": { "@vue/compiler-dom": "3.5.24", "@vue/compiler-sfc": "3.5.24", "@vue/runtime-dom": "3.5.24", "@vue/server-renderer": "3.5.24", "@vue/shared": "3.5.24" }, "peerDependencies": { "typescript": "*" }, "optionalPeers": ["typescript"] }, "sha512-uTHDOpVQTMjcGgrqFPSb8iO2m1DUvo+WbGqoXQz8Y1CeBYQ0FXf2z1gLRaBtHjlRz7zZUBHxjVB5VTLzYkvftg=="],
+
+    "vue-prism": ["vue-prism@1.0.5", "", { "dependencies": { "prismjs": "^1.6.0" }, "peerDependencies": { "vue": "2.x" } }, "sha512-ck5nZ2uHiPtAx55s1vmdLv7oSw5v9IRAcSDFtw9lS3Y8GIVVxNaTYPf5uJxGZ0v12X8oIraJi+s0p2aOVX2/Pw=="],
 
     "vue-router": ["vue-router@4.6.3", "", { "dependencies": { "@vue/devtools-api": "^6.6.4" }, "peerDependencies": { "vue": "^3.5.0" } }, "sha512-ARBedLm9YlbvQomnmq91Os7ck6efydTSpRP3nuOKCvgJOHNrhRoJDSKtee8kcL1Vf7nz6U+PMBL+hTvR3bTVQg=="],
 

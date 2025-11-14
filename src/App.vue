@@ -1,12 +1,24 @@
 <script setup lang="ts">
+
+import {ref} from "vue"
+
 import { RouterLink, RouterView } from 'vue-router'
 
 import StickyBottomBar from "./StickyBottomBar.vue"
+import SearchBar from "./SearchBar.vue"
+
 // import PrintAction from "./views/reusables/PrintAction.vue"
 import SocialMediaLinks from "./views/reusables/SocialMediaLinks.vue"
 import FloatingAction from "./views/reusables/FloatingAction.vue"
 
 import { isPrintAll } from "./router.ts"
+
+const someMotto = ref(
+    // "TOTALITAS & SISTEMATIS"
+    // "VISIBLE & SUSTAINABLE"
+    // "SOLID & CREATIVE"
+   "CREATIVE COMPOUNDING" 
+)
 
 const performScrolling = () => {
   console.log("perform scrolling");
@@ -65,13 +77,14 @@ onBeforeUnmount(() => {
     <!-- <PrintAction :isPrintAll="isPrintAll"/> -->
 
   <h2 class="message">
-    <small>semoga</small>
+    <!-- <small>semoga</small> -->
     <br/>
-    <!-- TOTALITAS & SISTEMATIS -->
-    VISIBLE & SUSTAINABLE
+      {{someMotto}}
   </h2>
 
     <SocialMediaLinks/>
+
+    <SearchBar/>
 
     <FloatingAction
       @action-scroll="performScrolling"
