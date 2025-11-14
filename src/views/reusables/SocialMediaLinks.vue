@@ -3,10 +3,8 @@ import { ref } from 'vue'
 const socialLinks = ref([
   { name: 'GitHub', url: 'https://github.com', icon: '💻' },
   { name: 'Twitter', url: 'https://twitter.com', icon: '🐦' },
-  { name: 'LinkedIn', url: 'https://linkedin.com', icon: '💼' },
   { name: 'Instagram', url: 'https://instagram.com', icon: '📷' },
   { name: 'YouTube', url: 'https://youtube.com', icon: '▶️' },
-  { name: 'Discord', url: 'https://discord.com', icon: '💬' }
 ])
 </script>
 
@@ -15,14 +13,8 @@ const socialLinks = ref([
     <div class="social-container">
       <h2 class="social-title">Connect With Me</h2>
       <div class="social-links">
-        <a
-          v-for="social in socialLinks"
-          :key="social.name"
-          :href="social.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="social-link"
-        >
+        <a v-for="social in socialLinks" :key="social.name" :href="social.url" target="_blank" rel="noopener noreferrer"
+          class="social-link">
           <span class="social-icon">{{ social.icon }}</span>
           <span class="social-name">{{ social.name }}</span>
         </a>
@@ -160,7 +152,7 @@ const socialLinks = ref([
   .social-container {
     max-width: 500px;
   }
-  
+
   .social-links {
     gap: 14px;
   }

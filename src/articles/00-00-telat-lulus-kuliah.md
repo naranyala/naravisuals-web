@@ -1,3 +1,6 @@
+---
+isReadyToPublish: true
+---
 
 # telat lulus kuliah
 

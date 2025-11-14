@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted, watch, watchEffect} from "vue"
+import { ref, onMounted, watch, watchEffect, computed} from "vue"
 
+import {useTitle} from "../composables.ts"
 
 import { 
   saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams 
@@ -32,6 +33,12 @@ const tabs = ref([
   { label: "CREATIVE-3D", component: Creative3DView },
 ])
 
+
+const setupWelcome = () => {
+      setQueryParams({ page: "profile", msg: "support me"  }, true)
+      useTitle(computed(() => "profile | naravisuals-web"))
+}
+
 const changeRoute = (idx) => {
   activeTab.value = idx
 
@@ -39,19 +46,27 @@ const changeRoute = (idx) => {
   // console.log("current page: ", idx)
   switch(idx){
     case 0: 
-      setQueryParams({ page: "article", articleId: ""  }, true)
+      setupWelcome()
       break;
     case 1:
-      setQueryParams({ page: "creative-2d", artId: ""  }, true)
+      setQueryParams({ page: "articles", articleId: ""  }, true)
+      useTitle(computed(() => "articles | naravisuals-web"))
       break;
     case 2:
-      setQueryParams({ page: "creative-3d", artId: "" }, true)
+      setQueryParams({ page: "grabn-go-vue", componentId: ""  }, true)
+      useTitle(computed(() => "grabn-go-vue | naravisuals-web"))
       break;
     case 3: 
-      setQueryParams({ page: "gh-repos", repoLink: ""  }, true)
+      setQueryParams({ page: "coreDumpRelearn", lowLevelId: ""  }, true)
+      useTitle(computed(() => "coredump-relearn | naravisuals-web"))
       break;
     case 4: 
-      setQueryParams({ page: "profile", msg: "support me"  }, true)
+      setQueryParams({ page: "creative-2d", artId: ""  }, true)
+      useTitle(computed(() => "creative 2d | naravisuals-web"))
+      break;
+    case 5: 
+      setQueryParams({ page: "creative-3d", artId: "" }, true)
+      useTitle(computed(() => "creative 3d | naravisuals-web"))
       break;
   }
 
@@ -72,9 +87,10 @@ setInterval(() => {
 
 onMounted(() => {
 
-  setQueryParams({ page: "welcome", state: null  }, true)
+  setupWelcome()  
 
-  setActiveUrl()
+
+  // setActiveUrl()
   // restoreLastUrl();
 })
 

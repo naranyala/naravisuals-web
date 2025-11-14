@@ -28,7 +28,7 @@
         <circle cx="11" cy="11" r="8" />
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
-      Search
+      <span class="button-text">Search</span>
     </button>
   </div>
 </template>
@@ -40,15 +40,11 @@ import { ref } from 'vue'
 const searchEngines = [
   { name: 'Google', url: 'https://www.google.com/search?q=%s' },
   { name: 'YouTube', url: 'https://www.youtube.com/results?search_query=%s' },
-  // { name: 'Bing', url: 'https://www.bing.com/search?q=%s' },
-  // { name: 'DuckDuckGo', url: 'https://duckduckgo.com/?q=%s' },
-  { name: 'Wikipedia', url:
-    'https://en.wikipedia.org/wiki/Special:Search?search=%s' },
+  { name: 'Wikipedia', url: 'https://en.wikipedia.org/wiki/Special:Search?search=%s' },
   { name: 'Twitter', url: 'https://twitter.com/search?q=%s' },
-  { name: 'Github' , url: 'https://github.com/search?q=%s&type=repositories' },
+  { name: 'Github', url: 'https://github.com/search?q=%s&type=repositories' },
   { name: 'Hacker News', url: 'https://hn.algolia.com/?q=%s'},
   { name: 'Reddit', url: 'https://www.reddit.com/search/?q=%s' },
-  // { name: '', url: ''},
 ]
 
 // Reactive state for selected engine and search query
@@ -58,7 +54,7 @@ const query = ref('')
 // Function to perform the search
 const performSearch = () => {
   if (!query.value.trim()) return // Prevent empty searches
-
+  
   // Find the selected engine's URL
   const engine = searchEngines.find(e => e.name === selectedEngine.value)
   if (engine) {
@@ -77,14 +73,13 @@ const performSearch = () => {
   gap: 12px;
   max-width: 700px;
   margin: 20px auto;
-  padding-bottom: 150px;
-  /* background: #1e1e1e; */
+  padding: 0 16px 150px;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .search-select {
-  padding: 10px;
+  padding: 12px 30px 12px 12px;
   border: 1px solid #444;
   border-radius: 8px;
   background: #2a2a2a;
@@ -93,9 +88,10 @@ const performSearch = () => {
   appearance: none;
   background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
   background-repeat: no-repeat;
-  background-position-x: calc(100% - 10px);
+  background-position-x: calc(100% - 8px);
   background-position-y: center;
-  padding-right: 30px;
+  min-width: 110px;
+  flex-shrink: 0;
 }
 
 .search-select:focus {
@@ -105,7 +101,8 @@ const performSearch = () => {
 
 .search-input {
   flex: 1;
-  padding: 10px;
+  min-width: 0;
+  padding: 12px;
   border: 1px solid #444;
   border-radius: 8px;
   background: #2a2a2a;
@@ -125,8 +122,9 @@ const performSearch = () => {
 .search-button {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 10px 20px;
+  padding: 12px 20px;
   background: #6200ea;
   color: #e0e0e0;
   border: none;
@@ -134,13 +132,58 @@ const performSearch = () => {
   cursor: pointer;
   font-size: 15px;
   transition: background 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .search-button:hover {
   background: #7f39fb;
 }
 
+.search-button:active {
+  transform: scale(0.98);
+}
+
 .search-button svg {
   stroke: #e0e0e0;
+  flex-shrink: 0;
+}
+
+/* Mobile-first styling applied to all screens */
+.search-bar {
+  gap: 8px;
+  padding: 0 12px 200px;
+  margin: 16px auto;
+}
+
+.search-select {
+  min-width: 90px;
+  padding: 10px 28px 10px 8px;
+  font-size: 14px;
+}
+
+.search-input {
+  padding: 10px;
+  font-size: 14px;
+}
+
+.search-button {
+  padding: 10px 16px;
+  font-size: 14px;
+  min-height: 44px;
+}
+
+.button-text {
+  display: none;
+}
+
+.search-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.search-select,
+.search-input {
+  min-height: 44px;
 }
 </style>
