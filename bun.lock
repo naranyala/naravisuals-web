@@ -14,7 +14,6 @@
         "three": "^0.181.1",
         "unplugin-vue-markdown": "^29.2.0",
         "vue": "^3.5.24",
-        "vue-prism": "^1.0.5",
         "vue-router": "^4.6.3",
       },
       "devDependencies": {
@@ -649,8 +648,6 @@
     "vscode-uri": ["vscode-uri@3.1.0", "", {}, "sha512-/BpdSx+yCQGnCvecbyXdxHDkuk55/G3xwnC0GqY4gmQ3j+A+g8kzzgB4Nk/SINjqn6+waqw3EgbVF2QKExkRxQ=="],
 
     "vue": ["vue@3.5.24", "", { "dependencies": { "@vue/compiler-dom": "3.5.24", "@vue/compiler-sfc": "3.5.24", "@vue/runtime-dom": "3.5.24", "@vue/server-renderer": "3.5.24", "@vue/shared": "3.5.24" }, "peerDependencies": { "typescript": "*" }, "optionalPeers": ["typescript"] }, "sha512-uTHDOpVQTMjcGgrqFPSb8iO2m1DUvo+WbGqoXQz8Y1CeBYQ0FXf2z1gLRaBtHjlRz7zZUBHxjVB5VTLzYkvftg=="],
-
-    "vue-prism": ["vue-prism@1.0.5", "", { "dependencies": { "prismjs": "^1.6.0" }, "peerDependencies": { "vue": "2.x" } }, "sha512-ck5nZ2uHiPtAx55s1vmdLv7oSw5v9IRAcSDFtw9lS3Y8GIVVxNaTYPf5uJxGZ0v12X8oIraJi+s0p2aOVX2/Pw=="],
 
     "vue-router": ["vue-router@4.6.3", "", { "dependencies": { "@vue/devtools-api": "^6.6.4" }, "peerDependencies": { "vue": "^3.5.0" } }, "sha512-ARBedLm9YlbvQomnmq91Os7ck6efydTSpRP3nuOKCvgJOHNrhRoJDSKtee8kcL1Vf7nz6U+PMBL+hTvR3bTVQg=="],
 
