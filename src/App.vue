@@ -4,9 +4,10 @@ import {ref} from "vue"
 
 import { RouterLink, RouterView } from 'vue-router'
 
-import StickyBottomBar from "./StickyBottomBar.vue"
+import WordRandomizer from "./WordRandomizer.vue"
+import RunningTextBar from "./RunningTextBar.vue"
 import SearchBar from "./SearchBar.vue"
-
+import PhoneKeypad from "./PhoneKeypad.vue"
 // import PrintAction from "./views/reusables/PrintAction.vue"
 import SocialMediaLinks from "./views/reusables/SocialMediaLinks.vue"
 import FloatingAction from "./views/reusables/FloatingAction.vue"
@@ -65,9 +66,15 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+
+    <RunningTextBar 
+      direction="right"
+      text="COMING SOON! WORK IN PROGRESS ..."
+    />
+
   <RouterView />
 
-    <!-- <StickyBottomBar  -->
+    <!-- <RunningTextBar  -->
     <!--   direction="right" -->
     <!--   text="OPEN FOR WORK BTW ..." -->
     <!-- /> -->
@@ -76,25 +83,27 @@ onBeforeUnmount(() => {
   
     <!-- <PrintAction :isPrintAll="isPrintAll"/> -->
 
+
+    <SocialMediaLinks/>
+
   <h2 class="message">
     <!-- <small>semoga</small> -->
     <br/>
       {{someMotto}}
   </h2>
 
-    <SocialMediaLinks/>
+    <WordRandomizer/>
 
     <SearchBar/>
+
+    <PhoneKeypad/>
+
 
     <FloatingAction
       @action-scroll="performScrolling"
       @action-print="performPrinting"
     />
 
-    <StickyBottomBar 
-      direction="right"
-      text="COMING SOON! WORK IN PROGRESS ..."
-    />
   </div>
 </template>
 

@@ -65,7 +65,7 @@ const handleClick = (button) => {
 <style scoped>
 .fab-container {
   position: fixed;
-  bottom: 50px;
+  bottom: 40px;
   right: 45px;
   display: flex;
   flex-direction: column;
