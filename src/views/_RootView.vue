@@ -7,6 +7,7 @@ import {
   saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams 
 } from "./utils.js"
 
+import ProgrammingConceptView from "./ProgrammingConceptView.vue"
 import CodeDumpRelearnView from "./CodeDumpRelearnView.vue"
 import ProfileView from "./ProfileView.vue"
 import CreativeView from "./CreativeView.vue"
@@ -28,7 +29,8 @@ const tabs = ref([
   // { label: "FAQ", component: GeneralFaqView },
   { label: "ARTICLES", component: ArticleView },
   { label: "GRABN-GO-VUE", component: GrabnGoVueView },
-  { label: "COREDUMP-RELEARN", component: CodeDumpRelearnView },
+  { label: "SEGFAULT", component: CodeDumpRelearnView },
+  { label: "THEORIES", component: ProgrammingConceptView },
   { label: "CREATIVE-2D", component: CreativeView },
   { label: "CREATIVE-3D", component: Creative3DView },
 ])
