@@ -1,8 +1,9 @@
 <script setup>
+
 import { ref, onMounted, watch, watchEffect, computed} from "vue"
-
+import URLManager from "./utilities/URLManager.js"
 import {useTitle} from "../composables.ts"
-
+import useLocalStorage from "./composables/useLocalStorage.js"
 import { 
   saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams 
 } from "./utils.js"
@@ -17,84 +18,75 @@ import ArticleView from "./ArticleView.vue"
 import VueComposablesView from "./VueComposablesView.vue"
 import ClarityFAQ from "./ClarityFAQ.vue"
 
-// const isPrintAll = ref(false)
-// const isPrintAll = ref(true)
-
 const props = defineProps(["isPrintAll"])
-
 const isPrintAll = ref(props?.isPrintAll || true)
 
 const activeTab = ref(0)
 const tabs = ref([
-  { label: "PROFILE", component: ProfileView },
-  { label: "FAQ", component: ClarityFAQ },
-  { label: "ARTICLES", component: ArticleView },
-  { label: "COMPOSABLES", component: VueComposablesView },
-  { label: "SEGFAULT", component: CodeDumpRelearnView },
-  { label: "THEORIES", component: ProgrammingConceptView },
-  // { label: "CREATIVE-2D", component: CreativeView },
-  // { label: "CREATIVE-3D", component: Creative3DView },
+  { id: 0, label: "PROFILE", component: ProfileView },
+  { id: 1, label: "FAQ", component: ClarityFAQ },
+  { id: 2, label: "ARTICLES", component: ArticleView },
+  { id: 3, label: "COMPOSABLES", component: VueComposablesView },
+  { id: 4, label: "SEGFAULT", component: CodeDumpRelearnView },
+  { id: 5, label: "THEORIES", component: ProgrammingConceptView },
+  // { id: 6, label: "CREATIVE-2D", component: CreativeView },
+  // { id: 7, label: "CREATIVE-3D", component: Creative3DView },
 ])
 
-
 const setupWelcome = () => {
-      setQueryParams({ page: "profile", msg: "support me"  }, true)
-      useTitle(computed(() => "profile | naravisuals-web"))
+    useTitle(computed(() => `${tabs.value[0]?.label} | naravisuals-web`))
+    setQueryParams({ page: tabs.value[0]?.label }, true)
 }
 
 const changeRoute = (idx) => {
-  activeTab.value = idx
+  activeTab.value = idx;
 
-  // console.log(history)
-  // console.log("current page: ", idx)
-  switch(idx){
-    case 0: 
-      setupWelcome()
-      break;
-    case 1:
-      setQueryParams({ page: "articles", articleId: ""  }, true)
-      useTitle(computed(() => "articles | naravisuals-web"))
-      break;
-    case 2:
-      setQueryParams({ page: "grabn-go-vue", componentId: ""  }, true)
-      useTitle(computed(() => "grabn-go-vue | naravisuals-web"))
-      break;
-    case 3: 
-      setQueryParams({ page: "coreDumpRelearn", lowLevelId: ""  }, true)
-      useTitle(computed(() => "coredump-relearn | naravisuals-web"))
-      break;
-    case 4: 
-      setQueryParams({ page: "creative-2d", artId: ""  }, true)
-      useTitle(computed(() => "creative 2d | naravisuals-web"))
-      break;
-    case 5: 
-      setQueryParams({ page: "creative-3d", artId: "" }, true)
-      useTitle(computed(() => "creative 3d | naravisuals-web"))
-      break;
-  }
 
-  setActiveUrl()
+  tabs.value.map((page, id) => {
+    if(id === idx) {
+      refreshTheStore()
+
+      useTitle(computed(() => `${page.label} | naravisuals-web`))
+      setQueryParams({ page: page.label }, true)
+    } 
+  }) 
+
 }
 
-const setActiveUrl = () => {
-    const fullUrl = window.location.href // includes ?search=vue&page=69#section
-    console.log(fullUrl)
+const store = useLocalStorage('store', {
+    page: ''
+})  
+
+const refreshTheStore = () => {
+  const url = new URLManager()
+  const currentPage = url.getParam('page')
+
+  console.log("store-prev: ", store.value?.page)
+  store.value = { page: currentPage }
+  console.log("store-current: ", store.value?.page)
 }
-
-
-setInterval(() => {
-  // saveCurrentUrl()
-}, 1000)
-
 
 
 onMounted(() => {
+  console.log("onMounted: ", store.value)
+ 
+  const previousTab = tabs.value.filter(item => {
+    if(item.label === store.value.page){
+      useTitle(computed(() => `${item.label} | naravisuals-web`))
 
-  setupWelcome()  
+      return item.id
+    }
+  })
 
+  const prevId = previousTab[0]?.id || 0
+  console.log("prevId: ", prevId)
 
-  // setActiveUrl()
-  // restoreLastUrl();
+  if(prevId <= tabs.value.length){
+    activeTab.value = prevId
+  }else {
+    console.log("INVALID TAB-ID")
+  }
+
 })
 
 </script>

@@ -100,7 +100,7 @@ const cLibraryHeaders = ref([
 
     <div class="group-container">
     <div v-for="item in myLibraries" :key="item.libName">
-      <button @click="item.isOpen = true" style="margin: 10px;">{{item.libName}}</button>
+      <button @click="item.isOpen = true" style="margin: 10px; color: black;">{{item.libName}}</button>
 
   <FullScreenModal v-model="item.isOpen">
         <div style="margin-top: 60px;">
@@ -122,7 +122,7 @@ const cLibraryHeaders = ref([
 
     <div class="group-container">
     <div v-for="item in cLibraryHeaders" :key="item.header">
-      <button @click="item.isOpen = true" style="margin: 10px;">{{item.header}}</button>
+      <button @click="item.isOpen = true" style="margin: 10px; color: black;">{{item.header}}</button>
 
   <FullScreenModal v-model="item.isOpen">
         <div style="margin-top: 60px;">

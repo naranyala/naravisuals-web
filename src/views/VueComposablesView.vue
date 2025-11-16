@@ -39,7 +39,7 @@ const myComposables = ref([
 
     <div class="group-container">
     <div v-for="item in myComposables" :key="item.label">
-      <button @click="item.isOpen = true" style="margin: 10px;">{{item.label}}</button>
+      <button @click="item.isOpen = true" style="margin: 10px; color: black;">{{item.label}}</button>
 
   <FullScreenModal v-model="item.isOpen">
         <div style="margin-top: 60px;">
