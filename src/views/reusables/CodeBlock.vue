@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import Prism from 'prismjs'
 import 'prismjs/themes/prism-tomorrow.css'
+import 'prismjs/components/prism-c' // Import C language support
 
-// Import common language support
 const props = defineProps({
-  label: { type: String, require: true, default: "Example"}, 
-  code: { type: String, required: true, default: "const greeting = () => console.log('welcome');"},
+  label: { type: String, required: true, default: "Example" },
+  code: { type: String, required: true, default: "const greeting = () => console.log('welcome');" },
   language: { type: String, default: 'js' }
 })
 
@@ -15,18 +15,28 @@ const copying = ref(false)
 const copied = ref(false)
 const lineCount = ref(1)
 
-
-onMounted(() => {
-  highlightCode()
+// Map custom language prop to Prism language identifiers
+const prismLanguage = computed(() => {
+  switch (props.language.toLowerCase()) {
+    case 'js':
+    case 'javascript':
+      return 'javascript'
+    case 'c-programming':
+    case 'c':
+      return 'c'
+    default:
+      return 'javascript' // Fallback to JavaScript
+  }
 })
 
 // Highlight code
 function highlightCode() {
   if (codeRef.value) {
     codeRef.value.textContent = props.code
+    codeRef.value.className = `language-${prismLanguage.value}`
     Prism.highlightElement(codeRef.value)
     // Calculate line count
-    lineCount.value = props.code?.split('\n').length
+    lineCount.value = props.code?.split('\n').length || 0
   }
 }
 
@@ -35,7 +45,7 @@ async function copy() {
   if (copying.value) return
   copying.value = true
   copied.value = false
-  
+
   try {
     await navigator.clipboard.writeText(props.code)
     copied.value = true
@@ -56,7 +66,7 @@ function fallbackCopy() {
   el.style.opacity = '0'
   document.body.appendChild(el)
   el.select()
-  
+
   try {
     if (document.execCommand('copy')) {
       copied.value = true
@@ -68,6 +78,9 @@ function fallbackCopy() {
   }
 }
 
+onMounted(() => {
+  highlightCode()
+})
 
 watch(() => props.code, () => {
   highlightCode()
@@ -78,12 +91,11 @@ watch(() => props.language, () => {
 })
 </script>
 
-
 <template>
   <div class="code-block">
     <!-- Header -->
     <div class="code-header">
-      <span class="lang">{{ props?.label || "example"  }}</span>
+      <span class="lang">{{ props?.label || "Example" }}</span>
       <button
         class="copy-btn"
         @click="copy"
@@ -109,11 +121,10 @@ watch(() => props.language, () => {
       <div class="line-numbers" aria-hidden="true">
         <span v-for="n in lineCount" :key="n" class="line-number">{{ n }}</span>
       </div>
-      <pre class="code-pre"><code ref="codeRef" :class="`language-${language}`"></code></pre>
+      <pre class="code-pre"><code ref="codeRef"></code></pre>
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .code-block {
@@ -125,11 +136,9 @@ watch(() => props.language, () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition: border-color 0.2s ease;
 }
-
 .code-block:hover {
   border-color: #3d4152;
 }
-
 .code-header {
   display: flex;
   justify-content: space-between;
@@ -140,14 +149,11 @@ watch(() => props.language, () => {
   color: #7aa2f7;
   font-size: 0.85rem;
 }
-
 .lang {
-  /* text-transform: uppercase; */
   font-weight: 600;
   letter-spacing: 0.5px;
   font-size: 1.1rem;
 }
-
 .copy-btn {
   display: flex;
   align-items: center;
@@ -162,32 +168,26 @@ watch(() => props.language, () => {
   transition: all 0.2s ease;
   font-family: inherit;
 }
-
 .copy-btn:hover:not(:disabled) {
   color: #c0caf5;
   background: #24283b;
   border-color: #3d4152;
 }
-
 .copy-btn:disabled {
   color: #4ade80;
   border-color: #4ade80;
   cursor: default;
 }
-
 .copy-btn svg {
   flex-shrink: 0;
 }
-
 .copy-text {
   font-weight: 500;
 }
-
 .code-container {
   display: flex;
   background: #1a1b26;
 }
-
 .line-numbers {
   display: flex;
   flex-direction: column;
@@ -203,12 +203,10 @@ watch(() => props.language, () => {
   line-height: 1.6;
   color: #565f89;
 }
-
 .line-number {
   display: block;
   font-family: 'Fira Code', 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
 }
-
 .code-pre {
   margin: 0;
   padding: 1.25rem;
@@ -219,25 +217,20 @@ watch(() => props.language, () => {
   background: #1a1b26;
   flex: 1;
 }
-
 .code-pre::-webkit-scrollbar {
   height: 8px;
 }
-
 .code-pre::-webkit-scrollbar-track {
   background: #16161e;
   border-radius: 4px;
 }
-
 .code-pre::-webkit-scrollbar-thumb {
   background: #2a2d3a;
   border-radius: 4px;
 }
-
 .code-pre::-webkit-scrollbar-thumb:hover {
   background: #3d4152;
 }
-
 /* Override Prism theme colors for better dark mode */
 :deep(.token.comment),
 :deep(.token.prolog),
@@ -245,11 +238,9 @@ watch(() => props.language, () => {
 :deep(.token.cdata) {
   color: #565f89;
 }
-
 :deep(.token.punctuation) {
   color: #c0caf5;
 }
-
 :deep(.token.property),
 :deep(.token.tag),
 :deep(.token.boolean),
@@ -259,7 +250,6 @@ watch(() => props.language, () => {
 :deep(.token.deleted) {
   color: #ff9e64;
 }
-
 :deep(.token.selector),
 :deep(.token.attr-name),
 :deep(.token.string),
@@ -268,7 +258,6 @@ watch(() => props.language, () => {
 :deep(.token.inserted) {
   color: #9ece6a;
 }
-
 :deep(.token.operator),
 :deep(.token.entity),
 :deep(.token.url),
@@ -276,18 +265,15 @@ watch(() => props.language, () => {
 :deep(.style .token.string) {
   color: #89ddff;
 }
-
 :deep(.token.atrule),
 :deep(.token.attr-value),
 :deep(.token.keyword) {
   color: #bb9af7;
 }
-
 :deep(.token.function),
 :deep(.token.class-name) {
   color: #7aa2f7;
 }
-
 :deep(.token.regex),
 :deep(.token.important),
 :deep(.token.variable) {

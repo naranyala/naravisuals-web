@@ -2,7 +2,10 @@
   <div v-if="isOpen" class="modal-overlay" @click.self="close">
     <div class="modal-content">
       <button class="modal-close" @click="close">
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 1024 1024"><path fill="currentColor" d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64"/><path fill="currentColor" d="m237.248 512l265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 1024 1024">
+          <path fill="currentColor" d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64"/>
+          <path fill="currentColor" d="m237.248 512l265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312z"/>
+        </svg>
         <div>Back</div>
       </button>
       <div class="modal-body">
@@ -13,7 +16,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, computed } from 'vue'
+import { watch, defineProps, defineEmits, computed, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -32,6 +35,25 @@ const isOpen = computed({
 function close() {
   isOpen.value = false
 }
+
+// Add/remove no-scroll class to body when modal is opened/closed
+onMounted(() => {
+  if (isOpen.value) {
+    document.body.classList.add('no-scroll')
+  }
+})
+
+onUnmounted(() => {
+  document.body.classList.remove('no-scroll')
+})
+
+watch(isOpen, (newVal) => {
+  if (newVal) {
+    document.body.classList.add('no-scroll')
+  } else {
+    document.body.classList.remove('no-scroll')
+  }
+})
 </script>
 
 <style scoped>
@@ -39,12 +61,12 @@ function close() {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw; /* full width */
-  height: 100vh; /* full height */
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.9);
   display: flex;
-  align-items: stretch; /* stretch modal to fill height */
-  justify-content: stretch; /* stretch modal to fill width */
+  align-items: stretch;
+  justify-content: stretch;
   z-index: 99999;
 }
 
@@ -88,3 +110,10 @@ function close() {
 }
 </style>
 
+<style>
+/* Add this to global styles or in a style tag without scoped */
+.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+}
+</style>

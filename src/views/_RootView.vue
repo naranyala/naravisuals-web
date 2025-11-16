@@ -14,7 +14,7 @@ import CreativeView from "./CreativeView.vue"
 import Creative3DView from "./Creative3DView.vue"
 import ArticleView from "./ArticleView.vue"
 // import GeneralFaqView from "./GeneralFaqView.vue"
-import GrabnGoVueView from "./GrabnGoVueView.vue"
+import VueComposablesView from "./VueComposablesView.vue"
 import ClarityFAQ from "./ClarityFAQ.vue"
 
 // const isPrintAll = ref(false)
@@ -29,7 +29,7 @@ const tabs = ref([
   { label: "PROFILE", component: ProfileView },
   { label: "FAQ", component: ClarityFAQ },
   { label: "ARTICLES", component: ArticleView },
-  { label: "GRABN-GO-VUE", component: GrabnGoVueView },
+  { label: "COMPOSABLES", component: VueComposablesView },
   { label: "SEGFAULT", component: CodeDumpRelearnView },
   { label: "THEORIES", component: ProgrammingConceptView },
   // { label: "CREATIVE-2D", component: CreativeView },

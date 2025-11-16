@@ -14,13 +14,91 @@ const myLibraries = ref([
 ])
 
 
+
+const cLibraryHeaders = ref([
+  // Standard C Headers (C11/C17/C23)
+  { isOpen: false, header: "stdio.h",      example: "", desc: "Standard Input/Output (e.g., printf, scanf)" },
+  { isOpen: false, header: "stdlib.h",     example: "", desc: "Standard Library (e.g., malloc, free, exit)" },
+  { isOpen: false, header: "string.h",     example: "", desc: "String manipulation (e.g., strcpy, strlen)" },
+  { isOpen: false, header: "math.h",       example: "", desc: "Mathematical functions (e.g., sin, sqrt)" },
+  { isOpen: false, header: "time.h",       example: "", desc: "Time and date functions (e.g., time, clock)" },
+  { isOpen: false, header: "ctype.h",      example: "", desc: "Character handling (e.g., isalpha, tolower)" },
+  { isOpen: false, header: "stdint.h",     example: "", desc: "Fixed-width integer types (e.g., int32_t, uint64_t)" },
+  { isOpen: false, header: "stddef.h",     example: "", desc: "Standard definitions (e.g., NULL, size_t)" },
+  { isOpen: false, header: "stdbool.h",    example: "", desc: "Boolean type and values (e.g., bool, true, false)" },
+  { isOpen: false, header: "assert.h",     example: "", desc: "Assertions (e.g., assert macro)" },
+  { isOpen: false, header: "signal.h",     example: "", desc: "Signal handling (e.g., signal, raise)" },
+  { isOpen: false, header: "errno.h",      example: "", desc: "Error codes (e.g., errno, perror)" },
+  { isOpen: false, header: "float.h",      example: "", desc: "Floating-point limits (e.g., FLT_MAX, DBL_MIN)" },
+  { isOpen: false, header: "limits.h",     example: "", desc: "Implementation-defined limits (e.g., INT_MAX, CHAR_BIT)" },
+  { isOpen: false, header: "stdarg.h",     example: "", desc: "Variable arguments (e.g., va_list, va_start)" },
+  { isOpen: false, header: "setjmp.h",     example: "", desc: "Non-local jumps (e.g., setjmp, longjmp)" },
+  { isOpen: false, header: "locale.h",     example: "", desc: "Localization (e.g., setlocale, localeconv)" },
+  { isOpen: false, header: "wchar.h",      example: "", desc: "Wide character functions (e.g., wprintf, wcslen)" },
+  { isOpen: false, header: "wctype.h",     example: "", desc: "Wide character classification (e.g., iswalpha)" },
+  { isOpen: false, header: "uchar.h",      example: "", desc: "Unicode utilities (C11, e.g., char16_t, char32_t)" },
+  { isOpen: false, header: "inttypes.h",   example: "", desc: "Format conversion for inttypes (e.g., PRIu64)" },
+  { isOpen: false, header: "stdalign.h",   example: "", desc: "Alignment utilities (C11, e.g., alignas, alignof)" },
+  { isOpen: false, header: "stdnoreturn.h",example: "", desc: "noreturn macro (C11, e.g., _Noreturn)" },
+  { isOpen: false, header: "tgmath.h",     example: "", desc: "Type-generic math macros (e.g., sin, cos)" },
+  { isOpen: false, header: "complex.h",    example: "", desc: "Complex number arithmetic (e.g., complex, I)" },
+
+  // POSIX/Linux/Unix Headers
+  { isOpen: false, header: "unistd.h",     example: "", desc: "POSIX API (file operations, process control, e.g., read, fork)" },
+  { isOpen: false, header: "sys/types.h",  example: "", desc: "Data types (e.g., pid_t, size_t, off_t)" },
+  { isOpen: false, header: "sys/stat.h",   example: "", desc: "File status (e.g., stat, mkdir, chmod)" },
+  { isOpen: false, header: "sys/wait.h",   example: "", desc: "Process control (e.g., waitpid, WIFEXITED)" },
+  { isOpen: false, header: "sys/socket.h", example: "", desc: "Socket programming (e.g., socket, bind, connect)" },
+  { isOpen: false, header: "sys/mman.h",   example: "", desc: "Memory management (e.g., mmap, munmap)" },
+  { isOpen: false, header: "sys/ioctl.h",  example: "", desc: "I/O control (e.g., ioctl)" },
+  { isOpen: false, header: "sys/time.h",   example: "", desc: "Time types and functions (e.g., gettimeofday)" },
+  { isOpen: false, header: "sys/resource.h", example: "", desc: "Resource usage (e.g., getrusage, setrlimit)" },
+  { isOpen: false, header: "sys/select.h", example: "", desc: "I/O multiplexing (e.g., select)" },
+  { isOpen: false, header: "sys/utsname.h",example: "", desc: "System information (e.g., uname)" },
+  { isOpen: false, header: "fcntl.h",      example: "", desc: "File control (e.g., open, fcntl)" },
+  { isOpen: false, header: "dirent.h",     example: "", desc: "Directory operations (e.g., opendir, readdir)" },
+  { isOpen: false, header: "pthread.h",    example: "", desc: "POSIX threads (e.g., pthread_create, pthread_mutex_t)" },
+  { isOpen: false, header: "semaphore.h",  example: "", desc: "Semaphores (e.g., sem_init, sem_wait)" },
+  { isOpen: false, header: "mqueue.h",     example: "", desc: "POSIX message queues (e.g., mq_open, mq_send)" },
+  { isOpen: false, header: "sched.h",      example: "", desc: "Scheduling (e.g., sched_yield, sched_get_priority_max)" },
+  { isOpen: false, header: "netinet/in.h", example: "", desc: "Internet domain addresses (e.g., struct sockaddr_in)" },
+  { isOpen: false, header: "arpa/inet.h",  example: "", desc: "Internet operations (e.g., inet_addr, inet_ntoa)" },
+  { isOpen: false, header: "netdb.h",      example: "", desc: "Network database operations (e.g., gethostbyname)" },
+  { isOpen: false, header: "termios.h",    example: "", desc: "Terminal I/O (e.g., tcgetattr, tcsetattr)" },
+  { isOpen: false, header: "poll.h",       example: "", desc: "I/O multiplexing (e.g., poll)" },
+  { isOpen: false, header: "aio.h",        example: "", desc: "Asynchronous I/O (e.g., aio_read, aio_write)" },
+  { isOpen: false, header: "dlfcn.h",      example: "", desc: "Dynamic linking (e.g., dlopen, dlsym)" },
+  { isOpen: false, header: "grp.h",        example: "", desc: "Group file operations (e.g., getgrnam, getgrgid)" },
+  { isOpen: false, header: "pwd.h",        example: "", desc: "Password file operations (e.g., getpwnam, getpwuid)" },
+  { isOpen: false, header: "shadow.h",     example: "", desc: "Shadow password file operations (e.g., getspnam)" },
+  { isOpen: false, header: "crypt.h",      example: "", desc: "Password hashing (e.g., crypt)" },
+  { isOpen: false, header: "libgen.h",     example: "", desc: "Pathname manipulation (e.g., basename, dirname)" },
+  { isOpen: false, header: "glob.h",       example: "", desc: "Pathname pattern matching (e.g., glob)" },
+  { isOpen: false, header: "fnmatch.h",    example: "", desc: "Filename matching (e.g., fnmatch)" },
+  { isOpen: false, header: "regex.h",      example: "", desc: "Regular expressions (e.g., regcomp, regexec)" },
+  { isOpen: false, header: "wordexp.h",    example: "", desc: "Word expansion (e.g., wordexp)" },
+  { isOpen: false, header: "ftw.h",        example: "", desc: "File tree walking (e.g., ftw, nftw)" },
+  { isOpen: false, header: "syslog.h",     example: "", desc: "System logging (e.g., syslog, openlog)" },
+  { isOpen: false, header: "utime.h",      example: "", desc: "File access/modification times (e.g., utime)" },
+  { isOpen: false, header: "utmpx.h",      example: "", desc: "User accounting (e.g., getutxent)" },
+  { isOpen: false, header: "lastlog.h",    example: "", desc: "Last login logging (e.g., struct lastlog)" },
+  { isOpen: false, header: "sys/ipc.h",    example: "", desc: "IPC (Inter-Process Communication, e.g., ftok)" },
+  { isOpen: false, header: "sys/msg.h",    example: "", desc: "Message queues (e.g., msgget, msgsnd)" },
+  { isOpen: false, header: "sys/shm.h",    example: "", desc: "Shared memory (e.g., shmget, shmat)" },
+  { isOpen: false, header: "sys/sem.h",    example: "", desc: "Semaphores (e.g., semget, semop)" },
+]);
+
 </script>
 
 <template>
   <div class="projects-container" @keydown="handleKeydown">
-    <h1 class="section-title">Our Projects</h1>
+    <h1 class="section-title">SEGFAULT</h1>
 
-    <div style="display: flex;">
+    <hr/>
+
+    <h2>UTILITY FUNCTION USAGE</h2>
+
+    <div class="group-container">
     <div v-for="item in myLibraries" :key="item.libName">
       <button @click="item.isOpen = true" style="margin: 10px;">{{item.libName}}</button>
 
@@ -32,6 +110,28 @@ const myLibraries = ref([
 
 
             <CodeBlock language="c" :label="item.libName" :code="item.code"/>
+
+        </div>
+  </FullScreenModal>
+    </div>
+    </div>
+
+    <hr/>
+
+    <h2 style="margin-top: 20px;">LIBC/POSIX EXAMPLES</h2>
+
+    <div class="group-container">
+    <div v-for="item in cLibraryHeaders" :key="item.header">
+      <button @click="item.isOpen = true" style="margin: 10px;">{{item.header}}</button>
+
+  <FullScreenModal v-model="item.isOpen">
+        <div style="margin-top: 60px;">
+        <h2>{{item.libName}}</h2>
+
+        <p style="margin: 20px 0; border: 1px solid gray; border-radius: 10px; padding: 10px;">lorem ipsum dolor</p>
+
+
+            <CodeBlock language="c" :label="item.header" :code="item.example"/>
 
         </div>
   </FullScreenModal>
@@ -58,217 +158,8 @@ const myLibraries = ref([
   text-align: center;
 }
 
-.projects-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
+.group-container {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px 0;
 }
 
-.project-group {
-  padding: 1rem;
-}
-
-.group-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.group-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.project-card {
-  background-color: #1e1e1e;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-  cursor: pointer;
-  transition: all 0.25s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.project-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.7);
-  background-color: #252525;
-}
-
-.project-card:focus {
-  outline: 3px solid #60a5fa;
-  outline-offset: 2px;
-}
-
-.project-name {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.project-type {
-  font-size: 1rem;
-  color: #ccc;
-  margin-bottom: 0.5rem;
-}
-
-.preview-hint {
-  font-size: 0.75rem;
-  color: #888;
-  display: block;
-  margin-top: 0.75rem;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.project-card:hover .preview-hint {
-  opacity: 1;
-}
-
-/* Modal Styles */
-.modal-backdrop {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  backdrop-filter: blur(8px);
-}
-
-.modal-panel {
-  width: 95vw;
-  height: 95vh;
-  max-width: 1400px;
-  max-height: 900px;
-  background: #1a1a1a;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-header {
-  padding: 1rem 1.5rem;
-  background: #252525;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #333;
-}
-
-.modal-header h3 {
-  font-size: 1.1rem;
-  color: #aaa;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 80%;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: background 0.2s;
-}
-
-.close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.iframe-wrapper {
-  position: relative;
-  flex: 1;
-  background: #000;
-}
-
-.iframe-wrapper iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-.loading-spinner {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  z-index: 10;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #333;
-  border-top: 4px solid #60a5fa;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.modal-footer {
-  padding: 1rem;
-  background: #252525;
-  text-align: right;
-  border-top: 1px solid #333;
-}
-
-.open-external-btn {
-  background: #60a5fa;
-  color: #000;
-  font-weight: 600;
-  border: none;
-  padding: 0.65rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.open-external-btn:hover {
-  background: #93bbfc;
-}
-
-/* Modal Transition */
-.modal-enter-active, .modal-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.modal-enter-from, .modal-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-active .modal-panel,
-.modal-leave-active .modal-panel {
-  transition: transform 0.3s ease;
-}
-
-.modal-enter-from .modal-panel,
-.modal-leave-to .modal-panel {
-  transform: scale(0.9);
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-  .projects-container { padding: 1rem; }
-  .section-title { font-size: 1.5rem; }
-  .group-cards { grid-template-columns: 1fr; }
-  .modal-panel { width: 100vw; height: 100vh; border-radius: 0; }
-  .modal-header h3 { font-size: 0.9rem; }
-}
 </style>

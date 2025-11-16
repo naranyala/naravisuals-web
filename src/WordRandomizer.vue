@@ -215,79 +215,6 @@ const systemProgrammingTerms = [
 ]
 
 
-const cLibraryHeaders = [
-  // Standard C Headers (C11/C17/C23)
-  { header: "stdio.h",      description: "Standard Input/Output (e.g., printf, scanf)" },
-  { header: "stdlib.h",     description: "Standard Library (e.g., malloc, free, exit)" },
-  { header: "string.h",     description: "String manipulation (e.g., strcpy, strlen)" },
-  { header: "math.h",       description: "Mathematical functions (e.g., sin, sqrt)" },
-  { header: "time.h",       description: "Time and date functions (e.g., time, clock)" },
-  { header: "ctype.h",      description: "Character handling (e.g., isalpha, tolower)" },
-  { header: "stdint.h",     description: "Fixed-width integer types (e.g., int32_t, uint64_t)" },
-  { header: "stddef.h",     description: "Standard definitions (e.g., NULL, size_t)" },
-  { header: "stdbool.h",    description: "Boolean type and values (e.g., bool, true, false)" },
-  { header: "assert.h",     description: "Assertions (e.g., assert macro)" },
-  { header: "signal.h",     description: "Signal handling (e.g., signal, raise)" },
-  { header: "errno.h",      description: "Error codes (e.g., errno, perror)" },
-  { header: "float.h",      description: "Floating-point limits (e.g., FLT_MAX, DBL_MIN)" },
-  { header: "limits.h",     description: "Implementation-defined limits (e.g., INT_MAX, CHAR_BIT)" },
-  { header: "stdarg.h",     description: "Variable arguments (e.g., va_list, va_start)" },
-  { header: "setjmp.h",     description: "Non-local jumps (e.g., setjmp, longjmp)" },
-  { header: "locale.h",     description: "Localization (e.g., setlocale, localeconv)" },
-  { header: "wchar.h",      description: "Wide character functions (e.g., wprintf, wcslen)" },
-  { header: "wctype.h",     description: "Wide character classification (e.g., iswalpha)" },
-  { header: "uchar.h",      description: "Unicode utilities (C11, e.g., char16_t, char32_t)" },
-  { header: "inttypes.h",   description: "Format conversion for inttypes (e.g., PRIu64)" },
-  { header: "stdalign.h",   description: "Alignment utilities (C11, e.g., alignas, alignof)" },
-  { header: "stdnoreturn.h",description: "noreturn macro (C11, e.g., _Noreturn)" },
-  { header: "tgmath.h",     description: "Type-generic math macros (e.g., sin, cos)" },
-  { header: "complex.h",    description: "Complex number arithmetic (e.g., complex, I)" },
-
-  // POSIX/Linux/Unix Headers
-  { header: "unistd.h",     description: "POSIX API (file operations, process control, e.g., read, fork)" },
-  { header: "sys/types.h",  description: "Data types (e.g., pid_t, size_t, off_t)" },
-  { header: "sys/stat.h",   description: "File status (e.g., stat, mkdir, chmod)" },
-  { header: "sys/wait.h",   description: "Process control (e.g., waitpid, WIFEXITED)" },
-  { header: "sys/socket.h", description: "Socket programming (e.g., socket, bind, connect)" },
-  { header: "sys/mman.h",   description: "Memory management (e.g., mmap, munmap)" },
-  { header: "sys/ioctl.h",  description: "I/O control (e.g., ioctl)" },
-  { header: "sys/time.h",   description: "Time types and functions (e.g., gettimeofday)" },
-  { header: "sys/resource.h", description: "Resource usage (e.g., getrusage, setrlimit)" },
-  { header: "sys/select.h", description: "I/O multiplexing (e.g., select)" },
-  { header: "sys/utsname.h",description: "System information (e.g., uname)" },
-  { header: "fcntl.h",      description: "File control (e.g., open, fcntl)" },
-  { header: "dirent.h",     description: "Directory operations (e.g., opendir, readdir)" },
-  { header: "pthread.h",    description: "POSIX threads (e.g., pthread_create, pthread_mutex_t)" },
-  { header: "semaphore.h",  description: "Semaphores (e.g., sem_init, sem_wait)" },
-  { header: "mqueue.h",     description: "POSIX message queues (e.g., mq_open, mq_send)" },
-  { header: "sched.h",      description: "Scheduling (e.g., sched_yield, sched_get_priority_max)" },
-  { header: "netinet/in.h", description: "Internet domain addresses (e.g., struct sockaddr_in)" },
-  { header: "arpa/inet.h",  description: "Internet operations (e.g., inet_addr, inet_ntoa)" },
-  { header: "netdb.h",      description: "Network database operations (e.g., gethostbyname)" },
-  { header: "termios.h",    description: "Terminal I/O (e.g., tcgetattr, tcsetattr)" },
-  { header: "poll.h",       description: "I/O multiplexing (e.g., poll)" },
-  { header: "aio.h",        description: "Asynchronous I/O (e.g., aio_read, aio_write)" },
-  { header: "dlfcn.h",      description: "Dynamic linking (e.g., dlopen, dlsym)" },
-  { header: "grp.h",        description: "Group file operations (e.g., getgrnam, getgrgid)" },
-  { header: "pwd.h",        description: "Password file operations (e.g., getpwnam, getpwuid)" },
-  { header: "shadow.h",     description: "Shadow password file operations (e.g., getspnam)" },
-  { header: "crypt.h",      description: "Password hashing (e.g., crypt)" },
-  { header: "libgen.h",     description: "Pathname manipulation (e.g., basename, dirname)" },
-  { header: "glob.h",       description: "Pathname pattern matching (e.g., glob)" },
-  { header: "fnmatch.h",    description: "Filename matching (e.g., fnmatch)" },
-  { header: "regex.h",      description: "Regular expressions (e.g., regcomp, regexec)" },
-  { header: "wordexp.h",    description: "Word expansion (e.g., wordexp)" },
-  { header: "ftw.h",        description: "File tree walking (e.g., ftw, nftw)" },
-  { header: "syslog.h",     description: "System logging (e.g., syslog, openlog)" },
-  { header: "utime.h",      description: "File access/modification times (e.g., utime)" },
-  { header: "utmpx.h",      description: "User accounting (e.g., getutxent)" },
-  { header: "lastlog.h",    description: "Last login logging (e.g., struct lastlog)" },
-  { header: "sys/ipc.h",    description: "IPC (Inter-Process Communication, e.g., ftok)" },
-  { header: "sys/msg.h",    description: "Message queues (e.g., msgget, msgsnd)" },
-  { header: "sys/shm.h",    description: "Shared memory (e.g., shmget, shmat)" },
-  { header: "sys/sem.h",    description: "Semaphores (e.g., semget, semop)" },
-];
-
 const currentTerm = ref("Click to randomize")
 
 const randomize = () => {
@@ -295,14 +222,14 @@ const randomize = () => {
     return item.name + " - " + item.description;
   })
 
-  const codingTerms = cLibraryHeaders.map((item) => {
-    return item.header + " - " + item.description;
-  })
+  // const codingTerms = cLibraryHeaders.map((item) => {
+  //   return item.header + " - " + item.description;
+  // })
 
   const combinedTerms = [
     ...strProgrammingEcosystem,
     ...systemProgrammingTerms,
-    ...codingTerms
+    // ...codingTerms
   ]
 
   // console.log(combinedTerms)
