@@ -5,9 +5,9 @@ import 'prismjs/themes/prism-tomorrow.css'
 
 // Import common language support
 const props = defineProps({
-  label: { type: String, require: true }, 
-  code: { type: String, required: true },
-  language: { type: String, default: 'javascript' }
+  label: { type: String, require: true, default: "Example"}, 
+  code: { type: String, required: true, default: "const greeting = () => console.log('welcome');"},
+  language: { type: String, default: 'js' }
 })
 
 const codeRef = ref(null)
@@ -15,13 +15,18 @@ const copying = ref(false)
 const copied = ref(false)
 const lineCount = ref(1)
 
+
+onMounted(() => {
+  highlightCode()
+})
+
 // Highlight code
 function highlightCode() {
   if (codeRef.value) {
     codeRef.value.textContent = props.code
     Prism.highlightElement(codeRef.value)
     // Calculate line count
-    lineCount.value = props.code.split('\n').length
+    lineCount.value = props.code?.split('\n').length
   }
 }
 
@@ -63,9 +68,6 @@ function fallbackCopy() {
   }
 }
 
-onMounted(() => {
-  highlightCode()
-})
 
 watch(() => props.code, () => {
   highlightCode()

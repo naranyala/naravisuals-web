@@ -343,13 +343,14 @@ const randomize = () => {
   align-items: center;
   justify-content: center;
   background: #0a0a0a;
-  padding: 20px;
+  padding: 0px;
+  margin: 20px;
 }
 
 .card {
   max-width: 500px;
   width: 100%;
-  padding: 40px;
+  padding: 20px;
   background: #1a1a1a;
   border-radius: 12px;
   border: 1px solid #2a2a2a;
@@ -359,7 +360,7 @@ const randomize = () => {
   padding: 60px 20px;
   text-align: center;
   height: 300px;
-  font-size: 2rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: #ffffff;
   background: #0f0f0f;

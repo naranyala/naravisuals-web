@@ -14,12 +14,11 @@ import FloatingAction from "./views/reusables/FloatingAction.vue"
 
 import { isPrintAll } from "./router.ts"
 
-const someMotto = ref(
-    // "TOTALITAS & SISTEMATIS"
-    // "VISIBLE & SUSTAINABLE"
-    // "SOLID & CREATIVE"
-   "CREATIVE COMPOUNDING" 
-)
+const msg = {
+  someMotto: "CREATIVE COMPOUNDING",
+  // someMotto: "LOW-LEVEL WIZARD WANNABE",
+  socialContract: "mastering the industry, fulfill missing part of it"
+}
 
 const performScrolling = () => {
   console.log("perform scrolling");
@@ -86,11 +85,9 @@ onBeforeUnmount(() => {
 
     <SocialMediaLinks/>
 
-  <h2 class="message">
-    <!-- <small>semoga</small> -->
-    <br/>
-      {{someMotto}}
-  </h2>
+    <h2 class="message">{{msg.someMotto}}<br/>
+      <small>{{msg.socialContract}}</small>
+    </h2>
 
     <WordRandomizer/>
 

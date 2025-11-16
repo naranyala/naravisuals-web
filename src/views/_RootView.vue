@@ -15,6 +15,7 @@ import Creative3DView from "./Creative3DView.vue"
 import ArticleView from "./ArticleView.vue"
 // import GeneralFaqView from "./GeneralFaqView.vue"
 import GrabnGoVueView from "./GrabnGoVueView.vue"
+import ClarityFAQ from "./ClarityFAQ.vue"
 
 // const isPrintAll = ref(false)
 // const isPrintAll = ref(true)
@@ -26,13 +27,13 @@ const isPrintAll = ref(props?.isPrintAll || true)
 const activeTab = ref(0)
 const tabs = ref([
   { label: "PROFILE", component: ProfileView },
-  // { label: "FAQ", component: GeneralFaqView },
+  { label: "FAQ", component: ClarityFAQ },
   { label: "ARTICLES", component: ArticleView },
   { label: "GRABN-GO-VUE", component: GrabnGoVueView },
   { label: "SEGFAULT", component: CodeDumpRelearnView },
   { label: "THEORIES", component: ProgrammingConceptView },
-  { label: "CREATIVE-2D", component: CreativeView },
-  { label: "CREATIVE-3D", component: Creative3DView },
+  // { label: "CREATIVE-2D", component: CreativeView },
+  // { label: "CREATIVE-3D", component: Creative3DView },
 ])
 
 

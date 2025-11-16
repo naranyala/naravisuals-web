@@ -1,135 +1,43 @@
 <script setup>
 import { ref } from 'vue'
 
-// import GhReposAccordion from "./GhReposAccordion.vue"
+import FullScreenModal from "./reusables/FullScreenModal.vue"
+import CodeBlock from "./reusables/CodeBlock.vue"
 
-// Flat data source with external URLs
-const flatProjects = [
-  { title: "NaraVisuals Web", type: "Random", rating: 4.2, url: "https://github.com/naranyala/naravisuals-web" },
-  { title: "Modular Dotfiles", type: "Random", rating: 4.9, url: "https://github.com/naranyala/modular-dotfiles" },
-  { title: "SIPENA", type: "", rating: 3.5, url: "https://google.com" },
-  { title: "Project Delta", type: "", rating: 4.6, url: "https://example.com/project-delta" },
-  { title: "Project Epsilon", type: "", rating: 4.1, url: "https://example.com/project-epsilon" },
-  { title: "Project Zeta", type: "", rating: 4.8, url: "https://example.com/project-zeta" },
-]
+import strReactiveH from "./raw-files/reactive.h?raw"
 
-// Grouping logic
-const groupsMap = {
-  5: { title: "Top Rated", items: [] },
-  4: { title: "Highly Recommended", items: [] },
-  3: { title: "Good Effort", items: [] }
-}
+const myLibraries = ref([
+  { libName: "reactive.h", isOpen: false, code: strReactiveH },
+  { libName: "str_builder.h", isOpen: false, code: ""},
+  { libName: "dynamic_arr.h", isOpen: false, code: ""},
+  { libName: "kv_store.h", isOpen: false, code: ""}
+])
 
-flatProjects.forEach(item => {
-  if (item.rating >= 4.5) groupsMap[5].items.push(item)
-  else if (item.rating >= 3.5) groupsMap[4].items.push(item)
-  else groupsMap[3].items.push(item)
-})
 
-const sortedGroups = [groupsMap[5], groupsMap[4], groupsMap[3]].filter(g => g.items.length > 0)
-
-// Modal state
-const modalUrl = ref('')
-const isModalOpen = ref(false)
-const isLoading = ref(true)
-
-// Open modal preview
-const openPreview = (url) => {
-  if (!url) return
-  modalUrl.value = url
-  isModalOpen.value = true
-  isLoading.value = true
-}
-
-// Close modal
-const closeModal = () => {
-  isModalOpen.value = false
-  modalUrl.value = ''
-  isLoading.value = true
-}
-
-// Fallback: open in new tab (right-click or Ctrl+click still works)
-const openLinkNewTab = (url) => {
-  if (url) window.open(url, '_blank', 'noopener,noreferrer')
-}
-
-// Keyboard support
-const handleKeydown = (e) => {
-  if (e.key === 'Escape' && isModalOpen.value) closeModal()
-}
 </script>
 
 <template>
   <div class="projects-container" @keydown="handleKeydown">
     <h1 class="section-title">Our Projects</h1>
 
-    <!-- <GhReposAccordion/> -->
+    <div style="display: flex;">
+    <div v-for="item in myLibraries" :key="item.libName">
+      <button @click="item.isOpen = true" style="margin: 10px;">{{item.libName}}</button>
 
-    <div class="projects-grid">
-      <div v-for="(group, groupIndex) in sortedGroups" :key="groupIndex" class="project-group">
-        <h2 class="group-title">{{ group.title }}</h2>
-        <div class="group-cards">
-          <div
-            v-for="(item, itemIndex) in group.items"
-            :key="itemIndex"
-            class="project-card"
-            role="button"
-            tabindex="0"
-            @click.prevent="openPreview(item.url)"
-            @contextmenu.prevent="openLinkNewTab(item.url)"
-            @keydown.enter.prevent="openPreview(item.url)"
-            @keydown.space.prevent="openPreview(item.url)"
-          >
-            <h3 class="project-name">{{ item.title }}</h3>
-            <p class="project-type">{{ item.type }}</p>
-            <span class="preview-hint">Click to preview • Right-click to open in new tab</span>
-          </div>
+  <FullScreenModal v-model="item.isOpen">
+        <div style="margin-top: 60px;">
+        <h2>{{item.libName}}</h2>
+
+        <p style="margin: 20px 0; border: 1px solid gray; border-radius: 10px; padding: 10px;">lorem ipsum dolor</p>
+
+
+            <CodeBlock language="c" :label="item.libName" :code="item.code"/>
+
         </div>
-      </div>
+  </FullScreenModal>
+    </div>
     </div>
 
-    <!-- Modal Overlay -->
-    <Teleport to="body">
-      <Transition name="modal">
-        <div v-if="isModalOpen" class="modal-backdrop" @click.self="closeModal">
-          <div class="modal-panel" role="dialog" aria-modal="true" @click.stop>
-            <!-- Header -->
-            <div class="modal-header">
-              <h3>Preview: {{ modalUrl }}</h3>
-              <button class="close-btn" @click="closeModal" aria-label="Close preview">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M18 6L6 18" />
-                  <path d="M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <!-- Iframe Container -->
-            <div class="iframe-wrapper">
-              <div v-if="isLoading" class="loading-spinner">
-                <div class="spinner"></div>
-                <p>Loading preview...</p>
-              </div>
-              <iframe
-                :src="modalUrl"
-                frameborder="0"
-                @load="isLoading = false"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"
-                loading="lazy"
-              ></iframe>
-            </div>
-
-            <!-- Footer Actions -->
-            <div class="modal-footer">
-              <button @click="openLinkNewTab(modalUrl)" class="open-external-btn">
-                Open in New Tab →
-              </button>
-            </div>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
   </div>
 </template>
 
