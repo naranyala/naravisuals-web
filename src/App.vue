@@ -4,20 +4,24 @@ import {ref} from "vue"
 
 import { RouterLink, RouterView } from 'vue-router'
 
+import CurrentCalendar from "./views/widgets/CurrentCalendar.vue"
+import MinimalFooter from "./MinimalFooter.vue"
 import WordRandomizer from "./WordRandomizer.vue"
 import RunningTextBar from "./RunningTextBar.vue"
 import SearchBar from "./SearchBar.vue"
 import PhoneKeypad from "./PhoneKeypad.vue"
 // import PrintAction from "./views/reusables/PrintAction.vue"
-import SocialMediaLinks from "./views/reusables/SocialMediaLinks.vue"
 import FloatingAction from "./views/reusables/FloatingAction.vue"
 
 import { isPrintAll } from "./router.ts"
 
 const msg = {
-  someMotto: "CREATIVE COMPOUNDING",
-  // someMotto: "LOW-LEVEL WIZARD WANNABE",
-  socialContract: "mastering the industry, fulfill missing part of it"
+  someMotto: [
+    "acceptable yet agressive enabler",
+    "sophisticated compounding",
+    "mastering the industry, fulfill missing part of it",
+    "mutual yet equal treatment"
+  ],
 }
 
 const performScrolling = () => {
@@ -82,19 +86,23 @@ onBeforeUnmount(() => {
   
     <!-- <PrintAction :isPrintAll="isPrintAll"/> -->
 
-
-    <SocialMediaLinks/>
-
-    <h2 class="message">{{msg.someMotto}}<br/>
-      <small>{{msg.socialContract}}</small>
-    </h2>
-
     <WordRandomizer/>
-
     <SearchBar/>
 
-    <PhoneKeypad/>
+    <h2 class="message">
+      <small v-for="motto in msg.someMotto" :key="motto">
+        {{ motto }}<br/>
+      </small>
+    </h2>
 
+    <div class="item-container">
+     <CurrentCalendar style="margin: 40px auto; width: 100%;"/>
+    </div>
+
+    <!-- <PhoneKeypad/> -->
+
+
+    <MinimalFooter/>
 
     <FloatingAction
       @action-scroll="performScrolling"
@@ -126,5 +134,18 @@ small, h2 { text-align: center; font-style: italic; padding-bottom: 200px;
 .print-button:hover {
   background-color: #2563eb;
 }
+
+.item-container { 
+  text-align: center; 
+  width: 100%; 
+  margin: 0 auto; 
+  padding: 0 20px; 
+}
+
+
+@media (width > 300px) { .item-container { padding: 0 80px; } }
+@media (width > 600px) { .item-container { padding: 0 200px; } }
+@media (width > 900px) { .item-container { padding: 0 220px; } }
+@media (width > 1200px) { .item-container { padding: 0 1200px; } }
 
 </style>

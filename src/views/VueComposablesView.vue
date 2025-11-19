@@ -16,6 +16,9 @@ import AccordionUsage from "./grabn-go-content/AccordionUsage.vue"
 
 import FullScreenModal from "./reusables/FullScreenModal.vue"
 
+// import HeadlessDatepicker from "./reusables/HeadlessDatepicker.vue"
+
+
 import strReactiveH from "./raw-files/reactive.h?raw"
 
 const myComposables = ref([
@@ -36,6 +39,7 @@ const myComposables = ref([
     <hr/> 
 
     <h2>REUSABLE VUE COMPONENTS</h2>
+
 
     <div class="group-container">
     <div v-for="item in myComposables" :key="item.label">

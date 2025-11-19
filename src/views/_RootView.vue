@@ -4,10 +4,11 @@ import { ref, onMounted, watch, watchEffect, computed} from "vue"
 import URLManager from "./utilities/URLManager.js"
 import {useTitle} from "../composables.ts"
 import useLocalStorage from "./composables/useLocalStorage.js"
-import { 
-  saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams 
+import {
+  saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams
 } from "./utils.js"
 
+import CodeShowView from "./CodeShowView.vue"
 import ProgrammingConceptView from "./ProgrammingConceptView.vue"
 import CodeDumpRelearnView from "./CodeDumpRelearnView.vue"
 import ProfileView from "./ProfileView.vue"
@@ -17,18 +18,24 @@ import ArticleView from "./ArticleView.vue"
 // import GeneralFaqView from "./GeneralFaqView.vue"
 import VueComposablesView from "./VueComposablesView.vue"
 import ClarityFAQ from "./ClarityFAQ.vue"
+import GamePanelView from "./GamePanelView.vue"
+import BashScriptCollectionView from "./BashScriptCollectionView.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
 
 const activeTab = ref(0)
 const tabs = ref([
-  { id: 0, label: "PROFILE", component: ProfileView },
-  { id: 1, label: "FAQ", component: ClarityFAQ },
-  { id: 2, label: "ARTICLES", component: ArticleView },
+  // { id: 0, label: "PROFILE", component: ProfileView },
+  { id: 1, label: "ARTICLES", component: ArticleView },
+  { id: 2, label: "SCRIPTS", component: BashScriptCollectionView },
   { id: 3, label: "COMPOSABLES", component: VueComposablesView },
   { id: 4, label: "SEGFAULT", component: CodeDumpRelearnView },
   { id: 5, label: "THEORIES", component: ProgrammingConceptView },
+  { id: 6, label: "EXAMPLES", component: CodeShowView },
+
+  // { id: 1, label: "FAQ", component: ClarityFAQ },
+  // { id: 5, label: "THEORIES", component: GamePanelView },
   // { id: 6, label: "CREATIVE-2D", component: CreativeView },
   // { id: 7, label: "CREATIVE-3D", component: Creative3DView },
 ])
@@ -48,14 +55,14 @@ const changeRoute = (idx) => {
 
       useTitle(computed(() => `${page.label} | naravisuals-web`))
       setQueryParams({ page: page.label }, true)
-    } 
-  }) 
+    }
+  })
 
 }
 
 const store = useLocalStorage('store', {
     page: ''
-})  
+})
 
 const refreshTheStore = () => {
   const url = new URLManager()
@@ -69,7 +76,7 @@ const refreshTheStore = () => {
 
 onMounted(() => {
   console.log("onMounted: ", store.value)
- 
+
   const previousTab = tabs.value.filter(item => {
     if(item.label === store.value.page){
       useTitle(computed(() => `${item.label} | naravisuals-web`))
