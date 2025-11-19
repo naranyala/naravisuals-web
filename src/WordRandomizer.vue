@@ -265,13 +265,14 @@ const randomize = () => {
 
 <style scoped>
 .container {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   display: flex;
   align-items: center;
   justify-content: center;
   background: #0a0a0a;
   padding: 0px;
-  margin: 20px;
+  margin: 20px auto;
+  text-align: center;
 }
 
 .card {
@@ -281,6 +282,7 @@ const randomize = () => {
   background: #1a1a1a;
   border-radius: 12px;
   border: 1px solid #2a2a2a;
+  margin: 0 auto;
 }
 
 .display {

@@ -4,6 +4,7 @@ import {ref} from "vue"
 
 import { RouterLink, RouterView } from 'vue-router'
 
+import MottonCollection from "./MottoCollection.vue"
 import CurrentCalendar from "./views/widgets/CurrentCalendar.vue"
 import MinimalFooter from "./MinimalFooter.vue"
 import WordRandomizer from "./WordRandomizer.vue"
@@ -15,14 +16,6 @@ import FloatingAction from "./views/reusables/FloatingAction.vue"
 
 import { isPrintAll } from "./router.ts"
 
-const msg = {
-  someMotto: [
-    "acceptable yet agressive enabler",
-    "sophisticated compounding",
-    "mastering the industry, fulfill missing part of it",
-    "mutual yet equal treatment"
-  ],
-}
 
 const performScrolling = () => {
   console.log("perform scrolling");
@@ -89,17 +82,14 @@ onBeforeUnmount(() => {
     <WordRandomizer/>
     <SearchBar/>
 
-    <h2 class="message">
-      <small v-for="motto in msg.someMotto" :key="motto">
-        {{ motto }}<br/>
-      </small>
-    </h2>
 
-    <div class="item-container">
+    <MottonCollection/>
+
      <CurrentCalendar style="margin: 40px auto; width: 100%;"/>
-    </div>
+
 
     <!-- <PhoneKeypad/> -->
+
 
 
     <MinimalFooter/>
@@ -114,10 +104,6 @@ onBeforeUnmount(() => {
 
 <style scoped>
 
-small, h2 { text-align: center; font-style: italic; padding-bottom: 200px;
-  background: rgba(0 0 0 0); text: white; }
-
-.message { padding-top: 200px; }
 
 
 .print-button {
@@ -135,17 +121,5 @@ small, h2 { text-align: center; font-style: italic; padding-bottom: 200px;
   background-color: #2563eb;
 }
 
-.item-container { 
-  text-align: center; 
-  width: 100%; 
-  margin: 0 auto; 
-  padding: 0 20px; 
-}
-
-
-@media (width > 300px) { .item-container { padding: 0 80px; } }
-@media (width > 600px) { .item-container { padding: 0 200px; } }
-@media (width > 900px) { .item-container { padding: 0 220px; } }
-@media (width > 1200px) { .item-container { padding: 0 1200px; } }
 
 </style>
