@@ -3,14 +3,21 @@ import { ref } from 'vue'
 
 import FullScreenModal from "./reusables/FullScreenModal.vue"
 import CodeBlock from "./reusables/CodeBlock.vue"
+import DashbaordLayout from "./reusables/DashboardLayout.vue"
 
 import strReactiveH from "./raw-files/reactive.h?raw"
+import strTuiH from "./raw-files/tui.h?raw"
+import strKvstoreH from "./raw-files/kvstore.h?raw"
+import strDynarrayH from "./raw-files/dynarray.h?raw"
+import strStringBuilderH from "./raw-files/strbuilder.h?raw"
 
 const myLibraries = ref([
   { libName: "reactive.h", isOpen: false, code: strReactiveH },
-  { libName: "str_builder.h", isOpen: false, code: ""},
-  { libName: "dynamic_arr.h", isOpen: false, code: ""},
-  { libName: "kv_store.h", isOpen: false, code: ""}
+  { libName: "tui.h", isOpen: false, code: strTuiH },
+  { libName: "strbuilder.h", isOpen: false, code: strStringBuilderH },
+  { libName: "dynarray.h", isOpen: false, code: strDynarrayH },
+  { libName: "kvstore.h", isOpen: false, code: strKvstoreH }
+  // { libName: "", isOpen: false, code: "" }
 ])
 
 
@@ -93,6 +100,8 @@ const cLibraryHeaders = ref([
 <template>
   <div class="projects-container" @keydown="handleKeydown">
     <h1 class="section-title">SEGFAULT</h1>
+
+        <DashbaordLayout/>
 
     <hr/>
 
