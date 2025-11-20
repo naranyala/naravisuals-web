@@ -10,14 +10,16 @@ import strTuiH from "./raw-files/tui.h?raw"
 import strKvstoreH from "./raw-files/kvstore.h?raw"
 import strDynarrayH from "./raw-files/dynarray.h?raw"
 import strStringBuilderH from "./raw-files/strbuilder.h?raw"
+import strToonFormatH from "./raw-files/toon_format.h?raw"
 
 const myLibraries = ref([
   { libName: "reactive.h", isOpen: false, code: strReactiveH },
   { libName: "tui.h", isOpen: false, code: strTuiH },
   { libName: "strbuilder.h", isOpen: false, code: strStringBuilderH },
   { libName: "dynarray.h", isOpen: false, code: strDynarrayH },
-  { libName: "kvstore.h", isOpen: false, code: strKvstoreH }
-  // { libName: "", isOpen: false, code: "" }
+  { libName: "kvstore.h", isOpen: false, code: strKvstoreH },
+  { libName: "toon_format.h", isOpen: false, code: strToonFormatH },
+  // { libName: "", isOpen: false, code: "" },
 ])
 
 
@@ -95,13 +97,34 @@ const cLibraryHeaders = ref([
   { isOpen: false, header: "sys/sem.h",    example: "", desc: "Semaphores (e.g., semget, semop)" },
 ]);
 
+import CollapsibleSection from "./reusables/CollapsibleSection.vue"
+
 </script>
 
 <template>
   <div class="projects-container" @keydown="handleKeydown">
     <h1 class="section-title">SEGFAULT</h1>
 
-        <DashbaordLayout/>
+        <CollapsibleSection>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.    Sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua.    Ut
+            enim ad minim veniam, quis nostrud exercitation ullamco laboris  
+            nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in  
+            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+               pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+            in    culpa qui officia deserunt mollit anim id est laborum.</p>
+        </CollapsibleSection>
+
+
+        <CollapsibleSection>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.    Sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua.    Ut
+            enim ad minim veniam, quis nostrud exercitation ullamco laboris  
+            nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in  
+            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+               pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+            in    culpa qui officia deserunt mollit anim id est laborum.</p>
+        </CollapsibleSection>
 
     <hr/>
 

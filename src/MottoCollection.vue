@@ -3,10 +3,11 @@
 
 const msg = {
   someMotto: [
-    "acceptable yet agressive enabler",
-    "sophisticated compounding",
-    "mastering the industry, fulfill missing part of it",
-    "mutual yet equal treatment"
+    "acceptable yet agressive enabler;",
+    "sophisticated compounding;",
+    "mastering the industry, fulfill missing part of it;",
+    "mutual yet equal treatment;",
+    "is that relevant?"
   ],
 }
 

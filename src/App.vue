@@ -4,6 +4,7 @@ import {ref} from "vue"
 
 import { RouterLink, RouterView } from 'vue-router'
 
+import ScrollIndicator from "./ScrollIndicator.vue"
 import MottonCollection from "./MottoCollection.vue"
 import CurrentCalendar from "./views/widgets/CurrentCalendar.vue"
 import MinimalFooter from "./MinimalFooter.vue"
@@ -90,6 +91,9 @@ onBeforeUnmount(() => {
 
     <!-- <PhoneKeypad/> -->
 
+        <ScrollIndicator/>
+
+        <!-- <GradientGenerator/> -->
 
 
     <MinimalFooter/>
