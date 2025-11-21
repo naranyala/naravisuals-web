@@ -7,7 +7,8 @@ const msg = {
     "sophisticated compounding;",
     "mastering the industry, fulfill missing part of it;",
     "mutual yet equal treatment;",
-    "is that relevant?"
+    "is that relevant?",
+    // "relevant, relevant, relevant;"
   ],
 }
 
@@ -27,7 +28,7 @@ const msg = {
 
 .motto-container { 
   border: 1px solid gray; border-radius: 20px; max-width:
-  500px; margin: 60px auto 0px auto; 
+  500px; margin: 60px auto 60px auto; 
 }
 
 small, h2 { 

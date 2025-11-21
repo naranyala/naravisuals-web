@@ -10,6 +10,8 @@
 - [ ] fix article toc navigation
 - [ ] sorting/grouping articles/2d/3d assets
 - [ ] search bar for content
+- [ ] global light/dark theme toggle
+- [ ] global theme switch
 
 ## previous TODOS 
 

@@ -30,7 +30,7 @@ onUnmounted(() => {
   position: fixed;
   bottom: 0;
   left: 0;
-  height: 4px;
+  height: 1.5px;
   background: linear-gradient(to right, #007bff, #00aaff);
   z-index: 9999;
   transition: width 0.05s ease;

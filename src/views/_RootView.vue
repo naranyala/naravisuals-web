@@ -22,6 +22,7 @@ import VueComposablesView from "./VueComposablesView.vue"
 import ClarityFAQ from "./ClarityFAQ.vue"
 import GamePanelView from "./GamePanelView.vue"
 import BashScriptCollectionView from "./BashScriptCollectionView.vue"
+import MyLearningCourses from "./MyLearningCourses.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
@@ -34,7 +35,7 @@ const tabs = ref([
   { id: 3, label: "PLUGINS", component: MakeYourOwnPluginView },
   { id: 4, label: "SEGFAULT", component: CodeDumpRelearnView },
   { id: 5, label: "THEORIES", component: ProgrammingConceptView },
-  { id: 6, label: "EXAMPLES", component: CodeShowView },
+  { id: 6, label: "EXAMPLES", component: MyLearningCourses },
 
   // { id: 1, label: "FAQ", component: ClarityFAQ },
   // { id: 5, label: "THEORIES", component: GamePanelView },

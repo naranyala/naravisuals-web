@@ -6,10 +6,16 @@
       </a>
     </div>
     <p class="footer-copyright">© 2025 gema_naranyala</p>
+
+
+    <ScrollToTop/>
   </footer>
 </template>
 
 <script setup>
+
+import ScrollToTop from "./ScrollToTop.vue"
+
 const links = [
   { label: 'menu', href: '#' },
   { label: 'profile', href: '#' },
@@ -21,7 +27,8 @@ const links = [
 <style scoped>
 .footer {
   text-align: center;
-  padding: 1.2rem 1rem;
+  padding-top: 1.2rem;
+  padding-bottom: 120px;
   background-color: #121212;
   color: #b0b0b0;
   font-size: 1.05rem;
@@ -56,6 +63,7 @@ const links = [
   font-weight: 300;
   letter-spacing: 0.5px;
   font-size: 0.8rem;
+  margin-bottom: 20px;
 }
 
 /* Responsive touch optimization */

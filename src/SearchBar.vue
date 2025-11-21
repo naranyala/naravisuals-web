@@ -83,7 +83,7 @@ const performSearch = () => {
   flex-direction: column;
   gap: 12px;
   max-width: 500px;
-  margin: 60px auto 20px auto;
+  margin: 60px auto 60px auto;
   padding: 20px;
   background: #1a1a1a;
   border-radius: 12px;

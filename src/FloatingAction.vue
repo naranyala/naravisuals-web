@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 
-import IconPrinter from "../icons/IconPrinter.vue"
-import IconToTop from "../icons/IconToTop.vue"
+import IconPrinter from "./views/icons/IconPrinter.vue"
+import IconToTop from "./views/icons/IconToTop.vue"
 
 const buttons = ref([
   {

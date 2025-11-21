@@ -13,7 +13,11 @@ import RunningTextBar from "./RunningTextBar.vue"
 import SearchBar from "./SearchBar.vue"
 import PhoneKeypad from "./PhoneKeypad.vue"
 // import PrintAction from "./views/reusables/PrintAction.vue"
-import FloatingAction from "./views/reusables/FloatingAction.vue"
+// import FloatingAction from "./FloatingAction.vue"
+// import ProfileHeader from "./ProfileHeader.vue"
+import CommandCenter from "./CommandCenter.vue"
+
+
 
 import { isPrintAll } from "./router.ts"
 
@@ -63,47 +67,19 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-
-    <RunningTextBar 
-      direction="right"
-      text="COMING SOON! WORK IN PROGRESS ..."
-    />
-
+  <RunningTextBar direction="right" text="COMING SOON! WORK IN PROGRESS ..."/>
+  <CommandCenter/>
   <RouterView />
 
-    <!-- <RunningTextBar  -->
-    <!--   direction="right" -->
-    <!--   text="OPEN FOR WORK BTW ..." -->
-    <!-- /> -->
-
   <div class="no-print">
-  
-    <!-- <PrintAction :isPrintAll="isPrintAll"/> -->
-
-    <WordRandomizer/>
-    <SearchBar/>
-
-
-    <MottonCollection/>
-
-     <CurrentCalendar style="margin: 40px auto; width: 100%;"/>
-
-
-    <!-- <PhoneKeypad/> -->
-
-        <ScrollIndicator/>
-
-        <!-- <GradientGenerator/> -->
-
-
-    <MinimalFooter/>
-
-    <FloatingAction
-      @action-scroll="performScrolling"
-      @action-print="performPrinting"
-    />
-
+      <CurrentCalendar style="margin: 40px auto; width: 100%;"/>
+      <SearchBar/>
+      <WordRandomizer/>
+      <MottonCollection/>
+      <ScrollIndicator/>
+      <MinimalFooter/>
   </div>
+
 </template>
 
 <style scoped>
