@@ -8,7 +8,6 @@ import ScrollIndicator from "./ScrollIndicator.vue"
 import MottonCollection from "./MottoCollection.vue"
 import CurrentCalendar from "./views/widgets/CurrentCalendar.vue"
 import MinimalFooter from "./MinimalFooter.vue"
-import WordRandomizer from "./WordRandomizer.vue"
 import RunningTextBar from "./RunningTextBar.vue"
 import SearchBar from "./SearchBar.vue"
 import PhoneKeypad from "./PhoneKeypad.vue"
@@ -17,6 +16,9 @@ import PhoneKeypad from "./PhoneKeypad.vue"
 // import ProfileHeader from "./ProfileHeader.vue"
 import CommandCenter from "./CommandCenter.vue"
 
+import RandomWordSystem from "./RandomWordSystem.vue"
+import RandomWordTerms from "./RandomWordTerms.vue"
+import RandomWordHeaders from "./RandomWordHeaders.vue"
 
 
 import { isPrintAll } from "./router.ts"
@@ -73,8 +75,12 @@ onBeforeUnmount(() => {
 
   <div class="no-print">
       <CurrentCalendar style="margin: 40px auto; width: 100%;"/>
+      
+      <RandomWordSystem/>
+      <RandomWordTerms/>
+      <RandomWordHeaders/>
       <SearchBar/>
-      <WordRandomizer/>
+
       <MottonCollection/>
       <ScrollIndicator/>
       <MinimalFooter/>

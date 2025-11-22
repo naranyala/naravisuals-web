@@ -248,12 +248,9 @@ const randomize = () => {
 <template>
   <div class="container">
     <div class="card">
-      <h4 style="text-align: center; margin-bottom: 20px;">
-        Some System Programming Topic
-      </h4>
 
       <button @click="randomize" class="btn" style="margin-bottom: 20px;">
-        Randomize
+        Random System
       </button>
 
       <div class="display">
@@ -288,7 +285,7 @@ const randomize = () => {
 .display {
   padding: 60px 20px;
   text-align: center;
-  height: 300px;
+  height: 200px;
   font-size: 1.2rem;
   font-weight: 600;
   color: #ffffff;

@@ -9,6 +9,7 @@ const msg = {
     "mutual yet equal treatment;",
     "is that relevant?",
     // "relevant, relevant, relevant;"
+    "facilitate message-delivery"
   ],
 }
 

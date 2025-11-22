@@ -1,4 +1,3 @@
-
 <script setup>
 
 import { ref, onMounted, watch, watchEffect, computed} from "vue"
@@ -32,11 +31,11 @@ const activeTab = ref(0)
 const tabs = ref([
   // { id: 0, label: "PROFILE", component: ProfileView },
   { id: 1, label: "ARTICLES", component: ArticleView },
-  { id: 2, label: "VUE-COMPOSABLES", component: VueComposablesView },
-  { id: 3, label: "C+LIBRARIES", component: ProgrammingConceptView },
-  // { id: 3, label: "VUE-STYLING", component: MakeYourOwnPluginView },
-  // { id: 4, label: "C+NEOVIM", component: CodeDumpRelearnView },
-  // { id: 6, label: "C+RAYLIB", component: MyLearningCourses },
+  { id: 2, label: "COMPOSABLES", component: VueComposablesView },
+  { id: 3, label: "PLUGINS", component: MakeYourOwnPluginView },
+  { id: 4, label: "SEGFAULT", component: CodeDumpRelearnView },
+  { id: 5, label: "THEORIES", component: ProgrammingConceptView },
+  { id: 6, label: "EXAMPLES", component: MyLearningCourses },
 
   // { id: 1, label: "FAQ", component: ClarityFAQ },
   // { id: 5, label: "THEORIES", component: GamePanelView },

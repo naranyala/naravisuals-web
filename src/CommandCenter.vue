@@ -131,6 +131,7 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
               spellcheck="false"
               placeholder="type help"
             />
+            <button @click="exec">RUN</button>
           </div>
         </div>
       </div>
