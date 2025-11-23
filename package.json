@@ -19,6 +19,7 @@
     "dompurify": "^3.3.0",
     "gltf-loader": "^1.0.0",
     "highlight.js": "^11.11.1",
+    "leaflet": "^1.9.4",
     "marked": "^17.0.1",
     "orbit-controls": "^1.2.4",
     "prismjs": "^1.30.0",

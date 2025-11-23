@@ -1,0 +1,83 @@
+
+[
+  {
+    "label": "Frame Buffer",
+    "description": "A memory buffer that stores pixel data for rendering images on screen."
+  },
+  {
+    "label": "Render Loop",
+    "description": "The continuous cycle of updating and drawing graphics each frame."
+  },
+  {
+    "label": "Shader",
+    "description": "A small program executed on the GPU to control vertex or pixel processing."
+  },
+  {
+    "label": "Vertex",
+    "description": "A point in 2D or 3D space used to define geometry."
+  },
+  {
+    "label": "Fragment",
+    "description": "A potential pixel generated during rasterization, processed by fragment shaders."
+  },
+  {
+    "label": "Rasterization",
+    "description": "The process of converting vector graphics (triangles) into pixels on the screen."
+  },
+  {
+    "label": "Texture",
+    "description": "An image applied to geometry to add detail and realism."
+  },
+  {
+    "label": "UV Mapping",
+    "description": "The process of projecting a 2D texture onto a 3D surface."
+  },
+  {
+    "label": "Lighting",
+    "description": "Simulation of light sources to affect the appearance of objects."
+  },
+  {
+    "label": "Phong Shading",
+    "description": "A shading technique that interpolates surface normals for smooth lighting."
+  },
+  {
+    "label": "Z-Buffer",
+    "description": "A depth buffer used to determine which objects are visible in a scene."
+  },
+  {
+    "label": "Anti-Aliasing",
+    "description": "A technique to reduce jagged edges in rendered images."
+  },
+  {
+    "label": "GPU",
+    "description": "Graphics Processing Unit, specialized hardware for parallel rendering tasks."
+  },
+  {
+    "label": "Pipeline",
+    "description": "The sequence of stages (vertex, rasterization, fragment) used to render graphics."
+  },
+  {
+    "label": "Ray Tracing",
+    "description": "A rendering technique that simulates light rays for realistic reflections and shadows."
+  },
+  {
+    "label": "Frame Rate",
+    "description": "The number of frames rendered per second, affecting smoothness of animation."
+  },
+  {
+    "label": "Double Buffering",
+    "description": "Using two frame buffers to prevent flickering and tearing during rendering."
+  },
+  {
+    "label": "V-Sync",
+    "description": "Vertical synchronization to align frame rendering with display refresh rate."
+  },
+  {
+    "label": "Scene Graph",
+    "description": "A hierarchical structure representing objects and transformations in a scene."
+  },
+  {
+    "label": "Tessellation",
+    "description": "The process of subdividing geometry into finer detail for rendering."
+  }
+]

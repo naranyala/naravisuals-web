@@ -1,0 +1,83 @@
+
+[
+  {
+    "label": "Pointer",
+    "description": "A variable that stores the memory address of another variable."
+  },
+  {
+    "label": "Struct",
+    "description": "A user-defined composite data type that groups variables under one name."
+  },
+  {
+    "label": "Union",
+    "description": "A data type where all members share the same memory location."
+  },
+  {
+    "label": "Enum",
+    "description": "A set of named integer constants used to improve code readability."
+  },
+  {
+    "label": "Lifetime",
+    "description": "The duration for which a variable exists in memory (automatic, static, dynamic)."
+  },
+  {
+    "label": "Thread",
+    "description": "A unit of execution within a process, enabling concurrent operations."
+  },
+  {
+    "label": "Event",
+    "description": "An occurrence or signal that triggers specific code execution, often via callbacks."
+  },
+  {
+    "label": "Mutex",
+    "description": "A synchronization primitive that prevents multiple threads from accessing shared data simultaneously."
+  },
+  {
+    "label": "Semaphore",
+    "description": "A signaling mechanism used to control access to shared resources."
+  },
+  {
+    "label": "Callback",
+    "description": "A function passed as an argument to another function, invoked at a later time."
+  },
+  {
+    "label": "Heap",
+    "description": "Memory region used for dynamic allocation via malloc, calloc, realloc."
+  },
+  {
+    "label": "Stack",
+    "description": "Memory region used for automatic variables and function call management."
+  },
+  {
+    "label": "Buffer",
+    "description": "A temporary memory area used to store data during input/output operations."
+  },
+  {
+    "label": "Signal",
+    "description": "An asynchronous notification sent to a process to trigger a handler."
+  },
+  {
+    "label": "Interrupt",
+    "description": "A hardware or software mechanism that temporarily halts execution to handle events."
+  },
+  {
+    "label": "Compiler",
+    "description": "A program that translates C source code into machine code."
+  },
+  {
+    "label": "Linker",
+    "description": "A tool that combines object files and libraries into an executable."
+  },
+  {
+    "label": "Library",
+    "description": "A collection of precompiled routines, either static (.a) or dynamic (.so)."
+  },
+  {
+    "label": "Header file",
+    "description": "A file containing declarations and macros, typically with a .h extension."
+  },
+  {
+    "label": "State machine",
+    "description": "A programming model where behavior is defined by states and transitions."
+  }
+]

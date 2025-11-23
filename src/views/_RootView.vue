@@ -24,6 +24,8 @@ import ClarityFAQ from "./ClarityFAQ.vue"
 import GamePanelView from "./GamePanelView.vue"
 import BashScriptCollectionView from "./BashScriptCollectionView.vue"
 import MyLearningCourses from "./MyLearningCourses.vue"
+import VerticalTimeline from "./VerticalTimeline.vue"
+
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
@@ -31,7 +33,7 @@ const isPrintAll = ref(props?.isPrintAll || true)
 const activeTab = ref(0)
 const tabs = ref([
   // { id: 0, label: "PROFILE", component: ProfileView },
-  { id: 1, label: "ARTICLES", component: ArticleView },
+  { id: 1, label: "ARTICLES", component: VerticalTimeline },
   { id: 2, label: "VUE-COMPOSABLES", component: VueComposablesView },
   { id: 3, label: "C+LIBRARIES", component: ProgrammingConceptView },
   // { id: 3, label: "VUE-STYLING", component: MakeYourOwnPluginView },

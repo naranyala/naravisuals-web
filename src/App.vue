@@ -15,11 +15,12 @@ import PhoneKeypad from "./PhoneKeypad.vue"
 // import FloatingAction from "./FloatingAction.vue"
 // import ProfileHeader from "./ProfileHeader.vue"
 import CommandCenter from "./CommandCenter.vue"
+import RepoSearch from "./RepoSearch.vue"
 
 import RandomWordSystem from "./RandomWordSystem.vue"
 import RandomWordTerms from "./RandomWordTerms.vue"
 import RandomWordHeaders from "./RandomWordHeaders.vue"
-
+import MapPicker from "./MapPicker.vue"
 
 import { isPrintAll } from "./router.ts"
 
@@ -74,12 +75,18 @@ onBeforeUnmount(() => {
   <RouterView />
 
   <div class="no-print">
-      <CurrentCalendar style="margin: 40px auto; width: 100%;"/>
+       <div style="margin: auto; width: 500px; height: auto;">
+          <MapPicker/>
+      </div>
+      <CurrentCalendar 
+       style="margin: 40px auto; width: 100%;"/>
       
       <RandomWordSystem/>
       <RandomWordTerms/>
       <RandomWordHeaders/>
+
       <SearchBar/>
+      <RepoSearch/>
 
       <MottonCollection/>
       <ScrollIndicator/>
