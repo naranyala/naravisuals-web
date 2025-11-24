@@ -2,7 +2,7 @@
 <script setup>
 
 import { ref, onMounted, watch, watchEffect, computed} from "vue"
-import URLManager from "./utilities/URLManager.js"
+import URLManager from "../utilities/URLManager.js"
 import {useTitle} from "../composables.ts"
 import useLocalStorage from "./composables/useLocalStorage.js"
 import {
@@ -29,16 +29,20 @@ import ArticleView from "./ArticleView.vue"
 import EasyBudgetView from "./EasyBudgetView.vue"
 import SipenaView from "./SipenaView.vue"
 import CodingAsHobbyView from "./CodingAsHobbyView.vue"
+import GalleryView from "./GalleryView.vue"
+import CreativeLyrics from "./CreativeLyrics.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
 
 const activeTab = ref(0)
 const tabs = ref([
-  { id: 0, label: "MY-ARTICLES", component: ArticleView },
-  { id: 1, label: "CODING-AS-HOBBY", component: CodingAsHobbyView },
-  { id: 2, label: "SIPENA (TM)", component: SipenaView },
-  { id: 3, label: "EASYBUDGET (TM)", component: EasyBudgetView },
+  { id: 0, label: "GALLERY", component: GalleryView },
+  { id: 1, label: "ARTICLES", component: ArticleView },
+  { id: 2, label: "CODING-AS-HOBBY", component: CodingAsHobbyView },
+  { id: 3, label: "SIPENA (TM)", component: SipenaView },
+  { id: 4, label: "EASYBUDGET (TM)", component: EasyBudgetView },
+  { id: 5, label: "CREATIVE-LYRICS (TM)", component: CreativeLyrics },
   // { id: 0, label: "PROFILE", component: ProfileView },
   // { id: 1, label: "ARTICLES", component: VerticalTimeline },
   // { id: 2, label: "VUE-COMPOSABLES", component: VueComposablesView },

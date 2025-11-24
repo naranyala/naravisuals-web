@@ -1,11 +1,6 @@
-
 <template>
   <div>
-    <!-- Trigger button -->
-    <button @click="openGame">Play Breakout</button>
-
-    <!-- Modal overlay -->
-    <div v-if="showModal" class="modal">
+    <div class="modal">
       <div class="modal-content">
         <canvas ref="canvas" width="480" height="320"></canvas>
         <button @click="closeGame">Close</button>
@@ -17,7 +12,10 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 
-const showModal = ref(false);
+import CanvasUtils from "../utilities/canvas.js"
+
+const emit = defineEmits(['toggle-container']);
+
 const canvas = ref(null);
 let ctx;
 let gameInterval;
@@ -34,13 +32,13 @@ let rightPressed = false;
 let leftPressed = false;
 
 // Bricks
-let brickRowCount = 3;
-let brickColumnCount = 5;
-let brickWidth = 75;
-let brickHeight = 20;
-let brickPadding = 10;
-let brickOffsetTop = 30;
-let brickOffsetLeft = 30;
+const brickRowCount = 3;
+const brickColumnCount = 5;
+const brickWidth = 75;
+const brickHeight = 20;
+const brickPadding = 10;
+const brickOffsetTop = 30;
+const brickOffsetLeft = 30;
 let bricks = [];
 
 // Score
@@ -67,11 +65,9 @@ function initGame() {
 }
 
 function drawBall() {
-  ctx.beginPath();
-  ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+  CanvasUtils.drawCircle(ctx, x, y, ballRadius);
   ctx.fillStyle = "red";
   ctx.fill();
-  ctx.closePath();
 }
 
 function drawPaddle() {
@@ -79,22 +75,21 @@ function drawPaddle() {
   ctx.rect(paddleX, canvas.value.height - paddleHeight, paddleWidth, paddleHeight);
   ctx.fillStyle = "blue";
   ctx.fill();
-  ctx.closePath();
 }
 
 function drawBricks() {
   for (let c = 0; c < brickColumnCount; c++) {
     for (let r = 0; r < brickRowCount; r++) {
       if (bricks[c][r].status === 1) {
-        let brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
-        let brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+        const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+        const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
         bricks[c][r].x = brickX;
         bricks[c][r].y = brickY;
+        
         ctx.beginPath();
         ctx.rect(brickX, brickY, brickWidth, brickHeight);
         ctx.fillStyle = "green";
         ctx.fill();
-        ctx.closePath();
       }
     }
   }
@@ -103,7 +98,7 @@ function drawBricks() {
 function collisionDetection() {
   for (let c = 0; c < brickColumnCount; c++) {
     for (let r = 0; r < brickRowCount; r++) {
-      let b = bricks[c][r];
+      const b = bricks[c][r];
       if (b.status === 1) {
         if (
           x > b.x && x < b.x + brickWidth &&
@@ -129,7 +124,9 @@ function drawScore() {
 }
 
 function draw() {
+  // Clear using utility (more efficient than clearRect in some cases)
   ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
+  
   drawBricks();
   drawBall();
   drawPaddle();
@@ -171,20 +168,16 @@ function keyUpHandler(e) {
   else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
 }
 
-function openGame() {
-  showModal.value = true;
-  initGame();
-}
-
 function closeGame() {
-  showModal.value = false;
+  emit('toggle-container');
   clearInterval(gameInterval);
 }
 
 onMounted(() => {
-  ctx = canvas.value.getContext("2d");
+  ctx = canvas.value?.getContext("2d");
   document.addEventListener("keydown", keyDownHandler);
   document.addEventListener("keyup", keyUpHandler);
+  initGame(); // Start game on mount
 });
 
 onBeforeUnmount(() => {

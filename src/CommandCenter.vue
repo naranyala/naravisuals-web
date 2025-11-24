@@ -3,6 +3,10 @@ import { ref, nextTick, watch } from 'vue'
 
 import ScrollToBottom from "./ScrollToBottom.vue"
 
+import Calculator from "./games/Calculator.vue"
+import Breakout from "./games/Breakout.vue"
+import Snake from "./games/Snake.vue"
+
 const open = ref(false)
 const history = ref([])
 const cmd = ref('')
@@ -20,6 +24,10 @@ const PROMPT_SYMBOL = ref(">")
 watch(open, (val) => {
   if (val) nextTick(() => inputRef.value?.focus())
 })
+
+const isCalculatorVisible = ref(false)
+const isBreakoutVisible = ref(false)
+const isSnakeVisible = ref(false)
 
 const commands = {
   work: () => out("hire me! fast"),
@@ -60,7 +68,6 @@ const commands = {
     const q = ['Keep it simple.', 'Stay curious.', 'Done is better than perfect.', 'Think different.', 'Start now.']
     out(q[Math.floor(Math.random() * q.length)])
   },
-  ascii: () => out(' _____\n|TERM |\n|_____|'),
   matrix: () => {
     let i = 0
     const iv = setInterval(() => {
@@ -70,9 +77,21 @@ const commands = {
       out(`<span style="color:#0f0">${line}</span>`)
     }, 100)
   },
-  game_snake: () => alert('play snake game!'),
-  game_breakout: () => alert('play breakout game!'),
-  app_calculator: () => alert('open calculator!'),
+  game_snake: () => {
+    isSnakeVisible.value = !isSnakeVisible.value;
+    open.value = !open.value;
+  },
+  game_breakout: () => {
+    isBreakoutVisible.value = !isBreakoutVisible.value;
+    open.value = !open.value;
+  },
+  app_calculator: () => {
+    isCalculatorVisible.value = !isCalculatorVisible.value;
+    open.value = !open.value;
+  },
+  show_profile: () => {
+    location.replace('/profile');
+  }
 }
 
 function out(content, type = '') {
@@ -116,7 +135,7 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
     <!-- Sticky Header (navbar + terminal) -->
     <header class="sticky-header">
       <nav class="navbar">
-        <span class="logo">{{SITE_TITLE}}</span>
+        <a href="/" class="logo">{{SITE_TITLE}}</a>
         <button @click="open = !open" style="border: none;">
           <svg v-if="open" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M16 2C8.2 2 2 8.2 2 16s6.2 14 14 14s14-6.2 14-14S23.8 2 16 2m0 26C9.4 28 4 22.6 4 16S9.4 4 16 4s12 5.4 12 12s-5.4 12-12 12"/><path fill="currentColor" d="M21.4 23L16 17.6L10.6 23L9 21.4l5.4-5.4L9 10.6L10.6 9l5.4 5.4L21.4 9l1.6 1.6l-5.4 5.4l5.4 5.4z"/></svg>            
           <svg v-if="!open" xmlns="http://www.w3.org/2000/svg" width="32"
@@ -149,7 +168,18 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
       </div>
     </header>
 
+    <Teleport to="body">
+      <Calculator 
+        v-if="isCalculatorVisible" 
+        @toggle-container="commands.app_calculator"/>
+      <Breakout
+        v-if="isBreakoutVisible" 
+        @toggle-container="commands.game_breakout"/>
 
+      <Snake
+        v-if="isSnakeVisible" 
+        @toggle-container="commands.game_snake"/>
+    </Teleport>
   </div>
 </template>
 

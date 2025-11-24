@@ -1,6 +1,6 @@
 <template>
   <div class="welcome-menu">
-    <h1 class="menu-title">Welcome to Your App!</h1>
+    <h1 class="menu-title">Welcome to My App!</h1>
 
     <div class="card-grid">
       <div 
