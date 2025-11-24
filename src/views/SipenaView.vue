@@ -179,12 +179,15 @@ onMounted(() => {
 }
 
 .header {
-  display: flex;
+  /* display: flex; */
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  padding-bottom: 10px;
+  padding-bottom: 30px;
   border-bottom: 1px solid #333;
+  text-align: center;
+
+  h1 { padding-bottom: 20px; }
 }
 
 h1 {
@@ -193,8 +196,10 @@ h1 {
 }
 
 .controls {
-  display: flex;
-  gap: 8px;
+  /* display: grid; */
+  width: auto;
+  /* gap: 8px; */
+  button { margin: 4px; }
 }
 
 button {

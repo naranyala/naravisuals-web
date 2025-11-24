@@ -1,10 +1,11 @@
 <template>
   <footer class="footer">
-    <div class="footer-links">
+<!--    <div class="footer-links">
       <a v-for="item in links" :key="item.label" :href="item.href" class="link-item">
         {{ item.label }}
       </a>
     </div>
+-->
     <p class="footer-copyright">© 2025 gema_naranyala</p>
 
 

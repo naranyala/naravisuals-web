@@ -9,6 +9,8 @@ import CommandCenter from "./CommandCenter.vue"
 import RunningTextBar from "./RunningTextBar.vue"
 import MinimalFooter from "./MinimalFooter.vue"
 
+import WelcomeMenu from "./WelcomeMenu.vue"
+
 import { isPrintAll } from "./router.ts"
 
 
@@ -62,7 +64,7 @@ onBeforeUnmount(() => {
   <RouterView />
 
   <div class="no-print">
-
+      <WelcomeMenu/>
       <MinimalFooter/>
   </div>
 
