@@ -4,23 +4,10 @@ import {ref} from "vue"
 
 import { RouterLink, RouterView } from 'vue-router'
 
-import ScrollIndicator from "./ScrollIndicator.vue"
-import MottonCollection from "./MottoCollection.vue"
-import CurrentCalendar from "./views/widgets/CurrentCalendar.vue"
-import MinimalFooter from "./MinimalFooter.vue"
-import RunningTextBar from "./RunningTextBar.vue"
-import SearchBar from "./SearchBar.vue"
-import PhoneKeypad from "./PhoneKeypad.vue"
-// import PrintAction from "./views/reusables/PrintAction.vue"
-// import FloatingAction from "./FloatingAction.vue"
-// import ProfileHeader from "./ProfileHeader.vue"
-import CommandCenter from "./CommandCenter.vue"
-import RepoSearch from "./RepoSearch.vue"
 
-import RandomWordSystem from "./RandomWordSystem.vue"
-import RandomWordTerms from "./RandomWordTerms.vue"
-import RandomWordHeaders from "./RandomWordHeaders.vue"
-import MapPicker from "./MapPicker.vue"
+import CommandCenter from "./CommandCenter.vue"
+import RunningTextBar from "./RunningTextBar.vue"
+import MinimalFooter from "./MinimalFooter.vue"
 
 import { isPrintAll } from "./router.ts"
 
@@ -75,21 +62,7 @@ onBeforeUnmount(() => {
   <RouterView />
 
   <div class="no-print">
-       <div style="margin: auto; width: 500px; height: auto;">
-          <MapPicker/>
-      </div>
-      <CurrentCalendar 
-       style="margin: 40px auto; width: 100%;"/>
-      
-      <RandomWordSystem/>
-      <RandomWordTerms/>
-      <RandomWordHeaders/>
 
-      <SearchBar/>
-      <RepoSearch/>
-
-      <MottonCollection/>
-      <ScrollIndicator/>
       <MinimalFooter/>
   </div>
 

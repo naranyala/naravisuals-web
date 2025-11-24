@@ -10,32 +10,39 @@ import {
 } from "./utils.js"
 
 
-import MakeYourOwnPluginView from "./MakeYourOwnPlugin.vue"
-import CodeShowView from "./CodeShowView.vue"
-import ProgrammingConceptView from "./ProgrammingConceptView.vue"
-import CodeDumpRelearnView from "./CodeDumpRelearnView.vue"
-import ProfileView from "./ProfileView.vue"
-import CreativeView from "./CreativeView.vue"
-import Creative3DView from "./Creative3DView.vue"
-import ArticleView from "./ArticleView.vue"
+// import MakeYourOwnPluginView from "./MakeYourOwnPlugin.vue"
+// import CodeShowView from "./CodeShowView.vue"
+// import ProgrammingConceptView from "./ProgrammingConceptView.vue"
+// import CodeDumpRelearnView from "./CodeDumpRelearnView.vue"
+// import ProfileView from "./ProfileView.vue"
+// import CreativeView from "./CreativeView.vue"
+// import Creative3DView from "./Creative3DView.vue"
 // import GeneralFaqView from "./GeneralFaqView.vue"
-import VueComposablesView from "./VueComposablesView.vue"
-import ClarityFAQ from "./ClarityFAQ.vue"
-import GamePanelView from "./GamePanelView.vue"
-import BashScriptCollectionView from "./BashScriptCollectionView.vue"
-import MyLearningCourses from "./MyLearningCourses.vue"
-import VerticalTimeline from "./VerticalTimeline.vue"
+// import VueComposablesView from "./VueComposablesView.vue"
+// import ClarityFAQ from "./ClarityFAQ.vue"
+// import GamePanelView from "./GamePanelView.vue"
+// import BashScriptCollectionView from "./BashScriptCollectionView.vue"
+// import MyLearningCourses from "./MyLearningCourses.vue"
+// import VerticalTimeline from "./VerticalTimeline.vue"
 
+import ArticleView from "./ArticleView.vue"
+import EasyBudgetView from "./EasyBudgetView.vue"
+import SipenaView from "./SipenaView.vue"
+import CodingAsHobbyView from "./CodingAsHobbyView.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
 
 const activeTab = ref(0)
 const tabs = ref([
+  { id: 0, label: "MY-ARTICLES", component: ArticleView },
+  { id: 1, label: "CODING-AS-HOBBY", component: CodingAsHobbyView },
+  { id: 2, label: "SIPENA (TM)", component: SipenaView },
+  { id: 3, label: "EASYBUDGET (TM)", component: EasyBudgetView },
   // { id: 0, label: "PROFILE", component: ProfileView },
-  { id: 1, label: "ARTICLES", component: VerticalTimeline },
-  { id: 2, label: "VUE-COMPOSABLES", component: VueComposablesView },
-  { id: 3, label: "C+LIBRARIES", component: ProgrammingConceptView },
+  // { id: 1, label: "ARTICLES", component: VerticalTimeline },
+  // { id: 2, label: "VUE-COMPOSABLES", component: VueComposablesView },
+  // { id: 3, label: "C+LIBRARIES", component: ProgrammingConceptView },
   // { id: 3, label: "VUE-STYLING", component: MakeYourOwnPluginView },
   // { id: 4, label: "C+NEOVIM", component: CodeDumpRelearnView },
   // { id: 6, label: "C+RAYLIB", component: MyLearningCourses },

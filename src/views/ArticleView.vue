@@ -1,492 +1,243 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
-const selectedItem = ref(null);
-const isDarkTheme = ref(true);
-const showModal = ref(false);
-
-const mainDesc = ref("koleksi artikel di bawah ini ditujukan untuk memetakkan perjalan manusia dalam upaya bertahan dengan kondisi alam dan kondisi sosial yang senantiasa berubah, dituntut untuk beradaptasi, bertahan, dan menang.")
-
-const sections = ref([
+// --- Article Data (Unchanged from previous response) ---
+const articles = ref([
   {
-    title: "1. Early Humanity & Stone Ages",
-    items: [
-      { date: "3.5M YA", event: "First stone tools (scavenging)" },
-      { date: "1.8M YA", event: "Fire + migration; cooking boosts brain development" },
-      { date: "300K YA", event: "Homo sapiens emerges" },
-      { date: "70K YA", event: "Toba bottleneck (genetic reset)" },
-      { date: "60K YA", event: "Out of Africa migration (coastal routes)" },
-      { date: "50K YA", event: "Australia colonized (rafts)" },
-      { date: "40K YA", event: "Europe colonized; Neanderthal decline" },
-      { date: "15K YA", event: "Cave art peak (Lascaux)" },
-      { date: "12K YA", event: "End of Ice Age → megafauna extinction" },
-      { date: "10K YA", event: "Agriculture begins → end of pure survival mode" }
-    ]
+    id: 1,
+    title: 'The Future of Frontend Development',
+    summary: 'A look into modern framework trends, performance optimizations, and the rise of server-side components.',
+    content: [
+      { chapterTitle: 'Chapter 1: The Rise of Build Tools', body: 'The landscape of frontend development is constantly evolving. The shift towards **Vite** and **Turbopack** is accelerating development cycles significantly, making initial load times near instantaneous.' },
+      { chapterTitle: 'Chapter 2: Universal Rendering Trends', body: 'The move towards **universal** (or isomorphic) rendering, including Server-Side Rendering (SSR) and Static Site Generation (SSG), is key to modern performance.' },
+      { chapterTitle: 'Chapter 3: The WebAssembly Factor', body: 'Furthermore, **WebAssembly (Wasm)** is opening new doors for performance-intensive tasks within the browser, allowing high-performance code written in languages like Rust or C++ to run at near-native speed.' },
+    ],
   },
   {
-    title: "2. Early Agriculture, Late Neolithic & Medieval",
-    items: [
-      { date: "10,000 BCE", event: "First farms (Fertile Crescent)" },
-      { date: "8,000 BCE", event: "Jericho: first walled town" },
-      { date: "6,000 BCE", event: "Copper tools + megaliths" },
-      { date: "5,000 BCE", event: "Wheel invented (Mesopotamia)" },
-      { date: "4,000 BCE", event: "Sumer: cities, writing, war" },
-      { date: "3,000 BCE", event: "Bronze Age begins" },
-      { date: "1,200 BCE", event: "Bronze Age collapse → Iron Age" },
-      { date: "500 CE", event: "Fall of Rome → 'Dark Ages'" },
-      { date: "800 CE", event: "Viking expansion (trade + raids)" },
-      { date: "1000 CE", event: "Medieval warm period → population boom" },
-      { date: "1347 CE", event: "Black Death → social reset" },
-      { date: "1440 CE", event: "Gutenberg printing press" },
-      { date: "1492 CE", event: "Columbus → end of medieval isolation" }
-    ]
+    id: 2,
+    title: 'Mastering Vue 3 Composables',
+    summary: 'Understand how to create reusable, reactive logic using the Composition API to keep your components clean.',
+    content: [
+      { chapterTitle: 'Chapter 1: What are Composables?', body: 'Composables are functions that leverage Vue 3\'s reactivity system to encapsulate stateful logic. This pattern allows for powerful **code reuse** and improved separation of concerns.' },
+      { chapterTitle: 'Chapter 2: Structure and Implementation', body: 'A composable typically starts with `use` (e.g., `useMousePosition`). Inside the function, you define reactive state using `ref` or `reactive` and expose only the necessary properties.' },
+      { chapterTitle: 'Chapter 3: Real-World Examples', body: 'Common examples of composables in a large application include custom logic for API fetching (`useFetch`) or managing local browser storage (`useStorage`).' },
+    ],
   },
-  {
-    title: "3. Kingdoms, Empires & Exploration Era",
-    items: [
-      { date: "1415", event: "Portugal captures Ceuta (start of global exploration)" },
-      { date: "1453", event: "Constantinople falls, spice routes blocked" },
-      { date: "1492", event: "Columbus reaches the Americas" },
-      { date: "1494", event: "Treaty of Tordesillas divides the world" },
-      { date: "1498", event: "Vasco da Gama reaches India" },
-      { date: "1519–1522", event: "Magellan expedition: first circumnavigation" },
-      { date: "1577", event: "Drake circumnavigates + plunder economy" },
-      { date: "1602", event: "Dutch VOC: early global capitalism" },
-      { date: "1620", event: "Mayflower lands in New England (colonization begins)" },
-      { date: "1688", event: "Glorious Revolution → constitutional monarchy" },
-      { date: "1740", event: "Scurvy cracked (Anson era)" },
-      { date: "1768", event: "Cook maps Pacific; scurvy eliminated" },
-      { date: "1776", event: "American Revolution (shift in global power)" }
-    ]
-  },
-  {
-    title: "4. Industrial, Modern & Digital Eras",
-    items: [
-      { date: "1769", event: "Watt's steam engine (Industrial Revolution)" },
-      { date: "1804", event: "Napoleon crowned emperor" },
-      { date: "1859", event: "Darwin's Origin of Species" },
-      { date: "1876", event: "Bell invents telephone" },
-      { date: "1913", event: "Ford assembly line + income tax" },
-      { date: "1914–1918", event: "WWI (empires collapse)" },
-      { date: "1929", event: "Wall Street Crash" },
-      { date: "1939–1945", event: "WWII → nuclear age begins" },
-      { date: "1944", event: "Bretton Woods (USD becomes world currency)" },
-      { date: "1969", event: "Moon landing" },
-      { date: "1971", event: "Gold standard ends → fiat era begins" },
-      { date: "1989", event: "World Wide Web invented; Berlin Wall falls" },
-      { date: "2001", event: "9/11 → War on Terror" },
-      { date: "2008", event: "Financial crisis + Bitcoin whitepaper" },
-      { date: "2020", event: "COVID → remote work + economic shocks" },
-      { date: "2023", event: "AI boom (GPT era) → job disruption" },
-      { date: "2025", event: '"You are here" → AGI on horizon?' }
-    ]
-  }
 ]);
 
-const openModal = (sectionIdx, itemIdx) => {
-  selectedItem.value = { sectionIdx, itemIdx };
-  showModal.value = true;
+// --- State and Methods (Unchanged) ---
+const selectedArticleId = ref(null);
+
+const selectedArticle = computed(() => {
+  if (selectedArticleId.value === null) {
+    return null;
+  }
+  return articles.value.find(a => a.id === selectedArticleId.value);
+});
+
+const openReadingMode = (id) => {
+  selectedArticleId.value = id;
 };
 
-const closeModal = () => {
-  showModal.value = false;
-};
-
-const toggleTheme = () => {
-  isDarkTheme.value = !isDarkTheme.value;
+const closeReadingMode = () => {
+  selectedArticleId.value = null;
 };
 </script>
 
 <template>
-  <div :class="['app-container', { 'dark-theme': isDarkTheme }]">
-    <div class="content-wrapper">
-      <!-- Theme Toggle -->
-      <div class="theme-toggle-wrapper">
-        <button class="theme-toggle-btn" @click="toggleTheme">
-          {{ isDarkTheme ? '☀️ Light Mode' : '🌙 Dark Mode' }}
-        </button>
-      </div>
+  <div class="article-container dark-theme">
+    <h1 class="main-title">VueJS Chaptered Article Viewer</h1>
 
-      <div class="article-card">
-        <!-- Header -->
-        <div class="article-header">
-          <p class="article-description">
-                        {{mainDesc}}
-          </p>
-          <h1 class="article-title">
-            Human Survival Timeline — Compact Edition
-          </h1>
-        </div>
+    <div v-if="selectedArticle" class="reading-mode">
+      <button @click="closeReadingMode" class="back-button">
+        &lt; Back to List
+      </button>
+      <h2>{{ selectedArticle.title }}</h2>
+      <hr class="divider">
 
-        <!-- Content -->
-        <div class="article-content">
-          <div
-            v-for="(section, sectionIdx) in sections"
-            :key="sectionIdx"
-            class="section"
-          >
-            <!-- Section Title -->
-            <h2 class="section-title">{{ section.title }}</h2>
-
-            <!-- Timeline Items -->
-            <div class="timeline-items">
-              <div
-                v-for="(item, itemIdx) in section.items"
-                :key="itemIdx"
-                @click="openModal(sectionIdx, itemIdx)"
-                class="timeline-item"
-              >
-                <span class="timeline-date">{{ item.date }}</span>
-                <span class="timeline-event">→ {{ item.event }}</span>
-              </div>
-            </div>
-
-            <!-- Section Divider -->
-            <div v-if="sectionIdx < sections.length - 1" class="section-divider">
-              <div class="divider-line"></div>
-            </div>
-          </div>
-        </div>
+      <div v-for="(chapter, index) in selectedArticle.content" :key="index" class="article-chapter">
+        <h3 class="chapter-title">{{ chapter.chapterTitle }}</h3>
+        <p class="chapter-body">{{ chapter.body }}</p>
       </div>
     </div>
 
-    <!-- Fullscreen Modal -->
-    <div v-if="showModal" class="modal-overlay" @click="closeModal">
-      <div class="modal-content" @click.stop>
-        <button class="modal-close" @click="closeModal">✕</button>
-        
-        <div v-if="selectedItem" class="modal-body">
-          <h2 class="modal-title">
-            {{ sections[selectedItem.sectionIdx].items[selectedItem.itemIdx].date }}
-          </h2>
-          <p class="modal-description">
-            {{ sections[selectedItem.sectionIdx].items[selectedItem.itemIdx].event }}
-          </p>
-          
-          <div class="modal-placeholder">
-            <p>Content will be displayed here...</p>
-          </div>
-        </div>
-      </div>
+    <div v-else class="article-list">
+      <h3>Select an Article to Read ({{ articles.length }} total)</h3>
+      <ul>
+        <li
+          v-for="article in articles"
+          :key="article.id"
+          @click="openReadingMode(article.id)"
+          class="article-item"
+        >
+          <h4>{{ article.title }}</h4>
+          <p>{{ article.summary }}</p>
+          <span class="read-more">Click to Read &gt;</span>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
 
 <style scoped>
-* {
-  box-sizing: border-box;
+/*
+|--------------------------------------------------------------------------
+| 1. CSS Variables (The Key to Theming)
+|--------------------------------------------------------------------------
+*/
+/* Default (Light) Theme Variables */
+:root {
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f0f0f0;
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #666666;
+    --color-accent: #42b883; /* Vue Green */
+    --color-border: #35495e;
+    --color-list-item-bg: #fff;
+    --color-list-item-hover-bg: #f5f5f5;
 }
 
-.app-container {
-  min-height: 100vh;
-  padding: 2rem;
-  background: #f3f4f6;
-  transition: background-color 0.3s ease;
+/* Dark Theme Variables (Override for .dark-theme) */
+.dark-theme {
+    /* Main Backgrounds and Text */
+    --color-bg-primary: #121212;
+    --color-bg-secondary: #1e1e1e;
+    --color-text-primary: #e0e0e0;
+    --color-text-secondary: #aaaaaa;
+    
+    /* Accent and Borders */
+    --color-accent: #69f0ae; /* A brighter, friendly green for dark mode */
+    --color-border: #333333;
+    
+    /* List/Card Specifics */
+    --color-list-item-bg: #222222;
+    --color-list-item-hover-bg: #2a2a2a;
 }
 
-.app-container.dark-theme {
-  background: #111827;
-}
 
-.content-wrapper {
-  max-width: 1024px;
+/*
+|--------------------------------------------------------------------------
+| 2. General Layout & Base Styles (Using Variables)
+|--------------------------------------------------------------------------
+*/
+.article-container {
+  max-width: 800px;
   margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  
+  /* Apply dark theme background/text colors to the root */
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  transition: background-color 0.3s;
 }
 
-.theme-toggle-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1rem;
+.main-title {
+  border-bottom: 2px solid var(--color-accent);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  color: var(--color-accent);
 }
 
-.theme-toggle-btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  border: none;
+.divider {
+    border: 0;
+    height: 1px;
+    background: var(--color-border);
+    margin: 20px 0;
+}
+
+/* --- List Styling --- */
+.article-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.article-item {
+  background-color: var(--color-list-item-bg);
+  border: 1px solid var(--color-border);
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background: white;
-  color: #374151;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
 }
 
-.dark-theme .theme-toggle-btn {
-  background: #1f2937;
-  color: #e5e7eb;
+.article-item:hover {
+  background-color: var(--color-list-item-hover-bg);
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.theme-toggle-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+.article-item h4 {
+  margin: 0 0 5px 0;
+  color: var(--color-text-primary);
 }
 
-.article-card {
-  border-radius: 0.5rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  background: white;
-  transition: background-color 0.3s ease;
+.article-item p {
+  font-size: 0.9em;
+  color: var(--color-text-secondary);
+  margin-bottom: 5px;
 }
 
-.dark-theme .article-card {
-  background: #1f2937;
-}
-
-.article-header {
-  border-bottom: 1px solid #e5e7eb;
-  padding: 1.5rem;
-  transition: border-color 0.3s ease;
-}
-
-.dark-theme .article-header {
-  border-bottom-color: #374151;
-}
-
-.article-description {
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-  line-height: 1.625;
-  color: #6b7280;
-  transition: color 0.3s ease;
-    text-align: center;
-}
-
-.dark-theme .article-description {
-  color: #9ca3af;
-}
-
-.highlight {
-  font-weight: 600;
-  color: #2563eb;
-  transition: color 0.3s ease;
-}
-
-.dark-theme .highlight {
-  color: #60a5fa;
-}
-
-.article-title {
-  font-size: 1.875rem;
-  font-family: Georgia, 'Times New Roman', serif;
+.read-more {
+  display: block;
+  font-size: 0.8em;
+  color: var(--color-accent);
   font-weight: bold;
-  color: #111827;
-  margin: 0;
-  transition: color 0.3s ease;
 }
 
-.dark-theme .article-title {
-  color: #f3f4f6;
+/* --- Reading Mode Styling --- */
+.reading-mode {
+  padding: 25px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-bg-secondary);
 }
 
-.article-content {
-  padding: 1.5rem;
-}
-
-.section {
-  margin-bottom: 2rem;
-}
-
-.section:last-child {
-  margin-bottom: 0;
-}
-
-.section-title {
-  font-size: 1.25rem;
-  font-family: Georgia, 'Times New Roman', serif;
+.back-button {
+  background: none;
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent);
+  padding: 8px 15px;
+  border-radius: 5px;
   font-weight: bold;
-  color: #111827;
-  margin: 0 0 1rem 0;
-  transition: color 0.3s ease;
-}
-
-.dark-theme .section-title {
-  color: #f3f4f6;
-}
-
-.timeline-items {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.timeline-item {
-  display: flex;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  margin-bottom: 20px;
+  transition: background-color 0.2s;
 }
 
-.timeline-item:hover {
-  background: #f9fafb;
-  transform: translateX(4px);
+.back-button:hover {
+  background-color: var(--color-accent);
+  color: var(--color-bg-secondary);
 }
 
-.dark-theme .timeline-item:hover {
-  background: rgba(55, 65, 81, 0.5);
+.reading-mode h2 {
+  color: var(--color-accent);
+  margin-top: 0;
+  font-size: 2em;
 }
 
-.timeline-date {
-  font-weight: 600;
-  min-width: 110px;
-  color: #111827;
-  transition: color 0.3s ease;
+/* --- Chapter Structure Styling --- */
+.article-chapter {
+  margin-bottom: 30px;
+  padding: 15px;
+  border-left: 5px solid var(--color-accent);
+  background-color: var(--color-list-item-hover-bg); /* slightly darker than reading mode bg */
+  border-radius: 4px;
 }
 
-.dark-theme .timeline-date {
-  color: #d1d5db;
+.chapter-title {
+  color: var(--color-text-primary);
+  margin: 0 0 10px 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 1.3em;
 }
 
-.timeline-event {
-  flex: 1;
-  color: #374151;
-  transition: color 0.3s ease;
-}
-
-.dark-theme .timeline-event {
-  color: #9ca3af;
-}
-
-.section-divider {
-  margin-top: 1.5rem;
-  display: flex;
-  justify-content: center;
-}
-
-.divider-line {
-  width: 16rem;
-  height: 1px;
-  background: #d1d5db;
-  transition: background-color 0.3s ease;
-}
-
-.dark-theme .divider-line {
-  background: #374151;
-}
-
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.modal-content {
-  background: white;
-  border-radius: 1rem;
-  width: 90%;
-  max-width: 1200px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  animation: slideUp 0.3s ease;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
-.dark-theme .modal-content {
-  background: #1f2937;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.modal-close {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  border: none;
-  background: #f3f4f6;
-  color: #374151;
-  font-size: 1.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  z-index: 10;
-}
-
-.dark-theme .modal-close {
-  background: #374151;
-  color: #f3f4f6;
-}
-
-.modal-close:hover {
-  background: #e5e7eb;
-  transform: rotate(90deg);
-}
-
-.dark-theme .modal-close:hover {
-  background: #4b5563;
-}
-
-.modal-body {
-  padding: 3rem;
-}
-
-.modal-title {
-  font-size: 2.5rem;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-weight: bold;
-  color: #111827;
-  margin: 0 0 1rem 0;
-}
-
-.dark-theme .modal-title {
-  color: #f3f4f6;
-}
-
-.modal-description {
-  font-size: 1.25rem;
-  color: #6b7280;
-  margin: 0 0 2rem 0;
-  line-height: 1.8;
-}
-
-.dark-theme .modal-description {
-  color: #9ca3af;
-}
-
-.modal-placeholder {
-  padding: 4rem 2rem;
-  background: #f9fafb;
-  border-radius: 0.5rem;
-  text-align: center;
-  color: #9ca3af;
-  font-size: 1.125rem;
-}
-
-.dark-theme .modal-placeholder {
-  background: #111827;
-  color: #6b7280;
+.chapter-body {
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0;
 }
 </style>
