@@ -1,0 +1,145 @@
+{
+  "nodes": [
+    {
+      "text": "Learn Rust",
+      "x": 400,
+      "y": 300,
+      "color": "#E74C3C"
+    },
+    {
+      "text": "Core Concepts",
+      "x": 200,
+      "y": 180,
+      "color": "#3498DB"
+    },
+    {
+      "text": "Systems Programming",
+      "x": 200,
+      "y": 420,
+      "color": "#3498DB"
+    },
+    {
+      "text": "Tooling & Ecosystem",
+      "x": 600,
+      "y": 180,
+      "color": "#3498DB"
+    },
+    {
+      "text": "Projects & Practice",
+      "x": 600,
+      "y": 420,
+      "color": "#3498DB"
+    },
+    {
+      "text": "Syntax & Types",
+      "x": 50,
+      "y": 100,
+      "color": "#2ECC71"
+    },
+    {
+      "text": "Ownership & Borrowing",
+      "x": 50,
+      "y": 180,
+      "color": "#2ECC71"
+    },
+    {
+      "text": "Error Handling",
+      "x": 50,
+      "y": 260,
+      "color": "#2ECC71"
+    },
+    {
+      "text": "Traits & Generics",
+      "x": 50,
+      "y": 340,
+      "color": "#2ECC71"
+    },
+    {
+      "text": "Memory Safety",
+      "x": 50,
+      "y": 420,
+      "color": "#2ECC71"
+    },
+    {
+      "text": "Concurrency & Parallelism",
+      "x": 50,
+      "y": 500,
+      "color": "#2ECC71"
+    },
+    {
+      "text": "Unsafe Rust & FFI",
+      "x": 50,
+      "y": 580,
+      "color": "#2ECC71"
+    },
+    {
+      "text": "Cargo & Crates.io",
+      "x": 750,
+      "y": 100,
+      "color": "#F39C12"
+    },
+    {
+      "text": "Testing & Benchmarking",
+      "x": 750,
+      "y": 180,
+      "color": "#F39C12"
+    },
+    {
+      "text": "Clippy & Rustfmt",
+      "x": 750,
+      "y": 260,
+      "color": "#F39C12"
+    },
+    {
+      "text": "Async & Tokio",
+      "x": 750,
+      "y": 340,
+      "color": "#F39C12"
+    },
+    {
+      "text": "CLI Applications",
+      "x": 750,
+      "y": 420,
+      "color": "#F39C12"
+    },
+    {
+      "text": "Web Backend (Axum/Actix)",
+      "x": 750,
+      "y": 500,
+      "color": "#F39C12"
+    },
+    {
+      "text": "WebAssembly (WASM)",
+      "x": 750,
+      "y": 580,
+      "color": "#F39C12"
+    },
+    {
+      "text": "Embedded / IoT",
+      "x": 750,
+      "y": 660,
+      "color": "#F39C12"
+    }
+  ],
+  "connections": [
+    { "from": 0, "to": 1 },
+    { "from": 0, "to": 2 },
+    { "from": 0, "to": 3 },
+    { "from": 0, "to": 4 },
+    { "from": 1, "to": 5 },
+    { "from": 1, "to": 6 },
+    { "from": 1, "to": 7 },
+    { "from": 1, "to": 8 },
+    { "from": 2, "to": 9 },
+    { "from": 2, "to": 10 },
+    { "from": 2, "to": 11 },
+    { "from": 3, "to": 12 },
+    { "from": 3, "to": 13 },
+    { "from": 3, "to": 14 },
+    { "from": 3, "to": 15 },
+    { "from": 4, "to": 16 },
+    { "from": 4, "to": 17 },
+    { "from": 4, "to": 18 },
+    { "from": 4, "to": 19 }
+  ]
+}

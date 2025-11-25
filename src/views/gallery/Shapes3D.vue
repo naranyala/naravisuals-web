@@ -208,7 +208,7 @@ watch(selectedShapeType, () => {
 .controls {
   padding: 1rem;
   border: 1px solid white;
-  margin: 0 20vw;
+  margin: 0 20px;
   /* background: #fafafa; */
   background: black;
   border-bottom: 1px solid #ddd;

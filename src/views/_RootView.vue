@@ -29,15 +29,17 @@ import ArticleView from "./ArticleView.vue"
 import EasyBudgetView from "./EasyBudgetView.vue"
 import SipenaView from "./SipenaView.vue"
 import CodingAsHobbyView from "./CodingAsHobbyView.vue"
-import GalleryView from "./GalleryView.vue"
+// import GalleryView from "./GalleryView.vue"
 import CreativeLyrics from "./CreativeLyrics.vue"
+import MindmapMaker from "./MindmapRoot.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
 
 const activeTab = ref(0)
 const tabs = ref([
-  { id: 0, label: "GALLERY", component: GalleryView },
+  { id: 0, label: "MINDMAP-MAKER", component: MindmapMaker },
+  // { id: 0, label: "GALLERY", component: GalleryView },
   { id: 1, label: "ARTICLES", component: ArticleView },
   { id: 2, label: "CODING-AS-HOBBY", component: CodingAsHobbyView },
   { id: 3, label: "SIPENA (TM)", component: SipenaView },
