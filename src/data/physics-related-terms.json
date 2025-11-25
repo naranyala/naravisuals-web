@@ -1,0 +1,83 @@
+[
+  {
+    "label": "Velocity",
+    "description": "The rate of change of position with respect to time, including both speed and direction."
+  },
+  {
+    "label": "Acceleration",
+    "description": "The rate of change of velocity over time, often caused by forces acting on an object."
+  },
+  {
+    "label": "Force",
+    "description": "An interaction that changes the motion of an object, described by Newton's laws."
+  },
+  {
+    "label": "Momentum",
+    "description": "The product of an object's mass and velocity, conserved in isolated systems."
+  },
+  {
+    "label": "Energy",
+    "description": "The capacity to do work, existing in forms such as kinetic, potential, and thermal."
+  },
+  {
+    "label": "Work",
+    "description": "The transfer of energy through force applied over a distance."
+  },
+  {
+    "label": "Power",
+    "description": "The rate at which work is done or energy is transferred."
+  },
+  {
+    "label": "Entropy",
+    "description": "A measure of disorder or randomness in a system, central to thermodynamics."
+  },
+  {
+    "label": "Temperature",
+    "description": "A measure of the average kinetic energy of particles in a substance."
+  },
+  {
+    "label": "Pressure",
+    "description": "Force exerted per unit area, often in fluids and gases."
+  },
+  {
+    "label": "Wave",
+    "description": "A disturbance that transfers energy through space and matter, such as sound or light."
+  },
+  {
+    "label": "Frequency",
+    "description": "The number of wave cycles passing a point per unit time."
+  },
+  {
+    "label": "Amplitude",
+    "description": "The maximum displacement of a wave from its equilibrium position."
+  },
+  {
+    "label": "Photon",
+    "description": "A quantum of electromagnetic radiation, carrying energy proportional to its frequency."
+  },
+  {
+    "label": "Quantum Superposition",
+    "description": "The principle that a quantum system can exist in multiple states simultaneously."
+  },
+  {
+    "label": "Uncertainty Principle",
+    "description": "A quantum rule stating that certain pairs of properties, like position and momentum, cannot be precisely known together."
+  },
+  {
+    "label": "Relativity",
+    "description": "Einstein's theory describing how space and time are linked and affected by motion and gravity."
+  },
+  {
+    "label": "Black Hole",
+    "description": "A region of spacetime with gravity so strong that nothing, not even light, can escape."
+  },
+  {
+    "label": "Magnetic Field",
+    "description": "A field produced by moving charges or magnetic materials, influencing other charges and currents."
+  },
+  {
+    "label": "Electric Field",
+    "description": "A region around a charged particle where other charges experience a force."
+  }
+]
+

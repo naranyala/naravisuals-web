@@ -5,6 +5,9 @@ import DemoLinearAlgebra from "./canvas-demo/DemoLinearAlgebra.vue"
 import Calculation2D from "./gallery/Calculation2D.vue"
 import Calculation3D from "./gallery/Calculation3D.vue"
 
+import Shapes2D from "./gallery/Shapes2D.vue"
+import Shapes3D from "./gallery/Shapes3D.vue"
+
 </script>
 
 <template>
@@ -17,6 +20,8 @@ import Calculation3D from "./gallery/Calculation3D.vue"
     <Calculation2D/>
     <Calculation3D/>
 
+    <Shapes2D/>
+    <Shapes3D/>
   </div>
 </template>
 
