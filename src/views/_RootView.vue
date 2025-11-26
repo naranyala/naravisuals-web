@@ -15,8 +15,6 @@ import {
 // import ProgrammingConceptView from "./ProgrammingConceptView.vue"
 // import CodeDumpRelearnView from "./CodeDumpRelearnView.vue"
 // import ProfileView from "./ProfileView.vue"
-// import CreativeView from "./CreativeView.vue"
-// import Creative3DView from "./Creative3DView.vue"
 // import GeneralFaqView from "./GeneralFaqView.vue"
 // import VueComposablesView from "./VueComposablesView.vue"
 // import ClarityFAQ from "./ClarityFAQ.vue"
@@ -24,27 +22,33 @@ import {
 // import BashScriptCollectionView from "./BashScriptCollectionView.vue"
 // import MyLearningCourses from "./MyLearningCourses.vue"
 // import VerticalTimeline from "./VerticalTimeline.vue"
+import CreativeView from "./CreativeView.vue"
+import Creative3DView from "./Creative3DView.vue"
 
 import ArticleView from "./ArticleView.vue"
 import EasyBudgetView from "./EasyBudgetView.vue"
 import SipenaView from "./SipenaView.vue"
 import CodingAsHobbyView from "./CodingAsHobbyView.vue"
-// import GalleryView from "./GalleryView.vue"
+import GalleryView from "./GalleryView.vue"
 import CreativeLyrics from "./CreativeLyrics.vue"
-import MindmapMaker from "./MindmapRoot.vue"
+// import MindmapMaker from "./MindmapRoot.vue"
+import TheoryCollection from "./TheoryCollection.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
 
 const activeTab = ref(0)
 const tabs = ref([
-  { id: 0, label: "MINDMAP-MAKER", component: MindmapMaker },
-  // { id: 0, label: "GALLERY", component: GalleryView },
-  { id: 1, label: "ARTICLES", component: ArticleView },
-  { id: 2, label: "CODING-AS-HOBBY", component: CodingAsHobbyView },
-  { id: 3, label: "SIPENA (TM)", component: SipenaView },
-  { id: 4, label: "EASYBUDGET (TM)", component: EasyBudgetView },
-  { id: 5, label: "CREATIVE-LYRICS (TM)", component: CreativeLyrics },
+  // { id: 0, label: "MINDMAP-MAKER", component: MindmapMaker },
+  { id: 0, label: "Gallery", component: GalleryView },
+  { id: 1, label: "Creative3D", component: Creative3DView },
+  { id: 2, label: "Theories", component: TheoryCollection },
+  { id: 3, label: "Creative2D", component: CreativeView },
+  { id: 4, label: "VisualsLyrics", component: CreativeLyrics },
+  // { id: 1, label: "CODING-AS-HOBBY", component: CodingAsHobbyView },
+  // { id: 2, label: "ARTICLES", component: ArticleView },
+  // { id: 3, label: "SIPENA (TM)", component: SipenaView },
+  // { id: 4, label: "EASYBUDGET (TM)", component: EasyBudgetView },
   // { id: 0, label: "PROFILE", component: ProfileView },
   // { id: 1, label: "ARTICLES", component: VerticalTimeline },
   // { id: 2, label: "VUE-COMPOSABLES", component: VueComposablesView },
@@ -55,8 +59,6 @@ const tabs = ref([
 
   // { id: 1, label: "FAQ", component: ClarityFAQ },
   // { id: 5, label: "THEORIES", component: GamePanelView },
-  // { id: 6, label: "CREATIVE-2D", component: CreativeView },
-  // { id: 7, label: "CREATIVE-3D", component: Creative3DView },
 ])
 
 const setupWelcome = () => {

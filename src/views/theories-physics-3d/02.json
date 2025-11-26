@@ -1,0 +1,105 @@
+[{
+  "prefix": "physics",
+  "theories": [
+    {
+      "title": "Electric Potential Surfaces",
+      "category": "Electrostatics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Magnetic Vector Potential",
+      "category": "Electromagnetism",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Gravitational Potential Wells",
+      "category": "Gravitation",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Velocity Fields in Rigid Body Rotation",
+      "category": "Classical Mechanics",
+      "difficulty": "easy"
+    },
+    {
+      "title": "Vortex Lines and Vorticity Fields",
+      "category": "Fluid Dynamics",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Poynting Vector Flow",
+      "category": "Electromagnetism",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Schrödinger Wave Function Evolution",
+      "category": "Quantum Mechanics",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Geodesics on Curved Spacetime",
+      "category": "General Relativity",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Temperature and Heat Flux Fields",
+      "category": "Thermodynamics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Lorentz Boost Transformations",
+      "category": "Special Relativity",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Huygens Wavelet Reconstruction",
+      "category": "Wave Optics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Coriolis and Centrifugal Forces in Rotating Frames",
+      "category": "Classical Mechanics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Vector Potential of Current Distributions",
+      "category": "Magnetostatics",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Phase Space Trajectories",
+      "category": "Classical & Statistical Mechanics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Gaussian Beam Propagation",
+      "category": "Optics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Spin Precession in Magnetic Fields",
+      "category": "Quantum Mechanics",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Navier-Stokes Velocity & Pressure Fields",
+      "category": "Fluid Dynamics",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Black Hole Photon Orbits & Shadow",
+      "category": "General Relativity",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Fermi Surfaces in Momentum Space",
+      "category": "Solid State Physics",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Acoustic Standing Waves in 3D Cavities",
+      "category": "Acoustics",
+      "difficulty": "medium"
+    }
+  ]
+}]

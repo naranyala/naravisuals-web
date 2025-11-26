@@ -1,0 +1,55 @@
+[{
+  "prefix": "physics",
+  "theories": [
+    {
+      "title": "Dipole Radiation Patterns",
+      "category": "Electromagnetism",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Harmonic Oscillator Phase Space Orbits",
+      "category": "Classical Mechanics",
+      "difficulty": "easy"
+    },
+    {
+      "title": "Kelvin Wake Patterns from Moving Sources",
+      "category": "Wave Physics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Bloch Waves in Crystal Lattices",
+      "category": "Solid State Physics",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Aharonov-Bohm Vector Potential Cylinders",
+      "category": "Quantum Mechanics",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Rayleigh-Bénard Convection Cells",
+      "category": "Fluid Dynamics & Thermodynamics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Kerr Metric Frame-Dragging",
+      "category": "General Relativity",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Plasmon Polariton Fields on Metal Surfaces",
+      "category": "Nanophotonics",
+      "difficulty": "hard"
+    },
+    {
+      "title": "Chaotic Trajectories in Double Pendulum",
+      "category": "Nonlinear Dynamics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Topological Defect Lines (Vortex Filaments & Disclinations)",
+      "category": "Condensed Matter Physics",
+      "difficulty": "hard"
+    }
+  ]
+}]

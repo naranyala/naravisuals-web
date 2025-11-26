@@ -1,0 +1,56 @@
+
+[{
+  "prefix": "physics",
+  "theories": [
+    {
+      "title": "Brownian Motion Paths",
+      "category": "Statistical Physics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Resonance Curves",
+      "category": "Oscillations & Waves",
+      "difficulty": "easy"
+    },
+    {
+      "title": "Shock Waves",
+      "category": "Fluid Dynamics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Quantum Probability Clouds",
+      "category": "Quantum Mechanics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Capillary Action",
+      "category": "Fluid Mechanics",
+      "difficulty": "easy"
+    },
+    {
+      "title": "Nonlinear Pendulum Chaos",
+      "category": "Nonlinear Dynamics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Acoustic Standing Waves",
+      "category": "Acoustics",
+      "difficulty": "easy"
+    },
+    {
+      "title": "Plasma Oscillations",
+      "category": "Plasma Physics",
+      "difficulty": "medium"
+    },
+    {
+      "title": "Gravitational Potential Contours",
+      "category": "Classical Mechanics",
+      "difficulty": "easy"
+    },
+    {
+      "title": "Turbulent Flow Patterns",
+      "category": "Fluid Dynamics",
+      "difficulty": "hard"
+    }
+  ]
+}]

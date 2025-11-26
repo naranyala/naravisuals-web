@@ -1,5 +1,10 @@
 <template>
   <div class="budget-root" :class="{ report: mode === 'report' }">
+
+      <CurrentCalendar 
+       style="margin: 40px auto; width: 100%;"/>
+
+
     <header class="topbar">
       <h2>Monthly Budget</h2>
       <button @click="toggleMode">
@@ -103,6 +108,8 @@
 
 <script setup>
 import { reactive, ref, computed, watch, onMounted } from 'vue'
+
+import CurrentCalendar from "./widgets/CurrentCalendar.vue"
 
 /* ---------- STATE ---------- */
 const mode = ref('editor')               // editor | report

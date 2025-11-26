@@ -33,7 +33,12 @@ onMounted(() => {
   let angle = 0
 
   function draw() {
-    ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
+    ctx.clearRect(
+      0, 
+      0, 
+      canvas?.value?.width ?? 800, 
+      canvas?.value?.height ?? 600
+    )
 
     // Build transformation matrix
     const aspect = canvas.value.width / canvas.value.height

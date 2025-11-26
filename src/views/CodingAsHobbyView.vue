@@ -2,7 +2,7 @@
 
 import ScrollIndicator from "../ScrollIndicator.vue"
 import MottonCollection from "../MottoCollection.vue"
-import CurrentCalendar from "../views/widgets/CurrentCalendar.vue"
+// import CurrentCalendar from "../views/widgets/CurrentCalendar.vue"
 import SearchBar from "../SearchBar.vue"
 import PhoneKeypad from "../PhoneKeypad.vue"
 // import PrintAction from "../views/reusables/PrintAction.vue"
@@ -25,8 +25,8 @@ import MapPicker from "../MapPicker.vue"
        <div style="margin: auto; width: 500px; height: auto;">
           <MapPicker/>
       </div>
-      <CurrentCalendar 
-       style="margin: 40px auto; width: 100%;"/>
+      <!-- <CurrentCalendar  -->
+      <!--  style="margin: 40px auto; width: 100%;"/> -->
       
       <RandomWordSystem/>
       <RandomWordTerms/>

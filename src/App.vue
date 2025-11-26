@@ -64,7 +64,7 @@ onBeforeUnmount(() => {
   <RouterView />
 
   <div class="no-print">
-      <WelcomeMenu/>
+      <!-- <WelcomeMenu/> -->
       <MinimalFooter/>
   </div>
 

@@ -1,0 +1,57 @@
+[
+  {
+    "prefix": "physics",
+    "theories": [
+      {
+        "title": "Classical Trajectories",
+        "category": "Classical Mechanics",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Electric Field Lines",
+        "category": "Electrostatics",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Magnetic Field Lines",
+        "category": "Magnetostatics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Wave Interference Patterns",
+        "category": "Wave Physics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Phase Space Diagrams",
+        "category": "Classical Mechanics",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Fluid Streamlines",
+        "category": "Fluid Dynamics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Equipotential Contours",
+        "category": "Electrostatics",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Ray Optics",
+        "category": "Geometrical Optics",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Diffusion and Heat Maps",
+        "category": "Thermodynamics & Diffusion",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Polarization & EM Waves",
+        "category": "Electromagnetism",
+        "difficulty": "medium"
+      }
+    ]
+  }
+]

@@ -1,0 +1,16 @@
+
+[{
+  "prefix": "physics",
+  "theories": [
+    { "title": "Pendulum Phase Portraits", "category": "Classical Mechanics", "difficulty": "medium" },
+    { "title": "Standing Wave Modes", "category": "Wave Physics", "difficulty": "easy" },
+    { "title": "Vortex Dynamics", "category": "Fluid Dynamics", "difficulty": "medium" },
+    { "title": "Diffraction Patterns", "category": "Wave Physics / Optics", "difficulty": "medium" },
+    { "title": "Isothermal & Adiabatic Curves", "category": "Thermodynamics", "difficulty": "easy" },
+    { "title": "Chaos in the Logistic Map", "category": "Nonlinear Dynamics", "difficulty": "medium" },
+    { "title": "Lissajous Figures", "category": "Oscillations", "difficulty": "easy" },
+    { "title": "Diffusion-Limited Aggregation", "category": "Statistical Physics", "difficulty": "medium" },
+    { "title": "Percolation Theory", "category": "Statistical Physics", "difficulty": "medium" },
+    { "title": "Acoustic Pressure Maps", "category": "Acoustics", "difficulty": "medium" }
+  ]
+}]
