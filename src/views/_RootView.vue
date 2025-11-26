@@ -33,6 +33,7 @@ import GalleryView from "./GalleryView.vue"
 import CreativeLyrics from "./CreativeLyrics.vue"
 // import MindmapMaker from "./MindmapRoot.vue"
 import TheoryCollection from "./TheoryCollection.vue"
+import CanvasExamplesView from "./CanvasExamplesView.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
@@ -40,7 +41,8 @@ const isPrintAll = ref(props?.isPrintAll || true)
 const activeTab = ref(0)
 const tabs = ref([
   // { id: 0, label: "MINDMAP-MAKER", component: MindmapMaker },
-  { id: 0, label: "Gallery", component: GalleryView },
+  { id: 0, label: "Gallery", component: CanvasExamplesView },
+  // { id: 0, label: "Gallery", component: GalleryView },
   { id: 1, label: "Creative3D", component: Creative3DView },
   { id: 2, label: "Theories", component: TheoryCollection },
   { id: 3, label: "Creative2D", component: CreativeView },
