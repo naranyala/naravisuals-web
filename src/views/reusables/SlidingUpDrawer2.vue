@@ -81,7 +81,6 @@ const closeDrawer = () => {
   /* padding: 0 1rem; */
   /* min-height: 100vh; */
   border: 1px solid lightgray;
-  border-radius: 10px;
 }
 .item-list {
   list-style: none;
