@@ -1,7 +1,4 @@
 [
-  {
-    "prefix": "physics",
-    "theories": [
       {
         "title": "Classical Trajectories",
         "category": "Classical Mechanics",
@@ -52,6 +49,4 @@
         "category": "Electromagnetism",
         "difficulty": "medium"
       }
-    ]
-  }
 ]

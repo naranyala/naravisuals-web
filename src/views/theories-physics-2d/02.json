@@ -1,7 +1,5 @@
 
-[{
-  "prefix": "physics",
-  "theories": [
+[
     { "title": "Pendulum Phase Portraits", "category": "Classical Mechanics", "difficulty": "medium" },
     { "title": "Standing Wave Modes", "category": "Wave Physics", "difficulty": "easy" },
     { "title": "Vortex Dynamics", "category": "Fluid Dynamics", "difficulty": "medium" },
@@ -12,5 +10,4 @@
     { "title": "Diffusion-Limited Aggregation", "category": "Statistical Physics", "difficulty": "medium" },
     { "title": "Percolation Theory", "category": "Statistical Physics", "difficulty": "medium" },
     { "title": "Acoustic Pressure Maps", "category": "Acoustics", "difficulty": "medium" }
-  ]
-}]
+]

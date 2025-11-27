@@ -60,7 +60,7 @@ watch(() => props.cards.theories, (newTheories) => {
         <!-- <h3 class="card-title">{{idx}} - {{ card.title }}</h3> -->
         <h3 class="card-title">{{ card.title }}</h3>
         <TheoryBadge :label="card.category"/>
-        <TheoryBadge :label="card.difficulty" :difficulty="card.difficulty"/>
+        <TheoryBadge :difficulty="card.difficulty"/>
         <span class="card-hint">→</span>
       </div>
     </div>

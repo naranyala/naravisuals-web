@@ -2,42 +2,66 @@
 import { ref, onMounted, reactive} from "vue"
 import TheoryList from './TheoryList.vue'
 
-import physics2d01 from "./theories-physics-2d/01.json"
-import physics2d02 from "./theories-physics-2d/02.json"
-import physics2d03 from "./theories-physics-2d/03.json"
+function sumTheories(sourceObj){
+  const finalObj = [];
+  Object.keys(sourceObj).forEach((fileKey) => {
+    const temp = sourceObj[fileKey].default;
+    temp.forEach((item) => finalObj.push(item));
+  });
+  return finalObj;
+}
 
-const allPhysics2D = reactive({
-  prefix: "physics",
-  theories: [
-    ...physics2d01[0]?.theories,
-    ...physics2d02[0]?.theories,
-    ...physics2d03[0]?.theories,
-  ]
-})
+function getBlenderTopics(){
+  const rawBlenderTopics = import.meta.glob('./theories-blender-3d/**/*.json', { 
+    eager: true, query: '?json' 
+  });
+  return sumTheories(rawBlenderTopics)
+}
 
-console.log("allPhysics2D", allPhysics2D)
+function getMath2D(){
+  const rawMath2D = import.meta.glob('./theories-math-2d/**/*.json', { 
+    eager: true, query: '?json' 
+  });
+  return sumTheories(rawMath2D)
+}
 
-import physics3d01 from "./theories-physics-3d/01.json"
-import physics3d02 from "./theories-physics-3d/02.json"
-import physics3d03 from "./theories-physics-3d/03.json"
+function getMath3D(){
+  const rawMath3D = import.meta.glob('./theories-math-3d/**/*.json', { 
+    eager: true, query: '?json' 
+  }); 
+  return sumTheories(rawMath3D)
+}
 
-const allPhysics3D = reactive({
-  prefix: "physics",
-  theories: [
-    ...physics3d01[0]?.theories,
-    ...physics3d02[0]?.theories,
-    ...physics3d03[0]?.theories,
-  ]
-})
+function getPhysic2D(){
+  const rawPhysics2D = import.meta.glob('./theories-physics-2d/**/*.json', { 
+    eager: true, query: '?json' 
+  });
+  return sumTheories(rawPhysics2D)
+}
+
+function getPhysic3D(){
+  const rawPhysics3D = import.meta.glob('./theories-physics-3d/**/*.json', { 
+    eager: true, query: '?json' 
+  });
+  return sumTheories(rawPhysics3D)
+}
+
+const allBlenderTopics = reactive({ prefix: "blender", theories: getBlenderTopics() })
+const allMath2D = reactive({ prefix: "math", theories: getMath2D() })
+const allMath3D = reactive({ prefix: "math", theories: getMath3D() })
+const allPhysics2D = reactive({ prefix: "physics", theories: getPhysic2D() })
+const allPhysics3D = reactive({ prefix: "physics", theories: getPhysic3D() })
 
 
 const shuffleTrigger = reactive({
+  blender3d: 0,
   math2d: 0,
   math3d: 0,
   physics2d: 0,
   physics3d: 0,
 })
 const triggerShuffle = (key) => {
+  if (key === 'blender3d') shuffleTrigger.blender3d += 1;
   if (key === 'math2d') shuffleTrigger.math2d += 1;
   if (key === 'math3d') shuffleTrigger.math3d += 1;
   if (key === 'physics2d') shuffleTrigger.physics2d += 1;
@@ -49,10 +73,47 @@ const onShuffleDone = () => console.log('Cards shuffled!');
 
 <template>
   <div class="app">
+  
+    <!-- <pre>{{JSON.stringify(rawBlenderTopics, null, 2)}}</pre> -->
 
-    <!-- <pre>{{JSON.stringify(allPhysics2D, null, 2)}}</pre> -->
-    <!-- <pre>{{JSON.stringify(shuffleTrigger.physics2d, null, 2)}}</pre> -->
-    <!-- <pre>{{JSON.stringify(shuffleTrigger.physics3d, null, 2)}}</pre> -->
+
+    <div class="group-context">
+      <h2 class="group-title">Blender 3D</h2>
+      <button @click="triggerShuffle('blender3d')" class="shuffle-btn">
+        shuffle (5/{{ allBlenderTopics.theories.length }})
+      </button>
+    </div>
+    <TheoryList
+      :cards="allBlenderTopics"
+      :shuffle-trigger="shuffleTrigger.blender3d"
+      @shuffle-complete="onShuffleDone"
+    />
+
+    <div class="group-context">
+      <h2 class="group-title">Math 2D</h2>
+      <button @click="triggerShuffle('math2d')" class="shuffle-btn">
+        shuffle (5/{{ allMath2D.theories.length }})
+      </button>
+    </div>
+    <TheoryList
+      :cards="allMath2D"
+      :shuffle-trigger="shuffleTrigger.math2d"
+      @shuffle-complete="onShuffleDone"
+    />
+
+
+    <div class="group-context">
+      <h2 class="group-title">Math 3D</h2>
+      <button @click="triggerShuffle('math3d')" class="shuffle-btn">
+        shuffle (5/{{ allMath3D.theories.length }})
+      </button>
+    </div>
+    <TheoryList
+      :cards="allMath3D"
+      :shuffle-trigger="shuffleTrigger.math3d"
+      @shuffle-complete="onShuffleDone"
+    />
+
 
     <div class="group-context">
       <h2 class="group-title">Physics 2D</h2>

@@ -1,7 +1,5 @@
 
-[{
-  "prefix": "physics",
-  "theories": [
+[
     {
       "title": "Brownian Motion Paths",
       "category": "Statistical Physics",
@@ -52,5 +50,4 @@
       "category": "Fluid Dynamics",
       "difficulty": "hard"
     }
-  ]
-}]
+]

@@ -1,6 +1,4 @@
-[{
-  "prefix": "physics",
-  "theories": [
+[
     {
       "title": "Electromagnetic Fields",
       "category": "Electromagnetism",
@@ -51,5 +49,4 @@
       "category": "Plasma Physics",
       "difficulty": "hard"
     }
-  ]
-}]
+]

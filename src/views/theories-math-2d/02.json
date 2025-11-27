@@ -1,0 +1,53 @@
+[
+  {
+    "title": "Implicit Curves (e.g., x² + y² = 1)",
+    "category": "Analytic Geometry",
+    "difficulty": "easy"
+  },
+  {
+    "title": "Polar Coordinates & Rose Curves",
+    "category": "Coordinate Systems",
+    "difficulty": "medium"
+  },
+  {
+    "title": "Level Sets & Contour Lines",
+    "category": "Multivariable Calculus",
+    "difficulty": "medium"
+  },
+  {
+    "title": "Direction Fields (Slope Fields)",
+    "category": "Differential Equations",
+    "difficulty": "medium"
+  },
+  {
+    "title": "Affine Transformations (Rotation, Scaling, Shear)",
+    "category": "Linear Algebra",
+    "difficulty": "medium"
+  },
+  {
+    "title": "Bézier Curves",
+    "category": "Computational Geometry",
+    "difficulty": "medium"
+  },
+  {
+    "title": "Conformal Mappings",
+    "category": "Complex Analysis",
+    "difficulty": "hard"
+  },
+  {
+    "title": "Lissajous Figures",
+    "category": "Parametric Equations",
+    "difficulty": "easy"
+  },
+  {
+    "title": "Streamlines in 2D Flows",
+    "category": "Vector Calculus",
+    "difficulty": "hard"
+  },
+  {
+    "title": "Isoclines in Dynamical Systems",
+    "category": "Dynamical Systems",
+    "difficulty": "hard"
+  }
+]
+

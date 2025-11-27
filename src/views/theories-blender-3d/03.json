@@ -1,0 +1,52 @@
+[
+      {
+        "title": "Differential Growth Patterns",
+        "category": "Biomathematics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Topological Surfaces (Klein Bottle, Möbius Strip)",
+        "category": "Topology",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Cellular Automata",
+        "category": "Discrete Mathematics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Minimal Surfaces",
+        "category": "Differential Geometry",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Knot Theory",
+        "category": "Topology",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Lissajous Curves",
+        "category": "Harmonic Motion",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Hyperbolic Geometry",
+        "category": "Non-Euclidean Geometry",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Probability Distributions",
+        "category": "Statistics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Tessellations (Penrose, Islamic Patterns)",
+        "category": "Geometry",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Matrix Transformations (Rotation, Scaling, Shearing)",
+        "category": "Linear Algebra",
+        "difficulty": "easy"
+      }
+]

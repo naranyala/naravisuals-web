@@ -1,0 +1,52 @@
+[
+      {
+        "title": "Implicit Surfaces",
+        "category": "Implicit Geometry",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Vector Fields in 3D",
+        "category": "Vector Calculus",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Parametric Surfaces",
+        "category": "Parametric Geometry",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Level Sets and Contour Surfaces",
+        "category": "Scalar Fields",
+        "difficulty": "hard"
+      },
+      {
+        "title": "3D Fractals",
+        "category": "Chaos & Fractals",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Gradient and Curl Fields",
+        "category": "Vector Calculus",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Dynamical Systems & Attractors",
+        "category": "Dynamical Systems",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Algebraic Geometry: Quadric Surfaces",
+        "category": "Algebraic Geometry",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Topological Manifolds",
+        "category": "Topology",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Voronoi Diagrams in 3D",
+        "category": "Computational Geometry",
+        "difficulty": "hard"
+      }
+]

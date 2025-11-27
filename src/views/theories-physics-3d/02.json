@@ -1,6 +1,4 @@
-[{
-  "prefix": "physics",
-  "theories": [
+[
     {
       "title": "Electric Potential Surfaces",
       "category": "Electrostatics",
@@ -101,5 +99,4 @@
       "category": "Acoustics",
       "difficulty": "medium"
     }
-  ]
-}]
+]

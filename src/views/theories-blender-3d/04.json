@@ -1,0 +1,52 @@
+[
+      {
+        "title": "Chladni Plate Patterns",
+        "category": "Acoustics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Ferrofluid Structures",
+        "category": "Magnetic Fluids",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Cymatics",
+        "category": "Wave Phenomena",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Superconductivity Flux Pinning",
+        "category": "Condensed Matter",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Brownian Motion",
+        "category": "Statistical Mechanics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Liquid Crystal Textures",
+        "category": "Soft Matter Physics",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Pendulum Wave Motion",
+        "category": "Classical Mechanics",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Plasma Filaments",
+        "category": "Plasma Physics",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Granular Material Flow",
+        "category": "Granular Physics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Quantum Probability Clouds",
+        "category": "Quantum Mechanics",
+        "difficulty": "hard"
+      }
+]

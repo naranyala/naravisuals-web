@@ -1,6 +1,4 @@
-[{
-  "prefix": "physics",
-  "theories": [
+[
     {
       "title": "Dipole Radiation Patterns",
       "category": "Electromagnetism",
@@ -51,5 +49,4 @@
       "category": "Condensed Matter Physics",
       "difficulty": "hard"
     }
-  ]
-}]
+]

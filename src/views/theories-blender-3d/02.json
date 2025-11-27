@@ -1,0 +1,53 @@
+
+[
+      {
+        "title": "Wave Interference Patterns",
+        "category": "Wave Physics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Elastic Deformation",
+        "category": "Continuum Mechanics",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Magnetic Field Lines",
+        "category": "Electromagnetism",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Fluid Surface Tension",
+        "category": "Fluid Dynamics",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Projectile Motion Trajectories",
+        "category": "Classical Mechanics",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Optical Caustics",
+        "category": "Geometric Optics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Crystal Lattice Structures",
+        "category": "Solid State Physics",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Black Body Radiation",
+        "category": "Thermodynamics",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Orbital Mechanics",
+        "category": "Celestial Mechanics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Soap Film Minimal Surfaces",
+        "category": "Surface Physics",
+        "difficulty": "hard"
+      }
+  ]

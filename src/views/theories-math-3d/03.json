@@ -1,0 +1,77 @@
+[
+      {
+        "title": "Wave Equation in 3D (Acoustic or Elastic)",
+        "category": "Partial Differential Equations",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Navier-Stokes Fluid Simulation",
+        "category": "Computational Fluid Dynamics",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Reaction-Diffusion Systems (Turing Patterns)",
+        "category": "Mathematical Biology",
+        "difficulty": "medium"
+      },
+      {
+        "title": "N-Body Gravitational Simulation",
+        "category": "Classical Mechanics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Particle Systems with Force Fields",
+        "category": "Computational Physics",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Heat Equation & Thermal Diffusion in 3D",
+        "category": "Thermodynamics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Electromagnetic Field Propagation (Maxwell's Equations)",
+        "category": "Electrodynamics",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Cellular Automata in 3D (e.g., 3D Game of Life)",
+        "category": "Discrete Simulation",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Molecular Dynamics (Lennard-Jones Potential)",
+        "category": "Statistical Mechanics",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Elastic Deformable Bodies (Mass-Spring Systems)",
+        "category": "Continuum Mechanics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Charged Particle Trajectories in EM Fields",
+        "category": "Plasma Physics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Swarm Intelligence & Flocking Behavior (Boids)",
+        "category": "Agent-Based Modeling",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Geodesic Flow on Surfaces",
+        "category": "Differential Geometry",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Chaotic Pendulum Networks",
+        "category": "Nonlinear Dynamics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Crystal Growth & Diffusion-Limited Aggregation (DLA)",
+        "category": "Fractal Simulation",
+        "difficulty": "medium"
+      }
+]

@@ -1,0 +1,52 @@
+[
+      {
+        "title": "Ray Marching with SDFs",
+        "category": "Rendering",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Procedural Noise Generation",
+        "category": "Texturing",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Subsurface Scattering",
+        "category": "Material Physics",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Physics-Based Rigging",
+        "category": "Animation",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Fluid Simulation (SPH/Grid Methods)",
+        "category": "Computational Fluid Dynamics",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Cloth Dynamics",
+        "category": "Soft Body Physics",
+        "difficulty": "medium"
+      },
+      {
+        "title": "Global Illumination",
+        "category": "Light Transport",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Particle Systems",
+        "category": "Procedural Animation",
+        "difficulty": "easy"
+      },
+      {
+        "title": "Hair/Fur Dynamics",
+        "category": "Strand-Based Simulation",
+        "difficulty": "hard"
+      },
+      {
+        "title": "Volumetric Rendering",
+        "category": "Atmospheric Effects",
+        "difficulty": "hard"
+      }
+]
