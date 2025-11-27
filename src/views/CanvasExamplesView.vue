@@ -1,13 +1,15 @@
 <script setup>
-import TreeWithLeaves from "./canvas-draw/TreeWithLeaves.vue"
-import KanagawaGreatWave from "./canvas-draw/KanagawaGreatWave.vue"
+// import TreeWithLeaves from "./canvas-draw/TreeWithLeaves.vue"
+// import KanagawaGreatWave from "./canvas-draw/KanagawaGreatWave.vue"
+// import CombineLocalDemo from "./canvas-draw/CombineLocalDemo.vue"
+// import SnakeGame from "./canvas-draw/SnakeGame.vue"
 
-import CombineLocalDemo from "./canvas-draw/CombineLocalDemo.vue"
-import SnakeGame from "./canvas-draw/SnakeGame.vue"
-
-import RandomMath from "./canvas-draw/RandomMath.vue"
+import BasicDrawing from "./canvas-draw/BasicDrawing.vue"
 import ParticleDemo from "./canvas-draw/ParticleDemo.vue"
 import HandmakeCube from "./canvas-draw/HandmakeCube.vue"
+
+import RandomMath from "./canvas-draw/RandomMath.vue"
+
 </script>
 
 <template>
@@ -15,7 +17,13 @@ import HandmakeCube from "./canvas-draw/HandmakeCube.vue"
   <!-- <KanagawaGreatWave/> -->
   <!-- <CombineLocalDemo/> -->
   <!-- <SnakeGame/> -->
-  <RandomMath/>
+
+
+  <BasicDrawing/>
   <ParticleDemo/>
   <HandmakeCube/>
+
+
+  <RandomMath/>
+
 </template>

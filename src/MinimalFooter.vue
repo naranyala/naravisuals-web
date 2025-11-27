@@ -18,10 +18,9 @@
 import ScrollToTop from "./ScrollToTop.vue"
 
 const links = [
-  { label: 'menu', href: '#' },
-  { label: 'profile', href: '#' },
-  { label: 'gallery', href: '#' },
-  { label: 'connect', href: '#' },
+  { label: 'past-of-me', href: '#' },
+  { label: 'present-of-me', href: '#' },
+  { label: 'future-of-me', href: '#' },
 ];
 </script>
 

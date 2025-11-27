@@ -5,11 +5,9 @@ import CanvasUtility from '../../utilities/canvas.js'
 import glmInspired from '../../utilities/glm-inspired.js'
 
 // Canvas references
-const basicCanvas = ref(null)
 const particleCanvas = ref(null)
 
 // Canvas utility instances
-let basicCanvasUtil = null
 let particleCanvasUtil = null
 
 // Animation control
@@ -20,7 +18,6 @@ const mousePos = ref({ x: 0, y: 0 })
 
 // Initialize all demos
 onMounted(() => {
-  initializeBasicDemo()
   initializeParticleDemo()
   startAnimation()
 })
@@ -29,29 +26,6 @@ onUnmounted(() => {
   stopAnimation()
 })
 
-// Demo 1: Basic Shapes
-function initializeBasicDemo() {
-  if (!basicCanvas.value) return
-  
-  basicCanvasUtil = new CanvasUtility(basicCanvas.value)
-  
-  // Clear with gradient background
-  const gradient = basicCanvasUtil.createLinearGradient(0, 0, 600, 400, [
-    { offset: 0, color: '#1e3c72' },
-    { offset: 1, color: '#2a5298' }
-  ])
-  
-  basicCanvasUtil
-    .fill(gradient)
-    .drawRoundedRect(50, 50, 200, 100, 20, '#e74c3c', '#c0392b', 3)
-    .drawCircle(400, 150, 80, '#27ae60', '#2ecc71', 2)
-    .drawEllipse(150, 280, 120, 60, Math.PI / 6, '#f39c12', '#e67e22', 2)
-    .drawText('Canvas Utility Demo', 300, 350, {
-      font: '24px Arial',
-      fillStyle: '#ecf0f1',
-      textAlign: 'center'
-    })
-}
 
 
 
@@ -186,7 +160,6 @@ function stopAnimation() {
 function resetAll() {
   cubeRotation = 0
   resetParticles()
-  initializeBasicDemo()
   drawParticles()
 }
 </script>
@@ -195,10 +168,6 @@ function resetAll() {
   <div class="demo-container">
     <h1>Canvas & 3D Math Demos</h1>
     
-    <div class="demo-section">
-      <h2>1. Basic Shapes Demo</h2>
-      <canvas ref="basicCanvas" width="600" height="400"></canvas>
-    </div>
 
 
     <div class="demo-section">

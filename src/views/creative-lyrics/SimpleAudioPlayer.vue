@@ -1,14 +1,13 @@
 <!-- SimpleAudioPlayer.vue -->
 <template>
   <section class="player">
-    <!-- 1. File picker -->
+
+    <!-- 2. Transport buttons -->
+    <div class="transport">
     <label class="file-btn">
       <input type="file" accept="audio/*" @change="loadFile" />
       📁 Pick audio
     </label>
-
-    <!-- 2. Transport buttons -->
-    <div class="transport">
       <button @click="togglePlay" :disabled="!src">
         {{ playing ? '⏸ Pause' : '▶ Play' }}
       </button>
@@ -111,7 +110,7 @@ watch(volume, v => (audio.value && (audio.value.volume = v)))
 .player {
   display: grid;
   gap: 0.6rem;
-  max-width: 420px;
+  /* max-width: 420px; */
   padding: 1rem;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -119,10 +118,13 @@ watch(volume, v => (audio.value && (audio.value.volume = v)))
 }
 .file-btn {
   cursor: pointer;
-  padding: 0.4rem 0.8rem;
-  background: #f2f2f2;
+  padding: 10px;
+  background: black;;
   border-radius: 4px;
-  display: inline-block;
+  margin: 0 5px;
+
+  &:hover { background: gray; }
+
 }
 .file-btn input[type="file"] {
   display: none;

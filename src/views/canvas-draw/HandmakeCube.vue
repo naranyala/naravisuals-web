@@ -178,7 +178,7 @@ function stopAnimation() {
 <style scoped>
 .demo-section {
   /* margin-bottom: 40px; */
-  margin: 0 14vw;
+  margin: 0 3vw;
   padding: 20px;
   background: #f8f9fa;
   border-radius: 10px;

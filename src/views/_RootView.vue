@@ -34,6 +34,7 @@ import CreativeLyrics from "./CreativeLyrics.vue"
 // import MindmapMaker from "./MindmapRoot.vue"
 import TheoryCollection from "./TheoryCollection.vue"
 import CanvasExamplesView from "./CanvasExamplesView.vue"
+import MyAnimationView from "./MyAnimationView.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
@@ -41,14 +42,15 @@ const isPrintAll = ref(props?.isPrintAll || true)
 const activeTab = ref(0)
 const tabs = ref([
   // { id: 0, label: "MINDMAP-MAKER", component: MindmapMaker },
-  { id: 0, label: "Gallery", component: CanvasExamplesView },
   // { id: 0, label: "Gallery", component: GalleryView },
-  { id: 1, label: "Creative3D", component: Creative3DView },
-  { id: 2, label: "Theories", component: TheoryCollection },
-  { id: 3, label: "Creative2D", component: CreativeView },
-  { id: 4, label: "VisualsLyrics", component: CreativeLyrics },
+  { id: 0, label: "VisualsLyrics", component: CreativeLyrics },
+  { id: 1, label: "Theories", component: TheoryCollection },
+  { id: 2, label: "Articles", component: ArticleView },
+  { id: 3, label: "Gallery", component: CanvasExamplesView },
+  { id: 4, label: "Creative3D", component: Creative3DView },
+  { id: 5, label: "Animation", component: MyAnimationView },
+  // { id: 3, label: "Creative2D", component: CreativeView },
   // { id: 1, label: "CODING-AS-HOBBY", component: CodingAsHobbyView },
-  // { id: 2, label: "ARTICLES", component: ArticleView },
   // { id: 3, label: "SIPENA (TM)", component: SipenaView },
   // { id: 4, label: "EASYBUDGET (TM)", component: EasyBudgetView },
   // { id: 0, label: "PROFILE", component: ProfileView },
