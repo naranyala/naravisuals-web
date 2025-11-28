@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <!-- Scroll to top button -->
     <button 
       v-show="showScrollButton" 
@@ -13,16 +12,32 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 
 const showScrollButton = ref(false);
+const props = defineProps({
+  triggerScroll: {
+    type: Boolean,
+    default: false
+  }
+});
+
+const emit = defineEmits(['scroll-complete']);
 
 const scrollToTop = () => {
   window.scrollTo({
     top: 0,
     behavior: 'smooth'
   });
+  emit('scroll-complete');
 };
+
+// Watch for changes in triggerScroll prop
+watch(() => props.triggerScroll, (newValue) => {
+  if (newValue) {
+    scrollToTop();
+  }
+});
 
 const handleScroll = () => {
   // Show button when scrolled down more than 200px
@@ -40,10 +55,10 @@ onUnmounted(() => {
 });
 </script>
 
-<style>
+<style scoped>
 .scroll-btn {
   /* position: fixed; */
-  bottom: 20px;
+  /* bottom: 20px; */
   right: 20px;
   padding: 10px 20px;
   background-color: #28a745;

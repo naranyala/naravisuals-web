@@ -5,6 +5,19 @@ import {ref, reactive} from "vue"
 
 import ScrollToTop from "./ScrollToTop.vue"
 import SlidingUpDrawer from "./views/reusables/SligindUpDrawer.vue"
+import GridMenu from "./views/reusables/GridMenu.vue"
+
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const menuItems = [
+  { label: 'Home', action: () => router.push('/') },
+  { label: 'Profile', action: () => router.push('/profile') },
+  { label: 'Settings', action: () => router.push('/settings') },
+  { label: 'Logout', action: () => console.log('Logging out...') },
+]
+
 
 const links = [
   { label: 'past-of-me', href: '#' },
@@ -15,14 +28,14 @@ const links = [
 // State variable to control the drawer's visibility
 const isDrawerOpen = reactive({
   pastOfMe: false,
-  currentOfMe: false, 
+  presentOfMe: false, 
   futureOfMe: false
 })
 
 // Function to open it (e.g., when a button is clicked)
 const openDrawer = (key) => {
   if (key === "past-of-me") isDrawerOpen.pastOfMe = true
-  if (key === "current-of-me") isDrawerOpen.currentOfMe = true
+  if (key === "present-of-me") isDrawerOpen.presentOfMe = true
   if (key === "future-of-me") isDrawerOpen.futureOfMe = true
 }
 
@@ -35,8 +48,8 @@ const contentPastOfMe = reactive({
   ]
 })
 
-const contentCurrentOfMe = reactive({
-  title: "current-of-me",
+const contentPresentOfMe = reactive({
+  title: "present-of-me",
   articles: [
     "lorem ipsum dolor",
     "lorem ipsum",
@@ -54,38 +67,56 @@ const contentFutureOfMe = reactive({
 })
 
 
+const triggerScroll = ref(false);
+
+
+const actionPastOfMe = () => {
+  isDrawerOpen.pastOfMe = false;
+  triggerScroll.value = true;
+}
+
+const actionPresentOfMe = () => {
+  isDrawerOpen.presentOfMe = false;
+  triggerScroll.value = true;
+}
+
+
+const actionFutureOfMe = () => {
+  isDrawerOpen.futureOfMe = false;
+  triggerScroll.value = true;
+}
+
 </script>
 
 
 <template>
   <footer class="footer">
     <div class="footer-links">
-      <!-- <a v-for="item in links" :key="item.label" :href="item.href" class="link-item"> -->
-      <!--   {{ item.label }} -->
-      <!-- </a> -->
-
       <a class="link-item" @click="openDrawer('past-of-me')">{{contentPastOfMe.title}}</a> 
-      <a class="link-item" @click="openDrawer('current-of-me')">{{contentCurrentOfMe.title}}</a> 
+      <a class="link-item" @click="openDrawer('present-of-me')">{{contentPresentOfMe.title}}</a> 
       <a class="link-item" @click="openDrawer('future-of-me')">{{contentFutureOfMe.title}}</a> 
     </div>
 
     <p class="footer-copyright">© 2025 gema_naranyala</p>
-    <ScrollToTop/>
+
+    <ScrollToTop :trigger-scroll="triggerScroll" @scroll-complete="triggerScroll = false" />
 
 
     <SlidingUpDrawer v-model="isDrawerOpen.pastOfMe" :persistent="false">
         <template #header>
           <h3 class="drawer-header">{{contentPastOfMe.title}}</h3>
         </template>
-      <p v-for="section in contentPastOfMe.articles">{{section}}</p>
+        
+      <GridMenu :items="menuItems" @drawer-close="actionPastOfMe"/>
     </SlidingUpDrawer>
 
 
-    <SlidingUpDrawer v-model="isDrawerOpen.currentOfMe" :persistent="false">
+    <SlidingUpDrawer v-model="isDrawerOpen.presentOfMe" :persistent="false">
         <template #header>
-          <h3 class="drawer-header">{{contentCurrentOfMe.title}}</h3>
+          <h3 class="drawer-header">{{contentPresentOfMe.title}}</h3>
         </template>
-      <p v-for="section in contentCurrentOfMe.articles">{{section}}</p>
+        
+      <GridMenu :items="menuItems" @drawer-close="actionPresentOfMe"/>
     </SlidingUpDrawer>
 
 
@@ -93,8 +124,11 @@ const contentFutureOfMe = reactive({
         <template #header>
           <h3 class="drawer-header">{{contentFutureOfMe.title}}</h3>
         </template>
-      <p v-for="section in contentFutureOfMe.articles">{{section}}</p>
+
+      <GridMenu :items="menuItems" @drawer-close="actionFutureOfMe"/>
     </SlidingUpDrawer>
+
+
 
   </footer>
 </template>
@@ -136,12 +170,6 @@ const contentFutureOfMe = reactive({
 
   &:hover { text-decoration: underline; cursor: pointer; }
 }
-
-/* .link-item:hover, */
-/* .link-item:focus { */
-/*   color: #4da6ff; */
-/*   outline: none; */
-/* } */
 
 .footer-copyright {
   margin: 0;

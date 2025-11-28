@@ -2,6 +2,8 @@
 
 > source code of my static site
 
+[naravisuals-web](https://naravisuals-web.pages.dev/)
+
 ## current TODOS
 
 - [ ] preload assets, lazy load
