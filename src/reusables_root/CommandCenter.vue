@@ -3,9 +3,9 @@ import { ref, nextTick, watch } from 'vue'
 
 import ScrollToBottom from "./ScrollToBottom.vue"
 
-import Calculator from "./games/Calculator.vue"
-import Breakout from "./games/Breakout.vue"
-import Snake from "./games/Snake.vue"
+import Calculator from "../exploration_games/Calculator.vue"
+import Breakout from "../exploration_games/Breakout.vue"
+import Snake from "../exploration_games/Snake.vue"
 
 const open = ref(false)
 const history = ref([])

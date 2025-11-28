@@ -1,15 +1,15 @@
 <script setup lang="ts">
 
-import {ref} from "vue"
+import {ref} from "./reusables_rootue"
 
 import { RouterLink, RouterView } from 'vue-router'
 
 
-import CommandCenter from "./CommandCenter.vue"
-import RunningTextBar from "./RunningTextBar.vue"
-import MinimalFooter from "./MinimalFooter.vue"
+import CommandCenter from "./reusables_root/CommandCenter.vue"
+import RunningTextBar from "./reusables_root/RunningTextBar.vue"
+import MinimalFooter from "./reusables_root/MinimalFooter.vue"
 
-import WelcomeMenu from "./WelcomeMenu.vue"
+import WelcomeMenu from "./reusables_root/WelcomeMenu.vue"
 
 import { isPrintAll } from "./router.ts"
 
@@ -27,7 +27,6 @@ const performPrinting = () => {
 
 import { onMounted, onBeforeUnmount } from 'vue';
 
-import {isPrintAll} from "./router.ts"
 
 const props = defineProps(["isPrintAll"])
 

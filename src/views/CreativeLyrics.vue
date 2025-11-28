@@ -1,8 +1,8 @@
 <script setup>
-import DynamicTextStyling from "./creative-lyrics/DynamicTextStyling.vue"
-import GradientPanel from "./creative-lyrics/GradientPanel.vue"
-import SimpleAudioPlayer from "./creative-lyrics/SimpleAudioPlayer.vue"
-import MySrtEditor from "./creative-lyrics/MySrtEditor.vue"
+import DynamicTextStyling from "../exploration_apps/clyrics/DynamicTextStyling.vue"
+import GradientPanel from "../exploration_apps/clyrics/GradientPanel.vue"
+import SimpleAudioPlayer from "../exploration_apps/clyrics/SimpleAudioPlayer.vue"
+import MySrtEditor from "../exploration_apps/clyrics/MySrtEditor.vue"
 
 </script>
 

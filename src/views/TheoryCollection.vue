@@ -12,35 +12,35 @@ function sumTheories(sourceObj){
 }
 
 function getBlenderTopics(){
-  const rawBlenderTopics = import.meta.glob('./theories-blender-3d/**/*.json', { 
+  const rawBlenderTopics = import.meta.glob('../data/blender-3d/**/*.json', { 
     eager: true, query: '?json' 
   });
   return sumTheories(rawBlenderTopics)
 }
 
 function getMath2D(){
-  const rawMath2D = import.meta.glob('./theories-math-2d/**/*.json', { 
+  const rawMath2D = import.meta.glob('../data/math-2d/**/*.json', { 
     eager: true, query: '?json' 
   });
   return sumTheories(rawMath2D)
 }
 
 function getMath3D(){
-  const rawMath3D = import.meta.glob('./theories-math-3d/**/*.json', { 
+  const rawMath3D = import.meta.glob('../data/math-3d/**/*.json', { 
     eager: true, query: '?json' 
   }); 
   return sumTheories(rawMath3D)
 }
 
 function getPhysic2D(){
-  const rawPhysics2D = import.meta.glob('./theories-physics-2d/**/*.json', { 
+  const rawPhysics2D = import.meta.glob('../data/physics-2d/**/*.json', { 
     eager: true, query: '?json' 
   });
   return sumTheories(rawPhysics2D)
 }
 
 function getPhysic3D(){
-  const rawPhysics3D = import.meta.glob('./theories-physics-3d/**/*.json', { 
+  const rawPhysics3D = import.meta.glob('../data/physics-3d/**/*.json', { 
     eager: true, query: '?json' 
   });
   return sumTheories(rawPhysics3D)

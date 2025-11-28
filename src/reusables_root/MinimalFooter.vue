@@ -4,8 +4,8 @@
 import {ref, reactive} from "vue"
 
 import ScrollToTop from "./ScrollToTop.vue"
-import SlidingUpDrawer from "./views/reusables/SligindUpDrawer.vue"
-import GridMenu from "./views/reusables/GridMenu.vue"
+import SlidingUpDrawer from "./SlidindUpDrawer.vue"
+import GridMenu from "./GridMenu.vue"
 
 import { useRouter } from 'vue-router'
 

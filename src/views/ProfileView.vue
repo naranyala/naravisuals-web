@@ -1,10 +1,10 @@
 
 <script setup>
 
-import IconVue from "./icons/IconVue.vue"
-import IconInkscape from "./icons/IconInkscape.vue"
-import IconBlender from "./icons/IconBlender.vue"
-import IconLinux from "./icons/IconLinux.vue"
+import IconVue from "../icons/IconVue.vue"
+import IconInkscape from "../icons/IconInkscape.vue"
+import IconBlender from "../icons/IconBlender.vue"
+import IconLinux from "../icons/IconLinux.vue"
 
 const cv = {
   exp: [

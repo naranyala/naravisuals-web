@@ -4,13 +4,14 @@ import { ref } from 'vue'
 import FullScreenModal from "./reusables/FullScreenModal.vue"
 import CodeBlock from "./reusables/CodeBlock.vue"
 import DashbaordLayout from "./reusables/DashboardLayout.vue"
+import CollapsibleSection from "./reusables/CollapsibleSection.vue"
 
-import strReactiveH from "./raw-files/reactive.h?raw"
-import strTuiH from "./raw-files/tui.h?raw"
-import strKvstoreH from "./raw-files/kvstore.h?raw"
-import strDynarrayH from "./raw-files/dynarray.h?raw"
-import strStringBuilderH from "./raw-files/strbuilder.h?raw"
-import strToonFormatH from "./raw-files/toon_format.h?raw"
+import strReactiveH from "../assets/raw-files/reactive.h?raw"
+import strTuiH from "../assets/raw-files/tui.h?raw"
+import strKvstoreH from "../assets/raw-files/kvstore.h?raw"
+import strDynarrayH from "../assets/raw-files/dynarray.h?raw"
+import strStringBuilderH from "../assets/raw-files/strbuilder.h?raw"
+import strToonFormatH from "../assets/raw-files/toon_format.h?raw"
 
 const myLibraries = ref([
   { libName: "reactive.h", isOpen: false, code: strReactiveH },
@@ -97,7 +98,6 @@ const cLibraryHeaders = ref([
   { isOpen: false, header: "sys/sem.h",    example: "", desc: "Semaphores (e.g., semget, semop)" },
 ]);
 
-import CollapsibleSection from "./reusables/CollapsibleSection.vue"
 
 </script>
 

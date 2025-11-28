@@ -1,20 +1,23 @@
 <script setup>
 
-import ScrollIndicator from "../ScrollIndicator.vue"
-import MottonCollection from "../MottoCollection.vue"
-// import CurrentCalendar from "../views/widgets/CurrentCalendar.vue"
-import SearchBar from "../SearchBar.vue"
-import PhoneKeypad from "../PhoneKeypad.vue"
-// import PrintAction from "../views/reusables/PrintAction.vue"
-// import FloatingAction from "../FloatingAction.vue"
-// import ProfileHeader from "../ProfileHeader.vue"
-import RepoSearch from "../RepoSearch.vue"
-import ReferenceSearch from "../ReferenceSearch.vue"
+import ScrollIndicator from "./reusables/ScrollIndicator.vue"
+import MottonCollection from "./reusables/MottoCollection.vue"
+import SearchBar from "./reusables/SearchBar.vue"
+import PhoneKeypad from "./reusables/PhoneKeypad.vue"
 
-import RandomWordSystem from "../RandomWordSystem.vue"
-import RandomWordTerms from "../RandomWordTerms.vue"
-import RandomWordHeaders from "../RandomWordHeaders.vue"
-import MapPicker from "../MapPicker.vue"
+import RepoSearch from "./reusables/RepoSearch.vue"
+import ReferenceSearch from "./reusables/ReferenceSearch.vue"
+
+import RandomWordSystem from "./reusables/RandomWordSystem.vue"
+import RandomWordTerms from "./reusables/RandomWordTerms.vue"
+import RandomWordHeaders from "./reusables/RandomWordHeaders.vue"
+import MapPicker from "./reusables/MapPicker.vue"
+
+// import CurrentCalendar from "./reusables/views/widgets/CurrentCalendar.vue"
+// import PrintAction from "./reusables/views/reusables/PrintAction.vue"
+// import FloatingAction from "./reusables/FloatingAction.vue"
+// import ProfileHeader from "./reusables/ProfileHeader.vue"
+
 
 </script>
 

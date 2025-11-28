@@ -19,7 +19,7 @@ import FullScreenModal from "./reusables/FullScreenModal.vue"
 // import HeadlessDatepicker from "./reusables/HeadlessDatepicker.vue"
 
 
-import strReactiveH from "./raw-files/reactive.h?raw"
+import strReactiveH from "../assets/raw-files/reactive.h?raw"
 
 const myComposables = ref([
   { isOpen: false, label: "Counter", codes: [strCounter] },
