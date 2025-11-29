@@ -5,7 +5,7 @@
     <p v-if="picked">Lat: {{ coords.lat.toFixed(5) }}, Lng: {{ coords.lng.toFixed(5) }}</p>
     <button @click="openModal" class="btn">{{ picked ? 'Change Location' : 'Pick Location' }}</button>
   </div>
-  
+
   <!-- Full Screen Modal -->
   <div v-if="showModal" class="modal-overlay">
     <div class="modal">
@@ -13,10 +13,10 @@
         <h3>Pick a Location</h3>
         <button @click="closeModal" class="btn-close">✕</button>
       </div>
-      
+
       <div class="map-container">
         <div ref="pickerMapRef" class="map-fullscreen"></div>
-        
+
         <!-- Crosshair -->
         <div class="crosshair">
           <div class="crosshair-horizontal"></div>
@@ -24,7 +24,7 @@
           <div class="crosshair-center"></div>
         </div>
       </div>
-      
+
       <div class="modal-footer">
         <div class="coords-display">
           <span v-if="tempCoords">
@@ -54,7 +54,9 @@ L.Icon.Default.mergeOptions({
 
 const showModal = ref(false);
 const picked = ref(false);
-const coords = ref({ lat: -7.8, lng: 112.0 }); // East Java default
+// const coords = ref({ lat: -7.8, lng: 112.0 }); // Kediri
+const coords = ref({ lat: -7.63148, lng: 111.52567 }); // Madiun
+
 const tempCoords = ref(null);
 
 const pickerMapRef = ref(null);
@@ -102,18 +104,18 @@ function initPicker() {
       zoom: 13,
       zoomControl: false
     });
-    
+
     // Add zoom control to top-right
     L.control.zoom({
       position: 'topright'
     }).addTo(pickerMap);
-    
+
     addTileLayer(pickerMap);
 
     // Update coordinates when map moves
     pickerMap.on('move', updateCrosshairCoords);
     pickerMap.on('moveend', updateCrosshairCoords);
-    
+
     // Initial coordinate update
     updateCrosshairCoords();
 
@@ -131,10 +133,10 @@ function initPicker() {
 
 function saveLocation() {
   if (!tempCoords.value) return;
-  
+
   coords.value = { ...tempCoords.value };
   picked.value = true;
-  
+
   closeModal();
   nextTick(() => {
     setTimeout(initStatic, 150);
@@ -163,7 +165,7 @@ function initStatic() {
       tap: false,
       touchZoom: false,
     });
-    
+
     addTileLayer(staticMap);
     L.marker([coords.value.lat, coords.value.lng]).addTo(staticMap);
 
@@ -398,27 +400,27 @@ onBeforeUnmount(() => {
   .modal-header {
     padding: 0.75rem 1rem;
   }
-  
+
   .modal-header h3 {
     font-size: 1.1rem;
   }
-  
+
   .modal-footer {
     padding: 0.75rem 1rem;
   }
-  
+
   .coords-display {
     font-size: 0.9rem;
   }
-  
+
   .crosshair-horizontal {
     width: 60px;
   }
-  
+
   .crosshair-vertical {
     height: 60px;
   }
-  
+
   .crosshair-center {
     width: 16px;
     height: 16px;

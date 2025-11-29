@@ -1,7 +1,6 @@
-
 <script setup>
 
-import {ref, reactive} from "vue"
+import { ref, reactive } from "vue"
 
 import ScrollToTop from "./ScrollToTop.vue"
 import SlidingUpDrawer from "./SlidindUpDrawer.vue"
@@ -28,7 +27,7 @@ const links = [
 // State variable to control the drawer's visibility
 const isDrawerOpen = reactive({
   pastOfMe: false,
-  presentOfMe: false, 
+  presentOfMe: false,
   futureOfMe: false
 })
 
@@ -92,9 +91,9 @@ const actionFutureOfMe = () => {
 <template>
   <footer class="footer">
     <div class="footer-links">
-      <a class="link-item" @click="openDrawer('past-of-me')">{{contentPastOfMe.title}}</a> 
-      <a class="link-item" @click="openDrawer('present-of-me')">{{contentPresentOfMe.title}}</a> 
-      <a class="link-item" @click="openDrawer('future-of-me')">{{contentFutureOfMe.title}}</a> 
+      <a class="link-item" @click="openDrawer('past-of-me')">{{ contentPastOfMe.title }}</a>
+      <a class="link-item" @click="openDrawer('present-of-me')">{{ contentPresentOfMe.title }}</a>
+      <a class="link-item" @click="openDrawer('future-of-me')">{{ contentFutureOfMe.title }}</a>
     </div>
 
     <p class="footer-copyright">© 2025 gema_naranyala</p>
@@ -103,29 +102,29 @@ const actionFutureOfMe = () => {
 
 
     <SlidingUpDrawer v-model="isDrawerOpen.pastOfMe" :persistent="false">
-        <template #header>
-          <h3 class="drawer-header">{{contentPastOfMe.title}}</h3>
-        </template>
-        
-      <GridMenu :items="menuItems" @drawer-close="actionPastOfMe"/>
+      <template #header>
+        <h3 class="drawer-header">{{ contentPastOfMe.title }}</h3>
+      </template>
+
+      <GridMenu :items="menuItems" @drawer-close="actionPastOfMe" />
     </SlidingUpDrawer>
 
 
     <SlidingUpDrawer v-model="isDrawerOpen.presentOfMe" :persistent="false">
-        <template #header>
-          <h3 class="drawer-header">{{contentPresentOfMe.title}}</h3>
-        </template>
-        
-      <GridMenu :items="menuItems" @drawer-close="actionPresentOfMe"/>
+      <template #header>
+        <h3 class="drawer-header">{{ contentPresentOfMe.title }}</h3>
+      </template>
+
+      <GridMenu :items="menuItems" @drawer-close="actionPresentOfMe" />
     </SlidingUpDrawer>
 
 
     <SlidingUpDrawer v-model="isDrawerOpen.futureOfMe" :persistent="false">
-        <template #header>
-          <h3 class="drawer-header">{{contentFutureOfMe.title}}</h3>
-        </template>
+      <template #header>
+        <h3 class="drawer-header">{{ contentFutureOfMe.title }}</h3>
+      </template>
 
-      <GridMenu :items="menuItems" @drawer-close="actionFutureOfMe"/>
+      <GridMenu :items="menuItems" @drawer-close="actionFutureOfMe" />
     </SlidingUpDrawer>
 
 
@@ -135,10 +134,13 @@ const actionFutureOfMe = () => {
 
 <style>
 /* These are the real animation classes Vue uses */
-.drawer-enter-active, .drawer-leave-active {
+.drawer-enter-active,
+.drawer-leave-active {
   transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.25s;
 }
-.drawer-enter-from, .drawer-leave-to {
+
+.drawer-enter-from,
+.drawer-leave-to {
   opacity: 0;
   transform: translateY(100%);
 }
@@ -147,10 +149,10 @@ const actionFutureOfMe = () => {
   text-align: center;
   padding-top: 1.2rem;
   padding-bottom: 120px;
-  background-color: #121212;
-  color: #b0b0b0;
+  /* background-color: #121212; */
+  /* color: #b0b0b0; */
   font-size: 1.05rem;
-  border-top: 1px solid #333;
+  /* border-top: 1px solid #333; */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -168,7 +170,10 @@ const actionFutureOfMe = () => {
   transition: color 0.2s ease;
   white-space: nowrap;
 
-  &:hover { text-decoration: underline; cursor: pointer; }
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
 }
 
 .footer-copyright {
@@ -177,7 +182,7 @@ const actionFutureOfMe = () => {
   font-weight: 300;
   letter-spacing: 0.5px;
   font-size: 0.8rem;
-  margin-bottom: 20px;
+  margin-bottom: 200px;
 }
 
 /* Responsive touch optimization */
@@ -191,5 +196,9 @@ const actionFutureOfMe = () => {
   }
 }
 
-.drawer-header { text-align: center; font-weight: bold; padding-bottom: 5px; }
+.drawer-header {
+  text-align: center;
+  font-weight: bold;
+  padding-bottom: 5px;
+}
 </style>

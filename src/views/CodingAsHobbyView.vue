@@ -1,7 +1,6 @@
 <script setup>
 
 import ScrollIndicator from "./reusables/ScrollIndicator.vue"
-import MottonCollection from "./reusables/MottoCollection.vue"
 import SearchBar from "./reusables/SearchBar.vue"
 import PhoneKeypad from "./reusables/PhoneKeypad.vue"
 
@@ -25,20 +24,19 @@ import MapPicker from "./reusables/MapPicker.vue"
   <h1>CODING AS HOBBY</h1>
 
 
-       <div style="margin: auto; width: 500px; height: auto;">
-          <MapPicker/>
-      </div>
-      <!-- <CurrentCalendar  -->
-      <!--  style="margin: 40px auto; width: 100%;"/> -->
-      
-      <RandomWordSystem/>
-      <RandomWordTerms/>
-      <RandomWordHeaders/>
+  <div style="margin: auto; width: 500px; height: auto;">
+    <MapPicker />
+  </div>
+  <!-- <CurrentCalendar  -->
+  <!--  style="margin: 40px auto; width: 100%;"/> -->
 
-      <SearchBar/>
-      <RepoSearch/>
-      <ReferenceSearch/>
+  <RandomWordSystem />
+  <RandomWordTerms />
+  <RandomWordHeaders />
 
-      <MottonCollection/>
-      <ScrollIndicator/>
+  <SearchBar />
+  <RepoSearch />
+  <ReferenceSearch />
+
+  <ScrollIndicator />
 </template>

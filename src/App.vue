@@ -1,9 +1,8 @@
 <script setup lang="ts">
 
-import {ref} from "./reusables_rootue"
+import { ref } from "./reusables_rootue"
 
 import { RouterLink, RouterView } from 'vue-router'
-
 
 import CommandCenter from "./reusables_root/CommandCenter.vue"
 import RunningTextBar from "./reusables_root/RunningTextBar.vue"
@@ -58,20 +57,28 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <RunningTextBar direction="right" text="COMING SOON! WORK IN PROGRESS ..."/>
-  <CommandCenter/>
+  <RunningTextBar direction="right" text="COMING SOON! WORK IN PROGRESS ..." />
+  <CommandCenter />
+
   <RouterView />
 
   <div class="no-print">
-      <!-- <WelcomeMenu/> -->
-      <MinimalFooter/>
+    <!-- <WelcomeMenu/> -->
+    <MinimalFooter />
   </div>
 
 </template>
 
 <style scoped>
+body {
+  height: 100vh;
+  padding: 0;
+}
 
-
+#app {
+  height: 100vh;
+  padding: 0;
+}
 
 .print-button {
   padding: 0.5rem 1rem;
@@ -84,9 +91,8 @@ onBeforeUnmount(() => {
   font-weight: 500;
   transition: background-color 0.2s;
 }
+
 .print-button:hover {
   background-color: #2563eb;
 }
-
-
 </style>

@@ -9,19 +9,18 @@ import {
   saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams
 } from "./utils.js"
 
+import MottoCollection from "./MottoCollection.vue"
+import ExploreCrustView from "./ExploreCrustView.vue"
+import JsVueExplorationMain from "./JsVueExplorationMain.vue"
 
-import MakeYourOwnPluginView from "./MakeYourOwnPlugin.vue"
 import CodeShowView from "./CodeShowView.vue"
 import ProgrammingConceptView from "./ProgrammingConceptView.vue"
 import CodeDumpRelearnView from "./CodeDumpRelearnView.vue"
 import ProfileView from "./ProfileView.vue"
 import GeneralFaqView from "./GeneralFaqView.vue"
-import VueComposablesView from "./VueComposablesView.vue"
 import ClarityFAQ from "./ClarityFAQ.vue"
-import GamePanelView from "./GamePanelView.vue"
 import BashScriptCollectionView from "./BashScriptCollectionView.vue"
-import MyLearningCourses from "./MyLearningCourses.vue"
-import VerticalTimeline from "./VerticalTimeline.vue"
+import NeovimAndCliView from "./NeovimAndCliView.vue"
 import CreativeView from "./CreativeView.vue"
 import Creative3DView from "./Creative3DView.vue"
 
@@ -35,36 +34,38 @@ import MindmapMaker from "./MindmapRoot.vue"
 import TheoryCollection from "./TheoryCollection.vue"
 import CanvasExamplesView from "./CanvasExamplesView.vue"
 import MyAnimationView from "./MyAnimationView.vue"
+import RoadmapCanvas from "./RoadmapCanvas.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
 
 const activeTab = ref(0)
 const tabs = ref([
-  { id: 0, label: "VisualsLyrics", component: CreativeLyrics },
-  { id: 1, label: "Theories", component: TheoryCollection },
-  { id: 2, label: "Articles", component: ArticleView },
-  { id: 3, label: "Gallery", component: CanvasExamplesView },
-  { id: 4, label: "Creative3D", component: Creative3DView },
-  { id: 5, label: "Animation", component: MyAnimationView },
-
-  // { id: 0, label: "MINDMAP-MAKER", component: MindmapMaker },
-  // { id: 1, label: "Gallery", component: GalleryView },
-  // { id: 2, label: "Creative2D", component: CreativeView },
-  // { id: 3, label: "CODING-AS-HOBBY", component: CodingAsHobbyView },
   // { id: 4, label: "SIPENA (TM)", component: SipenaView },
-
   // { id: 0, label: "EASYBUDGET (TM)", component: EasyBudgetView },
-  // { id: 1, label: "PROFILE", component: ProfileView },
-  // { id: 2, label: "ARTICLES", component: VerticalTimeline },
-  // { id: 3, label: "VUE-COMPOSABLES", component: VueComposablesView },
-  // { id: 4, label: "C+LIBRARIES", component: ProgrammingConceptView },
+  // { id: 0, label: "VisualsLyrics (TM)", component: CreativeLyrics },
 
-  // { id: 0, label: "VUE-STYLING", component: MakeYourOwnPluginView },
-  // { id: 1, label: "C+NEOVIM", component: CodeDumpRelearnView },
-  // { id: 2, label: "C+RAYLIB", component: MyLearningCourses },
-  // { id: 3, label: "FAQ", component: ClarityFAQ },
-  // { id: 4, label: "THEORIES", component: GamePanelView },
+  // { id: 1, label: "Theories", component: TheoryCollection },
+  // { id: 2, label: "Articles", component: ArticleView },
+  // { id: 3, label: "Gallery", component: CanvasExamplesView },
+  // { id: 4, label: "Creative3D", component: Creative3DView },
+  // { id: 5, label: "Animation", component: MyAnimationView },
+
+  { id: 0, label: "WELCOME", component: MottoCollection },
+  { id: 1, label: "Roadmap", component: RoadmapCanvas  },
+  { id: 2, label: "Gallery", component: GalleryView },
+  { id: 3, label: "C/RUST", component: ExploreCrustView },
+  { id: 4, label: "JS/VUE", component: JsVueExplorationMain },
+  { id: 5, label: "NEOVIM/CLI", component: NeovimAndCliView },
+
+
+  // { id: 1, label: "Creative2D", component: CreativeView },
+  // { id: 2, label: "MINDMAP-MAKER", component: MindmapMaker },
+  // { id: 3, label: "CODING-AS-HOBBY", component: CodingAsHobbyView },
+  // { id: 0, label: "PROFILE", component: ProfileView },
+  // { id: 3, label: "C+LIBRARIES", component: ProgrammingConceptView },
+  // { id: 0, label: "LINUX", component: CodeDumpRelearnView },
+  // { id: 4, label: "FAQ", component: ClarityFAQ },
 ])
 
 const setupWelcome = () => {
@@ -155,6 +156,7 @@ onMounted(() => {
       <component :is="tabs[activeTab].component"></component>
     </div>
     <div v-else>
+      <!-- PRINT MODE -->
       <ProfileView/>
       <hr/>
       <CodeDumpRelearnView/>

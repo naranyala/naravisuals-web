@@ -2,7 +2,7 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
+// import vueDevTools from 'vite-plugin-vue-devtools'
 
 import Markdown from 'unplugin-vue-markdown/vite'
 
@@ -18,5 +18,8 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  assetsInclude: ['**/*.glb'],
+  assetsInclude: [
+    // './**/*.md',
+    './**/*.glb'
+  ],
 })

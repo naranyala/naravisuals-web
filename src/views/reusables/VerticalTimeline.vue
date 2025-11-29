@@ -1,16 +1,10 @@
-
 <!-- VerticalTimeline.vue -->
 <template>
   <div class="timeline-container">
     <div class="timeline-line"></div>
 
-    <div
-      v-for="(item, index) in items"
-      :key="index"
-      class="timeline-item"
-      :class="{ active: activeIndex === index }"
-      @click="handleClick(index, item)"
-    >
+    <div v-for="(item, index) in items" :key="index" class="timeline-item" :class="{ active: activeIndex === index }"
+      @click="handleClick(index, item)">
       <div class="node"></div>
 
       <div class="content">
