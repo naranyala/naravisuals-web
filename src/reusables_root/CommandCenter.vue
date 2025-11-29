@@ -2,10 +2,13 @@
 import { ref, nextTick, watch } from 'vue'
 
 import ScrollToBottom from "./ScrollToBottom.vue"
+import SlidingUpDrawer from "./SlidindUpDrawer.vue"
 
 import Calculator from "../exploration_games/Calculator.vue"
 import Breakout from "../exploration_games/Breakout.vue"
 import Snake from "../exploration_games/Snake.vue"
+import Sudoku from "../exploration_games/Sudoku.vue"
+
 
 const open = ref(false)
 const history = ref([])
@@ -28,8 +31,13 @@ watch(open, (val) => {
 const isCalculatorVisible = ref(false)
 const isBreakoutVisible = ref(false)
 const isSnakeVisible = ref(false)
+const isSudokuVisible = ref(false)
 
 const commands = {
+  play_sudoku: () => isSudokuVisible.value = true,
+  play_snake: () => isSnakeVisible.value = true,
+  play_breakout: () => isBreakoutVisible.value = true,
+  use_calculator: () => isCalculatorVisible.value = true,
   work: () => out("hire me! fast"),
   info: () => {
     const info = {
@@ -77,18 +85,6 @@ const commands = {
       out(`<span style="color:#0f0">${line}</span>`)
     }, 100)
   },
-  game_snake: () => {
-    isSnakeVisible.value = !isSnakeVisible.value;
-    open.value = !open.value;
-  },
-  game_breakout: () => {
-    isBreakoutVisible.value = !isBreakoutVisible.value;
-    open.value = !open.value;
-  },
-  app_calculator: () => {
-    isCalculatorVisible.value = !isCalculatorVisible.value;
-    open.value = !open.value;
-  },
   show_profile: () => {
     location.replace('/profile');
   }
@@ -135,14 +131,21 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
     <!-- Sticky Header (navbar + terminal) -->
     <header class="sticky-header">
       <nav class="navbar">
-        <a href="/" class="logo">{{SITE_TITLE}}</a>
+        <a href="/" class="logo">{{ SITE_TITLE }}</a>
         <button @click="open = !open" style="border: none;">
-          <svg v-if="open" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M16 2C8.2 2 2 8.2 2 16s6.2 14 14 14s14-6.2 14-14S23.8 2 16 2m0 26C9.4 28 4 22.6 4 16S9.4 4 16 4s12 5.4 12 12s-5.4 12-12 12"/><path fill="currentColor" d="M21.4 23L16 17.6L10.6 23L9 21.4l5.4-5.4L9 10.6L10.6 9l5.4 5.4L21.4 9l1.6 1.6l-5.4 5.4l5.4 5.4z"/></svg>            
-          <svg v-if="!open" xmlns="http://www.w3.org/2000/svg" width="32"
-            height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m6.75 7.5l3 2.25l-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0 0 21 18V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v12a2.25 2.25 0 0 0 2.25 2.25"/></svg>
+          <svg v-if="open" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+            <path fill="currentColor"
+              d="M16 2C8.2 2 2 8.2 2 16s6.2 14 14 14s14-6.2 14-14S23.8 2 16 2m0 26C9.4 28 4 22.6 4 16S9.4 4 16 4s12 5.4 12 12s-5.4 12-12 12" />
+            <path fill="currentColor"
+              d="M21.4 23L16 17.6L10.6 23L9 21.4l5.4-5.4L9 10.6L10.6 9l5.4 5.4L21.4 9l1.6 1.6l-5.4 5.4l5.4 5.4z" />
+          </svg>
+          <svg v-if="!open" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="m6.75 7.5l3 2.25l-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0 0 21 18V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v12a2.25 2.25 0 0 0 2.25 2.25" />
+          </svg>
         </button>
 
-        <ScrollToBottom style="margin-right: 5px;"/>
+        <ScrollToBottom style="margin-right: 5px;" />
       </nav>
 
       <!-- Terminal Panel -->
@@ -153,15 +156,9 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
             <span v-html="e.content"></span>
           </div>
           <div class="line input">
-            <span class="prompt">{{PROMPT_SYMBOL}}</span>
-            <input
-              ref="inputRef"
-              v-model="cmd"
-              @keydown="onKey"
-              autocomplete="off"
-              spellcheck="false"
-              placeholder="type help"
-            />
+            <span class="prompt">{{ PROMPT_SYMBOL }}</span>
+            <input ref="inputRef" v-model="cmd" @keydown="onKey" autocomplete="off" spellcheck="false"
+              placeholder="type help" />
             <button @click="exec">RUN</button>
           </div>
         </div>
@@ -169,17 +166,21 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
     </header>
 
     <Teleport to="body">
-      <Calculator 
-        v-if="isCalculatorVisible" 
-        @toggle-container="commands.app_calculator"/>
-      <Breakout
-        v-if="isBreakoutVisible" 
-        @toggle-container="commands.game_breakout"/>
-
-      <Snake
-        v-if="isSnakeVisible" 
-        @toggle-container="commands.game_snake"/>
+      <SlidingUpDrawer v-model="isCalculatorVisible">
+        <Calculator />
+      </SlidingUpDrawer>
+      <SlidingUpDrawer v-model="isBreakoutVisible">
+        <Breakout />
+      </SlidingUpDrawer>
+      <SlidingUpDrawer v-model="isSnakeVisible">
+        <Snake />
+      </SlidingUpDrawer>
+      <SlidingUpDrawer v-model="isSudokuVisible">
+        <Sudoku />
+      </SlidingUpDrawer>
     </Teleport>
+
+
   </div>
 </template>
 
@@ -221,7 +222,10 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
   border-bottom: 1px solid var(--dim);
 }
 
-.logo { font-weight: 600; color: var(--accent); }
+.logo {
+  font-weight: 600;
+  color: var(--accent);
+}
 
 .toggle {
   background: none;
@@ -235,7 +239,9 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
   transition: border-color .15s;
 }
 
-.toggle:hover { border-color: var(--accent); }
+.toggle:hover {
+  border-color: var(--accent);
+}
 
 .terminal {
   max-height: 0;
@@ -273,7 +279,10 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
   font-size: 1.5rem;
 }
 
-.input { display: flex; margin-top: auto; }
+.input {
+  display: flex;
+  margin-top: auto;
+}
 
 input {
   flex: 1;
@@ -284,16 +293,28 @@ input {
   outline: none;
 }
 
-input::placeholder { color: var(--dim); }
+input::placeholder {
+  color: var(--dim);
+}
 
-.cmd { color: var(--accent); }
-.err { color: #a55; }
+.cmd {
+  color: var(--accent);
+}
 
-.output::-webkit-scrollbar { width: 3px; }
-.output::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 2px; }
+.err {
+  color: #a55;
+}
+
+.output::-webkit-scrollbar {
+  width: 3px;
+}
+
+.output::-webkit-scrollbar-thumb {
+  background: var(--dim);
+  border-radius: 2px;
+}
 
 button {
   background: none;
 }
-
 </style>

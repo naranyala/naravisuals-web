@@ -11,6 +11,7 @@ import {
 import MottoCollection from "./MottoCollection.vue"
 import ExploreCrustView from "./ExploreCrustView.vue"
 import JsVueExplorationMain from "./JsVueExplorationMain.vue"
+import MyComponentExploration from "./MyComponentExploration.vue"
 
 import CodeShowView from "./CodeShowView.vue"
 import ProgrammingConceptView from "./ProgrammingConceptView.vue"
@@ -35,6 +36,8 @@ import CanvasExamplesView from "./CanvasExamplesView.vue"
 import MyAnimationView from "./MyAnimationView.vue"
 
 import RoadmapContainer from "./RoadmapContainer.vue"
+import CanvasEngineDemo from "./CanvasEngineDemo.vue"
+import WebglExplorationView from "./WebglExplorationView.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
@@ -52,11 +55,14 @@ const tabs = ref([
   // { id: 5, label: "Animation", component: MyAnimationView },
 
   { id: 0, label: "WELCOME", component: MottoCollection },
-  { id: 1, label: "Roadmap Gen", component: RoadmapContainer },
+  // { id: 1, label: "Roadmap Gen", component: RoadmapContainer },
+  // { id: 1, label: "be-beyond", component: MyComponentExploration },
+  { id: 1, label: "be-beyond", component: CanvasEngineDemo },
   { id: 2, label: "Simulation", component: SimulationCenterView },
+  // { id: 2, label: "WEBGL", component: WebglExplorationView },
   { id: 3, label: "C/RUST", component: ExploreCrustView },
   { id: 4, label: "JS/VUE", component: JsVueExplorationMain },
-  { id: 5, label: "NEOVIM/CLI", component: NeovimAndCliView },
+  { id: 5, label: "CLI/NEOVIM", component: NeovimAndCliView },
 
 
   // { id: 1, label: "Creative2D", component: CreativeView },
