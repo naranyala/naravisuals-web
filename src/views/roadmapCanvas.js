@@ -266,6 +266,185 @@ export class RoadmapCanvas {
     this.draw();
   }
 
+  exportAsPNG() {
+    // Create a temporary offscreen canvas
+    const exportCanvas = document.createElement('canvas');
+    const ctx = exportCanvas.getContext('2d');
+
+    if (this.stages.length === 0) {
+      alert('No stages to export!');
+      return;
+    }
+
+    // Calculate bounds including ALL elements (nodes, text, connections)
+    let minX = Infinity, minY = Infinity;
+    let maxX = -Infinity, maxY = -Infinity;
+
+    // Calculate bounds for nodes and their text
+    this.stages.forEach(stage => {
+      const nodeRadius = 40; // Base radius
+      const textWidth = ctx.measureText(stage.title).width;
+      const textHeight = 20;
+
+      // Node bounds
+      minX = Math.min(minX, stage.x - nodeRadius);
+      maxX = Math.max(maxX, stage.x + nodeRadius);
+      minY = Math.min(minY, stage.y - nodeRadius);
+      maxY = Math.max(maxY, stage.y + nodeRadius);
+
+      // Text bounds (below node)
+      minX = Math.min(minX, stage.x - textWidth / 2);
+      maxX = Math.max(maxX, stage.x + textWidth / 2);
+      maxY = Math.max(maxY, stage.y + nodeRadius + textHeight + 10);
+    });
+
+    // Calculate bounds for connection lines
+    this.stages.forEach(stage => {
+      stage.dependencies.forEach(depId => {
+        const depStage = this.stages.find(s => s.id === depId);
+        if (depStage) {
+          // Include both endpoints of the connection
+          minX = Math.min(minX, stage.x, depStage.x);
+          maxX = Math.max(maxX, stage.x, depStage.x);
+          minY = Math.min(minY, stage.y, depStage.y);
+          maxY = Math.max(maxY, stage.y, depStage.y);
+        }
+      });
+    });
+
+    const contentWidth = maxX - minX;
+    const contentHeight = maxY - minY;
+
+    // Add generous padding (20% of content size or minimum 100px)
+    const padding = Math.max(100, Math.min(contentWidth, contentHeight) * 0.2);
+
+    // Set export canvas size with padding
+    exportCanvas.width = contentWidth + padding * 2;
+    exportCanvas.height = contentHeight + padding * 2;
+
+    // Dark background matching your theme
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+    // Apply transform to center content with padding
+    ctx.translate(padding - minX, padding - minY);
+
+    // Optional: Scale for better appearance
+    const exportScale = 1.0; // You can adjust this (0.8 for smaller, 1.2 for larger)
+    ctx.scale(exportScale, exportScale);
+
+    // === DRAW CONNECTIONS FIRST (behind nodes) ===
+    ctx.strokeStyle = '#4a5568';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+
+    this.stages.forEach(stage => {
+      stage.dependencies.forEach(depId => {
+        const depStage = this.stages.find(s => s.id === depId);
+        if (depStage) {
+          ctx.beginPath();
+          ctx.moveTo(depStage.x, depStage.y);
+          ctx.lineTo(stage.x, stage.y);
+          ctx.stroke();
+        }
+      });
+    });
+
+    // === DRAW NODES ===
+    this.stages.forEach(stage => {
+      const isSelected = this.selectedStage?.id === stage.id;
+      const radius = isSelected ? 35 : 30;
+      const fillColor = stage.completed ? '#48bb78' : '#4299e1';
+      const borderColor = isSelected ? '#fbbf24' : '#ffffff';
+      const borderWidth = isSelected ? 4 : 2;
+
+      // Node shadow for depth
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+      ctx.shadowBlur = 15;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 5;
+
+      // Draw node
+      ctx.fillStyle = fillColor;
+      ctx.beginPath();
+      ctx.arc(stage.x, stage.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw border
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = borderWidth;
+      ctx.stroke();
+
+      // Reset shadow for text
+      ctx.shadowColor = 'transparent';
+
+      // Draw ID text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(stage.id.toString(), stage.x, stage.y);
+
+      // Draw title text with better styling
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '600 14px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+
+      // Add text background for better readability
+      const textMetrics = ctx.measureText(stage.title);
+      const textBackgroundPadding = 6;
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+      ctx.fillRect(
+        stage.x - textMetrics.width / 2 - textBackgroundPadding,
+        stage.y + radius + 5 - textBackgroundPadding,
+        textMetrics.width + textBackgroundPadding * 2,
+        20 + textBackgroundPadding * 2
+      );
+
+      // Draw title text
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillText(stage.title, stage.x, stage.y + radius + 8);
+    });
+
+    // === ADD WATERMARK/INFO ===
+    ctx.resetTransform(); // Reset to canvas coordinates
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.font = '12px Arial, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(`Exported on ${new Date().toLocaleDateString()}`, exportCanvas.width - 20, exportCanvas.height - 10);
+
+    // === TRIGGER DOWNLOAD ===
+    try {
+      const link = document.createElement('a');
+      const datetime = this.getDatetime();
+      link.download = `roadmap-${datetime}.png`;
+      link.href = exportCanvas.toDataURL('image/png');
+      link.click();
+
+      console.log('Export successful! Canvas size:', exportCanvas.width, 'x', exportCanvas.height);
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export PNG. Please try again.');
+    }
+  }
+
+  getDatetime() {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    const datetime = `${year}${month}${day}-${hours}${minutes}${seconds}`;
+
+    return datetime;
+  }
+
   destroy() {
     this.removeEventListeners();
   }

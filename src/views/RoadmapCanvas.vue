@@ -3,8 +3,11 @@
     <div class="controls">
       <h1>Interactive Learning Roadmap</h1>
       <div class="buttons">
-        <button @click="resetView">Reset View</button>
         <button @click="autoLayout">Auto Layout</button>
+        <button @click="resetView">Reset View</button>
+        <button @click="exportAsPNG" class="export-btn">
+          Export
+        </button>
       </div>
     </div>
 
@@ -81,6 +84,7 @@ watch(stages, () => roadmap?.draw(), { deep: true })
 
 const handleZoom = (e) => roadmap?.zoom(e)
 const resetView = () => roadmap?.resetView()
+const exportAsPNG = () => roadmap?.exportAsPNG()
 
 const toggleCompletion = (stage) => {
   stage.completed = !stage.completed
@@ -161,5 +165,15 @@ canvas {
 .close {
   background: #e2e8f0;
   color: #1e293b;
+}
+
+.export-btn {
+  background: #9333ea !important;
+  /* purple = premium feel */
+  font-weight: bold;
+}
+
+.export-btn:hover {
+  background: #a855f7 !important;
 }
 </style>

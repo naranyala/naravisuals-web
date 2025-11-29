@@ -1,9 +1,8 @@
-
 <script setup>
 
-import { ref, onMounted, watch, watchEffect, computed} from "vue"
+import { ref, onMounted, watch, watchEffect, computed } from "vue"
 import URLManager from "../utilities/URLManager.js"
-import {useTitle} from "../composables.ts"
+import { useTitle } from "../composables.ts"
 import useLocalStorage from "./composables/useLocalStorage.js"
 import {
   saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams
@@ -28,13 +27,14 @@ import ArticleView from "./ArticleView.vue"
 import EasyBudgetView from "./EasyBudgetView.vue"
 import SipenaView from "./SipenaView.vue"
 import CodingAsHobbyView from "./CodingAsHobbyView.vue"
-import GalleryView from "./GalleryView.vue"
+import SimulationCenterView from "./SimulationCenterView.vue"
 import CreativeLyrics from "./CreativeLyrics.vue"
 import MindmapMaker from "./MindmapRoot.vue"
 import TheoryCollection from "./TheoryCollection.vue"
 import CanvasExamplesView from "./CanvasExamplesView.vue"
 import MyAnimationView from "./MyAnimationView.vue"
-import RoadmapCanvas from "./RoadmapCanvas.vue"
+
+import RoadmapContainer from "./RoadmapContainer.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
@@ -52,8 +52,8 @@ const tabs = ref([
   // { id: 5, label: "Animation", component: MyAnimationView },
 
   { id: 0, label: "WELCOME", component: MottoCollection },
-  { id: 1, label: "Roadmap", component: RoadmapCanvas  },
-  { id: 2, label: "Gallery", component: GalleryView },
+  { id: 1, label: "Roadmap Gen", component: RoadmapContainer },
+  { id: 2, label: "Simulation", component: SimulationCenterView },
   { id: 3, label: "C/RUST", component: ExploreCrustView },
   { id: 4, label: "JS/VUE", component: JsVueExplorationMain },
   { id: 5, label: "NEOVIM/CLI", component: NeovimAndCliView },
@@ -69,8 +69,8 @@ const tabs = ref([
 ])
 
 const setupWelcome = () => {
-    useTitle(computed(() => `${tabs.value[0]?.label} | naravisuals-web`))
-    setQueryParams({ page: tabs.value[0]?.label }, true)
+  useTitle(computed(() => `${tabs.value[0]?.label} | naravisuals-web`))
+  setQueryParams({ page: tabs.value[0]?.label }, true)
 }
 
 const changeRoute = (idx) => {
@@ -78,7 +78,7 @@ const changeRoute = (idx) => {
 
 
   tabs.value.map((page, id) => {
-    if(id === idx) {
+    if (id === idx) {
       refreshTheStore()
 
       useTitle(computed(() => `${page.label} | naravisuals-web`))
@@ -89,7 +89,7 @@ const changeRoute = (idx) => {
 }
 
 const store = useLocalStorage('store', {
-    page: ''
+  page: ''
 })
 
 const refreshTheStore = () => {
@@ -106,7 +106,7 @@ onMounted(() => {
   console.log("onMounted: ", store.value)
 
   const previousTab = tabs.value.filter(item => {
-    if(item.label === store.value.page){
+    if (item.label === store.value.page) {
       useTitle(computed(() => `${item.label} | naravisuals-web`))
 
       return item.id
@@ -116,9 +116,9 @@ onMounted(() => {
   const prevId = previousTab[0]?.id || 0
   console.log("prevId: ", prevId)
 
-  if(prevId <= tabs.value.length){
+  if (prevId <= tabs.value.length) {
     activeTab.value = prevId
-  }else {
+  } else {
     console.log("INVALID TAB-ID")
   }
 
@@ -130,22 +130,14 @@ onMounted(() => {
   <div class="tabs-container dark">
     <!-- Tabs -->
     <div class="tabs no-print">
-      <button
-        v-for="(tab, index) in tabs"
-        :key="index"
-        :class="{ active: activeTab === index }"
-        @click="changeRoute(index)"
-      >
+      <button v-for="(tab, index) in tabs" :key="index" :class="{ active: activeTab === index }"
+        @click="changeRoute(index)">
         {{ tab.label }}
       </button>
     </div>
 
     <!-- Optional mobile dropdown -->
-    <select
-      class="tabs-dropdown no-print"
-      v-model="activeTab"
-      @change="setActiveUrl"
-    >
+    <select class="tabs-dropdown no-print" v-model="activeTab" @change="setActiveUrl">
       <option v-for="(tab, index) in tabs" :key="index" :value="index">
         {{ tab.label }}
       </option>
@@ -157,15 +149,15 @@ onMounted(() => {
     </div>
     <div v-else>
       <!-- PRINT MODE -->
-      <ProfileView/>
-      <hr/>
-      <CodeDumpRelearnView/>
-      <hr/>
-      <ArticleView/>
-      <hr/>
-      <CreativeView/>
-      <hr/>
-      <Creative3DView/>
+      <ProfileView />
+      <hr />
+      <CodeDumpRelearnView />
+      <hr />
+      <ArticleView />
+      <hr />
+      <CreativeView />
+      <hr />
+      <Creative3DView />
     </div>
   </div>
 </template>
@@ -182,7 +174,8 @@ onMounted(() => {
 /* Tabs row */
 .tabs {
   display: flex;
-  overflow-x: auto;       /* allow horizontal scroll */
+  overflow-x: auto;
+  /* allow horizontal scroll */
   -webkit-overflow-scrolling: touch;
   border-bottom: 2px solid #333;
   background-color: #1e1e1e;
@@ -195,7 +188,8 @@ onMounted(() => {
 
 /* Tab buttons */
 .tabs button {
-  flex: 0 0 auto;         /* prevent squishing */
+  flex: 0 0 auto;
+  /* prevent squishing */
   padding: 12px 16px;
   cursor: pointer;
   background: none;
@@ -203,7 +197,8 @@ onMounted(() => {
   color: #ffffff;
   border-bottom: 2px solid transparent;
   transition: background 0.3s;
-  white-space: nowrap;    /* keep labels intact */
+  white-space: nowrap;
+  /* keep labels intact */
 }
 
 .tabs button:hover {
@@ -228,10 +223,13 @@ onMounted(() => {
 
 @media (max-width: 600px) {
   .tabs {
-    display: none;        /* hide row on small screens */
+    display: none;
+    /* hide row on small screens */
   }
+
   .tabs-dropdown {
-    display: block;       /* show dropdown instead */
+    display: block;
+    /* show dropdown instead */
   }
 }
 
