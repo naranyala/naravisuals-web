@@ -58,11 +58,11 @@ const tabs = ref([
   // { id: 1, label: "Roadmap Gen", component: RoadmapContainer },
   // { id: 1, label: "be-beyond", component: MyComponentExploration },
   { id: 1, label: "be-beyond", component: CanvasEngineDemo },
-  { id: 2, label: "Simulation", component: SimulationCenterView },
+  // { id: 2, label: "Simulation", component: SimulationCenterView },
   // { id: 2, label: "WEBGL", component: WebglExplorationView },
-  { id: 3, label: "C/RUST", component: ExploreCrustView },
   { id: 4, label: "JS/VUE", component: JsVueExplorationMain },
   { id: 5, label: "CLI/NEOVIM", component: NeovimAndCliView },
+  { id: 3, label: "C/RUST", component: ExploreCrustView },
 
 
   // { id: 1, label: "Creative2D", component: CreativeView },
