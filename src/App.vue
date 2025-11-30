@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { ref } from "./reusables_rootue"
+import { ref } from "vue"
 
 import { RouterLink, RouterView } from 'vue-router'
 
