@@ -9,7 +9,7 @@
       </label>
       <label>
         Donut Thickness:
-        <input type="range" v-model="donutThickness" min="0.3" max="1.2" step="0.1">
+        <input type="range" v-model="donutThickness" min="0.1" max="2" step="0.1">
         {{ donutThickness }}
       </label>
       <label>
@@ -21,8 +21,9 @@
         <input type="checkbox" v-model="autoRotate">
       </label>
     </div>
-    <canvas ref="canvasEl" width="800" height="600"></canvas>
-    <p class="hint">Click and drag to rotate manually</p>
+    <canvas ref="canvasEl" width="800" height="600" @touchstart="onTouchStart" @touchmove="onTouchMove"
+      @touchend="onTouchEnd" @touchcancel="onTouchEnd"></canvas>
+    <div class="touch-hint" v-if="isMobile">👆 Drag to rotate</div>
   </div>
 </template>
 
@@ -35,239 +36,236 @@ const canvasEl = ref(null)
 let app = null
 let donut = null
 
+// Reactive controls
 const rotationSpeed = ref(1.0)
 const donutThickness = ref(0.8)
 const showWireframe = ref(false)
 const autoRotate = ref(true)
+const isMobile = ref(false)
 
-const R = 1.5
-const r = 0.6
-const segments = 50
-const rings = 40
+// Touch state
+const touchState = ref({
+  isTouching: false,
+  lastX: 0,
+  lastY: 0,
+  touchId: null
+})
 
+// Donut parameters
+const R = 1.5  // Major radius
+const r = 0.6  // Minor radius
+const segments = 40
+const rings = 30
+
+// Detect mobile device
+const detectMobile = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0
+}
+
+// Initialize the donut demo
 const initDonut = () => {
   if (!canvasEl.value) return
 
+  // Create canvas app
   app = createCanvasApp(canvasEl.value)
   app.use(mathPlugin)
 
+  // Create donut object
   donut = app.root.add({
-    rotationX: 0.5,
-    rotationY: 0.5,
+    rotationX: 0,
+    rotationY: 0,
     rotationZ: 0,
-    vertices: [],
-    faces: [],
+    points: [],
     wireframe: showWireframe.value,
     thickness: donutThickness.value,
 
     update(dt) {
-      if (autoRotate.value) {
+      if (autoRotate.value && !touchState.value.isTouching) {
+        // Auto-rotate the donut around multiple axes
         this.rotationY += (dt / 1000) * rotationSpeed.value
         this.rotationX += (dt / 1000) * rotationSpeed.value * 0.7
       }
     },
 
     draw(ctx) {
-      if (!this.vertices.length) return
+      if (!this.points.length) return
 
-      const transformed = this.transformVertices()
-      const facesWithDepth = this.sortFaces(transformed)
+      ctx.strokeStyle = this.wireframe ? '#ff6b6b' : '#4ecdc4'
+      ctx.fillStyle = '#45b7aa'
+      ctx.lineWidth = 1
 
-      const lightDir = { x: 0.5, y: 0.7, z: 0.5 }
-      const lightMag = Math.sqrt(lightDir.x ** 2 + lightDir.y ** 2 + lightDir.z ** 2)
-      lightDir.x /= lightMag
-      lightDir.y /= lightMag
-      lightDir.z /= lightMag
+      // Project 3D points to 2D
+      const projected = this.points.map(p => this.project3D(p))
 
-      for (const { face } of facesWithDepth) {
-        const p1 = transformed[face[0]]
-        const p2 = transformed[face[1]]
-        const p3 = transformed[face[2]]
-
-        const v1x = p2.x - p1.x
-        const v1y = p2.y - p1.y
-        const v2x = p3.x - p1.x
-        const v2y = p3.y - p1.y
-        const cross = v1x * v2y - v1y * v2x
-
-        if (cross > 0) continue
-
-        const avgNormal = {
-          x: (p1.nx + p2.nx + p3.nx) / 3,
-          y: (p1.ny + p2.ny + p3.ny) / 3,
-          z: (p1.nz + p2.nz + p3.nz) / 3
-        }
-
-        const dot = Math.max(0, -(
-          avgNormal.x * lightDir.x +
-          avgNormal.y * lightDir.y +
-          avgNormal.z * lightDir.z
-        ))
-
-        const ambient = 0.3
-        const diffuse = 0.7
-        const brightness = ambient + diffuse * dot
-
-        if (this.wireframe) {
-          ctx.strokeStyle = '#ff6b6b'
-          ctx.lineWidth = 1
-          ctx.beginPath()
-          ctx.moveTo(p1.x, p1.y)
-          ctx.lineTo(p2.x, p2.y)
-          ctx.lineTo(p3.x, p3.y)
-          ctx.closePath()
-          ctx.stroke()
-        } else {
-          this.drawTriangle(ctx, p1, p2, p3, brightness)
-        }
+      if (this.wireframe) {
+        // Draw wireframe
+        this.drawWireframe(ctx, projected)
+      } else {
+        // Draw filled donut
+        this.drawFilledDonut(ctx, projected)
       }
-    },
-
-    transformVertices() {
-      return this.vertices.map(v => {
-        const rotated = this.rotatePoint(
-          { x: v.x, y: v.y, z: v.z },
-          this.rotationX,
-          this.rotationY,
-          this.rotationZ
-        )
-        const rotatedNormal = this.rotatePoint(
-          { x: v.nx, y: v.ny, z: v.nz },
-          this.rotationX,
-          this.rotationY,
-          this.rotationZ
-        )
-        const projected = this.project3D(rotated)
-
-        return {
-          ...projected,
-          nx: rotatedNormal.x,
-          ny: rotatedNormal.y,
-          nz: rotatedNormal.z,
-          originalZ: rotated.z
-        }
-      })
-    },
-
-    sortFaces(transformed) {
-      const facesWithDepth = this.faces.map(face => {
-        const avgZ = (
-          transformed[face[0]].originalZ +
-          transformed[face[1]].originalZ +
-          transformed[face[2]].originalZ
-        ) / 3
-        return { face, avgZ }
-      })
-
-      facesWithDepth.sort((a, b) => a.avgZ - b.avgZ)
-      return facesWithDepth
-    },
-
-    rotateX(point, angle) {
-      const cos = Math.cos(angle)
-      const sin = Math.sin(angle)
-      return {
-        x: point.x,
-        y: point.y * cos - point.z * sin,
-        z: point.y * sin + point.z * cos
-      }
-    },
-
-    rotateY(point, angle) {
-      const cos = Math.cos(angle)
-      const sin = Math.sin(angle)
-      return {
-        x: point.x * cos + point.z * sin,
-        y: point.y,
-        z: -point.x * sin + point.z * cos
-      }
-    },
-
-    rotateZ(point, angle) {
-      const cos = Math.cos(angle)
-      const sin = Math.sin(angle)
-      return {
-        x: point.x * cos - point.y * sin,
-        y: point.x * sin + point.y * cos,
-        z: point.z
-      }
-    },
-
-    rotatePoint(point, rx, ry, rz) {
-      let p = this.rotateX(point, rx)
-      p = this.rotateY(p, ry)
-      p = this.rotateZ(p, rz)
-      return p
     },
 
     project3D(point3D) {
-      const distance = 6
-      const fov = 500
-      const scale = fov / (distance + point3D.z)
+      // Apply donut rotation
+      const rotated = this.rotatePoint3D(point3D)
 
-      return {
-        x: canvasEl.value.width / 2 + point3D.x * scale,
-        y: canvasEl.value.height / 2 - point3D.y * scale,
-        z: point3D.z
+      // Fixed camera - always centered with perspective
+      const distance = 5 // Fixed camera distance
+      const fov = 400    // Field of view
+      const scale = fov / (distance + rotated.z)
+
+      // Center the donut on canvas
+      return app.vec2(
+        canvasEl.value.width / 2 + rotated.x * scale,
+        canvasEl.value.height / 2 + rotated.y * scale
+      )
+    },
+
+    rotatePoint3D(point) {
+      // Apply rotation around X axis
+      const cosX = Math.cos(this.rotationX)
+      const sinX = Math.sin(this.rotationX)
+      const y1 = point.y * cosX - point.z * sinX
+      const z1 = point.y * sinX + point.z * cosX
+
+      // Apply rotation around Y axis
+      const cosY = Math.cos(this.rotationY)
+      const sinY = Math.sin(this.rotationY)
+      const x2 = point.x * cosY - z1 * sinY
+      const z2 = point.x * sinY + z1 * cosY
+
+      // Apply rotation around Z axis
+      const cosZ = Math.cos(this.rotationZ)
+      const sinZ = Math.sin(this.rotationZ)
+      const x3 = x2 * cosZ - y1 * sinZ
+      const y3 = x2 * sinZ + y1 * cosZ
+
+      return { x: x3, y: y3, z: z2 }
+    },
+
+    drawWireframe(ctx, points) {
+      ctx.beginPath()
+
+      // Draw rings (circles around the donut)
+      for (let i = 0; i < rings; i++) {
+        for (let j = 0; j < segments; j++) {
+          const idx = i * segments + j
+          const nextIdx = i * segments + ((j + 1) % segments)
+
+          ctx.moveTo(points[idx].x, points[idx].y)
+          ctx.lineTo(points[nextIdx].x, points[nextIdx].y)
+        }
+      }
+
+      // Draw segments (lines through the hole)
+      for (let j = 0; j < segments; j++) {
+        for (let i = 0; i < rings; i++) {
+          const idx = i * segments + j
+          const nextIdx = ((i + 1) % rings) * segments + j
+
+          ctx.moveTo(points[idx].x, points[idx].y)
+          ctx.lineTo(points[nextIdx].x, points[nextIdx].y)
+        }
+      }
+
+      ctx.stroke()
+    },
+
+    drawFilledDonut(ctx, points) {
+      // Create triangles for filled rendering with backface culling
+      for (let i = 0; i < rings; i++) {
+        const nextI = (i + 1) % rings
+        for (let j = 0; j < segments; j++) {
+          const nextJ = (j + 1) % segments
+
+          const p1 = points[i * segments + j]
+          const p2 = points[nextI * segments + j]
+          const p3 = points[i * segments + nextJ]
+          const p4 = points[nextI * segments + nextJ]
+
+          // Calculate normal for backface culling (simple version)
+          const centerX = (p1.x + p2.x + p3.x + p4.x) / 4
+          const centerY = (p1.y + p2.y + p3.y + p4.y) / 4
+          const distanceFromCenter = Math.sqrt(
+            Math.pow(centerX - canvasEl.value.width / 2, 2) +
+            Math.pow(centerY - canvasEl.value.height / 2, 2)
+          )
+
+          // Only draw if facing somewhat towards camera (simple heuristic)
+          if (distanceFromCenter < 300) {
+            // Draw two triangles for each quad
+            this.drawTriangle(ctx, p1, p2, p3)
+            this.drawTriangle(ctx, p2, p4, p3)
+          }
+        }
       }
     },
 
-    drawTriangle(ctx, p1, p2, p3, brightness) {
+    drawTriangle(ctx, p1, p2, p3) {
       ctx.beginPath()
       ctx.moveTo(p1.x, p1.y)
       ctx.lineTo(p2.x, p2.y)
       ctx.lineTo(p3.x, p3.y)
       ctx.closePath()
 
-      const color = Math.floor(brightness * 255)
-      ctx.fillStyle = `rgb(${Math.floor(color * 0.3)}, ${Math.floor(color * 0.8)}, ${Math.floor(color * 0.7)})`
+      // Calculate brightness based on triangle position
+      const centerX = (p1.x + p2.x + p3.x) / 3
+      const centerY = (p1.y + p2.y + p3.y) / 3
+
+      const distanceFromCenter = Math.sqrt(
+        Math.pow(centerX - canvasEl.value.width / 2, 2) +
+        Math.pow(centerY - canvasEl.value.height / 2, 2)
+      )
+
+      // Brightness decreases with distance from center (simpler shading)
+      const brightness = Math.max(0.4, 1 - distanceFromCenter / 400)
+
+      ctx.fillStyle = `rgb(
+        ${Math.floor(69 * brightness)},
+        ${Math.floor(199 * brightness)},
+        ${Math.floor(170 * brightness)}
+      )`
       ctx.fill()
 
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)'
+      // Subtle outline
+      ctx.strokeStyle = `rgba(0, 0, 0, 0.2)`
       ctx.lineWidth = 0.5
       ctx.stroke()
     },
 
-    generateGeometry() {
-      this.vertices = []
-      this.faces = []
-      const currentR = this.thickness * r
-
-      for (let i = 0; i <= rings; i++) {
-        const phi = (i / rings) * Math.PI * 2
-        for (let j = 0; j <= segments; j++) {
-          const theta = (j / segments) * Math.PI * 2
-
-          const x = (R + currentR * Math.cos(theta)) * Math.cos(phi)
-          const y = currentR * Math.sin(theta)
-          const z = (R + currentR * Math.cos(theta)) * Math.sin(phi)
-
-          const nx = Math.cos(theta) * Math.cos(phi)
-          const ny = Math.sin(theta)
-          const nz = Math.cos(theta) * Math.sin(phi)
-
-          this.vertices.push({ x, y, z, nx, ny, nz })
-        }
-      }
+    generatePoints() {
+      const points = []
+      const currentThickness = this.thickness * r
 
       for (let i = 0; i < rings; i++) {
+        const phi = (i / rings) * Math.PI * 2  // Major circle angle
         for (let j = 0; j < segments; j++) {
-          const p1 = i * (segments + 1) + j
-          const p2 = p1 + (segments + 1)
-          const p3 = p1 + 1
-          const p4 = p2 + 1
+          const theta = (j / segments) * Math.PI * 2  // Minor circle angle
 
-          this.faces.push([p1, p2, p3])
-          this.faces.push([p2, p4, p3])
+          // Torus parametric equations
+          const x = (R + currentThickness * Math.cos(theta)) * Math.cos(phi)
+          const y = currentThickness * Math.sin(theta)
+          const z = (R + currentThickness * Math.cos(theta)) * Math.sin(phi)
+
+          points.push({ x, y, z })
         }
       }
+
+      this.points = points
     }
   })
 
-  donut.generateGeometry()
+  // Generate initial points
+  donut.generatePoints()
+
+  // Add mouse controls
   setupMouseControls()
 }
 
+// Mouse controls
 const setupMouseControls = () => {
   if (!canvasEl.value) return
 
@@ -304,15 +302,57 @@ const setupMouseControls = () => {
   })
 }
 
+// Touch event handlers
+const onTouchStart = (e) => {
+  e.preventDefault()
+  if (!donut) return
+
+  const touch = e.touches[0]
+  touchState.value = {
+    isTouching: true,
+    lastX: touch.clientX,
+    lastY: touch.clientY,
+    touchId: touch.identifier
+  }
+  autoRotate.value = false
+}
+
+const onTouchMove = (e) => {
+  e.preventDefault()
+  if (!touchState.value.isTouching || !donut) return
+
+  // Find our tracked touch
+  const touch = Array.from(e.touches).find(t => t.identifier === touchState.value.touchId)
+  if (!touch) return
+
+  const deltaX = touch.clientX - touchState.value.lastX
+  const deltaY = touch.clientY - touchState.value.lastY
+
+  donut.rotationY += deltaX * 0.01
+  donut.rotationX += deltaY * 0.01
+
+  touchState.value.lastX = touch.clientX
+  touchState.value.lastY = touch.clientY
+}
+
+const onTouchEnd = (e) => {
+  e.preventDefault()
+  touchState.value.isTouching = false
+  touchState.value.touchId = null
+}
+
+// Watch for control changes
 watch([donutThickness, showWireframe], () => {
   if (donut) {
     donut.thickness = donutThickness.value
     donut.wireframe = showWireframe.value
-    donut.generateGeometry()
+    donut.generatePoints()
   }
 })
 
+// Lifecycle
 onMounted(() => {
+  isMobile.value = detectMobile()
   initDonut()
 })
 
@@ -332,6 +372,10 @@ onUnmounted(() => {
   border-radius: 10px;
   max-width: 800px;
   margin: 0 auto;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .controls {
@@ -348,27 +392,53 @@ onUnmounted(() => {
   align-items: center;
   gap: 5px;
   font-size: 14px;
+  touch-action: none;
 }
 
 .controls input[type="range"] {
   width: 100px;
+  touch-action: none;
 }
 
 .controls input[type="checkbox"] {
   margin-left: 5px;
+  touch-action: none;
 }
 
 canvas {
   border: 2px solid #4ecdc4;
   border-radius: 8px;
-  background: #0f0f1e;
+  background: #16213e;
   cursor: grab;
   display: block;
   margin: 0 auto;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 canvas:active {
   cursor: grabbing;
+}
+
+.touch-hint {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #4ecdc4;
+  opacity: 0.8;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 h2 {
@@ -376,9 +446,29 @@ h2 {
   margin-bottom: 20px;
 }
 
-.hint {
-  margin-top: 10px;
-  font-size: 12px;
-  color: #888;
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .donut-demo {
+    padding: 10px;
+  }
+
+  .controls {
+    gap: 10px;
+    margin: 15px 0;
+  }
+
+  .controls label {
+    font-size: 12px;
+  }
+
+  canvas {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+  }
+
+  input[type="range"] {
+    width: 80px;
+  }
 }
 </style>
