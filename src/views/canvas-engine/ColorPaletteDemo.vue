@@ -1,389 +1,507 @@
 <template>
-  <div class="demo-container">
-    <h1>Canvas Engine + Color Palette Demo</h1>
+  <div class="palette-demo">
+    <h1>Color Palette Explorer</h1>
 
     <div class="controls">
-      <button @click="addRandomShape">Add Random Shape</button>
-      <button @click="addGradientShape">Add Gradient Shape</button>
-      <button @click="cycleColors = !cycleColors">
-        {{ cycleColors ? 'Stop' : 'Start' }} Color Cycling
+      <button @click="generateRandomPalette" class="generate-btn">
+        🎲 Generate Random Palette
       </button>
-      <button @click="showPalette = !showPalette">
-        {{ showPalette ? 'Hide' : 'Show' }} Palettes
+      <button @click="cyclePalettes" class="cycle-btn">
+        🔄 Cycle Palettes
+      </button>
+      <button @click="addCustomPalette" class="custom-btn">
+        ➕ Add Custom Palette
       </button>
     </div>
 
-    <div class="palette-selector" v-if="showPalette">
-      <h3>Color Palettes:</h3>
-      <div v-for="palette in availablePalettes" :key="palette" class="palette-item" @click="selectPalette(palette)"
-        :class="{ active: selectedPalette === palette }">
-        <span>{{ palette }}</span>
-        <div class="palette-swatches">
-          <div v-for="color in app?.colors.getPalette(palette)" :key="color" class="color-swatch"
-            :style="{ backgroundColor: color }"></div>
+    <div class="palette-display">
+      <div v-for="(palette, index) in displayedPalettes" :key="index" class="palette-section">
+        <h3>{{ palette.name }}</h3>
+        <div class="palette-colors">
+          <div v-for="(color, colorIndex) in palette.colors" :key="colorIndex" class="color-swatch"
+            :style="{ backgroundColor: color }" @click="copyColorToClipboard(color)" :title="`Click to copy: ${color}`">
+            <span class="color-hex">{{ color }}</span>
+          </div>
+        </div>
+        <div class="palette-canvas">
+          <canvas :ref="el => canvasRefs[palette.name] = el" :width="300" :height="100"></canvas>
         </div>
       </div>
     </div>
 
-    <canvas ref="canvasEl" width="800" height="600" @click="onCanvasClick"></canvas>
 
-    <div class="info">
-      <p>Shapes: {{ shapes.length }} | Click on shapes to animate them!</p>
+    <!-- Custom Palette Modal -->
+    <div v-if="showCustomModal" class="modal-overlay" @click="showCustomModal = false">
+      <div class="modal-content" @click.stop>
+        <h3>Add Custom Palette</h3>
+        <div class="color-inputs">
+          <div v-for="i in 5" :key="i" class="color-input">
+            <input type="color" v-model="customColors[i - 1]" class="color-picker">
+            <input type="text" v-model="customColors[i - 1]" placeholder="#FFFFFF" class="hex-input">
+          </div>
+        </div>
+        <input type="text" v-model="customPaletteName" placeholder="Palette Name" class="name-input">
+        <div class="modal-buttons">
+          <button @click="saveCustomPalette" class="save-btn">Save</button>
+          <button @click="showCustomModal = false" class="cancel-btn">Cancel</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+
+import { ref, onMounted, onUnmounted, watch, watchEffect } from 'vue'
 import { createCanvasApp } from '../../lib/engine/canvas_util.js'
-import { shapePlugin } from '../../lib/engine/shapePlugin.js'
+import { shapesPlugin } from '../../lib/engine/shapesPlugin.js'
 import { colorPalettePlugin } from '../../lib/engine/colorPalettePlugin.js'
 
-// Refs
-const canvasEl = ref(null)
-const app = ref(null)
-const shapes = ref([])
-const cycleColors = ref(false)
-const showPalette = ref(true)
-const selectedPalette = ref('vibrant')
 
-const availablePalettes = ['vibrant', 'pastel', 'monochrome', 'nature', 'sunset']
+const mainCanvas = ref(null)
+const canvasRefs = ref({})
+let app = null
 
-// Initialize canvas app
+// State
+const displayedPalettes = ref([])
+const showCustomModal = ref(false)
+const customColors = ref(Array(5).fill('#FFFFFF'))
+const customPaletteName = ref('')
+
+// Predefined palettes
+const basePalettes = [
+  {
+    name: 'Vibrant',
+    colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7']
+  },
+  {
+    name: 'Pastel',
+    colors: ['#FFD1DC', '#C4E0F9', '#B5EAD7', '#FFC8A2', '#E2F0CB']
+  },
+  {
+    name: 'Sunset',
+    colors: ['#FF7E5F', '#FEB47B', '#FF6A95', '#A7226E', '#6A0572']
+  },
+  {
+    name: 'Ocean',
+    colors: ['#0077B6', '#00B4D8', '#90E0EF', '#CAF0F8', '#03045E']
+  },
+  {
+    name: 'Forest',
+    colors: ['#2D6A4F', '#40916C', '#52B788', '#74C69D', '#95D5B2']
+  }
+]
+
 onMounted(() => {
-  if (!canvasEl.value) return
+  if (!mainCanvas.value) return
 
-  // Create canvas app
-  app.value = createCanvasApp(canvasEl.value)
+  // Initialize canvas app
+  app = createCanvasApp(mainCanvas.value)
+  app.use(shapesPlugin)
+  app.use(colorPalettePlugin)
 
-  // Use plugins
-  app.value.use(shapePlugin)
-  app.value.use(colorPalettePlugin)
+  // Load initial palettes
+  displayedPalettes.value = [...basePalettes]
 
-  // Create initial shapes
-  createInitialShapes()
+  // Register custom palettes with the color plugin
+  basePalettes.forEach(palette => {
+    app.colors.addPalette(palette.name.toLowerCase(), palette.colors)
+  })
+
+  // Draw initial previews
+  drawPalettePreviews()
+
 })
 
-// Cleanup
 onUnmounted(() => {
-  if (app.value) {
-    app.value.stop()
+  if (app) {
+    app.stop()
   }
 })
 
-// Watch for color cycling changes
-watch(cycleColors, (newVal) => {
-  if (newVal) {
-    startColorCycling()
-  } else {
-    stopColorCycling()
-  }
+watchEffect(() => {
+  generateRandomPalette()
 })
 
-// Create initial demo shapes
-function createInitialShapes() {
-  if (!app.value) return
-
-  // Clear existing shapes
-  shapes.value.forEach(shape => {
-    app.value.root.remove(shape)
-  })
-  shapes.value = []
-
-  // Create gradient background
-  const bgGradient = app.value.colors.createGradient(
-    app.value.colors.gradientTypes.LINEAR,
-    ['#1a1a2e', '#16213e', '#0f3460'],
-    0
-  )
-  const background = app.value.shapes.gradientRect(400, 300, 800, 600, bgGradient)
-  shapes.value.push(background)
-
-  // Create some colorful circles
-  for (let i = 0; i < 5; i++) {
-    const color = app.value.colors.getRandomFromPalette(selectedPalette.value)
-    const circle = app.value.shapes.circle(
-      100 + i * 150,
-      150,
-      40 + i * 10,
-      color
-    )
-    circle.originalColor = color
-    shapes.value.push(circle)
+function generateRandomPalette() {
+  const randomPalette = {
+    name: `Random-${Math.floor(Math.random() * 1000)}`,
+    colors: Array(5).fill().map(() => generateRandomColor())
   }
 
-  // Create gradient shapes
-  const gradient1 = app.value.colors.createGradient(
-    app.value.colors.gradientTypes.RADIAL,
-    ['#FF6B6B', '#4ECDC4', '#45B7D1'],
-    0
-  )
-  const gradientCircle = app.value.shapes.gradientCircle(400, 400, 60, gradient1)
-  shapes.value.push(gradientCircle)
-
-  const gradient2 = app.value.colors.createGradient(
-    app.value.colors.gradientTypes.LINEAR,
-    ['#96CEB4', '#FFEAA7', '#FF6B6B'],
-    45
-  )
-  const gradientRect = app.value.shapes.gradientRect(600, 400, 120, 80, gradient2)
-  shapes.value.push(gradientRect)
-
-  // Create palette displays
-  if (showPalette.value) {
-    createPaletteDisplays()
+  // Add to displayed palettes (limit to 6)
+  if (displayedPalettes.value.length >= 6) {
+    displayedPalettes.value.pop()
   }
+  displayedPalettes.value.unshift(randomPalette)
 
-  // Add some text
-  const text = app.value.shapes.text(400, 50, 'Canvas Engine + Color Palette Demo', 28, '#ffffff')
-  shapes.value.push(text)
+  // Register with color plugin
+  app.colors.addPalette(randomPalette.name.toLowerCase(), randomPalette.colors)
+
+  // Update visuals
+  drawPalettePreviews()
 }
 
-// Create palette visualization
-function createPaletteDisplays() {
-  if (!app.value) return
+function generateRandomColor() {
+  const letters = '0123456789ABCDEF'
+  let color = '#'
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)]
+  }
+  return color
+}
 
-  // Remove existing palette displays
-  shapes.value = shapes.value.filter(shape => !shape.isPaletteDisplay)
+function cyclePalettes() {
+  // Cycle through palettes in live preview
+  const paletteNames = displayedPalettes.value.map(p => p.name.toLowerCase())
+  let currentIndex = 0
 
-  availablePalettes.forEach((paletteName, index) => {
-    const display = app.value.shapes.paletteDisplay(
-      150 + index * 130,
-      500,
-      paletteName,
-      120,
-      30
-    )
-    if (display) {
-      display.isPaletteDisplay = true
-      shapes.value.push(display)
+  app.start(function* cycle() {
+    while (true) {
+      const paletteName = paletteNames[currentIndex]
+      currentIndex = (currentIndex + 1) % paletteNames.length
+      yield 1500 // Change every 1.5 seconds
     }
   })
 }
 
-// Add random shape
-function addRandomShape() {
-  if (!app.value) return
-
-  const shapeTypes = ['circle', 'rect']
-  const type = shapeTypes[Math.floor(Math.random() * shapeTypes.length)]
-  const color = app.value.colors.getRandomFromPalette(selectedPalette.value)
-
-  let shape
-  if (type === 'circle') {
-    shape = app.value.shapes.circle(
-      Math.random() * 700 + 50,
-      Math.random() * 400 + 100,
-      Math.random() * 30 + 20,
-      color
-    )
-  } else {
-    shape = app.value.shapes.rect(
-      Math.random() * 700 + 50,
-      Math.random() * 400 + 100,
-      Math.random() * 60 + 40,
-      Math.random() * 60 + 40,
-      color
-    )
-  }
-
-  shape.originalColor = color
-  shapes.value.push(shape)
+function addCustomPalette() {
+  showCustomModal.value = true
+  customColors.value = Array(5).fill('#FFFFFF')
+  customPaletteName.value = ''
 }
 
-// Add gradient shape
-function addGradientShape() {
-  if (!app.value) return
-
-  const gradientType = Math.random() > 0.5
-    ? app.value.colors.gradientTypes.LINEAR
-    : app.value.colors.gradientTypes.RADIAL
-
-  const colors = []
-  for (let i = 0; i < 3; i++) {
-    colors.push(app.value.colors.getRandomFromPalette(selectedPalette.value))
+function saveCustomPalette() {
+  if (!customPaletteName.value.trim()) {
+    alert('Please enter a palette name')
+    return
   }
 
-  const gradient = app.value.colors.createGradient(
-    gradientType,
-    colors,
-    Math.random() * 360
-  )
+  const customPalette = {
+    name: customPaletteName.value,
+    colors: [...customColors.value]
+  }
 
-  const shape = app.value.shapes.gradientCircle(
-    Math.random() * 700 + 50,
-    Math.random() * 400 + 100,
-    Math.random() * 40 + 30,
-    gradient
-  )
+  // Add to displayed palettes
+  if (displayedPalettes.value.length >= 6) {
+    displayedPalettes.value.pop()
+  }
+  displayedPalettes.value.unshift(customPalette)
 
-  shapes.value.push(shape)
+  // Register with color plugin
+  app.colors.addPalette(customPalette.name.toLowerCase(), customPalette.colors)
+
+  // Update visuals
+  drawPalettePreviews()
+  showCustomModal.value = false
 }
 
-// Canvas click handler
-function onCanvasClick(event) {
-  if (!app.value) return
+function drawPalettePreviews() {
+  // Use nextTick to ensure DOM is updated
+  setTimeout(() => {
+    displayedPalettes.value.forEach(palette => {
+      const canvas = canvasRefs.value[palette.name]
+      if (!canvas) return
 
-  const rect = canvasEl.value.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
+      const ctx = canvas.getContext('2d')
+      const width = canvas.width
+      const height = canvas.height
+      const swatchWidth = width / palette.colors.length
 
-  // Find clicked shape
-  const clickedShape = shapes.value.find(shape => {
-    if (shape.hitTest && shape !== shapes.value[0]) { // Skip background
-      return shape.hitTest(x, y)
-    }
-    return false
-  })
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height)
 
-  if (clickedShape) {
-    // Animate the clicked shape
-    app.value.animateTo(clickedShape, 'scaleX', 1.5, 200)
-    app.value.animateTo(clickedShape, 'scaleY', 1.5, 200)
+      // Draw color swatches
+      palette.colors.forEach((color, index) => {
+        ctx.fillStyle = color
+        ctx.fillRect(index * swatchWidth, 0, swatchWidth, height)
+      })
 
-    // Create a coroutine to reset animation
-    app.value.start(function* () {
-      yield 200 // Wait for scale up
-      app.value.animateTo(clickedShape, 'scaleX', 1, 200)
-      app.value.animateTo(clickedShape, 'scaleY', 1, 200)
+      // Add gradient overlay
+      const gradient = app.colors.createGradient(
+        app.colors.gradientTypes.LINEAR,
+        palette.colors,
+        45
+      )
+      const gradientFill = gradient.apply(ctx, 0, 0, width, height)
+
+      ctx.fillStyle = gradientFill
+      ctx.globalAlpha = 0.3
+      ctx.fillRect(0, 0, width, height)
+      ctx.globalAlpha = 1
+
+      // Add border
+      ctx.strokeStyle = '#333'
+      ctx.lineWidth = 2
+      ctx.strokeRect(0, 0, width, height)
     })
-
-    // Change color
-    if (clickedShape.originalColor) {
-      const newColor = app.value.colors.getRandomFromPalette(selectedPalette.value)
-      clickedShape.color = newColor
-    }
-  }
+  }, 100)
 }
 
-// Color cycling animation
-function startColorCycling() {
-  if (!app.value) return
 
-  shapes.value.forEach(shape => {
-    if (shape.originalColor && !shape.isPaletteDisplay && shape !== shapes.value[0]) {
-      const colors = app.value.colors.getPalette(selectedPalette.value)
-      const colorCycler = app.value.colors.createColorCycler(colors, 3000)
-
-      shape.update = function (dt) {
-        colorCycler.update(dt)
-        this.color = colorCycler.getCurrentColor()
-      }
-    }
+function copyColorToClipboard(color) {
+  navigator.clipboard.writeText(color).then(() => {
+    // Optional: Show a quick confirmation
+    console.log(`Copied: ${color}`)
+  }).catch(err => {
+    console.error('Failed to copy color: ', err)
   })
 }
-
-function stopColorCycling() {
-  if (!app.value) return
-
-  shapes.value.forEach(shape => {
-    if (shape.originalColor && shape.update) {
-      shape.color = shape.originalColor
-      delete shape.update
-    }
-  })
-}
-
-// Palette selection
-function selectPalette(paletteName) {
-  selectedPalette.value = paletteName
-  createInitialShapes()
-
-  if (cycleColors.value) {
-    startColorCycling()
-  }
-}
-
-// Watch palette visibility
-watch(showPalette, (newVal) => {
-  if (newVal) {
-    createPaletteDisplays()
-  } else {
-    shapes.value = shapes.value.filter(shape => !shape.isPaletteDisplay)
-  }
-})
 </script>
 
 <style scoped>
-.demo-container {
-  font-family: 'Arial', sans-serif;
-  text-align: center;
-  background: #2c3e50;
+.palette-demo {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #1a1a2e;
   color: white;
   min-height: 100vh;
-  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #4ECDC4;
 }
 
 .controls {
-  margin: 20px 0;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
 }
 
-.controls button {
-  background: #3498db;
-  color: white;
+button {
+  padding: 12px 20px;
   border: none;
-  padding: 10px 20px;
-  margin: 0 10px;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  transition: background 0.3s;
+  font-weight: bold;
+  transition: all 0.3s ease;
 }
 
-.controls button:hover {
-  background: #2980b9;
+.generate-btn {
+  background: #FF6B6B;
+  color: white;
 }
 
-canvas {
-  border: 2px solid #34495e;
-  border-radius: 10px;
-  background: #1a1a1a;
-  margin: 20px auto;
-  display: block;
+.generate-btn:hover {
+  background: #FF5252;
+  transform: translateY(-2px);
 }
 
-.palette-selector {
+.cycle-btn {
+  background: #4ECDC4;
+  color: white;
+}
+
+.cycle-btn:hover {
+  background: #45B7D1;
+  transform: translateY(-2px);
+}
+
+.custom-btn {
+  background: #FFEAA7;
+  color: #333;
+}
+
+.custom-btn:hover {
+  background: #FFDC7A;
+  transform: translateY(-2px);
+}
+
+.palette-display {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.palette-section {
   background: rgba(255, 255, 255, 0.1);
   padding: 15px;
   border-radius: 10px;
-  margin: 20px auto;
-  max-width: 800px;
+  backdrop-filter: blur(10px);
 }
 
-.palette-item {
-  display: inline-block;
-  margin: 10px;
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s;
+.palette-section h3 {
+  margin: 0 0 15px 0;
+  text-align: center;
+  color: #FFEAA7;
 }
 
-.palette-item:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.palette-item.active {
-  background: rgba(52, 152, 219, 0.3);
-  border: 2px solid #3498db;
-}
-
-.palette-swatches {
+.palette-colors {
   display: flex;
-  margin-top: 5px;
-  border-radius: 3px;
+  height: 60px;
+  border-radius: 8px;
   overflow: hidden;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .color-swatch {
-  width: 20px;
-  height: 20px;
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.info {
-  margin-top: 20px;
-  font-size: 14px;
-  color: #bdc3c7;
+.color-swatch:hover {
+  flex: 1.2;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+.color-swatch:hover .color-hex {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.color-hex {
+  color: white;
+  font-weight: bold;
+  font-size: 10px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.palette-canvas {
+  display: flex;
+  justify-content: center;
+}
+
+.palette-canvas canvas {
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.demo-shapes {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.preview-canvas {
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  background: #2d3047;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #2d3047;
+  padding: 30px;
+  border-radius: 15px;
+  min-width: 400px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: #4ECDC4;
+  text-align: center;
+}
+
+.color-inputs {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.color-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.color-picker {
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.hex-input {
+  width: 80px;
+  padding: 5px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: #1a1a2e;
+  color: white;
+  text-align: center;
+}
+
+.name-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #1a1a2e;
+  color: white;
+  margin: 15px 0;
+  text-align: center;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.save-btn {
+  background: #4ECDC4;
+  color: white;
+  padding: 10px 20px;
+}
+
+.cancel-btn {
+  background: #666;
+  color: white;
+  padding: 10px 20px;
+}
+
+.save-btn:hover,
+.cancel-btn:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .palette-display {
+    grid-template-columns: 1fr;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  button {
+    width: 200px;
+  }
 }
 </style>

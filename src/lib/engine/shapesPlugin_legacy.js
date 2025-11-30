@@ -1,7 +1,7 @@
 
 // shapePlugin.js — Advanced shape creation utilities
 
-export function shapePlugin(app) {
+export function shapesPlugin(app) {
     app.shapes = {
         circle(x, y, r, color = "#fff") {
             return app.root.add({

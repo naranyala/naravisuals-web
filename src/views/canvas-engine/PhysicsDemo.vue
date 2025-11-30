@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { createCanvasApp } from '../../lib/engine/canvas_util.js'
-import { shapePlugin } from '../../lib/engine/shapePlugin.js'
+import { shapesPlugin } from '../../lib/engine/shapesPlugin.js'
 import { physicsPlugin } from '../../lib/engine/physicsPlugin.js'
 
 const canvasRef = ref(null)
@@ -24,7 +24,7 @@ onMounted(() => {
 
   // Create canvas app with plugins
   app = createCanvasApp(canvas)
-  app.use(shapePlugin)
+  app.use(shapesPlugin)
   app.use(physicsPlugin)
 
   // Set background
@@ -216,51 +216,8 @@ function spawnRect() {
   updateObjectCount()
 }
 
-function spawnPyramid() {
-  const baseX = 450
-  const baseY = 200
-  const size = 30
-  const rows = 5
 
-  for (let row = 0; row < rows; row++) {
-    const count = rows - row
-    for (let col = 0; col < count; col++) {
-      const x = baseX + (col - count / 2 + 0.5) * size
-      const y = baseY + row * size
 
-      app.physics.createRect(x, y, size - 2, size - 2, {
-        color: '#4ecdc4',
-        mass: 0.5,
-        restitution: 0.3
-      })
-    }
-  }
-
-  updateObjectCount()
-}
-
-function applyExplosion() {
-  const centerX = 450
-  const centerY = 350
-  const force = 50
-
-  const bodies = app.physics.getBodies()
-  for (const body of bodies) {
-    if (body.isStatic) continue
-
-    const dx = body.x - centerX
-    const dy = body.y - centerY
-    const dist = Math.sqrt(dx * dx + dy * dy)
-
-    if (dist < 300 && dist > 0) {
-      const strength = force * (1 - dist / 300)
-      body.applyImpulse(
-        (dx / dist) * strength,
-        (dy / dist) * strength
-      )
-    }
-  }
-}
 
 function clearAll() {
   const bodies = app.physics.getBodies().filter(b => !b.isStatic)
@@ -300,7 +257,6 @@ function reverseGravity() {
         <h3>Spawn Objects</h3>
         <button @click="spawnCircle">⚫ Circle</button>
         <button @click="spawnRect">⬛ Rectangle</button>
-        <button @click="spawnPyramid">🔺 Pyramid</button>
       </div>
 
       <div class="control-group">
@@ -334,7 +290,6 @@ function reverseGravity() {
 
       <div class="control-group">
         <h3>Actions</h3>
-        <button @click="applyExplosion">💥 Explosion</button>
         <button @click="clearAll" class="danger-btn">🗑️ Clear ({{ objectCount }})</button>
       </div>
     </div>

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { createCanvasApp } from '../../lib/engine/canvas_util.js'
-import { shapePlugin } from '../../lib/engine/shapePlugin.js'
+import { shapesPlugin } from '../../lib/engine/shapesPlugin.js'
 import { particlePlugin } from '../../lib/engine/particlePlugin.js'
 
 const canvasRef = ref(null)
@@ -17,7 +17,7 @@ onMounted(() => {
 
   // Create canvas app with plugins
   app = createCanvasApp(canvas)
-  app.use(shapePlugin)
+  app.use(shapesPlugin)
   app.use(particlePlugin)
 
   // Set background
@@ -96,31 +96,7 @@ function createConfetti() {
   app.particles.confetti(x, y, 50)
 }
 
-function toggleEmitter() {
-  if (emitter) {
-    emitter.stop()
-    app.root.remove(emitter)
-    emitter = null
-  } else {
-    emitter = app.particles.emitter(450, 350, {
-      rate: 15,
-      particle: {
-        vx: 0,
-        vy: -3,
-        life: 2,
-        maxLife: 2,
-        size: 4,
-        color: '#4ecdc4',
-        gravity: 0.05,
-        fade: true
-      }
-    })
-  }
-}
 
-function toggleMouseTrail() {
-  mouseTrail = !mouseTrail
-}
 
 function createSmoke() {
   app.start(function* () {
@@ -180,15 +156,6 @@ function clearParticles() {
         <button @click="createSmoke">💨 Smoke</button>
       </div>
 
-      <div class="control-group">
-        <h3>Continuous Effects</h3>
-        <button @click="toggleEmitter">
-          {{ emitter ? '⏸️ Stop Emitter' : '▶️ Start Emitter' }}
-        </button>
-        <button @click="toggleMouseTrail">
-          {{ mouseTrail ? '🖱️ Trail: ON' : '🖱️ Trail: OFF' }}
-        </button>
-      </div>
 
       <div class="control-group">
         <h3>Special</h3>

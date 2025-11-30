@@ -2,7 +2,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { createCanvasApp } from '../../lib/engine/canvas_util.js'
-import { shapePlugin } from '../../lib/engine/shapePlugin.js'
+import { shapesPlugin } from '../../lib/engine/shapesPlugin.js'
 import { keyboardEventsPlugin } from '../../lib/engine/keyboardEventsPlugin.js'
 
 const score = ref(0)
@@ -12,7 +12,7 @@ onMounted(() => {
   const canvas = document.getElementById('canvas')
   const app = createCanvasApp(canvas)
 
-  app.use(shapePlugin)
+  app.use(shapesPlugin)
   app.use(keyboardEventsPlugin)
 
   const { shapes, keyboard, pointer, animateTo, start } = app

@@ -8,9 +8,7 @@ import {
   saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams
 } from "./utils.js"
 
-import MottoCollection from "./MottoCollection.vue"
-import ExploreCrustView from "./ExploreCrustView.vue"
-import JsVueExplorationMain from "./JsVueExplorationMain.vue"
+// import MottoCollection from "./MottoCollection.vue"
 import MyComponentExploration from "./MyComponentExploration.vue"
 
 import CodeShowView from "./CodeShowView.vue"
@@ -19,8 +17,6 @@ import CodeDumpRelearnView from "./CodeDumpRelearnView.vue"
 import ProfileView from "./ProfileView.vue"
 import GeneralFaqView from "./GeneralFaqView.vue"
 import ClarityFAQ from "./ClarityFAQ.vue"
-import BashScriptCollectionView from "./BashScriptCollectionView.vue"
-import NeovimAndCliView from "./NeovimAndCliView.vue"
 import CreativeView from "./CreativeView.vue"
 import Creative3DView from "./Creative3DView.vue"
 
@@ -34,35 +30,38 @@ import MindmapMaker from "./MindmapRoot.vue"
 import TheoryCollection from "./TheoryCollection.vue"
 import CanvasExamplesView from "./CanvasExamplesView.vue"
 import MyAnimationView from "./MyAnimationView.vue"
-
 import RoadmapContainer from "./RoadmapContainer.vue"
+
+import WelcomeCode from "./WelcomeCode.vue"
 import CanvasEngineDemo from "./CanvasEngineDemo.vue"
-import WebglExplorationView from "./WebglExplorationView.vue"
+import CanvasEngineMath from "./CanvasEngineMath.vue"
+import CanvasEnginePhysics from "./CanvasEnginePhysics.vue"
+import CanvasEngineGames from "./CanvasEngineGames.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
 
 const activeTab = ref(0)
 const tabs = ref([
+
+  { id: 0, label: "intro", component: WelcomeCode },
+  { id: 1, label: "shapes", component: CanvasEngineDemo },
+  { id: 2, label: "math", component: CanvasEngineMath },
+  { id: 3, label: "physics", component: CanvasEnginePhysics },
+  { id: 4, label: "games", component: CanvasEngineGames },
+
+  // { id: 2, label: "WEBGL", component: WebglExplorationView },
+  // { id: 4, label: "Creative3D", component: Creative3DView },
+
   // { id: 4, label: "SIPENA (TM)", component: SipenaView },
   // { id: 0, label: "EASYBUDGET (TM)", component: EasyBudgetView },
   // { id: 0, label: "VisualsLyrics (TM)", component: CreativeLyrics },
-
   // { id: 1, label: "Theories", component: TheoryCollection },
   // { id: 2, label: "Articles", component: ArticleView },
   // { id: 3, label: "Gallery", component: CanvasExamplesView },
-  // { id: 4, label: "Creative3D", component: Creative3DView },
   // { id: 5, label: "Animation", component: MyAnimationView },
-
-  { id: 0, label: "WELCOME", component: MottoCollection },
   // { id: 1, label: "Roadmap Gen", component: RoadmapContainer },
-  // { id: 1, label: "be-beyond", component: MyComponentExploration },
-  { id: 1, label: "be-beyond", component: CanvasEngineDemo },
   // { id: 2, label: "Simulation", component: SimulationCenterView },
-  // { id: 2, label: "WEBGL", component: WebglExplorationView },
-  { id: 4, label: "JS/VUE", component: JsVueExplorationMain },
-  { id: 5, label: "CLI/NEOVIM", component: NeovimAndCliView },
-  { id: 3, label: "C/RUST", component: ExploreCrustView },
 
 
   // { id: 1, label: "Creative2D", component: CreativeView },
