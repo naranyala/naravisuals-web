@@ -2,16 +2,15 @@
   <div class="dashboard">
     <!-- Top Bar -->
     <header class="topbar">
-      <button class="menu-btn" @click="toggleSidebar('left')">☰</button>
+      <button class="icon-btn" @click="toggleSidebar('left')">left</button>
       <div class="title">Playground</div>
       <div class="actions">
-        <button class="icon-btn">⟳</button>
-        <button class="icon-btn">⏸</button>
-        <button class="icon-btn" @click="toggleSidebar('right')">⚙</button>
+        <button class="icon-btn" @click="toggleSidebar('bottom')">bottom</button>
+        <button class="icon-btn" @click="toggleSidebar('right')">right</button>
       </div>
     </header>
 
-    <!-- Main 3-Column Layout -->
+    <!-- Main Workspace with Bottom Panel -->
     <div class="workspace">
 
       <!-- LEFT Sidebar -->
@@ -58,8 +57,24 @@
         </div>
       </aside>
 
+      <!-- BOTTOM Panel -->
+      <aside class="sidebar-bottom" :class="{ active: bottomPanelOpen }">
+        <div class="sidebar-header">
+          <div class="sidebar-title">Console / Timeline</div>
+          <button class="close-btn" @click="toggleSidebar('bottom')">×</button>
+        </div>
+        <div class="sidebar-scroll">
+          <div class="console-content">
+            <div v-for="n in 15" :key="n" class="console-line">
+              [{{ new Date().toLocaleTimeString() }}] Log message {{ n }}
+            </div>
+          </div>
+        </div>
+      </aside>
+
       <!-- Overlay for mobile -->
-      <div class="overlay" :class="{ active: leftSidebarOpen || rightSidebarOpen }" @click="closeSidebars"></div>
+      <div class="overlay" :class="{ active: leftSidebarOpen || rightSidebarOpen || bottomPanelOpen }"
+        @click="closeSidebars"></div>
 
     </div>
   </div>
@@ -68,22 +83,24 @@
 <script setup>
 import { ref } from 'vue';
 
-const leftSidebarOpen = ref(false);
-const rightSidebarOpen = ref(false);
+const leftSidebarOpen = ref(true); // Default open on desktop
+const rightSidebarOpen = ref(true); // Default open on desktop
+const bottomPanelOpen = ref(false); // Default closed
 
 const toggleSidebar = (side) => {
   if (side === 'left') {
     leftSidebarOpen.value = !leftSidebarOpen.value;
-    if (leftSidebarOpen.value) rightSidebarOpen.value = false;
-  } else {
+  } else if (side === 'right') {
     rightSidebarOpen.value = !rightSidebarOpen.value;
-    if (rightSidebarOpen.value) leftSidebarOpen.value = false;
+  } else if (side === 'bottom') {
+    bottomPanelOpen.value = !bottomPanelOpen.value;
   }
 };
 
 const closeSidebars = () => {
   leftSidebarOpen.value = false;
   rightSidebarOpen.value = false;
+  bottomPanelOpen.value = false;
 };
 
 const selectEntity = (n) => {
@@ -115,22 +132,7 @@ const selectEntity = (n) => {
   padding: 0 16px;
   border-bottom: 1px solid #3a3a3a;
   gap: 12px;
-}
-
-.menu-btn {
-  display: none;
-  background: #3a3a3a;
-  border: none;
-  color: #ccc;
-  padding: 6px 10px;
-  cursor: pointer;
-  border-radius: 4px;
-  font-size: 20px;
-  line-height: 1;
-}
-
-.menu-btn:hover {
-  background: #4b4b4b;
+  z-index: 100;
 }
 
 .topbar .title {
@@ -151,21 +153,23 @@ const selectEntity = (n) => {
   padding: 6px 10px;
   cursor: pointer;
   border-radius: 4px;
+  font-size: 16px;
+  transition: background 0.2s;
 }
 
 .icon-btn:hover {
   background: #4b4b4b;
 }
 
-/* Workspace: Left - Center - Right */
+/* Workspace Layout */
 .workspace {
-  display: grid;
-  grid-template-columns: 260px 1fr 320px;
+  display: flex;
   height: calc(100vh - 48px);
   position: relative;
+  overflow: hidden;
 }
 
-/* Sidebars */
+/* Sidebars Base Styles */
 .sidebar-left,
 .sidebar-right {
   background: #252525;
@@ -173,6 +177,8 @@ const selectEntity = (n) => {
   display: flex;
   flex-direction: column;
   z-index: 10;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .sidebar-right {
@@ -180,6 +186,94 @@ const selectEntity = (n) => {
   border-right: none;
 }
 
+/* Desktop Sidebar Behavior */
+.sidebar-left {
+  width: 260px;
+  min-width: 260px;
+  flex-shrink: 0;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.sidebar-right {
+  width: 320px;
+  min-width: 320px;
+  flex-shrink: 0;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+/* When bottom panel is active, shrink sidebars height */
+.sidebar-bottom.active~.sidebar-left,
+.sidebar-bottom.active~.sidebar-right {
+  height: calc(100% - 250px);
+}
+
+/* Sidebar Closed States */
+.sidebar-left:not(.active) {
+  width: 0;
+  min-width: 0;
+  border-right: none;
+}
+
+.sidebar-right:not(.active) {
+  width: 0;
+  min-width: 0;
+  border-left: none;
+}
+
+/* Main Viewport */
+.main-view {
+  background: #1a1a1a;
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+/* When bottom panel is active, shrink main viewport height */
+.sidebar-bottom.active~.main-view {
+  height: calc(100% - 250px);
+}
+
+.viewport {
+  flex-grow: 1;
+  position: relative;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 24px;
+  border: 2px dashed #333;
+}
+
+/* Bottom Panel */
+.sidebar-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #252525;
+  border-top: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 0;
+}
+
+.sidebar-bottom.active {
+  height: 250px;
+}
+
+/* Sidebar Header */
 .sidebar-header {
   display: flex;
   align-items: center;
@@ -187,6 +281,7 @@ const selectEntity = (n) => {
   padding: 12px;
   background: #2e2e2e;
   border-bottom: 1px solid #3a3a3a;
+  flex-shrink: 0;
 }
 
 .sidebar-title {
@@ -195,7 +290,6 @@ const selectEntity = (n) => {
 }
 
 .close-btn {
-  display: none;
   background: transparent;
   border: none;
   color: #ccc;
@@ -205,17 +299,23 @@ const selectEntity = (n) => {
   padding: 0;
   width: 32px;
   height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-btn:hover {
   color: #fff;
 }
 
+/* Sidebar Scroll Areas */
 .sidebar-scroll {
   overflow-y: auto;
   flex-grow: 1;
+  transition: height 0.3s ease;
 }
 
+/* Entity List */
 .entity-list {
   list-style: none;
   padding: 10px;
@@ -226,6 +326,7 @@ const selectEntity = (n) => {
   padding: 8px;
   border-radius: 4px;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .entity-list li:hover {
@@ -256,78 +357,78 @@ const selectEntity = (n) => {
   color: #eee;
   padding: 4px;
   border-radius: 4px;
+  margin-top: 4px;
 }
 
-/* Center Viewport */
-.main-view {
-  background: #1a1a1a;
-  display: flex;
+.panel-body input:focus {
+  outline: none;
+  border-color: #666;
 }
 
-.viewport {
-  flex-grow: 1;
-  position: relative;
+/* Console Content */
+.console-content {
+  padding: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
 }
 
-.placeholder {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #666;
-  font-size: 24px;
-  border: 2px dashed #333;
+.console-line {
+  padding: 4px 0;
+  color: #aaa;
+  border-bottom: 1px solid #2a2a2a;
 }
 
 /* Overlay */
 .overlay {
   display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 9;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
 }
 
 /* TABLET: 768px - 1024px */
 @media (max-width: 1024px) {
-  .workspace {
-    grid-template-columns: 220px 1fr 280px;
+  .sidebar-left {
+    width: 220px;
+    min-width: 220px;
+  }
+
+  .sidebar-right {
+    width: 280px;
+    min-width: 280px;
   }
 }
 
 /* MOBILE: Below 768px */
 @media (max-width: 768px) {
-  .menu-btn {
+  .workspace {
     display: block;
   }
 
-  .workspace {
-    grid-template-columns: 1fr;
+  .sidebar-left,
+  .sidebar-right,
+  .sidebar-bottom {
+    position: fixed;
+    z-index: 50;
   }
 
   .sidebar-left,
   .sidebar-right {
-    position: fixed;
     top: 48px;
     bottom: 0;
     width: 280px;
     max-width: 85vw;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    height: auto !important;
+    /* Override desktop height adjustments on mobile */
   }
 
   .sidebar-left {
     left: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
   }
 
   .sidebar-right {
     right: 0;
-    left: auto;
     transform: translateX(100%);
+    transition: transform 0.3s ease;
   }
 
   .sidebar-left.active {
@@ -338,12 +439,52 @@ const selectEntity = (n) => {
     transform: translateX(0);
   }
 
-  .close-btn {
+  /* Reset desktop behavior on mobile */
+  .sidebar-left:not(.active),
+  .sidebar-right:not(.active) {
+    width: 280px;
+    min-width: 280px;
+  }
+
+  /* Main viewport full height on mobile */
+  .main-view {
+    height: 100% !important;
+  }
+
+  /* Bottom panel mobile behavior */
+  .sidebar-bottom {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60vh;
+    max-height: 400px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar-bottom.active {
+    transform: translateY(0);
+    height: 60vh;
+  }
+
+  .sidebar-bottom:not(.active) {
+    height: 60vh;
+    transform: translateY(100%);
+  }
+
+  .overlay {
     display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
   }
 
   .overlay.active {
-    display: block;
     opacity: 1;
     pointer-events: all;
   }
@@ -378,8 +519,70 @@ const selectEntity = (n) => {
     max-width: 100%;
   }
 
+  .sidebar-bottom {
+    height: 70vh;
+    max-height: 70vh;
+  }
+
+  .sidebar-bottom.active {
+    height: 70vh;
+  }
+
+  .sidebar-bottom:not(.active) {
+    height: 70vh;
+  }
+
   .placeholder {
     font-size: 16px;
   }
+}
+
+/* EXTRA SMALL MOBILE: Below 360px */
+@media (max-width: 360px) {
+  .topbar {
+    padding: 0 6px;
+    gap: 8px;
+  }
+
+  .icon-btn {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+
+  .topbar .title {
+    font-size: 13px;
+  }
+
+  .sidebar-header {
+    padding: 8px 12px;
+  }
+
+  .sidebar-title {
+    font-size: 13px;
+  }
+
+  .close-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 24px;
+  }
+}
+
+/* Scrollbar Styling */
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 3px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 </style>

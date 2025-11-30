@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <h1>Canvas + Tween Demo in Vue 3</h1>
-    <canvas ref="canvas" width="800" height="600"></canvas>
+    <canvas ref="canvas" width="900" height="400"></canvas>
 
     <div class="controls">
       <button @click="startDemo">Run Full Demo</button>
@@ -54,7 +54,7 @@ onMounted(() => {
     x: app.canvas.width / 2,
     y: 100,
     text: 'Vue + Canvas + Tween = ❤️',
-    font: 'bold 48px Arial',
+    font: 'bold 28px Arial',
     color: '#60a5fa',
     opacity: 1,
     draw(ctx) {
@@ -73,7 +73,7 @@ onMounted(() => {
     const ball = app.root.add({
       x: 100 + i * 100,
       y: 300,
-      radius: 40,
+      radius: 20,
       color: colors[i],
       scaleX: 1,
       scaleY: 1,

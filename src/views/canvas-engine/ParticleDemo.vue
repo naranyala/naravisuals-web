@@ -12,8 +12,8 @@ let mouseTrail = false
 onMounted(() => {
   // Initialize canvas
   const canvas = canvasRef.value
-  canvas.width = 900
-  canvas.height = 700
+  canvas.width = 500
+  canvas.height = 300
 
   // Create canvas app with plugins
   app = createCanvasApp(canvas)

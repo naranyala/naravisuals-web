@@ -26,6 +26,12 @@ import CubeWithShadow from "./canvas-engine/CubeWithShadow.vue"
 
 <template>
   <div class="engine-container">
+
+    <ShapesDemo />
+    <ParticleDemo />
+    <TweenDemo />
+
+    <!-- <TextDemo /> -->
     <!-- <DragCanvasDemo /> -->
     <!-- <ColorPaletteDemo /> -->
     <!-- <LinearAlgebraDemo /> -->
@@ -33,12 +39,7 @@ import CubeWithShadow from "./canvas-engine/CubeWithShadow.vue"
     <!-- <MorphDemo /> -->
     <!-- <PlanetOrbitDemo /> -->
 
-    <ShapesDemo />
-    <ParticleDemo />
-    <TweenDemo />
-    <TextDemo />
     <!-- <CubeWithShadow /> -->
-
 
     <!-- <AudioVizDemo /> -->
     <!-- <KeyboardEvents /> -->
