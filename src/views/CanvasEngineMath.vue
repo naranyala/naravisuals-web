@@ -1,6 +1,7 @@
 <script setup>
+import VennDiagramDemo from "./canvas-engine/VennDiagramDemo.vue"
 </script>
 
 <template>
-  <h2>canvas engine math</h2>
+  <VennDiagramDemo />
 </template>

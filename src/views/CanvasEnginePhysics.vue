@@ -1,6 +1,11 @@
 <script setup>
+
+import PhysicsDemo from "./canvas-engine/PhysicsDemo.vue"
+
 </script>
 
 <template>
-  <h2>canvas engine physics</h2>
+  <div>
+    <PhysicsDemo />
+  </div>
 </template>

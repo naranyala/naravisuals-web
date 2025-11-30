@@ -8,7 +8,6 @@
 
 import ShapesDemo from "./canvas-engine/ShapesDemo.vue"
 import ParticleDemo from "./canvas-engine/ParticleDemo.vue"
-import PhysicsDemo from "./canvas-engine/PhysicsDemo.vue"
 import TweenDemo from "./canvas-engine/TweenDemo.vue"
 import TextDemo from "./canvas-engine/TextDemo.vue"
 import ColorPaletteDemo from "./canvas-engine/ColorPaletteDemo.vue"
@@ -20,7 +19,8 @@ import Shapes3DDemo from "./canvas-engine/Shapes3DDemo.vue"
 import MorphDemo from "./canvas-engine/MorphDemo.vue"
 
 // import PlanetOrbitDemo from "./canvas-engine/PlanetOrbitsDemo.vue"
-import DonutDemo from "./canvas-engine/DonutDemo.vue"
+
+import CubeWithShadow from "./canvas-engine/CubeWithShadow.vue"
 
 </script>
 
@@ -35,10 +35,9 @@ import DonutDemo from "./canvas-engine/DonutDemo.vue"
 
     <ShapesDemo />
     <ParticleDemo />
-    <PhysicsDemo />
     <TweenDemo />
     <TextDemo />
-    <DonutDemo />
+    <!-- <CubeWithShadow /> -->
 
 
     <!-- <AudioVizDemo /> -->

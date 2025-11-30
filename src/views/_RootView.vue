@@ -37,6 +37,7 @@ import CanvasEngineDemo from "./CanvasEngineDemo.vue"
 import CanvasEngineMath from "./CanvasEngineMath.vue"
 import CanvasEnginePhysics from "./CanvasEnginePhysics.vue"
 import CanvasEngineGames from "./CanvasEngineGames.vue"
+import ThreeDimensionRelated from "./ThreeDimensionRelated.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
@@ -46,6 +47,7 @@ const tabs = ref([
 
   { id: 0, label: "intro", component: WelcomeCode },
   { id: 1, label: "shapes", component: CanvasEngineDemo },
+  { id: 1, label: "3d-related", component: ThreeDimensionRelated },
   { id: 2, label: "math", component: CanvasEngineMath },
   { id: 3, label: "physics", component: CanvasEnginePhysics },
   { id: 4, label: "games", component: CanvasEngineGames },
