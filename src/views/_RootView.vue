@@ -39,6 +39,9 @@ import CanvasEnginePhysics from "./CanvasEnginePhysics.vue"
 import CanvasEngineGames from "./CanvasEngineGames.vue"
 import ThreeDimensionRelated from "./ThreeDimensionRelated.vue"
 
+import MonthlyChallenges from "./MonthlyChallenges.vue"
+import DashboardLayout from "./DashboardLayout.vue"
+
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
 
@@ -46,11 +49,14 @@ const activeTab = ref(0)
 const tabs = ref([
 
   { id: 0, label: "intro", component: WelcomeCode },
+  { id: 0, label: "challenges", component: MonthlyChallenges },
   { id: 1, label: "shapes", component: CanvasEngineDemo },
-  { id: 1, label: "3d-related", component: ThreeDimensionRelated },
-  { id: 2, label: "math", component: CanvasEngineMath },
-  { id: 3, label: "physics", component: CanvasEnginePhysics },
-  { id: 4, label: "games", component: CanvasEngineGames },
+  { id: 2, label: "charts", component: "" },
+  { id: 3, label: "audio", component: DashboardLayout },
+  { id: 4, label: "math", component: CanvasEngineMath },
+  { id: 5, label: "physics", component: CanvasEnginePhysics },
+  { id: 6, label: "games", component: CanvasEngineGames },
+  { id: 7, label: "3d-related", component: ThreeDimensionRelated },
 
   // { id: 2, label: "WEBGL", component: WebglExplorationView },
   // { id: 4, label: "Creative3D", component: Creative3DView },

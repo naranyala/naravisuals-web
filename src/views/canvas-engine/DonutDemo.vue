@@ -39,7 +39,7 @@ let donut = null
 // Reactive controls
 const rotationSpeed = ref(1.0)
 const donutThickness = ref(0.8)
-const showWireframe = ref(false)
+const showWireframe = ref(true)
 const autoRotate = ref(true)
 const isMobile = ref(false)
 

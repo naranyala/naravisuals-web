@@ -213,10 +213,8 @@ function spawnRect() {
     restitution: selectedRestitution.value
   })
 
-  updateObjectCount()
+  updateObjectCount();
 }
-
-
 
 
 function clearAll() {

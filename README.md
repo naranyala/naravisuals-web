@@ -4,6 +4,7 @@
 
 [naravisuals-web](https://naravisuals-web.pages.dev/)
 
+
 ## current TODOS
 
 - [ ] preload assets, lazy load
@@ -15,6 +16,13 @@
 - [ ] global light/dark theme toggle
 - [ ] global theme switch
 
-## previous TODOS 
+## previous TODOS
 
 - NONE
+
+## INSPIRATION
+
+[INSPIRATION](./INSPIRATION.png)
+
+- https://github.com/eva-engine/eva.js
+- https://github.com/jagenjo/litegraph.js
