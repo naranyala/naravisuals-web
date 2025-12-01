@@ -1,21 +1,48 @@
-import { ref, onMounted, onUnmounted } from "vue"
+// composables/useScreenSize.js
+import { ref, onMounted, onUnmounted } from 'vue';
 
 export function useScreenSize() {
-  const width = ref(window.innerWidth)
-  const height = ref(window.innerHeight)
+  // Define breakpoints (customize as needed)
+  const breakpoints = {
+    sm: 640,   // Mobile
+    md: 768,   // Tablet
+    lg: 1024,  // Laptop
+    xl: 1280,  // Desktop
+  };
 
-  function update() {
-    width.value = window.innerWidth
-    height.value = window.innerHeight
-  }
+  // Reactive screen size
+  const screenSize = ref({
+    width: 0,
+    height: 0,
+    isMobile: false,
+    isTablet: false,
+    isDesktop: false,
+  });
 
-  onMounted(() => window.addEventListener("resize", update))
-  onUnmounted(() => window.removeEventListener("resize", update))
+  // Update screen size
+  const updateScreenSize = () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
-  const isMobile = computed(() => width.value < 768)
-  const isTablet = computed(() => width.value >= 768 && width.value < 1024)
-  const isDesktop = computed(() => width.value >= 1024)
+    screenSize.value = {
+      width,
+      height,
+      isMobile: width < breakpoints.sm,
+      isTablet: width >= breakpoints.sm && width < breakpoints.lg,
+      isDesktop: width >= breakpoints.lg,
+    };
+  };
 
-  return { width, height, isMobile, isTablet, isDesktop }
+  // Lifecycle hooks
+  onMounted(() => {
+    updateScreenSize();
+    window.addEventListener('resize', updateScreenSize);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', updateScreenSize);
+  });
+
+  return { screenSize, breakpoints };
 }
 

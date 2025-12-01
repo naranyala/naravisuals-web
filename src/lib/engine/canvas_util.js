@@ -767,6 +767,7 @@ export function createCanvasApp(canvas) {
         createSprite,
         createCamera,
         tween,
+        tweens,
         checkCollision
     };
 

@@ -8,9 +8,9 @@ const msg = {
     "mastering the industry, fulfill missing part of it;",
     "mutual yet equal treatment;",
     "is that relevant?",
-    // "relevant, relevant, relevant;"
     "facilitate message-delivery;",
-    "modular and bare-minimum;"
+    "modular and bare-minimum;",
+    "any suggestion? thank you;"
   ],
 }
 

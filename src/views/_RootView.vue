@@ -2,7 +2,7 @@
 
 import { ref, onMounted, watch, watchEffect, computed } from "vue"
 import URLManager from "../utilities/URLManager.js"
-import { useTitle } from "../composables.ts"
+// import { useTitle } from "./composables/useTitle.ts"
 import useLocalStorage from "./composables/useLocalStorage.js"
 import {
   saveCurrentUrl, restoreLastUrl, setQueryParams, getQueryParams
@@ -40,8 +40,9 @@ import CanvasEngineGames from "./CanvasEngineGames.vue"
 import ThreeDimensionRelated from "./ThreeDimensionRelated.vue"
 
 import MonthlyChallenges from "./MonthlyChallenges.vue"
-import DashboardLayout from "./DashboardLayout.vue"
+import DashboardLayoutWrapper from "./DashboardLayoutWrapper.vue"
 import ChartContainer from "./ChartContainer.vue"
+import CanvasEngineAudio from "./CanvasEngineAudio.vue"
 
 const props = defineProps(["isPrintAll"])
 const isPrintAll = ref(props?.isPrintAll || true)
@@ -53,10 +54,10 @@ const tabs = ref([
   { id: 1, label: "challenges", component: MonthlyChallenges },
   { id: 2, label: "shapes", component: CanvasEngineDemo },
   { id: 3, label: "charts", component: ChartContainer },
-  { id: 4, label: "audio", component: DashboardLayout },
+  { id: 4, label: "animation", component: DashboardLayoutWrapper },
   { id: 5, label: "math", component: CanvasEngineMath },
   { id: 6, label: "physics", component: CanvasEnginePhysics },
-  { id: 7, label: "games", component: CanvasEngineGames },
+  { id: 7, label: "audio", component: CanvasEngineAudio },
   { id: 8, label: "3d-related", component: ThreeDimensionRelated },
 
   // { id: 2, label: "WEBGL", component: WebglExplorationView },
@@ -83,7 +84,7 @@ const tabs = ref([
 ])
 
 const setupWelcome = () => {
-  useTitle(computed(() => `${tabs.value[0]?.label} | naravisuals-web`))
+  // useTitle(computed(() => `${tabs.value[0]?.label} | naravisuals-web`))
   setQueryParams({ page: tabs.value[0]?.label }, true)
 }
 
@@ -95,7 +96,7 @@ const changeRoute = (idx) => {
     if (id === idx) {
       refreshTheStore()
 
-      useTitle(computed(() => `${page.label} | naravisuals-web`))
+      // useTitle(computed(() => `${page.label} | naravisuals-web`))
       setQueryParams({ page: page.label }, true)
     }
   })
@@ -121,7 +122,7 @@ onMounted(() => {
 
   const previousTab = tabs.value.filter(item => {
     if (item.label === store.value.page) {
-      useTitle(computed(() => `${item.label} | naravisuals-web`))
+      // useTitle(computed(() => `${item.label} | naravisuals-web`))
 
       return item.id
     }

@@ -8,14 +8,6 @@
         <select v-model="selectedEquation" @change="resetPlot">
           <option v-for="eq in Object.keys(equations)" :value="eq">{{ eq }}</option>
 
-          <!-- <option value="sine">Sine Wave</option> -->
-          <!-- <option value="quadratic">Quadratic</option> -->
-          <!-- <option value="cubic">Cubic</option> -->
-          <!-- <option value="exponential">Exponential</option> -->
-          <!-- <option value="logarithm">Logarithm</option> -->
-          <!-- <option value="circle">Circle (Parametric)</option> -->
-          <!-- <option value="spiral">Spiral (Polar)</option> -->
-          <!-- <option value="lissajous">Lissajous Curve</option> -->
         </select>
       </div>
 
@@ -24,10 +16,6 @@
         <label>Grid Type:</label>
         <select v-model="gridType" @change="setupGrid">
           <option v-for="grid in gridList" :value="grid">{{ grid }}</option>
-
-          <!-- <option value="cartesian">Cartesian</option> -->
-          <!-- <option value="polar">Polar</option> -->
-          <!-- <option value="isometric">Isometric</option> -->
         </select>
       </div>
 
@@ -82,6 +70,7 @@ const equationDisplay = ref('y = sin(x)')
 // Initialize when mounted
 onMounted(() => {
   if (!canvasEl.value) return
+
 
   // Create canvas app
   app.value = createCanvasApp(canvasEl.value)

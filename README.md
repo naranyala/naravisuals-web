@@ -22,7 +22,7 @@
 
 ## INSPIRATION
 
-[INSPIRATION](./INSPIRATION.png)
+![INSPIRATION](./INSPIRATION.png)
 
 - https://github.com/eva-engine/eva.js
 - https://github.com/jagenjo/litegraph.js

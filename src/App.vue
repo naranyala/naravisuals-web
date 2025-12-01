@@ -1,5 +1,12 @@
 <script setup lang="ts">
 
+import '@fontsource-variable/playpen-sans-arabic';
+import '@fontsource-variable/kode-mono';
+import '@fontsource-variable/google-sans-code';
+import '@fontsource/monaspace-krypton';
+import '@fontsource-variable/intel-one-mono';
+import '@fontsource/dm-mono';
+
 import { ref } from "vue"
 
 import { RouterLink, RouterView } from 'vue-router'
@@ -69,7 +76,16 @@ onBeforeUnmount(() => {
 
 </template>
 
-<style scoped>
+<style>
+* {
+  /* font-family: 'Playpen Sans Arabic Variable', cursive; */
+  /* font-family: 'Kode Mono Variable', monospace; */
+  /* font-family: 'Google Sans Code Variable', monospace; */
+  /* font-family: 'Monaspace Krypton', monospace; */
+  /* font-family: 'Intel One Mono Variable', monospace; */
+  font-family: 'DM Mono', monospace;
+}
+
 body {
   height: 100vh;
   padding: 0;

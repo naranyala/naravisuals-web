@@ -2,9 +2,10 @@
   <div class="dashboard">
     <!-- Top Bar -->
     <header class="topbar">
-      <button class="icon-btn" @click="toggleSidebar('left')">left</button>
-      <div class="title">Playground</div>
+      <button class="icon-btn" @click="triggerClose">back</button>
+      <div class="title">animation</div>
       <div class="actions">
+        <button class="icon-btn" @click="toggleSidebar('left')">left</button>
         <button class="icon-btn" @click="toggleSidebar('bottom')">bottom</button>
         <button class="icon-btn" @click="toggleSidebar('right')">right</button>
       </div>
@@ -12,53 +13,59 @@
 
     <!-- Main Workspace with Bottom Panel -->
     <div class="workspace">
+      <!-- Top Row: Sidebars + Main View -->
+      <div class="content-row">
+        <!-- LEFT Sidebar -->
+        <aside class="sidebar-left" :class="{ active: panelStates.leftSide }">
+          <div class="sidebar-header">
+            <div class="sidebar-title">Entities</div>
+            <button class="close-btn" @click="toggleSidebar('left')">×</button>
+          </div>
+          <div class="sidebar-scroll">
+            <ul class="entity-list">
+              <li v-for="n in 20" :key="n" @click="selectEntity(n)">Entity {{ n }}</li>
+            </ul>
+          </div>
+        </aside>
 
-      <!-- LEFT Sidebar -->
-      <aside class="sidebar-left" :class="{ active: leftSidebarOpen }">
-        <div class="sidebar-header">
-          <div class="sidebar-title">Entities</div>
-          <button class="close-btn" @click="toggleSidebar('left')">×</button>
-        </div>
-        <div class="sidebar-scroll">
-          <ul class="entity-list">
-            <li v-for="n in 20" :key="n" @click="selectEntity(n)">Entity {{ n }}</li>
-          </ul>
-        </div>
-      </aside>
+        <!-- CENTER Content -->
+        <main class="main-view">
+          <div class="viewport">
+            <!-- Replace with canvas/webgl/editor -->
+            <div class="placeholder">
+              Viewport Area
+              <small>{{ JSON.stringify(screenDetect, null, 2) }}</small>
 
-      <!-- CENTER Content -->
-      <main class="main-view">
-        <div class="viewport">
-          <!-- Replace with canvas/webgl/editor -->
-          <div class="placeholder">Viewport Area</div>
-        </div>
-      </main>
-
-      <!-- RIGHT Sidebar -->
-      <aside class="sidebar-right" :class="{ active: rightSidebarOpen }">
-        <div class="sidebar-header">
-          <div class="sidebar-title">Inspector</div>
-          <button class="close-btn" @click="toggleSidebar('right')">×</button>
-        </div>
-        <div class="sidebar-scroll">
-          <section class="panel" v-for="n in 4" :key="n">
-            <h3>Component {{ n }}</h3>
-            <div class="panel-body">
-              <label>
-                Value A
-                <input type="number" />
-              </label>
-              <label>
-                Value B
-                <input type="number" />
-              </label>
             </div>
-          </section>
-        </div>
-      </aside>
+          </div>
+        </main>
+
+        <!-- RIGHT Sidebar -->
+        <aside class="sidebar-right" :class="{ active: panelStates.rightSide }">
+          <div class="sidebar-header">
+            <div class="sidebar-title">Inspector</div>
+            <button class="close-btn" @click="toggleSidebar('right')">×</button>
+          </div>
+          <div class="sidebar-scroll">
+            <section class="panel" v-for="n in 4" :key="n">
+              <h3>Component {{ n }}</h3>
+              <div class="panel-body">
+                <label>
+                  Value A
+                  <input type="number" />
+                </label>
+                <label>
+                  Value B
+                  <input type="number" />
+                </label>
+              </div>
+            </section>
+          </div>
+        </aside>
+      </div>
 
       <!-- BOTTOM Panel -->
-      <aside class="sidebar-bottom" :class="{ active: bottomPanelOpen }">
+      <aside class="sidebar-bottom" :class="{ active: panelStates.bottomSide }">
         <div class="sidebar-header">
           <div class="sidebar-title">Console / Timeline</div>
           <button class="close-btn" @click="toggleSidebar('bottom')">×</button>
@@ -73,41 +80,88 @@
       </aside>
 
       <!-- Overlay for mobile -->
-      <div class="overlay" :class="{ active: leftSidebarOpen || rightSidebarOpen || bottomPanelOpen }"
-        @click="closeSidebars"></div>
-
+      <div class="overlay" :class="{
+        active:
+          panelStates.leftSide || panelStates.rightSide || panelStates.bottomSide
+      }" @click="closeSidebars"></div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive, watch, onMounted } from 'vue';
 
-const leftSidebarOpen = ref(true); // Default open on desktop
-const rightSidebarOpen = ref(true); // Default open on desktop
-const bottomPanelOpen = ref(false); // Default closed
+import { useScreenSize } from "./composables/useScreenSize.ts"
+const { screenSize } = useScreenSize()
+
+const panelStates = reactive({
+  leftSide: false,
+  rightSide: false,
+  bottomSide: false
+})
+
+
+const emit = defineEmits(["toggle-dashboard"])
+
+const screenDetect = ref([])
+
+// Watch multiple properties
+watch(
+  [
+    () => screenSize.value.isMobile,
+    () => screenSize.value.isTablet,
+    () => screenSize.value.isDesktop
+  ],
+  ([isMobile, isTablet, isDesktop]) => {
+    const state = { isMobile, isTablet, isDesktop }
+    // console.log(state)
+    screenDetect.value = state
+
+    if (isMobile) {
+      panelStates.leftSide = false;
+      panelStates.rightSide = false;
+      panelStates.bottomSide = false;
+    }
+
+    if (isTablet) {
+      panelStates.leftSide = true;
+      panelStates.rightSide = true;
+      panelStates.bottomSide = false;
+    }
+
+    if (isDesktop) {
+      panelStates.leftSide = true;
+      panelStates.rightSide = true;
+      panelStates.bottomSide = true;
+    }
+  }
+);
+
+const triggerClose = () => {
+  emit("toggle-dashboard")
+}
 
 const toggleSidebar = (side) => {
   if (side === 'left') {
-    leftSidebarOpen.value = !leftSidebarOpen.value;
+    panelStates.leftSide = !panelStates.leftSide;
   } else if (side === 'right') {
-    rightSidebarOpen.value = !rightSidebarOpen.value;
+    panelStates.rightSide = !panelStates.rightSide;
   } else if (side === 'bottom') {
-    bottomPanelOpen.value = !bottomPanelOpen.value;
+    panelStates.bottomSide = !panelStates.bottomSide;
   }
 };
 
 const closeSidebars = () => {
-  leftSidebarOpen.value = false;
-  rightSidebarOpen.value = false;
-  bottomPanelOpen.value = false;
+  panelStates.leftSide = false;
+  panelStates.rightSide = false;
+  panelStates.bottomSide = false;
 };
 
 const selectEntity = (n) => {
   console.log('Selected entity:', n);
   // On mobile, close sidebar after selection
   if (window.innerWidth < 768) {
-    leftSidebarOpen.value = false;
+    panelStates.leftSide = false;
   }
 };
 </script>
@@ -133,6 +187,7 @@ const selectEntity = (n) => {
   border-bottom: 1px solid #3a3a3a;
   gap: 12px;
   z-index: 100;
+  flex-shrink: 0;
 }
 
 .topbar .title {
@@ -164,8 +219,18 @@ const selectEntity = (n) => {
 /* Workspace Layout */
 .workspace {
   display: flex;
-  height: calc(100vh - 48px);
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   position: relative;
+  overflow: hidden;
+}
+
+/* Content Row - contains left sidebar, main view, right sidebar */
+.content-row {
+  display: flex;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -191,22 +256,12 @@ const selectEntity = (n) => {
   width: 260px;
   min-width: 260px;
   flex-shrink: 0;
-  height: 100%;
-  transition: all 0.3s ease;
 }
 
 .sidebar-right {
   width: 320px;
   min-width: 320px;
   flex-shrink: 0;
-  height: 100%;
-  transition: all 0.3s ease;
-}
-
-/* When bottom panel is active, shrink sidebars height */
-.sidebar-bottom.active~.sidebar-left,
-.sidebar-bottom.active~.sidebar-right {
-  height: calc(100% - 250px);
 }
 
 /* Sidebar Closed States */
@@ -226,15 +281,9 @@ const selectEntity = (n) => {
 .main-view {
   background: #1a1a1a;
   flex: 1;
+  min-width: 0;
   display: flex;
   overflow: hidden;
-  transition: all 0.3s ease;
-  height: 100%;
-}
-
-/* When bottom panel is active, shrink main viewport height */
-.sidebar-bottom.active~.main-view {
-  height: calc(100% - 250px);
 }
 
 .viewport {
@@ -245,7 +294,9 @@ const selectEntity = (n) => {
 .placeholder {
   position: absolute;
   inset: 0;
-  display: flex;
+  text-align: center;
+  /* display: flex; */
+  display: grid;
   align-items: center;
   justify-content: center;
   color: #666;
@@ -255,10 +306,6 @@ const selectEntity = (n) => {
 
 /* Bottom Panel */
 .sidebar-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   background: #252525;
   border-top: 1px solid #333;
   display: flex;
@@ -267,6 +314,7 @@ const selectEntity = (n) => {
   overflow: hidden;
   transition: all 0.3s ease;
   height: 0;
+  flex-shrink: 0;
 }
 
 .sidebar-bottom.active {
@@ -312,7 +360,6 @@ const selectEntity = (n) => {
 .sidebar-scroll {
   overflow-y: auto;
   flex-grow: 1;
-  transition: height 0.3s ease;
 }
 
 /* Entity List */
@@ -402,6 +449,11 @@ const selectEntity = (n) => {
     display: block;
   }
 
+  .content-row {
+    display: block;
+    height: 100%;
+  }
+
   .sidebar-left,
   .sidebar-right,
   .sidebar-bottom {
@@ -415,8 +467,6 @@ const selectEntity = (n) => {
     bottom: 0;
     width: 280px;
     max-width: 85vw;
-    height: auto !important;
-    /* Override desktop height adjustments on mobile */
   }
 
   .sidebar-left {
@@ -448,7 +498,7 @@ const selectEntity = (n) => {
 
   /* Main viewport full height on mobile */
   .main-view {
-    height: 100% !important;
+    height: 100%;
   }
 
   /* Bottom panel mobile behavior */
