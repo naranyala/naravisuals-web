@@ -8,6 +8,10 @@ import DashboardLayout from "./DashboardLayout.vue"
 // import TransitionSample02 from "./canvas-engine/TransitionSample02.vue"
 import TransitionSample03 from "./canvas-engine/TransitionSample03.vue"
 import TransitionSample04 from "./canvas-engine/TransitionSample04.vue"
+import TransitionSample05 from "./canvas-engine/TransitionSample05.vue"
+// import TransitionSample06 from "./canvas-engine/TransitionSample06.vue"
+
+// import TopologySample01 from "./canvas-engine/TopologySample01.vue"
 
 const isFullscreen = ref(false);
 
@@ -42,7 +46,10 @@ const toggleFullscreen = () => {
     <!-- <TransitionSample02 /> -->
     <TransitionSample03 />
     <TransitionSample04 />
+    <TransitionSample05 />
+    <!-- <TransitionSample06 /> -->
 
+    <!-- <TopologySample01 /> -->
 
   </div>
 </template>

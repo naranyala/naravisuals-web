@@ -1,8 +1,12 @@
 <script setup>
 import ThirtyDaysCBasics from "./challenges/ThirtyDaysCBasics.vue"
 import ThirtyDaysCAdvanced from "./challenges/ThirtyDaysCAdvanced.vue"
-import ThirtyDaysRustBasics from "./challenges/ThirtyDaysRustBasics.vue"
-import ThirtyDaysRustAdvanced from "./challenges/ThirtyDaysRustAdvanced.vue"
+// import ThirtyDaysRustBasics from "./challenges/ThirtyDaysRustBasics.vue"
+// import ThirtyDaysRustAdvanced from "./challenges/ThirtyDaysRustAdvanced.vue"
+
+import ThirtyDaysVlangBasics from "./challenges/ThirtyDaysVlangBasics.vue"
+import ThirtyDaysVlangAdvanced from "./challenges/ThirtyDaysVlangAdvanced.vue"
+
 </script>
 
 <template>
@@ -11,8 +15,12 @@ import ThirtyDaysRustAdvanced from "./challenges/ThirtyDaysRustAdvanced.vue"
 
   <ThirtyDaysCBasics />
   <ThirtyDaysCAdvanced />
-  <ThirtyDaysRustBasics />
-  <ThirtyDaysRustAdvanced />
+  <!-- <ThirtyDaysRustBasics /> -->
+  <!-- <ThirtyDaysRustAdvanced /> -->
+
+  <ThirtyDaysVlangBasics />
+  <ThirtyDaysVlangAdvanced />
+
 </template>
 
 <style scoped>
