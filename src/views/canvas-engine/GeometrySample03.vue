@@ -153,7 +153,7 @@ const resetConfig = () => {
     outerRadius: 100,
     sharpness: 0.5,
     rotationSpeed: 0.5,
-    wireframe: false,
+    wireframe: true,
     fillColor: '#ffd700',
     strokeColor: '#ff9900',
     strokeWidth: 2,

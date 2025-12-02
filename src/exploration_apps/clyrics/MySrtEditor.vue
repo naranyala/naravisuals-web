@@ -17,47 +17,42 @@
 
     <div class="editor-container">
       <!-- Timeline Section -->
-      <section class="timeline-section">
-        <h2>Timeline</h2>
-        <div class="timeline-visual" ref="timelineRef">
-          <div class="timeline-track">
-            <div
-              v-for="(subtitle, index) in subtitles"
-              :key="index"
-              class="subtitle-block"
-              :class="{ active: activeSubtitleIndex === index }"
-              :style="{
-                left: calculateBlockPosition(subtitle.startTime) + '%',
-                width: calculateBlockWidth(subtitle.startTime, subtitle.endTime) + '%'
-              }"
-              @click="selectSubtitle(index)"
-            >
-              <span class="block-label">{{ index + 1 }}</span>
-            </div>
-            <div
-              class="timeline-marker"
-              :style="{ left: currentTimePosition + '%' }"
-              @mousedown="startDrag"
-            ></div>
-          </div>
-        </div>
-
-        <div class="time-display">
-          Current: {{ formatDisplayTime(currentTime) }}
-        </div>
-      </section>
+      <!-- <section class="timeline-section"> -->
+      <!--   <h2>Timeline</h2> -->
+      <!--   <div class="timeline-visual" ref="timelineRef"> -->
+      <!--     <div class="timeline-track"> -->
+      <!--       <div -->
+      <!--         v-for="(subtitle, index) in subtitles" -->
+      <!--         :key="index" -->
+      <!--         class="subtitle-block" -->
+      <!--         :class="{ active: activeSubtitleIndex === index }" -->
+      <!--         :style="{ -->
+      <!--           left: calculateBlockPosition(subtitle.startTime) + '%', -->
+      <!--           width: calculateBlockWidth(subtitle.startTime, subtitle.endTime) + '%' -->
+      <!--         }" -->
+      <!--         @click="selectSubtitle(index)" -->
+      <!--       > -->
+      <!--         <span class="block-label">{{ index + 1 }}</span> -->
+      <!--       </div> -->
+      <!--       <div -->
+      <!--         class="timeline-marker" -->
+      <!--         :style="{ left: currentTimePosition + '%' }" -->
+      <!--         @mousedown="startDrag" -->
+      <!--       ></div> -->
+      <!--     </div> -->
+      <!--   </div> -->
+      <!---->
+      <!--   <div class="time-display"> -->
+      <!--     Current: {{ formatDisplayTime(currentTime) }} -->
+      <!--   </div> -->
+      <!-- </section> -->
 
       <!-- Subtitles List -->
       <section class="list-section">
         <h2>Subtitles ({{ subtitles.length }})</h2>
         <div class="subtitle-list">
-          <div
-            v-for="(subtitle, index) in subtitles"
-            :key="index"
-            class="subtitle-item"
-            :class="{ active: activeSubtitleIndex === index }"
-            @click="selectSubtitle(index)"
-          >
+          <div v-for="(subtitle, index) in subtitles" :key="index" class="subtitle-item"
+            :class="{ active: activeSubtitleIndex === index }" @click="selectSubtitle(index)">
             <div class="subtitle-header">
               <span class="subtitle-number">#{{ index + 1 }}</span>
               <span class="subtitle-time">
@@ -86,31 +81,17 @@
         <div v-if="activeSubtitleIndex !== null" class="editor-form">
           <div class="form-group">
             <label>Start Time</label>
-            <input
-              type="text"
-              v-model="activeSubtitle.startTime"
-              placeholder="00:00:00,000"
-              class="time-input"
-            >
+            <input type="text" v-model="activeSubtitle.startTime" placeholder="00:00:00,000" class="time-input">
           </div>
 
           <div class="form-group">
             <label>End Time</label>
-            <input
-              type="text"
-              v-model="activeSubtitle.endTime"
-              placeholder="00:00:00,000"
-              class="time-input"
-            >
+            <input type="text" v-model="activeSubtitle.endTime" placeholder="00:00:00,000" class="time-input">
           </div>
 
           <div class="form-group">
             <label>Subtitle Text</label>
-            <textarea
-              v-model="activeSubtitle.text"
-              placeholder="Enter subtitle text here..."
-              rows="4"
-            ></textarea>
+            <textarea v-model="activeSubtitle.text" placeholder="Enter subtitle text here..." rows="4"></textarea>
           </div>
 
           <div class="editor-actions">
@@ -131,13 +112,7 @@
     </div>
 
     <!-- Hidden file input -->
-    <input
-      type="file"
-      ref="fileInput"
-      accept=".srt"
-      style="display: none"
-      @change="handleFileImport"
-    >
+    <input type="file" ref="fileInput" accept=".srt" style="display: none" @change="handleFileImport">
   </div>
 </template>
 
@@ -154,8 +129,8 @@ const isDragging = ref(false)
 
 // Computed properties
 const activeSubtitle = computed(() => {
-  return activeSubtitleIndex.value !== null ? 
-    subtitles.value[activeSubtitleIndex.value] : 
+  return activeSubtitleIndex.value !== null ?
+    subtitles.value[activeSubtitleIndex.value] :
     null
 })
 
@@ -179,14 +154,14 @@ const formatDisplayTime = (seconds) => {
 
 const timeToSeconds = (timeString) => {
   if (!timeString) return 0
-  
+
   const parts = timeString.replace(',', '.').split(':')
   if (parts.length !== 3) return 0
-  
+
   const hours = parseInt(parts[0]) || 0
   const minutes = parseInt(parts[1]) || 0
   const seconds = parseFloat(parts[2]) || 0
-  
+
   return hours * 3600 + minutes * 60 + seconds
 }
 
@@ -226,7 +201,7 @@ const addSubtitle = () => {
     endTime: secondsToTime(currentTime.value + 5),
     text: 'New subtitle text'
   }
-  
+
   subtitles.value.push(newSubtitle)
   activeSubtitleIndex.value = subtitles.value.length - 1
 }
@@ -236,18 +211,18 @@ const saveSubtitle = () => {
     // Validate time format
     const startValid = /^\d{2}:\d{2}:\d{2}[,.]\d{3}$/.test(activeSubtitle.value.startTime)
     const endValid = /^\d{2}:\d{2}:\d{2}[,.]\d{3}$/.test(activeSubtitle.value.endTime)
-    
+
     if (!startValid || !endValid) {
       alert('Please use the format HH:MM:SS,mmm for time values')
       return
     }
-    
+
     // Ensure end time is after start time
     if (timeToSeconds(activeSubtitle.value.endTime) <= timeToSeconds(activeSubtitle.value.startTime)) {
       alert('End time must be after start time')
       return
     }
-    
+
     subtitles.value[activeSubtitleIndex.value] = { ...activeSubtitle.value }
   }
 }
@@ -267,43 +242,43 @@ const importFile = () => {
 const handleFileImport = (event) => {
   const file = event.target.files[0]
   if (!file) return
-  
+
   const reader = new FileReader()
   reader.onload = (e) => {
     const content = e.target.result
     parseSRTContent(content)
   }
   reader.readAsText(file)
-  
+
   // Reset the input
   event.target.value = ''
 }
 
 const parseSRTContent = (content) => {
   subtitles.value = []
-  
+
   const blocks = content.split(/\n\s*\n/)
-  
+
   for (const block of blocks) {
     const lines = block.trim().split('\n')
     if (lines.length < 3) continue
-    
+
     const timeLine = lines[1]
     const textLines = lines.slice(2)
-    
+
     const timeMatch = timeLine.match(/(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})/)
     if (!timeMatch) continue
-    
+
     const startTime = timeMatch[1].replace('.', ',')
     const endTime = timeMatch[2].replace('.', ',')
-    
+
     subtitles.value.push({
       startTime,
       endTime,
       text: textLines.join('\n')
     })
   }
-  
+
   if (subtitles.value.length > 0) {
     activeSubtitleIndex.value = 0
   }
@@ -314,15 +289,15 @@ const exportFile = () => {
     alert('No subtitles to export')
     return
   }
-  
+
   let srtContent = ''
-  
+
   subtitles.value.forEach((subtitle, index) => {
     srtContent += `${index + 1}\n`
     srtContent += `${subtitle.startTime} --> ${subtitle.endTime}\n`
     srtContent += `${subtitle.text}\n\n`
   })
-  
+
   const blob = new Blob([srtContent], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -344,11 +319,11 @@ const startDrag = (event) => {
 
 const handleDrag = (event) => {
   if (!isDragging.value || !timelineRef.value) return
-  
+
   const rect = timelineRef.value.getBoundingClientRect()
   const dragX = Math.max(0, Math.min(event.clientX - rect.left, rect.width))
   const percentage = (dragX / rect.width) * 100
-  
+
   currentTimePosition.value = percentage
 }
 
@@ -387,8 +362,9 @@ onMounted(() => {
   padding: 20px;
   background: #1e1e2e;
   color: #cdd6f4;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: min-content;
 }
 
 .editor-header {
@@ -461,7 +437,8 @@ onMounted(() => {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto 1fr;
   gap: 20px;
-  height: calc(100vh - 150px);
+  /* height: calc(100vh - 150px); */
+  height: 100%;
 }
 
 .timeline-section {
@@ -632,7 +609,8 @@ label {
   color: #a6adc8;
 }
 
-input, textarea {
+input,
+textarea {
   padding: 12px;
   border: 1px solid #585b70;
   border-radius: 6px;
@@ -642,7 +620,8 @@ input, textarea {
   transition: border-color 0.2s ease;
 }
 
-input:focus, textarea:focus {
+input:focus,
+textarea:focus {
   outline: none;
   border-color: #cba6f7;
 }
@@ -668,7 +647,8 @@ textarea {
 }
 
 /* Empty States */
-.empty-state, .empty-editor {
+.empty-state,
+.empty-editor {
   text-align: center;
   padding: 40px 20px;
   color: #a6adc8;
@@ -679,7 +659,8 @@ textarea {
   margin-bottom: 16px;
 }
 
-.empty-state p, .empty-editor p {
+.empty-state p,
+.empty-editor p {
   margin-bottom: 20px;
   font-size: 1.1rem;
 }
@@ -690,7 +671,7 @@ textarea {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto 1fr;
   }
-  
+
   .timeline-section {
     grid-column: 1;
   }
@@ -702,7 +683,7 @@ textarea {
     gap: 20px;
     text-align: center;
   }
-  
+
   .controls {
     flex-wrap: wrap;
     justify-content: center;

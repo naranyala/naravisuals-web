@@ -4,21 +4,25 @@ import GradientPanel from "../exploration_apps/clyrics/GradientPanel.vue"
 import SimpleAudioPlayer from "../exploration_apps/clyrics/SimpleAudioPlayer.vue"
 import MySrtEditor from "../exploration_apps/clyrics/MySrtEditor.vue"
 
+import ColorPalette from "../exploration_apps/clyrics/ColorPalette.vue"
+
 </script>
 
 <template>
   <div class="container">
-  <SimpleAudioPlayer/>
-  <MySrtEditor/>
-  <DynamicTextStyling/>
-  <GradientPanel/>
+    <SimpleAudioPlayer />
+    <MySrtEditor />
+    <DynamicTextStyling />
+    <GradientPanel />
+
+    <ColorPalette />
   </div>
 </template>
 
 <style scoped>
-  .container {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-  }
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
 </style>

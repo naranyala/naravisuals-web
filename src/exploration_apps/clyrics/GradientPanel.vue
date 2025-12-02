@@ -1,147 +1,187 @@
-<!-- GradientPanel.vue -->
 <template>
-  <div class="gradient-wrapper">
-    <!-- Live preview panel - moved to top on mobile -->
-    <div class="preview" :style="{ background: gradientCSS }" />
+  <div class="gradient-app">
+    <!-- Preview always on top -->
+    <div class="preview" :style="{ background: gradientCSS }"></div>
 
-    <section class="editor">
-      <h2>Dynamic gradient panel</h2>
+    <!-- Controls -->
+    <div class="controls">
+      <h2>Gradient Editor</h2>
 
-      <!-- Type and primary controls in a grid -->
-      <div class="controls-grid">
-        <label class="control-item">
-          <span class="label-text">Type</span>
+      <!-- Type and Color Space in one row -->
+      <div class="row">
+        <label class="control">
+          <span>Type</span>
           <select v-model="type">
             <option value="linear">Linear</option>
             <option value="radial">Radial</option>
           </select>
         </label>
 
-        <!-- Linear options -->
-        <template v-if="type === 'linear'">
-          <label class="control-item full-width">
-            <span class="label-text">Angle: {{ angle }}°</span>
-            <input v-model.number="angle" type="range" min="0" max="360" />
-          </label>
-        </template>
-
-        <!-- Radial options -->
-        <template v-else>
-          <label class="control-item">
-            <span class="label-text">Shape</span>
-            <select v-model="radShape">
-              <option value="circle">Circle</option>
-              <option value="ellipse">Ellipse</option>
-            </select>
-          </label>
-          <label class="control-item">
-            <span class="label-text">Size</span>
-            <select v-model="radSize">
-              <option value="closest-side">Closest side</option>
-              <option value="closest-corner">Closest corner</option>
-              <option value="farthest-side">Farthest side</option>
-              <option value="farthest-corner">Farthest corner</option>
-            </select>
-          </label>
-        </template>
+        <label class="control">
+          <span>Color Space</span>
+          <select v-model="colorSpace">
+            <option value="rgb">RGB</option>
+            <option value="hsl">HSL</option>
+            <option value="oklab">OKLab</option>
+            <option value="oklch">OKLCH</option>
+          </select>
+        </label>
       </div>
 
-      <!-- Color stops -->
-      <div class="stops">
-        <div class="stops-header">
-          <h3>Color stops</h3>
-          <button @click="addStop" class="btn-add">+ Add stop</button>
+      <!-- Angle control (linear only) -->
+      <label v-if="type === 'linear'" class="control full-width">
+        <span>Angle: {{ angle }}°</span>
+        <input v-model.number="angle" type="range" min="0" max="360">
+      </label>
+
+      <!-- Color Stops -->
+      <div class="stops-section">
+        <div class="section-header">
+          <h3>Color Stops</h3>
+          <button @click="addStop" class="btn-add">+ Add</button>
         </div>
-        <transition-group name="fade" tag="ul">
-          <li v-for="(stop, idx) in stops" :key="stop.id" class="stop-item">
-            <input v-model="stop.color" type="color" class="color-input" />
-            <div class="stop-controls">
-              <input
-                v-model.number="stop.pos"
-                type="range"
-                min="0"
-                max="100"
-                step="1"
-                class="range-input"
-              />
-              <span class="pos-value">{{ stop.pos }}%</span>
+        <div class="stops-list">
+          <div v-for="(stop, idx) in stops" :key="stop.id" class="stop-item">
+            <input v-model="stop.color" type="color" class="color-picker">
+            <div class="stop-slider">
+              <input v-model.number="stop.pos" type="range" min="0" max="100">
+              <span>{{ stop.pos }}%</span>
             </div>
-            <button @click="removeStop(idx)" class="btn-remove" aria-label="Remove">×</button>
-          </li>
-        </transition-group>
+            <button @click="removeStop(idx)" class="btn-remove" v-if="stops.length > 2">×</button>
+          </div>
+        </div>
       </div>
 
-      <!-- CSS output -->
-      <details class="css-section">
-        <summary>CSS Output</summary>
-        <pre class="css">{{ gradientCSS }}</pre>
-      </details>
-    </section>
+      <!-- CSS Output -->
+      <div class="output-section">
+        <h3>CSS Code</h3>
+        <pre class="css-code">{{ gradientCSS }}</pre>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import { v4 as uuid } from 'uuid'
 
-/* ----------- state ----------- */
+// Core state
 const type = ref('linear')
 const angle = ref(90)
-const radShape = ref('ellipse')
-const radSize = ref('farthest-corner')
+const colorSpace = ref('rgb')
 
-// initial stops
+// Color stops
+let stopId = 0
 const stops = ref([
-  { id: uuid(), color: '#667eea', pos: 0 },
-  { id: uuid(), color: '#764ba2', pos: 100 },
+  { id: stopId++, color: '#667eea', pos: 0 },
+  { id: stopId++, color: '#764ba2', pos: 100 },
 ])
 
-/* ----------- helpers ----------- */
-function addStop() {
-  const last = stops.value.at(-1)?.pos ?? 100
-  stops.value.push({ id: uuid(), color: '#ffffff', pos: Math.min(100, last + 20) })
-}
-function removeStop(index) {
-  if (stops.value.length > 2) stops.value.splice(index, 1)
+// Color space conversions (simplified - use a library like culori for production)
+const colorConverters = {
+  rgb: (color) => color, // Already in hex
+
+  hsl: (color) => {
+    // Simple hex to HSL conversion
+    const r = parseInt(color.slice(1, 3), 16) / 255
+    const g = parseInt(color.slice(3, 5), 16) / 255
+    const b = parseInt(color.slice(5, 7), 16) / 255
+
+    const max = Math.max(r, g, b)
+    const min = Math.min(r, g, b)
+    let h = 0, s, l = (max + min) / 2
+
+    if (max !== min) {
+      const d = max - min
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break
+        case g: h = (b - r) / d + 2; break
+        case b: h = (r - g) / d + 4; break
+      }
+      h /= 6
+    } else {
+      s = 0
+    }
+
+    return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`
+  },
+
+  oklab: (color) => {
+    // Placeholder - use a proper color library in production
+    const r = parseInt(color.slice(1, 3), 16)
+    const g = parseInt(color.slice(3, 5), 16)
+    const b = parseInt(color.slice(5, 7), 16)
+
+    // Simple luminance approximation
+    const l = (r * 0.2126 + g * 0.7152 + b * 0.0722) / 255
+    return `oklab(${l.toFixed(2)} 0.1 0.1)`
+  },
+
+  oklch: (color) => {
+    // Placeholder - use a proper color library in production
+    const r = parseInt(color.slice(1, 3), 16)
+    const g = parseInt(color.slice(3, 5), 16)
+    const b = parseInt(color.slice(5, 7), 16)
+
+    const l = (r * 0.2126 + g * 0.7152 + b * 0.0722) / 255
+    const c = Math.sqrt(r * r + g * g + b * b) / 442
+    const h = Math.atan2(g - 128, r - 128) * 180 / Math.PI
+
+    return `oklch(${l.toFixed(2)} ${c.toFixed(2)} ${Math.round((h + 360) % 360)})`
+  }
 }
 
-/* ----------- computed gradient string ----------- */
+// Methods
+const addStop = () => {
+  const lastPos = stops.value[stops.value.length - 1]?.pos || 100
+  stops.value.push({
+    id: stopId++,
+    color: '#ffffff',
+    pos: Math.min(100, lastPos + 20)
+  })
+}
+
+const removeStop = (index) => {
+  if (stops.value.length > 2) {
+    stops.value.splice(index, 1)
+  }
+}
+
+// Computed gradient
 const gradientCSS = computed(() => {
-  const list = stops.value
-    .slice()
-    .sort((a, b) => a.pos - b.pos)
-    .map(s => `${s.color} ${s.pos}%`)
-    .join(', ')
+  const sortedStops = [...stops.value].sort((a, b) => a.pos - b.pos)
+
+  const stopList = sortedStops.map(stop => {
+    const convertedColor = colorConverters[colorSpace.value](stop.color)
+    return `${convertedColor} ${stop.pos}%`
+  }).join(', ')
 
   if (type.value === 'linear') {
-    return `linear-gradient(${angle.value}deg, ${list})`
+    return `linear-gradient(${angle.value}deg, ${stopList})`
   }
-  return `radial-gradient(${radShape.value} ${radSize.value}, ${list})`
+  return `radial-gradient(circle, ${stopList})`
 })
 </script>
 
 <style scoped>
-.gradient-wrapper {
+/* Base styles - same for mobile and desktop */
+.gradient-app {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 100%;
-  /* max-width: 100%; */
   padding: 1rem;
   background: #0f172a;
   min-height: 100vh;
 }
 
 .preview {
-  width: 100%;
   height: 200px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  order: -1; /* Ensures preview is first on mobile */
   border: 1px solid #1e293b;
 }
 
-.editor {
+.controls {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -152,76 +192,78 @@ const gradientCSS = computed(() => {
   background: #1e293b;
 }
 
-.editor h2 {
+.controls h2 {
   margin: 0 0 0.5rem 0;
   font-size: 1.25rem;
   font-weight: 600;
   color: #f1f5f9;
 }
 
-/* Controls grid - responsive */
-.controls-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+/* Row layout for controls */
+.row {
+  display: flex;
   gap: 1rem;
 }
 
-.control-item {
+.control {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  flex: 1;
 }
 
-.control-item.full-width {
-  grid-column: 1 / -1;
+.control.full-width {
+  flex: 0 0 100%;
 }
 
-.label-text {
+.control span {
   font-size: 0.875rem;
   font-weight: 500;
   color: #cbd5e1;
 }
 
-select {
+select,
+input[type="range"] {
+  width: 100%;
   padding: 0.5rem;
   border: 1px solid #475569;
   border-radius: 6px;
-  font-size: 0.875rem;
   background: #0f172a;
   color: #e2e8f0;
+  font-size: 0.875rem;
 }
 
-input[type="range"] {
-  width: 100%;
-  cursor: pointer;
-}
-
-/* Color stops */
-.stops {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.stops-header {
+/* Stops section */
+.section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
 }
 
-.stops h3 {
+.section-header h3 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
   color: #f1f5f9;
 }
 
-.stops ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.btn-add {
+  padding: 0.5rem 1rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-add:hover {
+  background: #2563eb;
+}
+
+.stops-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -238,7 +280,7 @@ input[type="range"] {
   border-radius: 8px;
 }
 
-.color-input {
+.color-picker {
   width: 48px;
   height: 48px;
   border: 2px solid #475569;
@@ -247,37 +289,17 @@ input[type="range"] {
   background: #0f172a;
 }
 
-.stop-controls {
+.stop-slider {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   flex: 1;
 }
 
-.range-input {
-  width: 100%;
-}
-
-.pos-value {
+.stop-slider span {
   font-size: 0.75rem;
   color: #94a3b8;
   text-align: center;
-}
-
-.btn-add {
-  padding: 0.5rem 1rem;
-  background: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.btn-add:hover {
-  background: #2563eb;
 }
 
 .btn-remove {
@@ -286,13 +308,12 @@ input[type="range"] {
   border: none;
   background: #7f1d1d;
   color: #fca5a5;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
 .btn-remove:hover {
@@ -300,86 +321,59 @@ input[type="range"] {
   color: #fecaca;
 }
 
-/* CSS output - collapsible on mobile */
-.css-section {
+/* Output section */
+.output-section {
   margin-top: 0.5rem;
 }
 
-.css-section summary {
-  padding: 0.75rem;
-  background: #f3f4f6;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  user-select: none;
+.output-section h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f1f5f9;
 }
 
-.css-section summary:hover {
-  background: #e5e7eb;
-}
-
-.css {
-  background: #1f2937;
+.css-code {
+  background: #0f172a;
   color: #d1d5db;
   padding: 1rem;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   word-break: break-all;
-  margin-top: 0.5rem;
+  margin: 0;
   overflow-x: auto;
 }
 
-/* Transitions */
-.fade-move,
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 0.25s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
-/* Tablet and up */
-@media (min-width: 640px) {
-  .controls-grid {
-    grid-template-columns: repeat(2, 1fr);
+/* Desktop layout (same structure, just wider and side-by-side) */
+@media (min-width: 768px) {
+  .gradient-app {
+    flex-direction: row;
+    align-items: flex-start;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
   }
-  
-  .stop-item {
-    grid-template-columns: auto 1fr auto auto;
+
+  .preview {
+    width: 50%;
+    height: 400px;
+    position: sticky;
+    top: 2rem;
   }
-  
-  .stop-controls {
+
+  .controls {
+    width: 50%;
+  }
+
+  /* Make stop slider horizontal on desktop */
+  .stop-slider {
     flex-direction: row;
     align-items: center;
     gap: 0.75rem;
   }
-  
-  .pos-value {
-    min-width: 3rem;
-  }
-}
 
-/* Desktop */
-@media (min-width: 1024px) {
-  .gradient-wrapper {
-    flex-direction: row;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  .preview {
-    width: 50%;
-    height: auto;
-    min-height: 400px;
-    order: 0;
-  }
-  
-  .editor {
-    width: 50%;
+  .stop-slider span {
+    min-width: 3rem;
   }
 }
 </style>

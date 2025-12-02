@@ -18,8 +18,9 @@ const dropdownOptions = ref([
   { label: 'past-of-me', value: 'past-of-me' },
 ]);
 
-const handleSelect = (option) => {
-  console.log('Selected:', option);
+
+const handleSelect = (payload) => {
+  console.log('Selected:', payload);
 };
 
 const open = ref(false)
@@ -162,7 +163,12 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
 
         <!-- <ScrollToBottom style="margin-right: 5px;" /> -->
 
-        <Dropdown :options="dropdownOptions" placeholder="MODE" @select="handleSelect" />
+ <Dropdown
+      :options="dropdownOptions"
+      :default-index="0"
+      @select="handleSelect"
+    />
+
 
       </nav>
 
