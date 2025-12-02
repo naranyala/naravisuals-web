@@ -4,25 +4,22 @@ export function mathPlugin(app) {
     // =============================================
     // Enhanced Constants
     // =============================================
-    const τ = Math.PI * 2;
-    const φ = (1 + Math.sqrt(5)) / 2;
-    const ε = 1e-9;
+    const TAU = Math.PI * 2;
+    const PHI = (1 + Math.sqrt(5)) / 2;
+    const EPSILON = 1e-9;
 
     app.math = {
         PI: Math.PI,
-        TAU: τ,
+        TAU: TAU,
         E: Math.E,
-        PHI: φ,
+        PHI: PHI,
         SQRT2: Math.SQRT2,
         SQRT1_2: Math.SQRT1_2,
         LN2: Math.LN2,
         LN10: Math.LN10,
         LOG2E: Math.LOG2E,
         LOG10E: Math.LOG10E,
-        EPSILON: ε,
-        τ,
-        φ,
-        ε
+        EPSILON: EPSILON,
     };
 
     // =============================================
@@ -49,11 +46,11 @@ export function mathPlugin(app) {
         lenSq() { return this.x * this.x + this.y * this.y; },
         normalized() {
             const len = this.length();
-            return len > ε ? this.div(len) : app.vec2();
+            return len > EPSILON ? this.div(len) : app.vec2();
         },
         normalize$() {
             const len = this.length();
-            if (len > ε) this.div$(len);
+            if (len > EPSILON) this.div$(len);
             return this;
         },
 
@@ -87,7 +84,7 @@ export function mathPlugin(app) {
         // Utilities
         toArray() { return [this.x, this.y]; },
         clone() { return app.vec2(this.x, this.y); },
-        equals(v, eps = ε) {
+        equals(v, eps = EPSILON) {
             return Math.abs(this.x - v.x) < eps && Math.abs(this.y - v.y) < eps;
         },
         toString() { return `vec2(${this.x.toFixed(2)}, ${this.y.toFixed(2)})`; },
@@ -184,8 +181,8 @@ export function mathPlugin(app) {
         radToDeg: r => r * 180 / Math.PI,
         angleDiff(a, b) {
             let diff = b - a;
-            while (diff > Math.PI) diff -= τ;
-            while (diff < -Math.PI) diff += τ;
+            while (diff > Math.PI) diff -= TAU;
+            while (diff < -Math.PI) diff += TAU;
             return diff;
         },
 
@@ -195,7 +192,7 @@ export function mathPlugin(app) {
         chance(p) { return Math.random() < p; },
         randomSign() { return Math.random() < 0.5 ? -1 : 1; },
         randomVec2(length = 1) {
-            const angle = Math.random() * τ;
+            const angle = Math.random() * TAU;
             return app.vec2(Math.cos(angle) * length, Math.sin(angle) * length);
         },
 
@@ -300,7 +297,7 @@ export function mathPlugin(app) {
         // Line intersection
         lineIntersection(a1, a2, b1, b2) {
             const denominator = (a2.x - a1.x) * (b2.y - b1.y) - (a2.y - a1.y) * (b2.x - b1.x);
-            if (Math.abs(denominator) < ε) return null; // Parallel
+            if (Math.abs(denominator) < EPSILON) return null; // Parallel
 
             const ua = ((b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x)) / denominator;
             const ub = ((a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x)) / denominator;
@@ -458,11 +455,11 @@ export function mathPlugin(app) {
     app.math.signal = {
         // Wave generators
         sine(t, frequency = 1, amplitude = 1, phase = 0) {
-            return amplitude * Math.sin(t * frequency * τ + phase);
+            return amplitude * Math.sin(t * frequency * TAU + phase);
         },
 
         square(t, frequency = 1, amplitude = 1) {
-            return Math.sin(t * frequency * τ) >= 0 ? amplitude : -amplitude;
+            return Math.sin(t * frequency * TAU) >= 0 ? amplitude : -amplitude;
         },
 
         sawtooth(t, frequency = 1, amplitude = 1) {
@@ -670,7 +667,7 @@ export function mathPlugin(app) {
         // Parametric: x(t), y(t)
         parametric(xFn, yFn, {
             tMin = 0,
-            tMax = τ,
+            tMax = TAU,
             steps = 300,
             color = '#007aff',
             lineWidth = 3,
@@ -695,7 +692,7 @@ export function mathPlugin(app) {
 
         // Polar: r(θ)
         polar(rFn, {
-            thetaMax = τ,
+            thetaMax = TAU,
             steps = 360,
             color = '#ff9500',
             lineWidth = 3,
@@ -726,7 +723,7 @@ export function mathPlugin(app) {
                     ctx.strokeStyle = this.color;
                     this.points.forEach(p => {
                         ctx.beginPath();
-                        ctx.arc(p.x, p.y, this.radius, 0, τ);
+                        ctx.arc(p.x, p.y, this.radius, 0, TAU);
                         if (this.fill) {
                             ctx.fill();
                         } else {
@@ -770,7 +767,7 @@ export function mathPlugin(app) {
             for (let y = cellSize / 2; y < hh; y += cellSize) {
                 const vec = fieldFn(x, y);
                 const mag = vec.length();
-                if (mag < ε) continue;
+                if (mag < EPSILON) continue;
 
                 const scaledVec = vec.normalized().mul(arrowScale * Math.min(mag, maxMagnitude));
                 const end = app.vec2(x, y).add(scaledVec);

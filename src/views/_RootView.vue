@@ -37,7 +37,7 @@ import CanvasEngineDemo from "./CanvasEngineDemo.vue"
 import CanvasEngineMath from "./CanvasEngineMath.vue"
 import CanvasEnginePhysics from "./CanvasEnginePhysics.vue"
 import CanvasEngineGames from "./CanvasEngineGames.vue"
-import ThreeDimensionRelated from "./ThreeDimensionRelated.vue"
+import ShapesThreeDimension from "./ShapesThreeDimension.vue"
 
 import MonthlyChallenges from "./MonthlyChallenges.vue"
 import DashboardLayoutWrapper from "./DashboardLayoutWrapper.vue"
@@ -58,7 +58,7 @@ const tabs = ref([
   { id: 5, label: "math", component: CanvasEngineMath },
   { id: 6, label: "physics", component: CanvasEnginePhysics },
   { id: 7, label: "audio", component: CreativeLyrics },
-  { id: 8, label: "3d-related", component: ThreeDimensionRelated },
+  { id: 8, label: "3d-related", component: ShapesThreeDimension },
 
   // { id: 2, label: "WEBGL", component: WebglExplorationView },
   // { id: 4, label: "Creative3D", component: Creative3DView },
