@@ -27,7 +27,7 @@
     </div>
 
     <div class="canvas-container">
-      <canvas ref="canvasEl" width="800" height="600"></canvas>
+      <canvas ref="canvasEl" width="600" height="400"></canvas>
     </div>
   </div>
 </template>
@@ -312,13 +312,14 @@ watch(gridType, setupGrid)
 <style scoped>
 .demo-container {
   display: flex;
+  flex-direction: column;
   gap: 20px;
   padding: 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .controls {
-  width: 300px;
+  width: 100%;
   padding: 20px;
   background: #f5f5f5;
   border-radius: 10px;
@@ -371,6 +372,10 @@ watch(gridType, setupGrid)
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+canvas {
+  width: 100%;
 }
 
 .equation-display {

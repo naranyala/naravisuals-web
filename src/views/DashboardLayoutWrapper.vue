@@ -13,6 +13,10 @@ import TransitionSample05 from "./canvas-engine/TransitionSample05.vue"
 
 // import TopologySample01 from "./canvas-engine/TopologySample01.vue"
 
+import GeometrySample01 from "./canvas-engine/GeometrySample01.vue"
+import GeometrySample02 from "./canvas-engine/GeometrySample02.vue"
+
+
 const isFullscreen = ref(false);
 
 const toggleFullscreen = () => {
@@ -48,8 +52,10 @@ const toggleFullscreen = () => {
     <TransitionSample04 />
     <TransitionSample05 />
     <!-- <TransitionSample06 /> -->
-
     <!-- <TopologySample01 /> -->
+
+    <GeometrySample01 />
+    <GeometrySample02 />
 
   </div>
 </template>

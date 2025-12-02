@@ -4,8 +4,8 @@ import PyramidDemo from "./canvas-engine/PyramidDemo.vue"
 import AnotherPrism from "./canvas-engine/AnotherPrism.vue"
 import TriangulatedSphere from "./canvas-engine/TriangulatedSphere.vue"
 import WireframeOfSphere from "./canvas-engine/WireframeOfSphere.vue"
-
-import LowPolyDiamond from "./canvas-engine/LowPolyDiamond.vue"
+// import LowPolyDiamond from "./canvas-engine/LowPolyDiamond.vue"
+// import MoonOrbitLine from "./canvas-engine/MoonOrbitLine.vue"
 
 </script>
 
@@ -15,8 +15,11 @@ import LowPolyDiamond from "./canvas-engine/LowPolyDiamond.vue"
     <PyramidDemo />
     <AnotherPrism />
     <TriangulatedSphere />
-    <WireframeOfSphere />
 
-    <LowPolyDiamond />
+    <WireframeOfSphere />
+    <!-- <LowPolyDiamond /> -->
+    <!-- <MoonOrbitLine /> -->
+
+
   </div>
 </template>

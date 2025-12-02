@@ -1,7 +1,7 @@
 <script setup>
 import { ref, nextTick, watch } from 'vue'
 
-import ScrollToBottom from "./ScrollToBottom.vue"
+// import ScrollToBottom from "./ScrollToBottom.vue"
 import SlidingUpDrawer from "./SlidindUpDrawer.vue"
 
 import Calculator from "../exploration_games/Calculator.vue"
@@ -9,6 +9,18 @@ import Breakout from "../exploration_games/Breakout.vue"
 import Snake from "../exploration_games/Snake.vue"
 import Sudoku from "../exploration_games/Sudoku.vue"
 
+
+import Dropdown from './Dropdown.vue';
+
+const dropdownOptions = ref([
+  { label: 'future-of-me', value: 'future-of-me' },
+  { label: 'present-of-me', value: 'present-of-me' },
+  { label: 'past-of-me', value: 'past-of-me' },
+]);
+
+const handleSelect = (option) => {
+  console.log('Selected:', option);
+};
 
 const open = ref(false)
 const history = ref([])
@@ -132,6 +144,9 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
     <header class="sticky-header">
       <nav class="navbar">
         <a href="/" class="logo">{{ SITE_TITLE }}</a>
+
+        <!-- separator -->
+
         <button @click="open = !open" style="border: none;">
           <svg v-if="open" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
             <path fill="currentColor"
@@ -145,7 +160,10 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
           </svg>
         </button>
 
-        <ScrollToBottom style="margin-right: 5px;" />
+        <!-- <ScrollToBottom style="margin-right: 5px;" /> -->
+
+        <Dropdown :options="dropdownOptions" placeholder="MODE" @select="handleSelect" />
+
       </nav>
 
       <!-- Terminal Panel -->

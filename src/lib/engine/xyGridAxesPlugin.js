@@ -846,4 +846,15 @@ export function xyGridAxesPlugin(app) {
     };
 
     console.log("🎯 xyGridAxesPlugin loaded — Complete grid and axes system with Cartesian, polar, isometric, logarithmic, hexagonal, dot, perspective, and radial grids!");
+
+
+    // =============================================
+    // Auto-apply default systems
+    // =============================================
+    const defaultAxes = gridList.cartesian();
+    app.coordinateDisplay({ axesSystem: defaultAxes });
+    console.log("✅ xyGridAxesPlugin auto-applied Cartesian grid and coordinate display.");
+
 }
+
+

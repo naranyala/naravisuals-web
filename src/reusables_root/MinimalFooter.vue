@@ -5,6 +5,7 @@ import { ref, reactive } from "vue"
 import ScrollToTop from "./ScrollToTop.vue"
 import SlidingUpDrawer from "./SlidindUpDrawer.vue"
 import GridMenu from "./GridMenu.vue"
+import SocialMediaButtons from "./SocialMediaButtons.vue"
 
 import { useRouter } from 'vue-router'
 
@@ -90,15 +91,22 @@ const actionFutureOfMe = () => {
 
 <template>
   <footer class="footer">
+
+    <SocialMediaButtons />
+
+    <p class="footer-copyright">© 2025 gema_naranyala</p>
+
+
+    <ScrollToTop :trigger-scroll="triggerScroll" @scroll-complete="triggerScroll = false" />
+
+    <!--
     <div class="footer-links">
       <a class="link-item" @click="openDrawer('past-of-me')">{{ contentPastOfMe.title }}</a>
       <a class="link-item" @click="openDrawer('present-of-me')">{{ contentPresentOfMe.title }}</a>
       <a class="link-item" @click="openDrawer('future-of-me')">{{ contentFutureOfMe.title }}</a>
     </div>
 
-    <p class="footer-copyright">© 2025 gema_naranyala</p>
 
-    <ScrollToTop :trigger-scroll="triggerScroll" @scroll-complete="triggerScroll = false" />
 
 
     <SlidingUpDrawer v-model="isDrawerOpen.pastOfMe" :persistent="false">
@@ -106,29 +114,29 @@ const actionFutureOfMe = () => {
         <h3 class="drawer-header">{{ contentPastOfMe.title }}</h3>
       </template>
 
-      <GridMenu :items="menuItems" @drawer-close="actionPastOfMe" />
-    </SlidingUpDrawer>
+<GridMenu :items="menuItems" @drawer-close="actionPastOfMe" />
+</SlidingUpDrawer>
 
 
-    <SlidingUpDrawer v-model="isDrawerOpen.presentOfMe" :persistent="false">
-      <template #header>
+<SlidingUpDrawer v-model="isDrawerOpen.presentOfMe" :persistent="false">
+  <template #header>
         <h3 class="drawer-header">{{ contentPresentOfMe.title }}</h3>
       </template>
 
-      <GridMenu :items="menuItems" @drawer-close="actionPresentOfMe" />
-    </SlidingUpDrawer>
+  <GridMenu :items="menuItems" @drawer-close="actionPresentOfMe" />
+</SlidingUpDrawer>
 
 
-    <SlidingUpDrawer v-model="isDrawerOpen.futureOfMe" :persistent="false">
-      <template #header>
+<SlidingUpDrawer v-model="isDrawerOpen.futureOfMe" :persistent="false">
+  <template #header>
         <h3 class="drawer-header">{{ contentFutureOfMe.title }}</h3>
       </template>
 
-      <GridMenu :items="menuItems" @drawer-close="actionFutureOfMe" />
-    </SlidingUpDrawer>
+  <GridMenu :items="menuItems" @drawer-close="actionFutureOfMe" />
+</SlidingUpDrawer>
 
 
-
+-->
   </footer>
 </template>
 
@@ -177,7 +185,7 @@ const actionFutureOfMe = () => {
 }
 
 .footer-copyright {
-  margin: 0;
+  margin-top: 200px;
   color: #888;
   font-weight: 300;
   letter-spacing: 0.5px;

@@ -57,15 +57,14 @@ const tabs = ref([
   { id: 4, label: "animation", component: DashboardLayoutWrapper },
   { id: 5, label: "math", component: CanvasEngineMath },
   { id: 6, label: "physics", component: CanvasEnginePhysics },
-  { id: 7, label: "audio", component: CanvasEngineAudio },
+  { id: 7, label: "audio", component: CreativeLyrics },
   { id: 8, label: "3d-related", component: ThreeDimensionRelated },
 
   // { id: 2, label: "WEBGL", component: WebglExplorationView },
   // { id: 4, label: "Creative3D", component: Creative3DView },
-
+  // { id: 7, label: "audio", component: CanvasEngineAudio },
   // { id: 4, label: "SIPENA (TM)", component: SipenaView },
   // { id: 0, label: "EASYBUDGET (TM)", component: EasyBudgetView },
-  // { id: 0, label: "VisualsLyrics (TM)", component: CreativeLyrics },
   // { id: 1, label: "Theories", component: TheoryCollection },
   // { id: 2, label: "Articles", component: ArticleView },
   // { id: 3, label: "Gallery", component: CanvasExamplesView },
