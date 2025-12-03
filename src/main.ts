@@ -17,8 +17,10 @@ import './assets/01-reset-opinionated.css'
 // import './assets/04-print-friendly-preset.css'
 
 import { createApp } from 'vue'
-import DefaultLayout from './DefaultLayout.vue'
 import router from './router.ts'
+
+
+import DefaultLayout from './DefaultLayout.vue'
 
 const app = createApp(DefaultLayout)
 

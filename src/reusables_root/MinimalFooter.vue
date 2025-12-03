@@ -117,10 +117,12 @@ const principlesCollapsible = reactive({
 
     <ScrollToTop :trigger-scroll="triggerScroll" @scroll-complete="triggerScroll = false" />
 
+
+    <GeneralCollapsible :is-open="principlesCollapsible.isOpen" :title="principlesCollapsible.title" :strContent="principlesCollapsible.strContent"/>
+
     <GeneralCollapsible :is-open="aboutMeCollapsible.isOpen" :title="aboutMeCollapsible.title" :strContent="aboutMeCollapsible.strContent"/>
 
 
-    <GeneralCollapsible :is-open="principlesCollapsible.isOpen" :title="principlesCollapsible.title" :strContent="principlesCollapsible.strContent"/>
 
     <SocialMediaButtons />
     <p class="footer-copyright">© 2025 gema_naranyala</p>

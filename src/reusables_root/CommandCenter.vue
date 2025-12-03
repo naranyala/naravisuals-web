@@ -10,7 +10,9 @@ import Snake from "../exploration_games/Snake.vue"
 import Sudoku from "../exploration_games/Sudoku.vue"
 
 
-import Dropdown from './Dropdown.vue';
+// import Dropdown from './Dropdown.vue';
+
+import useLocalStorage from "../views/composables/useLocalStorage.js"
 
 const dropdownOptions = ref([
   { label: 'future-of-me', value: 'future-of-me' },
@@ -18,7 +20,7 @@ const dropdownOptions = ref([
   { label: 'past-of-me', value: 'past-of-me' },
 ]);
 
-const activeMode = ref()
+const activeMode = useLocalStorage()
 
 const handleSelect = (payload) => {
   activeMode.value = JSON.parse(JSON.stringify(payload));
@@ -141,6 +143,12 @@ function onKey(e) {
 function focusInput() { inputRef.value?.focus() }
 
 defineExpose({ out, register: (n, fn) => commands[n] = fn })
+
+
+function toggleSidebar(){
+  alert("toggle woy")
+}
+
 </script>
 
 <template>
@@ -148,11 +156,18 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
     <!-- Sticky Header (navbar + terminal) -->
     <header class="sticky-header">
       <nav class="navbar">
-        <a href="/" class="logo">{{ SITE_TITLE }}</a>
 
         <!-- separator -->
 
-        <button @click="open = !open" style="border: none;">
+        <button class="action-btn" @click="toggleSidebar">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 17h14M5 12h14M5 7h14"/></svg>
+
+        </button>
+
+
+        <a href="/" class="logo">{{ SITE_TITLE }}</a>
+
+        <button class="terminal-btn" @click="open = !open" style="border: none;">
           <svg v-if="open" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
             <path fill="currentColor"
               d="M16 2C8.2 2 2 8.2 2 16s6.2 14 14 14s14-6.2 14-14S23.8 2 16 2m0 26C9.4 28 4 22.6 4 16S9.4 4 16 4s12 5.4 12 12s-5.4 12-12 12" />
@@ -167,11 +182,11 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
 
         <!-- <ScrollToBottom style="margin-right: 5px;" /> -->
 
- <Dropdown
-      :options="dropdownOptions"
-      :default-index="0"
-      @select="handleSelect"
-    />
+ <!-- <Dropdown -->
+ <!--      :options="dropdownOptions" -->
+ <!--      :default-index="0" -->
+ <!--      @select="handleSelect" -->
+ <!--    /> -->
 
 
       </nav>
@@ -236,7 +251,9 @@ defineExpose({ out, register: (n, fn) => commands[n] = fn })
 /* Sticky header container */
 .sticky-header {
   position: sticky;
-  top: 0;
+  /* top: 0; */
+  bottom: 0;
+  margin-bottom: 0;
   z-index: 100;
   background: var(--card);
 }
@@ -342,7 +359,10 @@ input::placeholder {
   border-radius: 2px;
 }
 
-button {
-  background: none;
-}
+/* button { */
+/*   background: none; */
+/* } */
+
+.action-btn { color: white; }
+
 </style>

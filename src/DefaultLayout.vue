@@ -77,7 +77,7 @@ onBeforeUnmount(() => {
 
   <div class="no-print">
     <!-- <WelcomeMenu/> -->
-    <MinimalFooter />
+    <!-- <MinimalFooter /> -->
   </div>
 
 </template>
@@ -97,6 +97,8 @@ article {
 }
 
 body {
+  background: rgba(0 0 0 / 0.9);
+  color: white;
   height: 100vh;
   padding: 0;
 }
