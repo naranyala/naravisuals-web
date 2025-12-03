@@ -87,13 +87,15 @@ const tabs = ref([
   // ...finalTabViewed.value
 
 
-  { id: 0, label: "c-related", component: WelcomeCode },
-  { id: 1, label: "rust-related", component: MonthlyChallenges },
+  // { id: 0, label: "c-related", component: WelcomeCode },
+  { id: 0, label: "c-related", component: () => "MAINTENANCE" },
+  { id: 1, label: "rust-related", component: () => "MAINTENANCE" },
+  // { id: 1, label: "rust-related", component: MonthlyChallenges },
   { id: 1, label: "modern-css", component: WrapperOfModernCSS },
   { id: 1, label: "modern-js", component: WrapperOfModernJS },
-  { id: 1, label: "vue-related", component: "" },
-  { id: 1, label: "vue-setter-getter", component: "" },
-  { id: 1, label: "canvas-api", component: "" },
+  { id: 1, label: "vue-related", component: () => "WIP" },
+  { id: 1, label: "vue-setter-getter", component: () => "WIP" },
+  { id: 1, label: "canvas-api", component: () => "WIP" },
   // { id: 1, label: "-related", component: MonthlyChallenges },
 
   // { id: 1, label: "reader", component: PdfViewer },

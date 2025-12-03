@@ -1,11 +1,7 @@
 <template>
   <div>
     <!-- Scroll to top button -->
-    <button 
-      v-show="showScrollButton" 
-      @click="scrollToTop" 
-      class="scroll-btn"
-    >
+    <button v-show="showScrollButton" @click="scrollToTop" class="scroll-btn">
       Scroll to Top
     </button>
   </div>
@@ -41,7 +37,8 @@ watch(() => props.triggerScroll, (newValue) => {
 
 const handleScroll = () => {
   // Show button when scrolled down more than 200px
-  showScrollButton.value = window.scrollY > 200;
+  // showScrollButton.value = window.scrollY > 200;
+  showScrollButton.value = true
 };
 
 onMounted(() => {

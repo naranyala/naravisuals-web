@@ -6,6 +6,7 @@ import ScrollToTop from "./ScrollToTop.vue"
 import SlidingUpDrawer from "./SlidindUpDrawer.vue"
 import GridMenu from "./GridMenu.vue"
 import SocialMediaButtons from "./SocialMediaButtons.vue"
+import GeneralCollapsible from "./GeneralCollapsible.vue"
 
 import { useRouter } from 'vue-router'
 
@@ -86,18 +87,46 @@ const actionFutureOfMe = () => {
   triggerScroll.value = true;
 }
 
+const aboutMeCollapsible = reactive({
+  isOpen: false,
+  title: "about me",
+  strContent: [
+    "hello there",
+    "hello again",
+    "hello"
+  ]
+})
+
+const principlesCollapsible = reactive({
+  isOpen: true,
+  title: "principles",
+  strContent: [
+    "coding",
+    "eat",
+    "sleep"
+  ]
+})
+
+
 </script>
 
 
 <template>
   <footer class="footer">
 
-    <SocialMediaButtons />
 
+    <ScrollToTop :trigger-scroll="triggerScroll" @scroll-complete="triggerScroll = false" />
+
+    <GeneralCollapsible :is-open="aboutMeCollapsible.isOpen" :title="aboutMeCollapsible.title" :strContent="aboutMeCollapsible.strContent"/>
+
+
+    <GeneralCollapsible :is-open="principlesCollapsible.isOpen" :title="principlesCollapsible.title" :strContent="principlesCollapsible.strContent"/>
+
+    <SocialMediaButtons />
     <p class="footer-copyright">© 2025 gema_naranyala</p>
 
 
-    <ScrollToTop :trigger-scroll="triggerScroll" @scroll-complete="triggerScroll = false" />
+
 
     <!--
     <div class="footer-links">
@@ -185,12 +214,12 @@ const actionFutureOfMe = () => {
 }
 
 .footer-copyright {
-  margin-top: 200px;
+  margin-top: 45px;
+  margin-bottom: 120px;
   color: #888;
   font-weight: 300;
   letter-spacing: 0.5px;
   font-size: 0.8rem;
-  margin-bottom: 200px;
 }
 
 /* Responsive touch optimization */
