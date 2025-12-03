@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 
 import Timeline from "./engine/Timeline.vue"
+import OsLikeDemo from "./OsLikeDemo.vue"
 
 import DashboardLayout from "./DashboardLayout.vue"
 // import TransitionSample01 from "./canvas-engine/TransitionSample01.vue"
@@ -17,31 +18,57 @@ import GeometrySample01 from "./canvas-engine/GeometrySample01.vue"
 import GeometrySample02 from "./canvas-engine/GeometrySample02.vue"
 
 
-const isFullscreen = ref(false);
+const isDashboardVisible = ref(false);
 
-const toggleFullscreen = () => {
-  isFullscreen.value = !isFullscreen.value;
-  // Optional: Prevent scrolling when fullscreen is active
-  document.body.style.overflow = isFullscreen.value ? 'hidden' : 'auto';
+const toggleDashboard = () => {
+  isDashboardVisible.value = !isDashboardVisible.value;
+  document.body.style.overflow = isDashboardVisible.value ? 'hidden' : 'auto';
 };
+
+const isOsLikeVisible = ref(false);
+
+const toggleOS = () => {
+  isOsLikeVisible.value = !isOsLikeVisible.value;
+  document.body.style.overflow = isOsLikeVisible.value ? 'hidden' : 'auto';
+};
+
+
+
 </script>
 
 <template>
   <div class="animation-section">
 
     <div>
-      <div v-if="isFullscreen" class="fullscreen-overlay" @click.self="toggleFullscreen">
+      <div v-if="isDashboardVisible" class="fullscreen-overlay" @click.self="toggleFullscreen">
         <div class="fullscreen-content">
-          <DashboardLayout @toggle-dashboard="toggleFullscreen" />
+          <DashboardLayout @toggle-dashboard="toggleDashboard" />
         </div>
       </div>
 
       <div class="section-dasboard">
-        <button @click="toggleFullscreen">
+        <button @click="toggleDashboard">
           {{ isFullscreen ? 'close dashboard' : 'open dashboard' }}
         </button>
       </div>
     </div>
+
+
+    <div>
+      <div v-if="isOsLikeVisible" class="fullscreen-overlay" @click.self="toggleOS">
+        <div class="fullscreen-content">
+          <!-- <h1>my OS</h1> -->
+          <OsLikeDemo @toggle-os="toggleOS"/>
+        </div>
+      </div>
+
+      <div class="section-dasboard">
+        <button @click="toggleOS">
+          {{ isOsLikeVisible ? 'close os' : 'open os' }}
+        </button>
+      </div>
+    </div>
+
 
 
     <!-- <Timeline /> -->

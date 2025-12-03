@@ -7,7 +7,7 @@ import WireframeOfSphere from "./three-shapes/WireframeOfSphere.vue"
 // import LowPolyDiamond from "./three-shapes/LowPolyDiamond.vue"
 // import MoonOrbitLine from "./three-shapes/MoonOrbitLine.vue"
 
-import HexagonSphereDemo from "./three-shapes/HexagonSphereDemo.vue"
+// import HexagonSphereDemo from "./three-shapes/HexagonSphereDemo.vue"
 
 </script>
 
@@ -23,7 +23,7 @@ import HexagonSphereDemo from "./three-shapes/HexagonSphereDemo.vue"
     <TriangulatedSphere />
 
     <WireframeOfSphere />
-    <HexagonSphereDemo />
+    <!-- <HexagonSphereDemo /> -->
 
   </div>
 </template>

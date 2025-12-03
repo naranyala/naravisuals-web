@@ -10,7 +10,8 @@
 // import VlangProgramming01 from "./explore-code/VlangProgramming01.vue"
 
 import CProgrammingWrapper from "./explore-code/CProgrammingWrapper.vue"
-import VlangWrapper from "./explore-code/VlangWrapper.vue"
+// import VlangWrapper from "./explore-code/VlangWrapper.vue"
+import RustProgrammingWrapper from "./explore-code/RustProgrammingWrapper.vue"
 
 </script>
 
@@ -25,8 +26,9 @@ import VlangWrapper from "./explore-code/VlangWrapper.vue"
   <!-- <ExploreRustCode /> -->
   <!-- <ExploreCProgramming /> -->
   <!-- <VlangProgramming01 /> -->
+  <!-- <VlangWrapper /> -->
 
   <CProgrammingWrapper />
-  <VlangWrapper />
+  <RustProgrammingWrapper/>
 
 </template>

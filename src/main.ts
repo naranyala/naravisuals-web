@@ -17,10 +17,10 @@ import './assets/01-reset-opinionated.css'
 // import './assets/04-print-friendly-preset.css'
 
 import { createApp } from 'vue'
-import App from './App.vue'
+import DefaultLayout from './DefaultLayout.vue'
 import router from './router.ts'
 
-const app = createApp(App)
+const app = createApp(DefaultLayout)
 
 app.use(router)
 

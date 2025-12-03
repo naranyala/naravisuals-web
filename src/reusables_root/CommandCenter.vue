@@ -1,5 +1,5 @@
 <script setup>
-import { ref, nextTick, watch } from 'vue'
+import { ref, nextTick, watch, provide } from 'vue'
 
 // import ScrollToBottom from "./ScrollToBottom.vue"
 import SlidingUpDrawer from "./SlidindUpDrawer.vue"
@@ -18,10 +18,14 @@ const dropdownOptions = ref([
   { label: 'past-of-me', value: 'past-of-me' },
 ]);
 
+const activeMode = ref()
 
 const handleSelect = (payload) => {
-  console.log('Selected:', payload);
+  activeMode.value = JSON.parse(JSON.stringify(payload));
+  // console.log(activeMode?.value?.value)
 };
+
+provide('active-mode', activeMode.value)
 
 const open = ref(false)
 const history = ref([])

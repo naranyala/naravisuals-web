@@ -8,6 +8,7 @@
         "@fontsource-variable/google-sans-code": "^5.2.3",
         "@fontsource-variable/intel-one-mono": "^5.2.2",
         "@fontsource-variable/kode-mono": "^5.2.8",
+        "@fontsource-variable/noto-serif": "^5.2.9",
         "@fontsource-variable/pixelify-sans": "^5.2.7",
         "@fontsource-variable/playpen-sans-arabic": "^5.2.4",
         "@fontsource/dm-mono": "^5.2.7",
@@ -162,6 +163,8 @@
     "@fontsource-variable/intel-one-mono": ["@fontsource-variable/intel-one-mono@5.2.2", "", {}, "sha512-dXmY1M3SJhQ3mtCdI4L3zMik8YabWMO912BjI2LG3uQQVBZJubH9+sEt/YHHPz5e3II0h+LhORd2JIGNTynldw=="],
 
     "@fontsource-variable/kode-mono": ["@fontsource-variable/kode-mono@5.2.8", "", {}, "sha512-X1O4RAIPyP4Vm8rVoKHirg3amVdE2XvIAQUvDRU17aCzSUz648/9w2KJafH1vK6g0uy7U8PrOCc1I11riXhHwQ=="],
+
+    "@fontsource-variable/noto-serif": ["@fontsource-variable/noto-serif@5.2.9", "", {}, "sha512-9McZzWeOjD/Gsko+w6A2lpGlHXZw5J2JmxaSMgopiIHoMYI1m6DAyFrzG9QQ0WjdWxj5jZfKM0EGSBVZHC6+nw=="],
 
     "@fontsource-variable/pixelify-sans": ["@fontsource-variable/pixelify-sans@5.2.7", "", {}, "sha512-IbQ7po3a7bQuguwyGQ7x7kMUCYvHjzxTdc7lYAcqzgR87MQb+vf8fuu4hjGyFLlWaDhS6QEe0jrS9dmCJ9ZlYw=="],
 

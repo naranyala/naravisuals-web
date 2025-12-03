@@ -171,59 +171,6 @@ export const topics = [
       }
     `)
     },
-    {
-        id: 'union',
-        title: 'Unions (Memory Sharing)',
-        description: 'Multiple variables sharing the same memory location.',
-        example: dedent(`
-      #include <stdio.h>
-      #include <string.h>
-
-      typedef union {
-          float f;
-          int i;
-          char bytes[4];
-      } Value;
-
-      int main() {
-          Value v;
-          v.f = 3.14159f;
-
-          printf("As float: %.6f\\n", v.f);
-          printf("As int:   %d\\n", v.i);
-          printf("As bytes: ");
-          for (int i = 0; i < 4; i++) {
-              printf("%02x ", (unsigned char)v.bytes[i]);
-          }
-          printf("\\n");
-
-          return 0;
-      }
-    `)
-    },
-    {
-        id: 'command-line-args',
-        title: 'Command-Line Arguments',
-        description: 'Using argc and argv to accept input from the terminal.',
-        example: dedent(`
-      #include <stdio.h>
-
-      int main(int argc, char* argv[]) {
-          printf("Program name: %s\\n", argv[0]);
-          printf("You passed %d arguments:\\n", argc - 1);
-
-          for (int i = 1; i < argc; i++) {
-              printf("  [%d] %s\\n", i, argv[i]);
-          }
-
-          if (argc == 1) {
-              printf("Tip: Try running with your name!\\n");
-          }
-
-          return 0;
-      }
-    `)
-    }
 ]
 
 export default topics

@@ -1,6 +1,12 @@
 <script setup lang="ts">
 
+// SERIF GROUP
+import '@fontsource-variable/noto-serif';
+
+// SANS GROUP
 // import '@fontsource-variable/playpen-sans-arabic';
+
+// MONO GROUP
 // import '@fontsource-variable/kode-mono';
 // import '@fontsource-variable/google-sans-code';
 import '@fontsource/monaspace-krypton';
@@ -84,6 +90,10 @@ onBeforeUnmount(() => {
   /* font-family: 'Monaspace Krypton', monospace; */
   /* font-family: 'Intel One Mono Variable', monospace; */
   font-family: 'DM Mono', monospace;
+}
+
+article {
+  font-family: 'Noto Serif Variable', serif;
 }
 
 body {

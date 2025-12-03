@@ -1,6 +1,8 @@
 <script setup>
 
-import { ref, onMounted, watch, watchEffect, computed } from "vue"
+import {
+  ref, onMounted, watch, watchEffect, computed, inject
+} from "vue"
 import URLManager from "../utilities/URLManager.js"
 // import { useTitle } from "./composables/useTitle.ts"
 import useLocalStorage from "./composables/useLocalStorage.js"
@@ -43,22 +45,71 @@ import MonthlyChallenges from "./MonthlyChallenges.vue"
 import DashboardLayoutWrapper from "./DashboardLayoutWrapper.vue"
 import ChartContainer from "./ChartContainer.vue"
 import CanvasEngineAudio from "./CanvasEngineAudio.vue"
+import PdfViewer from "./BrowserPdfViewer.vue"
+import AcademicPaper from "./AcademicPaper.vue"
 
-const props = defineProps(["isPrintAll"])
+const props = defineProps(["isPrintAll", "activeMode"])
 const isPrintAll = ref(props?.isPrintAll || true)
+// const activeMode = ref(props?.activeMode || "future-of-me")
+// const activeMode = ref(props?.activeMode || "present-of-me")
+
+const temp = inject('active-mode');
+const activeMode = ref(temp || "future-of-me")
+
+watchEffect(() => {
+  console.log("active-mode", activeMode.value)
+})
 
 const activeTab = ref(0)
-const tabs = ref([
 
-  { id: 0, label: "intro", component: WelcomeCode },
-  { id: 1, label: "challenges", component: MonthlyChallenges },
-  { id: 2, label: "shapes", component: CanvasEngineDemo },
-  { id: 3, label: "charts", component: ChartContainer },
-  { id: 4, label: "animation", component: DashboardLayoutWrapper },
-  { id: 5, label: "math", component: CanvasEngineMath },
-  { id: 6, label: "physics", component: CanvasEnginePhysics },
-  { id: 7, label: "audio", component: CreativeLyrics },
-  { id: 8, label: "3d-related", component: ShapesThreeDimension },
+const futureOfMeTabs = [
+]
+
+const presentOfMeTabs = [
+]
+
+const pastOfMeTabs = [
+]
+
+const finalTabViewed = ref([])
+// if (activeMode.value == "future-of-me") finalTabViewed.value = futureOfMeTabs;
+// if (activeMode.value == "present-of-me") finalTabViewed.value = presentOfMeTabs;
+// if (activeMode.value == "past-of-me") finalTabViewed.value = pastOfMeTabs;
+
+// watch(finalTabViewed, (val) => {
+//   console.log(val)
+// })
+
+import WrapperOfModernJS from "./explore-code/WrapperOfModernJS.vue"
+import WrapperOfModernCSS from "./explore-code/WrapperOfModernCSS.vue"
+
+const tabs = ref([
+  // ...finalTabViewed.value
+
+
+  { id: 0, label: "c-related", component: WelcomeCode },
+  { id: 1, label: "rust-related", component: MonthlyChallenges },
+  { id: 1, label: "modern-css", component: WrapperOfModernCSS },
+  { id: 1, label: "modern-js", component: WrapperOfModernJS },
+  { id: 1, label: "vue-related", component: "" },
+  { id: 1, label: "vue-setter-getter", component: "" },
+  { id: 1, label: "canvas-api", component: "" },
+  // { id: 1, label: "-related", component: MonthlyChallenges },
+
+  // { id: 1, label: "reader", component: PdfViewer },
+  // { id: 1, label: "reader", component: AcademicPaper },
+  // { id: 1, label: "article", component: ArticleView },
+  // { id: 4, label: "headers", component: CodeDumpRelearnView },
+  // { id: 5, label: "random", component: ProgrammingConceptView },
+  // { id: 0, label: "profile", component: ProfileView },
+
+  // { id: 2, label: "shapes", component: CanvasEngineDemo },
+  // { id: 3, label: "charts", component: ChartContainer },
+  // { id: 4, label: "animation", component: DashboardLayoutWrapper },
+  // { id: 5, label: "math", component: CanvasEngineMath },
+  // { id: 6, label: "physics", component: CanvasEnginePhysics },
+  // { id: 7, label: "audio", component: CreativeLyrics },
+  // { id: 8, label: "3d-related", component: ShapesThreeDimension },
 
   // { id: 2, label: "WEBGL", component: WebglExplorationView },
   // { id: 4, label: "Creative3D", component: Creative3DView },
@@ -72,6 +123,11 @@ const tabs = ref([
   // { id: 1, label: "Roadmap Gen", component: RoadmapContainer },
   // { id: 2, label: "Simulation", component: SimulationCenterView },
 
+
+  // { id: 1, label: "FAQ", component: ClarityFAQ },
+  // { id: 5, label: "THEORIES", component: GamePanelView },
+  // { id: 6, label: "CREATIVE-2D", component: CreativeView },
+  // { id: 7, label: "CREATIVE-3D", component: Creative3DView },
 
   // { id: 1, label: "Creative2D", component: CreativeView },
   // { id: 2, label: "MINDMAP-MAKER", component: MindmapMaker },
@@ -161,6 +217,7 @@ onMounted(() => {
     <div v-if="!isPrintAll" class="tab-content">
       <component :is="tabs[activeTab].component"></component>
     </div>
+
     <div v-else>
       <!-- PRINT MODE -->
       <ProfileView />

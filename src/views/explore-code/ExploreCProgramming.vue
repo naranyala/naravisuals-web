@@ -52,7 +52,9 @@ const highlightedCode = computed(() => {
 }
 
 nav {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 5px;
 }
 
 button {
