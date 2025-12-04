@@ -55,14 +55,22 @@ const activeMenu = ref(0)
 
 const navSections = [
   {
-    title: 'Getting Started', items: [
+    title: 'future of me', items: [
       { label: 'Install', component: WrapperOfModernCSS },
       { label: 'First Bundle', component: WrapperOfModernJS },
       { label: 'Build Scripts', component: () => "sample" }
     ]
   },
   {
-    title: 'API', items: [
+    title: 'present of me', items: [
+      { label: 'Overview', component: () => "overview" },
+      { label: 'Options', component: () => "option" },
+      { label: 'Input', component: () => "testing" },
+      { label: 'Output', component: () => "output" }
+    ]
+  },
+  {
+    title: 'past of me', items: [
       { label: 'Overview', component: () => "overview" },
       { label: 'Options', component: () => "option" },
       { label: 'Input', component: () => "testing" },

@@ -4,14 +4,14 @@
 import '@fontsource-variable/noto-serif';
 
 // SANS GROUP
-// import '@fontsource-variable/playpen-sans-arabic';
+import '@fontsource-variable/playpen-sans-arabic';
 
 // MONO GROUP
-// import '@fontsource-variable/kode-mono';
-// import '@fontsource-variable/google-sans-code';
+import '@fontsource-variable/kode-mono';
+import '@fontsource-variable/google-sans-code';
 import '@fontsource/monaspace-krypton';
-// import '@fontsource-variable/intel-one-mono';
-// import '@fontsource/dm-mono';
+import '@fontsource-variable/intel-one-mono';
+import '@fontsource/dm-mono';
 
 import { ref } from "vue"
 
