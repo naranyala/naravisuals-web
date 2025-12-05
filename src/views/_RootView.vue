@@ -54,30 +54,40 @@ import AcademicPaper from "./AcademicPaper.vue"
 import DrivingCarExperience from "./three-js/DrivingCarExperience.vue"
 import AnotherArticle from "./AnotherArticle.vue"
 
+import GooberMotionWrapper from "./GooberMotionWrapper.vue"
+
 const activeMenu = ref(0)
 
+// start with index 0
 const navSections = [
   {
     title: 'future of me', items: [
-      { id: 0, label: 'modern-css', component: WrapperOfModernCSS },
-      { id: 1, label: 'modern-js', component: WrapperOfModernJS },
-      { id: 2, label: 'articles', component: AnotherArticle }
+      { id: 2, label: 'shapes', component: CanvasEngineDemo },
+      { id: 3, label: 'charts', component: ChartContainer },
+      { id: 4, label: 'animation', component: DashboardLayoutWrapper },
+      { id: 5, label: 'math', component: CanvasEngineMath },
+      { id: 6, label: 'physics', component: CanvasEnginePhysics },
+      { id: 7, label: 'audio', component: CreativeLyrics },
+      { id: 8, label: '3d-related', component: ShapesThreeDimension }
     ]
   },
+
   {
     title: 'present of me', items: [
-      { id: 3, label: 'dashboard', component: DashboardLayoutWrapper },
-      { id: 4, label: 'academic-paper', component: AcademicPaper },
-      { id: 5, label: 'car-driving', component: DrivingCarExperience },
-      { id: 6, label: 'Output', component: () => "output" }
+      { id: 9, label: 'dashboard', component: DashboardLayoutWrapper },
+      { id: 10, label: 'academic-paper', component: AcademicPaper },
+      { id: 11, label: 'car-driving', component: DrivingCarExperience },
+      { id: 12, label: 'goober-motion', component: GooberMotionWrapper },
+      { id: 13, label: 'articles', component: ArticleView }
     ]
   },
+
   {
     title: 'past of me', items: [
-      { id: 7, label: 'Overview', component: () => "overview" },
-      { id: 8, label: 'Options', component: () => "option" },
-      { id: 9, label: 'Input', component: () => "testing" },
-      { id: 10, label: 'Output', component: () => "output" }
+      { id: 14, label: 'modern-css', component: WrapperOfModernCSS },
+      { id: 15, label: 'modern-js', component: WrapperOfModernJS },
+      { id: 16, label: 'c-related', component: WelcomeCode },
+      { id: 17, label: 'rust-related', component: MonthlyChallenges }
     ]
   }
 ]
@@ -708,7 +718,7 @@ li button span.highlight {
 
 .tab-content {
   padding: 0;
-  background-color: #1e1e1e;
+  /* background-color: #1e1e1e; */
   color: #ffffff;
   width: 100%;
 }

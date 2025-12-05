@@ -1,5 +1,5 @@
 <script setup>
-import { useIdle } from './useIdle'
+import { useIdle } from './useIdle3'
 const idle = useIdle(2000)
 </script>
 

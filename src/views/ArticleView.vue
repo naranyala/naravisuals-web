@@ -64,12 +64,7 @@ const closeReadingMode = () => {
     <div v-else class="article-list">
       <h3>Select an Article to Read ({{ articles.length }} total)</h3>
       <ul>
-        <li
-          v-for="article in articles"
-          :key="article.id"
-          @click="openReadingMode(article.id)"
-          class="article-item"
-        >
+        <li v-for="article in articles" :key="article.id" @click="openReadingMode(article.id)" class="article-item">
           <h4>{{ article.title }}</h4>
           <p>{{ article.summary }}</p>
           <span class="read-more">Click to Read &gt;</span>
@@ -87,31 +82,33 @@ const closeReadingMode = () => {
 */
 /* Default (Light) Theme Variables */
 :root {
-    --color-bg-primary: #ffffff;
-    --color-bg-secondary: #f0f0f0;
-    --color-text-primary: #1a1a1a;
-    --color-text-secondary: #666666;
-    --color-accent: #42b883; /* Vue Green */
-    --color-border: #35495e;
-    --color-list-item-bg: #fff;
-    --color-list-item-hover-bg: #f5f5f5;
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f0f0f0;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #666666;
+  --color-accent: #42b883;
+  /* Vue Green */
+  --color-border: #35495e;
+  --color-list-item-bg: #fff;
+  --color-list-item-hover-bg: #f5f5f5;
 }
 
 /* Dark Theme Variables (Override for .dark-theme) */
 .dark-theme {
-    /* Main Backgrounds and Text */
-    --color-bg-primary: #121212;
-    --color-bg-secondary: #1e1e1e;
-    --color-text-primary: #e0e0e0;
-    --color-text-secondary: #aaaaaa;
-    
-    /* Accent and Borders */
-    --color-accent: #69f0ae; /* A brighter, friendly green for dark mode */
-    --color-border: #333333;
-    
-    /* List/Card Specifics */
-    --color-list-item-bg: #222222;
-    --color-list-item-hover-bg: #2a2a2a;
+  /* Main Backgrounds and Text */
+  --color-bg-primary: #121212;
+  --color-bg-secondary: #1e1e1e;
+  --color-text-primary: #e0e0e0;
+  --color-text-secondary: #aaaaaa;
+
+  /* Accent and Borders */
+  --color-accent: #69f0ae;
+  /* A brighter, friendly green for dark mode */
+  --color-border: #333333;
+
+  /* List/Card Specifics */
+  --color-list-item-bg: #222222;
+  --color-list-item-hover-bg: #2a2a2a;
 }
 
 
@@ -125,9 +122,9 @@ const closeReadingMode = () => {
   margin: 0 auto;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
-  
+
   /* Apply dark theme background/text colors to the root */
-  background-color: var(--color-bg-primary);
+  /* background-color: var(--color-bg-primary); */
   color: var(--color-text-primary);
   min-height: 100vh;
   transition: background-color 0.3s;
@@ -141,10 +138,10 @@ const closeReadingMode = () => {
 }
 
 .divider {
-    border: 0;
-    height: 1px;
-    background: var(--color-border);
-    margin: 20px 0;
+  border: 0;
+  height: 1px;
+  background: var(--color-border);
+  margin: 20px 0;
 }
 
 /* --- List Styling --- */
@@ -223,7 +220,8 @@ const closeReadingMode = () => {
   margin-bottom: 30px;
   padding: 15px;
   border-left: 5px solid var(--color-accent);
-  background-color: var(--color-list-item-hover-bg); /* slightly darker than reading mode bg */
+  background-color: var(--color-list-item-hover-bg);
+  /* slightly darker than reading mode bg */
   border-radius: 4px;
 }
 
@@ -236,8 +234,8 @@ const closeReadingMode = () => {
 }
 
 .chapter-body {
-    line-height: 1.6;
-    color: var(--color-text-secondary);
-    margin: 0;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  margin: 0;
 }
 </style>

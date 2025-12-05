@@ -6,7 +6,8 @@
 // import ThreeDimentionalDemo from "./canvas-engine/ThreeDimentionalDemo.vue"
 // import MathDemo from "./canvas-engine/MathDemo.vue"
 
-import ShapesDemo from "./canvas-engine/ShapesDemo.vue"
+import ShapesDemo from "./canvas-engine/ShapesDemo.jsx"
+
 import ParticleDemo from "./canvas-engine/ParticleDemo.vue"
 import TweenDemo from "./canvas-engine/TweenDemo.vue"
 import TextDemo from "./canvas-engine/TextDemo.vue"
