@@ -51,30 +51,33 @@ import CanvasEngineAudio from "./CanvasEngineAudio.vue"
 import PdfViewer from "./BrowserPdfViewer.vue"
 import AcademicPaper from "./AcademicPaper.vue"
 
+import DrivingCarExperience from "./three-js/DrivingCarExperience.vue"
+import AnotherArticle from "./AnotherArticle.vue"
+
 const activeMenu = ref(0)
 
 const navSections = [
   {
     title: 'future of me', items: [
-      { label: 'Install', component: WrapperOfModernCSS },
-      { label: 'First Bundle', component: WrapperOfModernJS },
-      { label: 'Build Scripts', component: () => "sample" }
+      { id: 0, label: 'modern-css', component: WrapperOfModernCSS },
+      { id: 1, label: 'modern-js', component: WrapperOfModernJS },
+      { id: 2, label: 'articles', component: AnotherArticle }
     ]
   },
   {
     title: 'present of me', items: [
-      { label: 'Overview', component: () => "overview" },
-      { label: 'Options', component: () => "option" },
-      { label: 'Input', component: () => "testing" },
-      { label: 'Output', component: () => "output" }
+      { id: 3, label: 'dashboard', component: DashboardLayoutWrapper },
+      { id: 4, label: 'academic-paper', component: AcademicPaper },
+      { id: 5, label: 'car-driving', component: DrivingCarExperience },
+      { id: 6, label: 'Output', component: () => "output" }
     ]
   },
   {
     title: 'past of me', items: [
-      { label: 'Overview', component: () => "overview" },
-      { label: 'Options', component: () => "option" },
-      { label: 'Input', component: () => "testing" },
-      { label: 'Output', component: () => "output" }
+      { id: 7, label: 'Overview', component: () => "overview" },
+      { id: 8, label: 'Options', component: () => "option" },
+      { id: 9, label: 'Input', component: () => "testing" },
+      { id: 10, label: 'Output', component: () => "output" }
     ]
   }
 ]
@@ -94,7 +97,7 @@ watchEffect(() => {
 
   console.log(arr)
 
-  newNavSections.value = arr
+  newNavSections.value = arr.sort((a, b) => a.id - b.id);
 })
 
 const benchmarks = [
@@ -213,6 +216,7 @@ const isPrintAll = ref(props?.isPrintAll || true)
 
 const tabs = ref([
   // { id: 0, label: "c-related", component: WelcomeCode },
+  { id: 0, label: "articles", component: () => AnotherArticle },
   { id: 0, label: "c-related", component: () => "MAINTENANCE" },
   { id: 1, label: "rust-related", component: () => "MAINTENANCE" },
   // { id: 1, label: "rust-related", component: MonthlyChallenges },
@@ -260,7 +264,9 @@ const changeRoute = (idx) => {
             <h3>{{ section.title }}</h3>
             <ul>
               <li v-for="(item, j) in section.items" :key="j">
-                <button @click="changeRoute(j)" v-html="highlightMatch(item.label)"></button>
+                <button @click="changeRoute(item.id)">
+                  {{ item.label }}
+                </button>
               </li>
             </ul>
           </div>
@@ -499,12 +505,15 @@ mark {
 .main {
   flex: 1;
   overflow-y: auto;
-  padding: 2rem;
+  /* padding: 2rem; */
 }
 
 .container {
-  max-width: 896px;
-  margin: 0 auto;
+  width: 100%;
+  /* max-width: 896px; */
+  /* margin: 0 auto; */
+  margin: 0;
+  padding: 0;
 }
 
 .page-header {
@@ -698,7 +707,7 @@ li button span.highlight {
 
 
 .tab-content {
-  padding: 20px;
+  padding: 0;
   background-color: #1e1e1e;
   color: #ffffff;
   width: 100%;

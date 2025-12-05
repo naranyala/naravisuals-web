@@ -17,6 +17,7 @@ import TransitionSample05 from "./canvas-engine/TransitionSample05.vue"
 import GeometrySample01 from "./canvas-engine/GeometrySample01.vue"
 import GeometrySample02 from "./canvas-engine/GeometrySample02.vue"
 
+import GeometricAlgebraDemo from "./canvas-engine/GeometricAlgebraDemo.vue"
 
 const isDashboardVisible = ref(false);
 
@@ -58,7 +59,7 @@ const toggleOS = () => {
       <div v-if="isOsLikeVisible" class="fullscreen-overlay" @click.self="toggleOS">
         <div class="fullscreen-content">
           <!-- <h1>my OS</h1> -->
-          <OsLikeDemo @toggle-os="toggleOS"/>
+          <OsLikeDemo @toggle-os="toggleOS" />
         </div>
       </div>
 
@@ -84,6 +85,9 @@ const toggleOS = () => {
     <GeometrySample01 />
     <GeometrySample02 />
 
+    <hr />
+
+    <GeometricAlgebraDemo />
   </div>
 </template>
 

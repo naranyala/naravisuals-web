@@ -12,6 +12,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { createCanvasApp } from '../../lib/engine/canvas_util.js'
+import { tweenPlugin } from '../../lib/engine/tweenPlugin.js'
 import { transitionPlugin } from '../../lib/engine/transitionPlugin.js'
 
 const canvasEl = ref(null)
@@ -23,7 +24,11 @@ onMounted(() => {
   if (!canvasEl.value) return
 
   app = createCanvasApp(canvasEl.value)
+
+  // orders matter
+  app.use(tweenPlugin)
   app.use(transitionPlugin)
+
   setupScene()
 })
 
