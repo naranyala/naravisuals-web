@@ -12,7 +12,6 @@ export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
-    styleX(),
     // vueDevTools(),
     Markdown(),
   ],
