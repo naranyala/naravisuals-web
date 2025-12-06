@@ -32,6 +32,7 @@
     "gltf-loader": "^1.0.0",
     "goober": "^2.1.18",
     "leaflet": "^1.9.4",
+    "lucide-vue-next": "^0.556.0",
     "marked": "^17.0.1",
     "motion": "^12.23.25",
     "motion-v": "^1.7.4",

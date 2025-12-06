@@ -6,6 +6,7 @@
 // import ThreeDimentionalDemo from "./canvas-engine/ThreeDimentionalDemo.vue"
 // import MathDemo from "./canvas-engine/MathDemo.vue"
 
+import PageHeader from "./goober-motion/PageHeader.jsx"
 import ShapesDemo from "./canvas-engine/ShapesDemo.jsx"
 
 import ParticleDemo from "./canvas-engine/ParticleDemo.vue"
@@ -27,6 +28,7 @@ import CubeWithShadow from "./canvas-engine/CubeWithShadow.vue"
 
 <template>
   <div class="engine-container">
+    <PageHeader/>
 
     <ShapesDemo />
     <ParticleDemo />

@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue';
 
+import PageHeader from "./goober-motion/PageHeader.jsx"
+
 import Timeline from "./engine/Timeline.vue"
 import OsLikeDemo from "./OsLikeDemo.vue"
 
@@ -38,6 +40,9 @@ const toggleOS = () => {
 </script>
 
 <template>
+  <PageHeader title="Animation Studio" subtitle="your batteries-included toolkit
+  for 2d animation"/>
+
   <div class="animation-section">
 
     <div>

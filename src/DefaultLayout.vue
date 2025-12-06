@@ -71,9 +71,11 @@ onBeforeUnmount(() => {
 
 <template>
   <RunningTextBar direction="right" text="COMING SOON! WORK IN PROGRESS ..." />
-  <CommandCenter />
+  <!-- <CommandCenter /> -->
 
+  <div class="root">
   <RouterView />
+  </div>
 
   <div class="no-print">
     <!-- <WelcomeMenu/> -->
@@ -92,12 +94,17 @@ onBeforeUnmount(() => {
   font-family: 'DM Mono', monospace;
 }
 
+.root {
+  /* padding-bottom: 200px; */
+  background: none;
+}
+
 article {
   font-family: 'Noto Serif Variable', serif;
 }
 
 body {
-  background: rgba(0 0 0 / 0.9);
+  /* background: rgba(0 0 0 / 0.9); */
   color: white;
   height: 100vh;
   padding: 0;

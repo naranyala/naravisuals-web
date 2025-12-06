@@ -1,6 +1,6 @@
 <script setup>
 import {
-  ref, computed, onMounted, onUnmounted, watchEffect
+  ref, watch, computed, onMounted, onUnmounted, watchEffect
 } from 'vue'
 
 const isSidebarOpen = ref(false)
@@ -55,41 +55,43 @@ import DrivingCarExperience from "./three-js/DrivingCarExperience.vue"
 import AnotherArticle from "./AnotherArticle.vue"
 
 import GooberMotionWrapper from "./GooberMotionWrapper.vue"
+// import LearningGit from "./goober-motion/LearningGit.jsx"
+import LearningGit from "./LearningGit.vue"
 
 const activeMenu = ref(0)
 
 // start with index 0
 const navSections = [
   {
-    title: 'future of me', items: [
-      { id: 2, label: 'shapes', component: CanvasEngineDemo },
-      { id: 3, label: 'charts', component: ChartContainer },
-      { id: 4, label: 'animation', component: DashboardLayoutWrapper },
-      { id: 5, label: 'math', component: CanvasEngineMath },
-      { id: 6, label: 'physics', component: CanvasEnginePhysics },
-      { id: 7, label: 'audio', component: CreativeLyrics },
-      { id: 8, label: '3d-related', component: ShapesThreeDimension }
+    title: 'exploration', items: [
+      { id: 100, label: 'shapes', component: CanvasEngineDemo },
+      { id: 101, label: 'charts', component: ChartContainer },
+      { id: 102, label: 'animation', component: DashboardLayoutWrapper },
+      { id: 103, label: 'math', component: CanvasEngineMath },
+      { id: 104, label: 'physics', component: CanvasEnginePhysics },
+      { id: 105, label: 'audio', component: CreativeLyrics },
+      { id: 106, label: '3d-related', component: ShapesThreeDimension }
+    ]
+  },
+  {
+    title: 'references', items: [
+      { id: 200, label: 'modern-css', component: WrapperOfModernCSS },
+      { id: 201, label: 'modern-js', component: WrapperOfModernJS },
+      { id: 202, label: 'c-related', component: WelcomeCode },
+      { id: 203, label: 'rust-related', component: MonthlyChallenges },
+      { id: 204, label: 'learning-git', component: LearningGit },
+    ]
+  },
+  {
+    title: 'articles', items: [
+      { id: 300, label: 'dashboard', component: DashboardLayoutWrapper },
+      { id: 301, label: 'academic-paper', component: AcademicPaper },
+      { id: 302, label: 'car-driving', component: DrivingCarExperience },
+      { id: 303, label: 'goober-motion', component: GooberMotionWrapper },
+      { id: 304, label: 'articles', component: ArticleView }
     ]
   },
 
-  {
-    title: 'present of me', items: [
-      { id: 9, label: 'dashboard', component: DashboardLayoutWrapper },
-      { id: 10, label: 'academic-paper', component: AcademicPaper },
-      { id: 11, label: 'car-driving', component: DrivingCarExperience },
-      { id: 12, label: 'goober-motion', component: GooberMotionWrapper },
-      { id: 13, label: 'articles', component: ArticleView }
-    ]
-  },
-
-  {
-    title: 'past of me', items: [
-      { id: 14, label: 'modern-css', component: WrapperOfModernCSS },
-      { id: 15, label: 'modern-js', component: WrapperOfModernJS },
-      { id: 16, label: 'c-related', component: WelcomeCode },
-      { id: 17, label: 'rust-related', component: MonthlyChallenges }
-    ]
-  }
 ]
 
 const newNavSections = ref()
@@ -110,15 +112,6 @@ watchEffect(() => {
   newNavSections.value = arr.sort((a, b) => a.id - b.id);
 })
 
-const benchmarks = [
-  { name: 'esbuild', time: 0.39 },
-  { name: 'parcel 2', time: 14.91 },
-  { name: 'rollup 4', time: 34.1 },
-  { name: 'webpack 5', time: 41.21 }
-]
-
-const maxTime = Math.max(...benchmarks.map(b => b.time))
-const getBarWidth = (time) => (time / maxTime) * 100
 
 // Fuzzy search function
 const fuzzyMatch = (text, query) => {
@@ -213,6 +206,10 @@ const updateIsMobile = () => {
 onMounted(() => {
   updateIsMobile()
   window.addEventListener('resize', updateIsMobile)
+
+
+  handleMenuChange("modern-css")
+
 })
 
 onUnmounted(() => {
@@ -223,24 +220,34 @@ onUnmounted(() => {
 const props = defineProps(["isPrintAll", "activeMode"])
 const isPrintAll = ref(props?.isPrintAll || true)
 
+const changeRoute = (idx) => activeMenu.value = idx;
+const selectedMenu = ref()
 
-const tabs = ref([
-  // { id: 0, label: "c-related", component: WelcomeCode },
-  { id: 0, label: "articles", component: () => AnotherArticle },
-  { id: 0, label: "c-related", component: () => "MAINTENANCE" },
-  { id: 1, label: "rust-related", component: () => "MAINTENANCE" },
-  // { id: 1, label: "rust-related", component: MonthlyChallenges },
-  // { id: 1, label: "modern-css", component: WrapperOfModernCSS },
-  // { id: 1, label: "modern-js", component: WrapperOfModernJS },
-  { id: 1, label: "vue-related", component: () => "WIP" },
-  { id: 1, label: "vue-setter-getter", component: () => "WIP" },
-  { id: 1, label: "canvas-api", component: () => "WIP" }
-]);
+const handleMenuChange = (key="modern-css") => {
+  newNavSections.value.forEach(item => {
+    let temp;
+     if(item.id === activeMenu.value) {
+      console.log("handleMenuChange: ", JSON.stringify(item.component?.__name))
+      selectedMenu.value = item.component
+     } else {
+        // console.log("1: ", item.id)
+        // console.log("2: ", activeMenu.value)
 
-
-const changeRoute = (idx) => {
-  activeMenu.value = idx;
+        //if(item.label === key){
+        //  selectedMenu.value = item.component
+        //}
+     }
+  })
 }
+
+watch(activeMenu, () => {
+  handleMenuChange()
+})
+
+watch(selectedMenu, () => {
+  console.log("selected-menu: ", selectedMenu.value)
+})
+
 
 </script>
 
@@ -249,13 +256,9 @@ const changeRoute = (idx) => {
   <div class="layout">
     <!-- Mobile Header -->
     <header v-if="isMobile" class="mobile-header">
-      <button @click="toggleSidebar">
-        MENU
-        <!-- <span></span> -->
-        <!-- <span></span> -->
-        <!-- <span></span> -->
-      </button>
-      <h1>esbuild</h1>
+      <button>HOME</button>
+      <button @click="toggleSidebar">MENU</button>
+      <button>TERMINAL</button>
     </header>
 
     <!-- Backdrop -->
@@ -273,6 +276,7 @@ const changeRoute = (idx) => {
           <div v-for="(section, i) in filteredSections" :key="i" class="nav-section">
             <h3>{{ section.title }}</h3>
             <ul>
+              <!-- {{section.items.map(item => item.id)}} -->
               <li v-for="(item, j) in section.items" :key="j">
                 <button @click="changeRoute(item.id)">
                   {{ item.label }}
@@ -297,7 +301,8 @@ const changeRoute = (idx) => {
 
         <!-- Content -->
         <div v-if="!isPrintAll" class="tab-content">
-          <component :is="newNavSections[activeMenu].component"></component>
+          <!-- <component :is="newNavSections[activeMenu].component"></component> -->
+          <component :is="selectedMenu"></component>
         </div>
 
         <div v-else>
@@ -339,7 +344,8 @@ const changeRoute = (idx) => {
 /* Mobile Header */
 .mobile-header {
   position: fixed;
-  top: 0;
+  /* top: 0; */
+  bottom: 28px;
   left: 0;
   right: 0;
   height: 56px;
@@ -347,6 +353,7 @@ const changeRoute = (idx) => {
   border-bottom: 1px solid #374151;
   z-index: 50;
   display: flex;
+  gap: 8px;
   align-items: center;
   padding: 0 1rem;
 }
@@ -398,7 +405,8 @@ const changeRoute = (idx) => {
 }
 
 .pt-mobile {
-  padding-top: 56px;
+  /* padding-top: 56px; */
+  height: 100vh;
 }
 
 .sidebar-header {
@@ -516,6 +524,7 @@ mark {
   flex: 1;
   overflow-y: auto;
   /* padding: 2rem; */
+  height: 100vh;
 }
 
 .container {
@@ -717,9 +726,10 @@ li button span.highlight {
 
 
 .tab-content {
-  padding: 0;
+  /* padding: 0; */
   /* background-color: #1e1e1e; */
   color: #ffffff;
   width: 100%;
+  padding-bottom: 200px;
 }
 </style>

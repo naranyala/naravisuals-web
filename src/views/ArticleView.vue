@@ -1,6 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue';
 
+
+import PageHeader from "./goober-motion/PageHeader.jsx"
+
 // --- Article Data (Unchanged from previous response) ---
 const articles = ref([
   {
@@ -45,6 +48,10 @@ const closeReadingMode = () => {
 </script>
 
 <template>
+  <PageHeader title="Brain Dump; Expect Nothing" subtitle="mostly my personal
+  devlog and journey"/>
+
+
   <div class="article-container dark-theme">
     <h1 class="main-title">VueJS Chaptered Article Viewer</h1>
 
