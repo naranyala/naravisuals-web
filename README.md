@@ -20,9 +20,29 @@
 
 - NONE
 
+## dispose TODOS
+
+- NONE
+
 ## INSPIRATION
 
 ![INSPIRATION](./INSPIRATION.png)
 
+![INSPIRATION-2](./INSPIRATION-2.png)
+
+![INSPIRATION-3](./INSPIRATION-3.png)
+
+![INSPIRATION-4](./INSPIRATION-4.png)
+
+
+
 - https://github.com/eva-engine/eva.js
 - https://github.com/jagenjo/litegraph.js
+- https://github.com/bbc/peaks.js
+- https://github.com/bitgapp/eqMac
+- https://surge-synthesizer.github.io/
+- https://codeberg.org/tenacityteam/tenacity
+
+---
+
+

@@ -31,6 +31,7 @@
     "dompurify": "^3.3.0",
     "gltf-loader": "^1.0.0",
     "goober": "^2.1.18",
+    "konva": "^10.0.12",
     "leaflet": "^1.9.4",
     "lucide-vue-next": "^0.556.0",
     "marked": "^17.0.1",
@@ -39,6 +40,7 @@
     "orbit-controls": "^1.2.4",
     "prismjs": "^1.30.0",
     "three": "^0.181.2",
+    "tone": "^15.1.22",
     "unplugin-vue-markdown": "^29.2.0",
     "uuid": "^13.0.0",
     "vue": "^3.5.25",
@@ -53,8 +55,8 @@
     "npm-run-all2": "^8.0.4",
     "prettier": "3.6.2",
     "typescript": "~5.9.3",
-    "vite": "^7.2.6",
+    "vite": "8.0.0-beta.0",
     "vite-plugin-vue-devtools": "^8.0.5",
-    "vue-tsc": "^3.1.5"
+    "vue-tsc": "^3.1.6"
   }
 }

@@ -1,6 +1,6 @@
 <script setup>
 import {
-  ref, watch, computed, onMounted, onUnmounted, watchEffect
+  ref, watch, computed, onMounted, onUnmounted, watchEffect, reactive
 } from 'vue'
 
 const isSidebarOpen = ref(false)
@@ -58,69 +58,74 @@ import GooberMotionWrapper from "./GooberMotionWrapper.vue"
 // import LearningGit from "./goober-motion/LearningGit.jsx"
 import LearningGit from "./LearningGit.vue"
 
-const activeMenu = ref(0)
+import StdOverviewLua from "./std-overview/StdOverviewLua.vue"
+import StdOverviewC11 from "./std-overview/StdOverviewC11.vue"
+import StdOverviewRust from "./std-overview/StdOverviewRust.vue"
+
+const activeMenuIdx = ref(0)
 
 // start with index 0
-const navSections = [
-  {
-    title: 'exploration', items: [
-      { id: 100, label: 'shapes', component: CanvasEngineDemo },
-      { id: 101, label: 'charts', component: ChartContainer },
-      { id: 102, label: 'animation', component: DashboardLayoutWrapper },
-      { id: 103, label: 'math', component: CanvasEngineMath },
-      { id: 104, label: 'physics', component: CanvasEnginePhysics },
-      { id: 105, label: 'audio', component: CreativeLyrics },
-      { id: 106, label: '3d-related', component: ShapesThreeDimension }
-    ]
-  },
+const navSections = reactive([
   {
     title: 'references', items: [
-      { id: 200, label: 'modern-css', component: WrapperOfModernCSS },
-      { id: 201, label: 'modern-js', component: WrapperOfModernJS },
-      { id: 202, label: 'c-related', component: WelcomeCode },
-      { id: 203, label: 'rust-related', component: MonthlyChallenges },
-      { id: 204, label: 'learning-git', component: LearningGit },
+      { id: 100, label: 'modern-css', component: WrapperOfModernCSS, isActive: false},
+      { id: 101, label: 'modern-js', component: WrapperOfModernJS, isActive: false},
+      { id: 102, label: 'c-related', component: WelcomeCode, isActive: false},
+      { id: 103, label: 'rust-related', component: MonthlyChallenges, isActive: false},
+      { id: 104, label: 'learning-git', component: LearningGit, isActive: false},
+      { id: 105, label: 'std-lua', component: StdOverviewLua, isActive: false},
+      { id: 106, label: 'std-c11', component: StdOverviewC11, isActive: false},
+      { id: 107, label: 'std-rust', component: StdOverviewRust, isActive: false},
+      { id: 108, label: 'vue-setter-getter', component: () => "WIP", isActive: false},
+      { id: 109, label: 'vue-components', component: () => "WIP", isActive: false},
+      { id: 110, label: 'vue-widgets', component: () => "WIP", isActive: false},
+      { id: 111, label: 'c-written-utility', component: () => "WIP", isActive: false},
+      { id: 112, label: 'rust-written-utility', component: () => "WIP", isActive: false},
     ]
   },
   {
-    title: 'articles', items: [
-      { id: 300, label: 'dashboard', component: DashboardLayoutWrapper },
-      { id: 301, label: 'academic-paper', component: AcademicPaper },
-      { id: 302, label: 'car-driving', component: DrivingCarExperience },
-      { id: 303, label: 'goober-motion', component: GooberMotionWrapper },
-      { id: 304, label: 'articles', component: ArticleView }
+    title: 'canvas-exploration', items: [
+      { id: 200, label: 'shapes', component: CanvasEngineDemo, isActive: false},
+      { id: 201, label: 'charts', component: ChartContainer, isActive: false},
+      { id: 202, label: 'animation', component: DashboardLayoutWrapper, isActive: false},
+      { id: 203, label: 'math', component: CanvasEngineMath, isActive: false},
+      { id: 204, label: 'physics', component: CanvasEnginePhysics, isActive: false},
+      { id: 205, label: 'audio', component: CreativeLyrics, isActive: false},
+      { id: 206, label: '3d-related', component: ShapesThreeDimension, isActive: false},
+      { id: 207, label: 'dashboard', component: DashboardLayoutWrapper, isActive: false},
+      { id: 208, label: 'academic-paper', component: AcademicPaper, isActive: false},
+      { id: 209, label: 'car-driving', component: DrivingCarExperience, isActive: false},
+      { id: 210, label: 'goober-motion', component: GooberMotionWrapper, isActive: false},
     ]
   },
-
-]
+  {
+    title: 'audio-exploration', items: [
+      { id: 300, label: 'articles', component: ArticleView, isActive: false},
+      { id: 301, label: 'examples', component: CanvasEngineAudio, isActive: false},
+    ]
+  },
+])
 
 const newNavSections = ref()
 
 watchEffect(() => {
-
-
   let arr = []
-
   navSections.forEach(section => {
     section.items.forEach((item, idx) => {
       arr.push({ id: idx, ...item })
     })
   })
-
-  console.log(arr)
-
   newNavSections.value = arr.sort((a, b) => a.id - b.id);
 })
 
+// import {trimText} from "../utilities/trimText.js"
 
 // Fuzzy search function
 const fuzzyMatch = (text, query) => {
   if (!query) return { match: true, score: 0 }
 
-  // console.log(text, " ", query)
-
-  const textLower = text?.trim().toLowerCase()
-  const queryLower = query?.trim().toLowerCase()
+  const textLower = String(text).trim().toLowerCase()
+  const queryLower = String(query).trim().toLowerCase()
 
   let textIndex = 0
   let queryIndex = 0
@@ -174,80 +179,98 @@ const filteredSections = computed(() => {
 // Highlight matched characters
 const highlightMatch = (text) => {
   if (!searchQuery.value.trim()) return text
-
   const result = fuzzyMatch(text, searchQuery.value)
+
   if (!result.match) return text
 
   let highlighted = ''
   for (let i = 0; i < text.length; i++) {
-    if (result.matches.includes(i)) {
-      // highlighted += `<mark>${text[i]}</mark>`
-      highlighted += `${text[i]}`
-    } else {
-      highlighted += text[i]
-    }
+    if (result.matches.includes(i)) highlighted += `${text[i]}`;
+    else highlighted += text[i];
   }
-
   return highlighted
 }
 
-const toggleSidebar = () => {
-  isSidebarOpen.value = !isSidebarOpen.value
-}
+const toggleSidebar = () => isSidebarOpen.value = !isSidebarOpen.value;
+const closeSidebar = () => isSidebarOpen.value = false;
+const updateIsMobile = () => isMobile.value = window.innerWidth < 768;
 
-const closeSidebar = () => {
-  isSidebarOpen.value = false
-}
-
-const updateIsMobile = () => {
-  isMobile.value = window.innerWidth < 768
-}
+const activeMenuLabel = ref("learning-git")
 
 onMounted(() => {
   updateIsMobile()
   window.addEventListener('resize', updateIsMobile)
-
-
-  handleMenuChange("modern-css")
-
+  console.log("welcome: ", setViewedComponent(activeMenuLabel.value))
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateIsMobile)
 })
 
+const selectedMenu = ref()
+
+const setViewedComponent = (key) => {
+  navSections.forEach(section => {
+    section.items.forEach(item => {
+      if(item.label === key) selectedMenu.value = item.component;
+    })
+  })
+}
 
 const props = defineProps(["isPrintAll", "activeMode"])
 const isPrintAll = ref(props?.isPrintAll || true)
 
-const changeRoute = (idx) => activeMenu.value = idx;
-const selectedMenu = ref()
+const changeRoute = (event, idx) => {
+  activeMenuIdx.value = idx;
 
-const handleMenuChange = (key="modern-css") => {
+  handleMenuChange()
+  handleMenuActive(event)
+}
+
+const handleMenuChange = (key) => {
   newNavSections.value.forEach(item => {
-    let temp;
-     if(item.id === activeMenu.value) {
-      console.log("handleMenuChange: ", JSON.stringify(item.component?.__name))
-      selectedMenu.value = item.component
-     } else {
-        // console.log("1: ", item.id)
-        // console.log("2: ", activeMenu.value)
-
-        //if(item.label === key){
-        //  selectedMenu.value = item.component
-        //}
-     }
+    if(item.id === activeMenuIdx.value) {
+      console.log("handleMenuChange: ", JSON.stringify(item))
+      setViewedComponent(item.label) 
+    } 
   })
 }
 
-watch(activeMenu, () => {
+const handleMenuActive = (event) => {
+  const textContent = event?.target?.textContent; 
+  // event?.target.style.textDecoration = "underline";
+
+  // navSections.value.forEach(section => {
+  filteredSections.value.forEach(section => {
+    section?.items.forEach(item => {
+      if(item.label === textContent) {
+        console.log(item.isActive)
+        item.isActive = true;
+        console.log(item.isActive)
+      } else {
+        item.isActive = false;
+      }
+    })
+  })
+
+}
+
+watch(activeMenuIdx, () => {
   handleMenuChange()
 })
 
 watch(selectedMenu, () => {
-  console.log("selected-menu: ", selectedMenu.value)
+  console.log("current-menu: ", selectedMenu.value)
 })
 
+
+// const isUrlActive = ref(false)
+
+const actionClearSearch = () => searchQuery.value = ""
+
+const isWelcomeActive = ref(false)
+onMounted(() => resetWelcomeView());
+const resetWelcomeView = () => isWelcomeActive.value = true;
 
 </script>
 
@@ -256,9 +279,10 @@ watch(selectedMenu, () => {
   <div class="layout">
     <!-- Mobile Header -->
     <header v-if="isMobile" class="mobile-header">
-      <button>HOME</button>
       <button @click="toggleSidebar">MENU</button>
-      <button>TERMINAL</button>
+      <button @click="console.log('WIP')">HOME</button>
+      <button @click="console.log('WIP')">TERMINAl</button>
+      <button @click="console.log('WIP')">SEARCH</button>
     </header>
 
     <!-- Backdrop -->
@@ -269,16 +293,28 @@ watch(selectedMenu, () => {
       <div :class="{ 'pt-mobile': isMobile }">
 
         <div class="search-container">
-          <input v-model="searchQuery" type="text" placeholder="Search menu..." class="search-input" />
+          <input v-model="searchQuery" type="text" placeholder="search" class="search-input" />
+          <button v-if="!searchQuery.value" class="btn-major" @click="actionClearSearch">
+            clear search
+          </button>
+
+                <!-- <button @click="resetWelcomeView" class="btn-major"> -->
+                <!--   home  -->
+                <!-- </button> -->
         </div>
 
         <nav class="nav">
+
+
           <div v-for="(section, i) in filteredSections" :key="i" class="nav-section">
             <h3>{{ section.title }}</h3>
             <ul>
+
+
               <!-- {{section.items.map(item => item.id)}} -->
               <li v-for="(item, j) in section.items" :key="j">
-                <button @click="changeRoute(item.id)">
+                <button @click="(ev) => changeRoute(ev, item.id)" 
+                  :class="{ 'menu-active' : item.isActive }">
                   {{ item.label }}
                 </button>
               </li>
@@ -301,7 +337,7 @@ watch(selectedMenu, () => {
 
         <!-- Content -->
         <div v-if="!isPrintAll" class="tab-content">
-          <!-- <component :is="newNavSections[activeMenu].component"></component> -->
+          <!-- <component :is="newNavSections[activeMenuIdx].component"></component> -->
           <component :is="selectedMenu"></component>
         </div>
 
@@ -344,8 +380,8 @@ watch(selectedMenu, () => {
 /* Mobile Header */
 .mobile-header {
   position: fixed;
-  /* top: 0; */
-  bottom: 28px;
+  top: 0;
+  /* bottom: 28px; */
   left: 0;
   right: 0;
   height: 56px;
@@ -354,8 +390,8 @@ watch(selectedMenu, () => {
   z-index: 50;
   display: flex;
   gap: 8px;
-  align-items: center;
-  padding: 0 1rem;
+  content-align: space-between;
+  padding: 5px;
 }
 
 .mobile-header h1 {
@@ -402,6 +438,7 @@ watch(selectedMenu, () => {
   overflow-y: auto;
   z-index: 40;
   transition: transform 0.3s ease;
+  padding-top: 100px;
 }
 
 .pt-mobile {
@@ -451,6 +488,7 @@ watch(selectedMenu, () => {
   font-size: 0.875rem;
   outline: none;
   transition: border-color 0.2s;
+  text-align: center;
 }
 
 .search-input::placeholder {
@@ -463,6 +501,8 @@ watch(selectedMenu, () => {
 
 .nav {
   padding: 0 1.5rem;
+  padding-bottom: 200px;
+  margin-bottom: 100px;
 }
 
 .nav-section {
@@ -732,4 +772,10 @@ li button span.highlight {
   width: 100%;
   padding-bottom: 200px;
 }
+
+.menu-active {
+  text-decoration: underline;
+}
+
+.btn-major { width: 100%; margin: 5px 0; }
 </style>

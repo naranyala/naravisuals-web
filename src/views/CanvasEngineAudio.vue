@@ -1,5 +1,5 @@
 <script setup>
-
+import DemoExtraction from "./audio-engine/DemoExtraction.vue"
 
 </script>
 
@@ -7,4 +7,6 @@
   <div>
     AUDIO THINGS
   </div>
+
+  <DemoExtraction/>
 </template>
