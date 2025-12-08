@@ -1,6 +1,6 @@
 <script setup>
 import DemoExtraction from "./audio-engine/DemoExtraction.vue"
-
+import AudioVizCatalog from "./audio-engine/AudioVizCatalog.vue"
 </script>
 
 <template>
@@ -9,4 +9,8 @@ import DemoExtraction from "./audio-engine/DemoExtraction.vue"
   </div>
 
   <DemoExtraction/>
+
+  <hr/>
+
+  <AudioVizCatalog/>
 </template>
