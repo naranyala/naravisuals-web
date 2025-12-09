@@ -40,8 +40,8 @@ import CanvasEngineGames from "./CanvasEngineGames.vue"
 import ShapesThreeDimension from "./ShapesThreeDimension.vue"
 
 
-import WrapperOfModernJS from "./explore-code/WrapperOfModernJS.vue"
-import WrapperOfModernCSS from "./explore-code/WrapperOfModernCSS.vue"
+import WrapperOfModernJS from "./WrapperOfModernJS.vue"
+import WrapperOfModernCSS from "./WrapperOfModernCSS.vue"
 // import DocsLayoutDemo from "./DocsLayoutDemo.vue"
 
 import MonthlyChallenges from "./MonthlyChallenges.vue"
@@ -67,7 +67,7 @@ const activeMenuIdx = ref(0)
 // start with index 0
 const navSections = reactive([
   {
-    title: 'references', items: [
+    title: 'actually  ☝️🤓', items: [
       { id: 100, label: 'modern-css', component: WrapperOfModernCSS, isActive: false},
       { id: 101, label: 'modern-js', component: WrapperOfModernJS, isActive: false},
       { id: 102, label: 'c-related', component: WelcomeCode, isActive: false},
@@ -83,6 +83,7 @@ const navSections = reactive([
       { id: 112, label: 'rust-written-utility', component: () => "WIP", isActive: false},
     ]
   },
+
   {
     title: 'canvas-exploration', items: [
       { id: 200, label: 'shapes', component: CanvasEngineDemo, isActive: false},
@@ -98,12 +99,22 @@ const navSections = reactive([
       { id: 210, label: 'goober-motion', component: GooberMotionWrapper, isActive: false},
     ]
   },
+
   {
-    title: 'audio-exploration', items: [
+    title: 'audio-programming', items: [
       { id: 300, label: 'articles', component: ArticleView, isActive: false},
       { id: 301, label: 'examples', component: CanvasEngineAudio, isActive: false},
     ]
   },
+
+
+  {
+    title: 'geo-and-maps', items: [
+      { id: 300, label: 'geo-related', component: () => "WIP", isActive: false},
+      { id: 301, label: 'map-related', component: () => "WIP", isActive: false},
+    ]
+  },
+
 ])
 
 const newNavSections = ref()
@@ -503,6 +514,7 @@ const resetWelcomeView = () => isWelcomeActive.value = true;
   padding: 0 1.5rem;
   padding-bottom: 200px;
   margin-bottom: 100px;
+  font-size: 1.4rem;
 }
 
 .nav-section {
@@ -770,7 +782,7 @@ li button span.highlight {
   /* background-color: #1e1e1e; */
   color: #ffffff;
   width: 100%;
-  padding-bottom: 200px;
+  /* padding-bottom: 200px; */
 }
 
 .menu-active {

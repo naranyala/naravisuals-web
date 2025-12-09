@@ -34,6 +34,8 @@
 
 ![INSPIRATION-4](./INSPIRATION-4.png)
 
+![INSPIRATION-5](./INSPIRATION-5.png)
+
 
 
 - https://github.com/eva-engine/eva.js
@@ -42,6 +44,7 @@
 - https://github.com/bitgapp/eqMac
 - https://surge-synthesizer.github.io/
 - https://codeberg.org/tenacityteam/tenacity
+- https://github.com/zrythm/zrythm
 
 ---
 

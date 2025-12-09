@@ -86,12 +86,15 @@ onBeforeUnmount(() => {
 
 <style>
 * {
+  /* font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif; */
+  /* font-family: "Helvetica Neue", Arial, sans-serif; */
+
   /* font-family: 'Playpen Sans Arabic Variable', cursive; */
   /* font-family: 'Kode Mono Variable', monospace; */
-  /* font-family: 'Google Sans Code Variable', monospace; */
+  /* font-family: 'Google Sans Code Variable', monospace; 
   /* font-family: 'Monaspace Krypton', monospace; */
-  /* font-family: 'Intel One Mono Variable', monospace; */
-  font-family: 'DM Mono', monospace;
+  font-family: 'Intel One Mono Variable', monospace; 
+  /* font-family: 'DM Mono', monospace; */
 }
 
 .root {

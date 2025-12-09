@@ -1,5 +1,5 @@
 /**
- * EnrichExtractionPlugin - Stream-Based Feature Extraction
+ * EnrichedExtractionPlugin - Stream-Based Feature Extraction
  * 
  * Modern implementation using:
  * - Web Audio API native analyzers
@@ -14,7 +14,7 @@
  * - Timbre (MFCC x13)
  */
 
-export class EnrichExtractionPlugin {
+export class EnrichedExtractionPlugin {
   constructor(daw, options = {}) {
     this.daw = daw;
     this.order = options.order ?? 1;
@@ -89,7 +89,7 @@ export class EnrichExtractionPlugin {
     // Start extraction loop
     this.start();
 
-    console.log('EnrichExtractionPlugin initialized (stream-based)');
+    console.log('EnrichedExtractionPlugin initialized (stream-based)');
     return ctx;
   }
 

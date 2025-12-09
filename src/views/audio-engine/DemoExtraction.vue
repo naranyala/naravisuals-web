@@ -160,7 +160,7 @@
 
 import { ref, onMounted, onBeforeUnmount, reactive, computed } from 'vue';
 import daw from '../../lib/audio/daw_core.js';
-import { EnrichExtractionPlugin } from '../../lib/audio/enrich_extraction_plugin.js';
+import { EnrichedExtractionPlugin } from '../../lib/audio/enriched_extraction_plugin.js';
 
 
 // Audio state machine states
@@ -227,7 +227,7 @@ const initializeAudio = async () => {
     gainNode.gain.value = volume.value;
     
     // Create and initialize plugin
-    plugin = new EnrichExtractionPlugin(daw, {
+    plugin = new EnrichedExtractionPlugin(daw, {
       bpm: 120,
       frameRate: 20,
       fftSize: 4096
@@ -544,15 +544,18 @@ h2 {
 }
 
 .player-controls {
-  display: flex;
-  align-items: center;
+  /* display: flex; */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 10px;
+  align-items: center;
   padding: 15px;
   background: #f8f9fa;
   border-radius: 8px;
 }
 
 .control-btn {
+  grid-column: 1 / -1;
   padding: 12px 20px;
   background: #667eea;
   color: white;
@@ -582,11 +585,15 @@ h2 {
 }
 
 .volume-control {
-  display: flex;
+  display: flex; 
+  grid-column: 1 / -1;
+  text-align: center;
+  width: 300px;
   align-items: center;
+  justify-content: between;
   gap: 10px;
   flex: 1;
-  margin-left: 15px;
+  margin: 15px auto;
 }
 
 .volume-icon {
@@ -594,9 +601,9 @@ h2 {
 }
 
 .volume-slider {
-  flex: 1;
-  height: 6px;
-  border-radius: 3px;
+  margin: 15px auto;
+  width: 100%;
+  border-radius: 40px;
   outline: none;
   -webkit-appearance: none;
   background: linear-gradient(to right, #667eea 0%, #764ba2 100%);
