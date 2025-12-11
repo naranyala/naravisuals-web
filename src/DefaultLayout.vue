@@ -70,7 +70,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <RunningTextBar direction="right" text="COMING SOON! WORK IN PROGRESS ..." />
+  <!-- <RunningTextBar direction="right" text="COMING SOON! WORK IN PROGRESS ..." /> -->
   <!-- <CommandCenter /> -->
 
   <div class="root">
@@ -93,7 +93,7 @@ onBeforeUnmount(() => {
   /* font-family: 'Kode Mono Variable', monospace; */
   /* font-family: 'Google Sans Code Variable', monospace; 
   /* font-family: 'Monaspace Krypton', monospace; */
-  font-family: 'Intel One Mono Variable', monospace; 
+  /* font-family: 'Intel One Mono Variable', monospace; */
   /* font-family: 'DM Mono', monospace; */
 }
 

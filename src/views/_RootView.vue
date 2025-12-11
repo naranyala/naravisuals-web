@@ -1,793 +1,507 @@
+
 <script setup>
-import {
-  ref, watch, computed, onMounted, onUnmounted, watchEffect, reactive
-} from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 
-const isSidebarOpen = ref(false)
-const isMobile = ref(false)
-const searchQuery = ref('')
+import Taskbar from "./os-like/Taskbar.vue"
+
+const emit = defineEmits(["toggle-os"])
 
 
-// import MottoCollection from "./MottoCollection.vue"
-import MyComponentExploration from "./MyComponentExploration.vue"
+/* taskbar-start */
+const activeWindowId = ref(null)
+const windows = reactive([])
 
-import CodeShowView from "./CodeShowView.vue"
-import ProgrammingConceptView from "./ProgrammingConceptView.vue"
-import CodeDumpRelearnView from "./CodeDumpRelearnView.vue"
-import ProfileView from "./ProfileView.vue"
-import GeneralFaqView from "./GeneralFaqView.vue"
-import ClarityFAQ from "./ClarityFAQ.vue"
-import CreativeView from "./CreativeView.vue"
-import Creative3DView from "./Creative3DView.vue"
-
-import ArticleView from "./ArticleView.vue"
-import EasyBudgetView from "./EasyBudgetView.vue"
-import SipenaView from "./SipenaView.vue"
-import CodingAsHobbyView from "./CodingAsHobbyView.vue"
-import SimulationCenterView from "./SimulationCenterView.vue"
-import CreativeLyrics from "./CreativeLyrics.vue"
-import MindmapMaker from "./MindmapRoot.vue"
-import TheoryCollection from "./TheoryCollection.vue"
-import CanvasExamplesView from "./CanvasExamplesView.vue"
-import MyAnimationView from "./MyAnimationView.vue"
-import RoadmapContainer from "./RoadmapContainer.vue"
-
-import WelcomeCode from "./WelcomeCode.vue"
-import CanvasEngineDemo from "./CanvasEngineDemo.vue"
-import CanvasEngineMath from "./CanvasEngineMath.vue"
-import CanvasEnginePhysics from "./CanvasEnginePhysics.vue"
-import CanvasEngineGames from "./CanvasEngineGames.vue"
-import ShapesThreeDimension from "./ShapesThreeDimension.vue"
-
-
-import WrapperOfModernJS from "./WrapperOfModernJS.vue"
-import WrapperOfModernCSS from "./WrapperOfModernCSS.vue"
-// import DocsLayoutDemo from "./DocsLayoutDemo.vue"
-
-import MonthlyChallenges from "./MonthlyChallenges.vue"
-import DashboardLayoutWrapper from "./DashboardLayoutWrapper.vue"
-import ChartContainer from "./ChartContainer.vue"
-import CanvasEngineAudio from "./CanvasEngineAudio.vue"
-import PdfViewer from "./BrowserPdfViewer.vue"
-import AcademicPaper from "./AcademicPaper.vue"
-
-import DrivingCarExperience from "./three-js/DrivingCarExperience.vue"
-import AnotherArticle from "./AnotherArticle.vue"
-
-import GooberMotionWrapper from "./GooberMotionWrapper.vue"
-// import LearningGit from "./goober-motion/LearningGit.jsx"
-import LearningGit from "./LearningGit.vue"
-
-import StdOverviewLua from "./std-overview/StdOverviewLua.vue"
-import StdOverviewC11 from "./std-overview/StdOverviewC11.vue"
-import StdOverviewRust from "./std-overview/StdOverviewRust.vue"
-
-const activeMenuIdx = ref(0)
-
-// start with index 0
-const navSections = reactive([
-  {
-    title: 'actually  ☝️🤓', items: [
-      { id: 100, label: 'modern-css', component: WrapperOfModernCSS, isActive: false},
-      { id: 101, label: 'modern-js', component: WrapperOfModernJS, isActive: false},
-      { id: 102, label: 'c-related', component: WelcomeCode, isActive: false},
-      { id: 103, label: 'rust-related', component: MonthlyChallenges, isActive: false},
-      { id: 104, label: 'learning-git', component: LearningGit, isActive: false},
-      { id: 105, label: 'std-lua', component: StdOverviewLua, isActive: false},
-      { id: 106, label: 'std-c11', component: StdOverviewC11, isActive: false},
-      { id: 107, label: 'std-rust', component: StdOverviewRust, isActive: false},
-      { id: 108, label: 'vue-setter-getter', component: () => "WIP", isActive: false},
-      { id: 109, label: 'vue-components', component: () => "WIP", isActive: false},
-      { id: 110, label: 'vue-widgets', component: () => "WIP", isActive: false},
-      { id: 111, label: 'c-written-utility', component: () => "WIP", isActive: false},
-      { id: 112, label: 'rust-written-utility', component: () => "WIP", isActive: false},
-    ]
-  },
-
-  {
-    title: 'canvas-exploration', items: [
-      { id: 200, label: 'shapes', component: CanvasEngineDemo, isActive: false},
-      { id: 201, label: 'charts', component: ChartContainer, isActive: false},
-      { id: 202, label: 'animation', component: DashboardLayoutWrapper, isActive: false},
-      { id: 203, label: 'math', component: CanvasEngineMath, isActive: false},
-      { id: 204, label: 'physics', component: CanvasEnginePhysics, isActive: false},
-      { id: 205, label: 'audio', component: CreativeLyrics, isActive: false},
-      { id: 206, label: '3d-related', component: ShapesThreeDimension, isActive: false},
-      { id: 207, label: 'dashboard', component: DashboardLayoutWrapper, isActive: false},
-      { id: 208, label: 'academic-paper', component: AcademicPaper, isActive: false},
-      { id: 209, label: 'car-driving', component: DrivingCarExperience, isActive: false},
-      { id: 210, label: 'goober-motion', component: GooberMotionWrapper, isActive: false},
-    ]
-  },
-
-  {
-    title: 'audio-programming', items: [
-      { id: 300, label: 'articles', component: ArticleView, isActive: false},
-      { id: 301, label: 'examples', component: CanvasEngineAudio, isActive: false},
-    ]
-  },
-
-
-  {
-    title: 'geo-and-maps', items: [
-      { id: 300, label: 'geo-related', component: () => "WIP", isActive: false},
-      { id: 301, label: 'map-related', component: () => "WIP", isActive: false},
-    ]
-  },
-
-])
-
-const newNavSections = ref()
-
-watchEffect(() => {
-  let arr = []
-  navSections.forEach(section => {
-    section.items.forEach((item, idx) => {
-      arr.push({ id: idx, ...item })
-    })
-  })
-  newNavSections.value = arr.sort((a, b) => a.id - b.id);
-})
-
-// import {trimText} from "../utilities/trimText.js"
-
-// Fuzzy search function
-const fuzzyMatch = (text, query) => {
-  if (!query) return { match: true, score: 0 }
-
-  const textLower = String(text).trim().toLowerCase()
-  const queryLower = String(query).trim().toLowerCase()
-
-  let textIndex = 0
-  let queryIndex = 0
-  let score = 0
-  const matches = []
-
-  while (textIndex < textLower.length && queryIndex < queryLower.length) {
-    if (textLower[textIndex] === queryLower[queryIndex]) {
-      matches.push(textIndex)
-      score += textIndex === queryIndex ? 2 : 1 // Bonus for consecutive matches
-      queryIndex++
-    }
-    textIndex++
-  }
-
-  return {
-    match: queryIndex === queryLower.length,
-    score,
-    matches
+const focusOrMinimize = (id) => {
+  if (activeWindowId.value === id) {
+    minimizeWindow(id)
+  } else {
+    focusWindow(id)
   }
 }
 
-// Filter sections based on search
-const filteredSections = computed(() => {
-  if (!searchQuery.value.trim()) return navSections
-
-  const results = []
-
-  navSections.forEach(section => {
-    const filteredItems = section.items.filter(item => {
-      return fuzzyMatch(item.label, searchQuery.value).match
-    })
-
-    // console.log("filter: ", filteredItems)
-
-    if (filteredItems.length > 0) {
-      results.push({
-        ...section,
-        items: filteredItems.sort((a, b) => {
-          const scoreA = fuzzyMatch(a, searchQuery.value).score
-          const scoreB = fuzzyMatch(b, searchQuery.value).score
-          return scoreB - scoreA
-        })
-      })
-    }
-  })
-
-  return results
-})
-
-// Highlight matched characters
-const highlightMatch = (text) => {
-  if (!searchQuery.value.trim()) return text
-  const result = fuzzyMatch(text, searchQuery.value)
-
-  if (!result.match) return text
-
-  let highlighted = ''
-  for (let i = 0; i < text.length; i++) {
-    if (result.matches.includes(i)) highlighted += `${text[i]}`;
-    else highlighted += text[i];
-  }
-  return highlighted
+const minimizeWindow = (id) => {
+  // In a real implementation, you'd hide the window
+  // For simplicity, we'll just remove it from view
+  closeWindow(id)
 }
 
-const toggleSidebar = () => isSidebarOpen.value = !isSidebarOpen.value;
-const closeSidebar = () => isSidebarOpen.value = false;
-const updateIsMobile = () => isMobile.value = window.innerWidth < 768;
+const focusWindow = (id) => {
+  activeWindowId.value = id
+  // Bring to front
+  const maxZ = Math.max(...windows.map(w => w.zIndex), 0)
+  const win = windows.find(w => w.id === id)
+  if (win) win.zIndex = maxZ + 1
+}
+const closeWindow = (id) => {
+  const index = windows.findIndex(w => w.id === id)
+  windows.splice(index, 1)
+  if (activeWindowId.value === id) {
+    activeWindowId.value = windows.length ? windows[windows.length - 1].id : null
+  }
+}
 
-const activeMenuLabel = ref("learning-git")
 
+const showStartMenu = ref(false)
+const toggleStartMenu = () => {
+  showStartMenu.value = !showStartMenu.value
+}
+
+/* taskbar-end */
+
+
+
+// State
+const desktopRef = ref(null)
+const startMenuRef = ref(null)
+const currentTime = ref(new Date().toLocaleTimeString())
+const dragState = ref({
+  isDragging: false,
+  windowId: null,
+  offsetX: 0,
+  offsetY: 0
+})
+
+
+const actionExit = () => emit('toggle-os')
+
+
+import WelcomePage from "./os-like/WelcomePage.vue"
+import SettingPage from "./os-like/SettingPage.vue"
+
+const appComponents = {
+  welcomePage: { obj: WelcomePage },
+  notepad: { obj: () => "WIP" },
+  calculator: { obj: () => "WIP" },
+  globalState: { obj: () => "WIP" },
+  settingPage: { obj: SettingPage }
+}
+
+const listApps = [
+  { id: "welcomePage", name: 'Welcome', emoji: '📦'},
+  { id: "notepad", name: 'Notepad', emoji: '📦' },
+  { id: "calculator", name: 'Calculator', emoji: '📦' },
+  { id: "globalState", name: 'Global State', emoji: '📦' },
+  { id: "settingPage", name: 'Setting Page', emoji: '📦' },
+]
+
+
+// Window Management
+const WINDOW_WIDTH = 600
+const WINDOW_HEIGHT = 400
+
+const createWindow = (app, selectedId) => {
+
+  // const id = Date.now()
+  const id = crypto.randomUUID()
+  const desktopRect = desktopRef.value.getBoundingClientRect()
+
+  // Calculate centered position
+  const x = (desktopRect.width - WINDOW_WIDTH) / 2
+  const y = (desktopRect.height - WINDOW_HEIGHT) / 2
+
+console.log("selected-id: ", selectedId)
+
+  windows.push({
+    id,
+    title: app.name,
+    // component: appComponents["welcomePage"],
+    component: appComponents[selectedId],
+    // component: appComponents["settingPage"],
+    x,
+    y,
+    width: WINDOW_WIDTH,
+    height: WINDOW_HEIGHT,
+    zIndex: windows.length + 10,
+    maximized: false,
+    originalX: x,
+    originalY: y,
+    originalWidth: WINDOW_WIDTH,
+    originalHeight: WINDOW_HEIGHT
+  })
+
+  activeWindowId.value = id
+  showStartMenu.value = false
+}
+
+
+
+const toggleMaximize = (id) => {
+  const win = windows.find(w => w.id === id)
+  if (!win) return
+
+  if (win.maximized) {
+    // Restore to original size and position
+    win.x = win.originalX
+    win.y = win.originalY
+    win.width = win.originalWidth
+    win.height = win.originalHeight
+    win.maximized = false
+  } else {
+    // Store original dimensions before maximizing
+    win.originalX = win.x
+    win.originalY = win.y
+    win.originalWidth = win.width
+    win.originalHeight = win.height
+
+    // Maximize to fill available space (excluding taskbar)
+    const desktopRect = desktopRef.value.getBoundingClientRect()
+    win.x = 0
+    win.y = 0
+    win.width = desktopRect.width
+    win.height = desktopRect.height - 40 // Account for taskbar height
+    win.maximized = true
+  }
+}
+
+
+
+// Draggable Window Implementation
+const startDrag = (event, win) => {
+  if (win.maximized) return // Don't allow dragging maximized windows
+
+  // Focus the window when starting to drag
+  focusWindow(win.id)
+
+  dragState.value = {
+    isDragging: true,
+    windowId: win.id,
+    offsetX: event.clientX - win.x,
+    offsetY: event.clientY - win.y
+  }
+
+  event.preventDefault()
+}
+
+const handleMouseMove = (event) => {
+  if (!dragState.value.isDragging) return
+
+  const win = windows.find(w => w.id === dragState.value.windowId)
+  if (!win || win.maximized) return
+
+  const desktopRect = desktopRef.value.getBoundingClientRect()
+
+  // Calculate new position
+  let newX = event.clientX - dragState.value.offsetX
+  let newY = event.clientY - dragState.value.offsetY
+
+  // Boundary checking
+  newX = Math.max(0, Math.min(newX, desktopRect.width - win.width))
+  newY = Math.max(0, Math.min(newY, desktopRect.height - win.height - 40)) // Account for taskbar
+
+  win.x = newX
+  win.y = newY
+}
+
+const handleMouseUp = () => {
+  dragState.value.isDragging = false
+  dragState.value.windowId = null
+}
+
+
+const closeStartMenu = () => {
+  showStartMenu.value = false
+}
+
+const launchApp = (app) => {
+  createWindow(app)
+}
+
+// Time update
+let timeInterval = null
 onMounted(() => {
-  updateIsMobile()
-  window.addEventListener('resize', updateIsMobile)
-  console.log("welcome: ", setViewedComponent(activeMenuLabel.value))
+  timeInterval = setInterval(() => {
+    currentTime.value = new Date().toLocaleTimeString()
+  }, 1000)
+
+  // Add mouse event listeners for dragging
+  document.addEventListener('mousemove', handleMouseMove)
+  document.addEventListener('mouseup', handleMouseUp)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', updateIsMobile)
+  if (timeInterval) clearInterval(timeInterval)
+  document.removeEventListener('mousemove', handleMouseMove)
+  document.removeEventListener('mouseup', handleMouseUp)
 })
 
-const selectedMenu = ref()
-
-const setViewedComponent = (key) => {
-  navSections.forEach(section => {
-    section.items.forEach(item => {
-      if(item.label === key) selectedMenu.value = item.component;
-    })
-  })
+// Click outside to close start menu
+const handleClickOutside = (event) => {
+  if (showStartMenu.value &&
+    startMenuRef.value &&
+    !startMenuRef.value.contains(event.target) &&
+    event.target !== desktopRef.value) {
+    showStartMenu.value = false
+  }
 }
 
-const props = defineProps(["isPrintAll", "activeMode"])
-const isPrintAll = ref(props?.isPrintAll || true)
-
-const changeRoute = (event, idx) => {
-  activeMenuIdx.value = idx;
-
-  handleMenuChange()
-  handleMenuActive(event)
-}
-
-const handleMenuChange = (key) => {
-  newNavSections.value.forEach(item => {
-    if(item.id === activeMenuIdx.value) {
-      console.log("handleMenuChange: ", JSON.stringify(item))
-      setViewedComponent(item.label) 
-    } 
-  })
-}
-
-const handleMenuActive = (event) => {
-  const textContent = event?.target?.textContent; 
-  // event?.target.style.textDecoration = "underline";
-
-  // navSections.value.forEach(section => {
-  filteredSections.value.forEach(section => {
-    section?.items.forEach(item => {
-      if(item.label === textContent) {
-        console.log(item.isActive)
-        item.isActive = true;
-        console.log(item.isActive)
-      } else {
-        item.isActive = false;
-      }
-    })
-  })
-
-}
-
-watch(activeMenuIdx, () => {
-  handleMenuChange()
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
 })
 
-watch(selectedMenu, () => {
-  console.log("current-menu: ", selectedMenu.value)
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
-
-
-// const isUrlActive = ref(false)
-
-const actionClearSearch = () => searchQuery.value = ""
-
-const isWelcomeActive = ref(false)
-onMounted(() => resetWelcomeView());
-const resetWelcomeView = () => isWelcomeActive.value = true;
-
 </script>
 
-
 <template>
-  <div class="layout">
-    <!-- Mobile Header -->
-    <header v-if="isMobile" class="mobile-header">
-      <button @click="toggleSidebar">MENU</button>
-      <button @click="console.log('WIP')">HOME</button>
-      <button @click="console.log('WIP')">TERMINAl</button>
-      <button @click="console.log('WIP')">SEARCH</button>
-    </header>
+  <div ref="desktopRef" class="desktop" @click="closeStartMenu">
+    <!-- Desktop Icons (optional) -->
+    <div class="desktop-icons">
+      <div v-for="item in listApps" :key="item.id" class="icon" @dblclick.prevent="createWindow(item, item.id)">
 
-    <!-- Backdrop -->
-    <div v-if="isMobile && isSidebarOpen" class="backdrop" @click="closeSidebar"></div>
-
-    <!-- Sidebar -->
-    <aside class="sidebar" :class="{ open: isSidebarOpen }">
-      <div :class="{ 'pt-mobile': isMobile }">
-
-        <div class="search-container">
-          <input v-model="searchQuery" type="text" placeholder="search" class="search-input" />
-          <button v-if="!searchQuery.value" class="btn-major" @click="actionClearSearch">
-            clear search
-          </button>
-
-                <!-- <button @click="resetWelcomeView" class="btn-major"> -->
-                <!--   home  -->
-                <!-- </button> -->
-        </div>
-
-        <nav class="nav">
-
-
-          <div v-for="(section, i) in filteredSections" :key="i" class="nav-section">
-            <h3>{{ section.title }}</h3>
-            <ul>
-
-
-              <!-- {{section.items.map(item => item.id)}} -->
-              <li v-for="(item, j) in section.items" :key="j">
-                <button @click="(ev) => changeRoute(ev, item.id)" 
-                  :class="{ 'menu-active' : item.isActive }">
-                  {{ item.label }}
-                </button>
-              </li>
-            </ul>
-          </div>
-          <p v-if="filteredSections.length === 0" class="no-results">No results found</p>
-        </nav>
+        <div class="icon-image">{{ item.emoji }}</div>
+        <div class="icon-label">{{ item.name }}</div>
       </div>
-    </aside>
+    </div>
 
-    <!-- Main Content -->
-    <main class="main" :class="{ 'pt-mobile': isMobile }">
-      <div class="container">
-
-        <!-- START-LAYOUT -->
-
-        <!-- <pre>{{ JSON.stringify(newNavSection, null, 2) }}</pre> -->
-
-
-
-        <!-- Content -->
-        <div v-if="!isPrintAll" class="tab-content">
-          <!-- <component :is="newNavSections[activeMenuIdx].component"></component> -->
-          <component :is="selectedMenu"></component>
+    <!-- Windows -->
+    <div v-for="win in windows" :key="win.id" class="window"
+      :class="{ active: activeWindowId === win.id, maximized: win.maximized }" :style="{
+        left: win.x + 'px',
+        top: win.y + 'px',
+        width: win.width + 'px',
+        height: win.height + 'px',
+        zIndex: win.zIndex
+      }" @mousedown="focusWindow(win.id)">
+      <div class="window-header" @mousedown="startDrag($event, win)" @dblclick.stop="toggleMaximize(win.id)">
+        <div class="window-title">{{ win.title }}</div>
+        <div class="window-controls">
+          <button @click.stop="minimizeWindow(win.id)">−</button>
+          <button @click.stop="toggleMaximize(win.id)">{{ win.maximized ? '❐' : '□' }}</button>
+          <button @click.stop="closeWindow(win.id)">✕</button>
         </div>
-
-        <div v-else>
-          <!-- PRINT MODE -->
-          <!-- <ProfileView /> -->
-          <!-- <hr /> -->
-          <!-- <CodeDumpRelearnView /> -->
-          <!-- <hr /> -->
-          <!-- <ArticleView /> -->
-          <!-- <hr /> -->
-          <!-- <CreativeView /> -->
-          <!-- <hr /> -->
-          <!-- <Creative3DView /> -->
-        </div>
-
-        <!-- END-LAYOUT -->
-
-
       </div>
-    </main>
+      <div class="window-content">
+        <component v-if="win.component.obj" :is="win.component.obj" /> 
+       
+        <hr/>
+
+        <div class="debug">
+        <small>
+          {{ JSON.stringify(win, null, 2) }}
+        </small>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- Taskbar -->
+    <Taskbar :leftSideContent="[]" :rightSideContent="windows"/>
+
+
+    <!-- Start Menu -->
+    <div v-if="showStartMenu" ref="startMenuRef" class="start-menu" @click.stop>
+      <div class="start-menu-header">
+        <div class="user-info">
+          <div class="user-icon">👤</div>
+          <div>VueUser</div>
+        </div>
+      </div>
+
+      <div class="start-menu-items">
+        <div v-for="app in listApps" :key="app.id" class="start-menu-item" @click="launchApp(app)">
+          <span>{{ app.emoji }}</span>
+          <span>{{ app.name }}</span>
+        </div>
+        <div class="start-menu-item" @click="actionExit">
+          {{"❌"}}
+          <span>Exit</span>
+        </div>
+      </div>
+    </div>
+
+
   </div>
 </template>
 
 
 <style scoped>
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
-.layout {
-  display: flex;
+.desktop {
+  width: 100vw;
+  /* height: 100vh; */
   height: 100vh;
-  background: #111827;
-  color: #e5e7eb;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
   overflow: hidden;
-}
-
-/* Mobile Header */
-.mobile-header {
-  position: fixed;
-  top: 0;
-  /* bottom: 28px; */
-  left: 0;
-  right: 0;
-  height: 56px;
-  background: #111827;
-  border-bottom: 1px solid #374151;
-  z-index: 50;
-  display: flex;
-  gap: 8px;
-  content-align: space-between;
-  padding: 5px;
-}
-
-.mobile-header h1 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 0 1rem;
-}
-
-.hamburger {
-  z-index: 999;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  width: 24px;
-  height: 24px;
-  /* background: none; */
-  /* background: black; */
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.hamburger span {
-  width: 100%;
-  height: 2px;
-  background: #e5e7eb;
-  border-radius: 2px;
-}
-
-/* Backdrop */
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 30;
-}
-
-/* Sidebar */
-.sidebar {
-  width: 256px;
-  height: 100vh;
-  background: #1f2937;
-  border-right: 1px solid #374151;
-  overflow-y: auto;
-  z-index: 40;
-  transition: transform 0.3s ease;
-  padding-top: 100px;
-}
-
-.pt-mobile {
-  /* padding-top: 56px; */
-  height: 100vh;
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  padding: 1.5rem;
-}
-
-.logo {
-  width: 32px;
-  height: 32px;
-  background: #eab308;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 1.25rem;
-  color: #000;
-  margin-right: 0.75rem;
-}
-
-.sidebar-header h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-.search-container {
-  padding: 0 1.5rem 1rem 1.5rem;
-  margin-top: 24px;
-  margin-bottom: 12px;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  background: #374151;
-  border: 1px solid #4b5563;
-  border-radius: 0.375rem;
-  color: #e5e7eb;
-  font-size: 0.875rem;
-  outline: none;
-  transition: border-color 0.2s;
-  text-align: center;
-}
-
-.search-input::placeholder {
-  color: #9ca3af;
-}
-
-.search-input:focus {
-  border-color: #eab308;
-}
-
-.nav {
-  padding: 0 1.5rem;
-  padding-bottom: 200px;
-  margin-bottom: 100px;
-  font-size: 1.4rem;
-}
-
-.nav-section {
-  margin-top: 1.5rem;
-}
-
-.nav-section:first-child {
-  margin-top: 0;
-}
-
-.nav-section h3 {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #9ca3af;
-  margin: 0 0 0.75rem 0;
-}
-
-.nav-section ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.nav-section li {
-  margin-bottom: 0.25rem;
-}
-
-.nav-section a {
-  font-size: 0.875rem;
-  color: #d1d5db;
-  text-decoration: none;
-  display: block;
-  padding: 0.25rem 0;
-}
-
-.nav-section a:hover {
-  color: #f9fafb;
-}
-
-.no-results {
-  padding: 1rem 0;
-  text-align: center;
-  color: #9ca3af;
-  font-size: 0.875rem;
-  margin: 0;
-}
-
-mark {
-  /* background: #eab308; */
-  background: #eba134;
-  color: #000;
-  padding: 0 2px;
-  border-radius: 2px;
-}
-
-/* Main Content */
-.main {
-  flex: 1;
-  overflow-y: auto;
-  /* padding: 2rem; */
-  height: 100vh;
-}
-
-.container {
-  width: 100%;
-  /* max-width: 896px; */
-  /* margin: 0 auto; */
-  margin: 0;
-  padding: 0;
-}
-
-.page-header {
-  margin-bottom: 2.5rem;
-}
-
-.page-header h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin: 0;
-}
-
-.page-header p {
-  font-size: 1.125rem;
-  color: #9ca3af;
-  margin: 0.5rem 0 0 0;
-}
-
-/* Performance Chart */
-.chart {
-  background: #1f2937;
-  padding: 1.25rem;
-  border-radius: 0.5rem;
-  margin-bottom: 2rem;
-}
-
-.chart-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.75rem;
-  height: 20px;
-}
-
-.tool-name {
-  width: 130px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.bar-container {
-  flex: 1;
-  height: 16px;
-  background: #374151;
-  border-radius: 0.25rem;
-  margin: 0 0.75rem;
-  overflow: hidden;
-}
-
-.bar {
-  height: 100%;
-  background: #eab308;
-  border-radius: 0.25rem;
-}
-
-.tool-time {
-  width: 45px;
-  font-size: 0.875rem;
-  text-align: right;
-}
-
-.chart-axis {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.75rem;
-  padding: 0 0.5rem;
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.intro {
-  margin-bottom: 2rem;
-  line-height: 1.6;
-  color: #d1d5db;
-}
-
-h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 0.75rem 0;
-}
-
-.features {
-  list-style: disc;
-  padding-left: 1.25rem;
-  color: #d1d5db;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.features li {
-  margin-bottom: 0.5rem;
-}
-
-/* Mobile Styles */
-@media (max-width: 767px) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    transform: translateX(-100%);
-  }
-
-  .sidebar.open {
-    transform: translateX(0);
-  }
-}
-
-/* Desktop Styles */
-@media (min-width: 768px) {
-  .sidebar {
-    position: static;
-    flex-shrink: 0;
-  }
-
-  .page-header h1 {
-    font-size: 3.75rem;
-  }
-
-  .page-header p {
-    font-size: 1.25rem;
-  }
-}
-
-/* Dark mode container */
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  /* background-color: #121212; */
-  /* Optional: if ul has its own bg */
-}
-
-/* List item */
-li {
-  margin: 0;
-}
-
-/* Dark mode button */
-li button {
-  width: 100%;
-  /* padding: 14px 18px; */
-  padding: 0 10px 0 28px;
-  border: none;
-  border-radius: 10px;
-  /* background-color: #1e1e1e; */
-  /* color: #e0e0e0; */
-  background: none;
-  color: white;
-  font-size: 16px;
-  font-weight: 500;
-  text-align: left;
-  cursor: pointer;
-  /* transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); */
-  /* box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); */
-  /* border: 1px solid #2d2d2d; */
+  position: relative;
   user-select: none;
 }
 
-/* Hover state – subtle lift & brighter bg */
-li button:hover {
-  /* background-color: #2a2a2a; */
-  /* transform: translateY(-2px); */
-  text-decoration: underline;
+/* Desktop Icons */
+.desktop-icons {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px;
+  gap: 20px;
 }
 
-/* Active / Focus state */
-li button:active {
-  /* background-color: #333333; */
-  /* transform: translateY(0); */
-  text-decoration: underline;
+.icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  width: 80px;
 }
 
-li button:focus {
-  outline: none;
+.icon-image {
+  font-size: 32px;
+  margin-bottom: 5px;
 }
 
-/* Highlight for matched text */
-li button span.highlight {
-  /* background-color: #3a3a00; */
-  /* Dark yellow bg */
-  color: #ffeb3b;
-  /* Bright yellow text */
-  padding: 0 5px;
+.icon-label {
+  color: white;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  font-size: 12px;
+}
+
+/* Windows */
+.window {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
   border-radius: 4px;
-  font-weight: 600;
-  /* box-shadow: 0 0 4px rgba(255, 235, 59, 0.2); */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+  min-height: 200px;
+  transition: all 0.2s ease;
+}
+
+.window.maximized {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.window.active {
+  border: 1px solid #0078d7;
+  box-shadow: 0 0 0 2px rgba(0, 120, 215, 0.3);
+}
+
+.window-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+  border-bottom: 1px solid #ccc;
+  cursor: move;
+  user-select: none;
+  max-width: 100vh;
+  color: black;
+}
+
+.window-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.window-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.window-controls button {
+  width: 24px;
+  height: 20px;
+  border: 1px solid #999;
+  background: #e0e0e0;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.window-controls button:hover {
+  background: #d0d0d0;
+}
+
+.window-content {
+  flex: 1;
+  padding: 0;
+  overflow: auto;
+  z-index: 2;
+  color: black;
+
+  div { margin: 0; }
+}
+
+.app-content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #333;
 }
 
 
-.tab-content {
-  /* padding: 0; */
-  /* background-color: #1e1e1e; */
-  color: #ffffff;
-  width: 100%;
-  /* padding-bottom: 200px; */
+/* Start Menu */
+.start-menu {
+  position: absolute;
+  bottom: 40px;
+  left: 10px;
+  width: 300px;
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid #444;
+  border-radius: 5px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  color: white;
+  z-index: 1001;
+  overflow: hidden;
 }
 
-.menu-active {
-  text-decoration: underline;
+.start-menu-header {
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.btn-major { width: 100%; margin: 5px 0; }
+.user-icon {
+  font-size: 32px;
+}
+
+.start-menu-items {
+  padding: 10px 0;
+}
+
+.start-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.start-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+aside {
+  z-index: 1;
+  width: 320px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  font-size: 0.8rem;
+  overflow-y: auto;
+  height: max-content;
+}
+
+.debug { background: white; color: black; margin: 20px; border: 1px solid gray; }
+  
 </style>
+

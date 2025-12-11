@@ -58,12 +58,15 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .sticky-bar {
-  border-top: 1px solid lightgray;
-  /* border-bottom: 1px solid lightgray; */
-  position: fixed;
+  /* position: fixed; */
   /* position: sticky; */
-  /* top: 0; */
-  bottom: 0;
+
+  top: 0; 
+  border-bottom: 1px solid lightgray;
+
+  /* bottom: 0; */
+  /* border-top: 1px solid lightgray; */
+
   left: 0;
   right: 0;
   background: #1a1a1a;
