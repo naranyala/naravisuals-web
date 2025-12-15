@@ -68,17 +68,21 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeyDown);
 });
 
+
+
 </script>
 
 <template>
   <!-- <RunningTextBar position="top" direction="right" text="COMING SOON! WORK IN PROGRESS ..." /> -->
   <!-- <CommandCenter /> -->
 
-  <Navbar/>
+  <!-- <Navbar/> -->
 
   <div class="root">
   <RouterView />
   </div>
+
+
 
   <div class="no-print">
     <!-- <WelcomeMenu/> -->

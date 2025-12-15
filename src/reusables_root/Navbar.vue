@@ -6,9 +6,9 @@
         :key="index"
         class="nav-item"
         :class="{ active: activeTab.value === index }"
-        @click="setActiveTab(index)"
+        @click="changeRoute(tab.url)"
       >
-        {{ tab }}
+        {{ tab.label }}
       </div>
       <div
         class="slider"
@@ -21,10 +21,23 @@
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
 
+
 // State
-const tabs = ['Home', 'About', 'Services', 'Portfolio', 'Contact']
+const tabs = [
+  {label: 'Home', url: '?tab=home'}, 
+  {label: 'About', url: '?tab=about'}, 
+  {label: 'Services', url: '?tab=services'}, 
+  {label: 'Portfolio', url: '?tab=portofolio'}, 
+  {label: 'Contact', url: '?tab=contact'}
+]
 const activeTab = ref(0)
 const sliderStyle = ref({ left: '0px', width: '0px' })
+
+const changeRoute = (url) => {
+  console.log(url)
+
+  window.location = url
+}
 
 // Update slider position based on active tab
 const updateSlider = () => {

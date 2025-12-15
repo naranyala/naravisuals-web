@@ -35,16 +35,20 @@ const props = defineProps({
     type: String,
     default: 'Collapsible Section'
   },
-  initiallyCollapsed: {
+  isOpen: {
     type: Boolean,
     default: false
   }
 });
 
-const isCollapsed = ref(props.initiallyCollapsed);
+const emit = defineEmits(["toggle-section"])
+
+const isCollapsed = ref(props.isOpen);
 
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
+
+  emit('toggle-section')
 };
 </script>
 

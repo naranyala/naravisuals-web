@@ -7,6 +7,7 @@ const isSidebarOpen = ref(false)
 const isMobile = ref(false)
 const searchQuery = ref('')
 
+import CollapsibleSection from "./reusables/CollapsibleSection.vue"
 
 // import MottoCollection from "./MottoCollection.vue"
 import MyComponentExploration from "./MyComponentExploration.vue"
@@ -248,11 +249,18 @@ const setViewedComponent = (key) => {
 const props = defineProps(["isPrintAll", "activeMode"])
 const isPrintAll = ref(props?.isPrintAll || true)
 
+const isCollapsibleOpen = ref(false)
+const toggleSection = () => {
+  isCollapsibleOpen.value = !isCollapsibleOpen.value
+}
+
 const changeRoute = (event, idx) => {
   activeMenuIdx.value = idx;
 
   handleMenuChange()
   handleMenuActive(event)
+
+  isCollapsibleOpen.value = false;
 }
 
 const handleMenuChange = (key) => {
@@ -300,24 +308,30 @@ const isWelcomeActive = ref(false)
 onMounted(() => resetWelcomeView());
 const resetWelcomeView = () => isWelcomeActive.value = true;
 
+import TagsDisplay from "./reusables/TagsDisplay.vue";
+
+const tags = [
+  { name: "VueJS", count: 8 },
+  { name: "WebDev", count: 12 },
+  { name: "JavaScript", count: 20 },
+  { name: "CSS", count: 5 },
+];
+
+
+import Navbar from "../reusables_root/Navbar.vue"
+import BetterFooter from "./reusables/BetterFooter.vue"
+
 </script>
 
 
 <template>
   <div class="layout">
     <!-- Mobile Header -->
-    <!-- <header v-if="isMobile" class="mobile-header"> -->
-    <header class="mobile-header">
-      <button v-if="isMobile" @click="toggleSidebar">MENU</button>
-      <button @click="console.log('WIP')">HOME</button>
-      <button @click="console.log('WIP')">TERMINAl</button>
-      <button @click="console.log('WIP')">SEARCH</button>
-    </header>
 
     <!-- Backdrop -->
     <div v-if="isMobile && isSidebarOpen" class="backdrop" @click="closeSidebar"></div>
 
-    <!-- Sidebar -->
+        <!--
     <aside class="sidebar" :class="{ open: isSidebarOpen }">
       <div :class="{ 'pt-mobile': isMobile }">
 
@@ -327,9 +341,6 @@ const resetWelcomeView = () => isWelcomeActive.value = true;
             clear search
           </button>
 
-                <!-- <button @click="resetWelcomeView" class="btn-major"> -->
-                <!--   home  -->
-                <!-- </button> -->
         </div>
 
         <nav class="nav">
@@ -340,7 +351,6 @@ const resetWelcomeView = () => isWelcomeActive.value = true;
             <ul>
 
 
-              <!-- {{section.items.map(item => item.id)}} -->
               <li v-for="(item, j) in section.items" :key="j">
                 <button @click="(ev) => changeRoute(ev, item.id)" 
                   :class="{ 'menu-active' : item.isActive }">
@@ -351,12 +361,48 @@ const resetWelcomeView = () => isWelcomeActive.value = true;
           </div>
           <p v-if="filteredSections.length === 0" class="no-results">No results found</p>
         </nav>
+
       </div>
     </aside>
+
+        -->
+
+
+    <!-- <header class="mobile-header"> -->
+    <!--   <button v-if="isMobile" @click="toggleSidebar">MENU</button> -->
+    <!--   <button @click="console.log('WIP')">HOME</button> -->
+    <!--   <button @click="console.log('WIP')">TERMINAl</button> -->
+    <!--   <button @click="console.log('WIP')">SEARCH</button> -->
+    <!-- </header> -->
+
 
     <!-- Main Content -->
     <main class="main" :class="{ 'pt-mobile': isMobile }">
       <div class="container">
+
+
+        <div class="main-header">
+
+
+
+
+
+        <CollapsibleSection @toggle-section="toggleSection" :isOpen="isCollapsibleOpen" title="open my exploration">
+           <BetterFooter :navSections="navSections" @change-route="changeRoute"/>
+        </CollapsibleSection>
+
+
+    <Navbar/>
+
+ <TagsDisplay
+    :tags="tags"
+    align="center"
+  />
+
+        </div>
+
+
+
 
         <!-- START-LAYOUT -->
 
@@ -383,8 +429,12 @@ const resetWelcomeView = () => isWelcomeActive.value = true;
           <!-- <Creative3DView /> -->
         </div>
 
+
+
+
         <!-- END-LAYOUT -->
 
+    <footer class="message">@gema_naranyala</footer>
 
       </div>
     </main>
@@ -393,9 +443,6 @@ const resetWelcomeView = () => isWelcomeActive.value = true;
 
 
 <style scoped>
-* {
-  box-sizing: border-box;
-}
 
 .layout {
   display: flex;
@@ -408,6 +455,7 @@ const resetWelcomeView = () => isWelcomeActive.value = true;
 
 /* Mobile Header */
 .mobile-header {
+  text-align: center;
   position: fixed;
   top: 0;
   /* bottom: 28px; */
@@ -420,13 +468,13 @@ const resetWelcomeView = () => isWelcomeActive.value = true;
   display: flex;
   gap: 8px;
   content-align: space-between;
-  padding: 5px;
+  padding: 8px 10px;
 }
 
-.mobile-header h1 {
+.mobile-header button {
   font-size: 1.25rem;
-  font-weight: 700;
   margin: 0 0 0 1rem;
+  width: 100%;
 }
 
 .hamburger {
@@ -458,7 +506,7 @@ const resetWelcomeView = () => isWelcomeActive.value = true;
   z-index: 30;
 }
 
-/* Sidebar */
+/* 
 .sidebar {
   width: 256px;
   height: 100vh;
@@ -469,6 +517,7 @@ const resetWelcomeView = () => isWelcomeActive.value = true;
   transition: transform 0.3s ease;
   padding-top: 100px;
 }
+*/
 
 .pt-mobile {
   /* padding-top: 56px; */
@@ -589,19 +638,18 @@ mark {
   border-radius: 2px;
 }
 
-/* Main Content */
 .main {
+  margin: 0 auto;
   flex: 1;
   overflow-y: auto;
-  /* padding: 2rem; */
   height: 100vh;
+  width: 100vw;
 }
 
 .container {
   width: 100%;
-  /* max-width: 896px; */
-  /* margin: 0 auto; */
-  margin: 0;
+  max-width: 896px; 
+  margin: 0 auto; 
   padding: 0;
 }
 
@@ -820,4 +868,11 @@ li button span.highlight {
 }
 
 .btn-major { width: 100%; margin: 5px 0; }
+
+
+
+.main-header { border: 0px solid gray; border-radius: 20px; margin: 10px auto; width: 100%; left: 20px; padding: 20px;}
+
+.message { padding: 200px 0; text-align: center; }
+
 </style>
