@@ -4,7 +4,7 @@
 </template>
 
 <script setup>
-import { ref, watch, defineProps, defineEmits } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps({ modelValue: String, delay: { type: Number, default: 300 } })
 const emit = defineEmits(['update:modelValue'])

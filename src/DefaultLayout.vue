@@ -22,6 +22,7 @@ import RunningTextBar from "./reusables_root/RunningTextBar.vue"
 import MinimalFooter from "./reusables_root/MinimalFooter.vue"
 
 import WelcomeMenu from "./reusables_root/WelcomeMenu.vue"
+import Navbar from "./reusables_root/Navbar.vue"
 
 import { isPrintAll } from "./router.ts"
 
@@ -70,8 +71,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <!-- <RunningTextBar direction="right" text="COMING SOON! WORK IN PROGRESS ..." /> -->
+  <!-- <RunningTextBar position="top" direction="right" text="COMING SOON! WORK IN PROGRESS ..." /> -->
   <!-- <CommandCenter /> -->
+
+  <Navbar/>
 
   <div class="root">
   <RouterView />

@@ -84,10 +84,10 @@ const finalTabViewed = ref([])
 //   console.log(val)
 // })
 
-import WrapperOfModernJS from "./explore-code/WrapperOfModernJS.vue"
-import WrapperOfModernCSS from "./explore-code/WrapperOfModernCSS.vue"
+import WrapperOfModernJS from "./WrapperOfModernJS.vue"
+import WrapperOfModernCSS from "./WrapperOfModernCSS.vue"
 
-import DocsLayoutDemo from "./DocsLayoutDemo.vue"
+// import DocsLayoutDemo from "./DocsLayoutDemo.vue"
 
 const tabs = ref([
   // ...finalTabViewed.value

@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, computed, onMounted, onUnmounted, watch, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, watch, ref } from 'vue'
 
 const props = defineProps({
   modelValue: Boolean,

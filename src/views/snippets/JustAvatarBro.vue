@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import { defineProps, computed } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({ src: String, alt: String, name: String })
 const initials = computed(() => props.name?.split(' ').map(n => n[0]).join('').toUpperCase())

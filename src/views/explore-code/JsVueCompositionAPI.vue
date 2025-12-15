@@ -199,7 +199,6 @@ const topics = [
     example: dedent(`
       // Child component
       <script setup>
-      import { defineProps, defineEmits } from 'vue'
 
       // Props with TypeScript (optional)
       const props = defineProps({
