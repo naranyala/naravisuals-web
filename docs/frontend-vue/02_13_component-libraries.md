@@ -1,4 +1,4 @@
-# Reusable Component Libraries in Vue for Tauri Applications
+# Component Libraries
 
 Creating reusable component libraries enhances maintainability and consistency across your Vue.js frontend in Tauri applications. This article explores patterns for building and organizing component libraries that work well with desktop applications.
 

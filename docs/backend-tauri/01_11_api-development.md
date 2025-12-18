@@ -1,4 +1,4 @@
-# API Development with Tauri
+# API Development
 
 Building robust APIs in Tauri applications enables seamless communication between the frontend and backend. This article explores how to implement REST and other API patterns within your Tauri application.
 

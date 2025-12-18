@@ -1,4 +1,4 @@
-# Native Menu Integration in Vue for Tauri Applications
+# Menu Systems
 
 Implementing native menu systems in Tauri applications provides authentic desktop experiences that users expect. This article explores patterns for creating application, context, and custom menus that integrate seamlessly with each operating system.
 

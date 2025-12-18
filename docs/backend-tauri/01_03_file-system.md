@@ -1,4 +1,4 @@
-# File System Operations
+# File System
 
 File system operations are fundamental to most desktop applications. Tauri provides secure, cross-platform file system access through Rust's robust standard library while maintaining security through permissions and sandboxing.
 

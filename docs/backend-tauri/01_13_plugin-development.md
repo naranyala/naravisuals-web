@@ -1,4 +1,4 @@
-# Creating Tauri Plugins
+# Plugin Development
 
 Extending Tauri applications with custom plugins enables access to system-level functionality and third-party libraries. This article explores the architecture and implementation patterns for creating robust Tauri plugins.
 

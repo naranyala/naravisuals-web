@@ -1,4 +1,4 @@
-# Frontend Module Architecture in Vue for Tauri Applications
+# Frontend Modules
 
 Creating modular frontend architectures in Vue for Tauri applications enables better code organization, reusability, and maintainability. This article explores patterns for building cohesive frontend modules that integrate seamlessly with Tauri's backend capabilities.
 

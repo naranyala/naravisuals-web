@@ -1,4 +1,4 @@
-# Vue.js UI Frameworks Integration
+# UI Frameworks
 
 Integrating popular Vue.js UI frameworks with Tauri applications enhances the desktop experience while maintaining native-like performance. This article covers integration patterns for popular UI libraries.
 

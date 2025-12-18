@@ -1,4 +1,4 @@
-# Native Desktop UI Components and Patterns in Vue for Tauri Applications
+# Desktop UI Patterns
 
 Creating authentic desktop experiences requires understanding native UI patterns and implementing them with Vue.js in Tauri applications. This article explores patterns for building interfaces that feel native to each operating system while maintaining cross-platform consistency.
 

@@ -2,7 +2,7 @@
 order: 7
 ---
 
-# Vue.js Frontend Setup with Tauri
+# Frontend Setup
 
 Setting up Vue.js as the frontend for your Tauri application provides a powerful combination of Vue's reactive framework with Tauri's secure Rust backend. This article covers the complete setup process and best practices.
 

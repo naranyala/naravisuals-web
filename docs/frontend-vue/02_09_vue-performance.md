@@ -1,4 +1,4 @@
-# Vue.js Performance Optimization in Tauri
+# Performance
 
 Performance optimization is crucial for desktop applications where users expect native-like responsiveness. This article covers Vue.js performance best practices specifically for Tauri applications.
 

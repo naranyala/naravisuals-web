@@ -1,4 +1,4 @@
-# Testing Strategies
+# Testing
 
 Comprehensive testing is essential for ensuring the reliability, maintainability, and quality of modular Tauri-Vue applications. This article explores testing strategies for both frontend and backend modules, including unit tests, integration tests, and end-to-end testing approaches.
 

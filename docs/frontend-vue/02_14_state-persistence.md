@@ -1,4 +1,4 @@
-# Local Storage & Data Persistence in Vue for Tauri Applications
+# State Persistence
 
 Managing data persistence in Tauri applications requires balancing between browser-based storage solutions and native file system operations. This article explores patterns for maintaining application state across sessions while leveraging the best of both web and native storage.
 

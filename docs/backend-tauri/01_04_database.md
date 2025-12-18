@@ -1,4 +1,4 @@
-# Database Integration with Tauri
+# Database
 
 Database integration is crucial for most desktop applications that need to persist data. Tauri provides excellent support for various database systems through Rust's rich ecosystem. This article covers comprehensive database integration patterns and best practices.
 

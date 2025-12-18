@@ -1,4 +1,4 @@
-# Vue.js Routing with Tauri
+# Routing
 
 Routing in Tauri desktop applications requires special considerations compared to web applications. This article covers Vue Router integration with Tauri and best practices for building desktop application navigation.
 

@@ -1,4 +1,4 @@
-# Vue.js Testing in Tauri Applications
+# Testing
 
 Testing Vue.js components in Tauri applications requires special considerations due to the integration with Rust backend commands. This article covers comprehensive testing strategies for Tauri + Vue.js applications.
 

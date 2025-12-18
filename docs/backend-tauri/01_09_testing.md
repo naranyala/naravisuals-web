@@ -1,6 +1,6 @@
 ---
-title: Testing and Debugging
-description: Comprehensive testing strategies and debugging techniques for Tauri applications, covering unit tests, integration tests, and debugging tools.
+title: Testing
+description: Testing strategies and debugging techniques for Tauri applications.
 order: 9
 difficulty: intermediate
 tags: [testing, debugging, quality-assurance, unit-tests, integration-tests]

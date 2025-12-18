@@ -1,6 +1,6 @@
 ---
-title: Tauri Backend Fundamentals
-description: Comprehensive introduction to Tauri's backend architecture, covering core concepts, security features, and performance advantages for modern desktop applications.
+title: Introduction
+description: Introduction to Tauri's backend architecture and core concepts.
 order: 1
 difficulty: beginner
 tags: [introduction, backend, rust, architecture, security, performance]

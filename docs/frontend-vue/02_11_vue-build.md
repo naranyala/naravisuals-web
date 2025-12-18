@@ -1,4 +1,4 @@
-# Vue.js Build Optimization for Tauri
+# Build Optimization
 
 Building optimized Vue.js applications for Tauri requires special attention to bundle size, asset management, and performance characteristics of desktop applications. This article covers comprehensive build optimization strategies for Tauri environments.
 

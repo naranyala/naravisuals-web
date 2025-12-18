@@ -1,4 +1,4 @@
-# Vue.js Accessibility in Desktop Applications
+# Accessibility
 
 Accessibility in Tauri desktop applications using Vue.js is crucial for ensuring all users, including those with disabilities, can effectively use your application. This article covers comprehensive accessibility patterns and best practices for Vue.js components in Tauri environments.
 

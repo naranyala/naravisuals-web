@@ -1,4 +1,4 @@
-# Vue.js Real-time Communication with Tauri Events
+# Events
 
 Tauri events provide powerful real-time communication between the backend and frontend. This article covers patterns for handling Tauri events in Vue.js applications, creating reactive data from backend events, and managing event subscriptions effectively.
 

@@ -1,4 +1,4 @@
-# Vue.js Components for Tauri Applications
+# Components
 
 Creating reusable Vue.js components that interact with Tauri commands is fundamental to building robust desktop applications. This article covers patterns and best practices for developing Tauri-aware Vue components.
 

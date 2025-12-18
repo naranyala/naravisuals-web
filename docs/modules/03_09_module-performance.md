@@ -1,4 +1,4 @@
-# Performance Optimization
+# Performance
 
 Optimizing module performance is critical for creating responsive and efficient Tauri-Vue applications. This article explores techniques for improving both frontend and backend module performance while maintaining security and functionality.
 

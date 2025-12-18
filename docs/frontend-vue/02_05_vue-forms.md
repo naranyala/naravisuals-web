@@ -1,4 +1,4 @@
-# Vue.js Forms and Validation with Tauri Backend
+# Forms
 
 Handling forms in Tauri applications requires special attention to validation, error handling, and integration with backend commands. This article covers comprehensive form management patterns for Vue.js applications with Tauri backend integration.
 

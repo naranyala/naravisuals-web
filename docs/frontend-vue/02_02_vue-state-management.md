@@ -1,6 +1,6 @@
 ---
-title: Vue.js State Management with Pinia
-description: Learn how to implement effective state management in Tauri applications using Pinia, Vue.js's official state management library.
+title: State Management
+description: State management in Tauri applications using Pinia.
 order: 2
 difficulty: intermediate
 tags: [state-management, pinia, vue, stores, typescript]

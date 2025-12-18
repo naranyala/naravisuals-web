@@ -1,4 +1,4 @@
-# Modal & Alert Management in Vue for Tauri Applications
+# Dialog Systems
 
 Creating effective dialog systems is crucial for desktop applications. This article explores patterns for implementing modal dialogs, alerts, and confirmation dialogs that integrate with native desktop experiences while maintaining Vue's reactivity and component architecture.
 

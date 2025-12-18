@@ -1,4 +1,4 @@
-# Background Services and Workers in Tauri
+# Background Services
 
 Managing long-running tasks and background services is crucial for creating responsive desktop applications. This article explores patterns for implementing robust background services in Tauri applications.
 

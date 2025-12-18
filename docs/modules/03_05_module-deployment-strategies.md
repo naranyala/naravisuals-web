@@ -1,4 +1,4 @@
-# Deployment Strategies
+# Deployment
 
 Deploying modules effectively in Tauri-Vue applications requires careful consideration of packaging, loading, and distribution strategies. This article explores various approaches to module deployment that optimize performance, maintainability, and user experience.
 

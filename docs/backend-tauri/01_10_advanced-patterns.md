@@ -2,7 +2,7 @@
 order: 12
 ---
 
-# Advanced Backend Patterns
+# Advanced Patterns
 
 This article covers advanced patterns and architectural approaches for building sophisticated Tauri applications. These patterns demonstrate professional-grade solutions for common challenges in desktop application development.
 

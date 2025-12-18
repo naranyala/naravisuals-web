@@ -2,7 +2,7 @@
 order: 11
 ---
 
-# Performance Optimization
+# Performance
 
 Performance optimization is crucial for creating responsive and efficient desktop applications. This guide covers optimization techniques for Tauri applications, from Rust backend performance to frontend-backend communication efficiency.
 

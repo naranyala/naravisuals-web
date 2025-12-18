@@ -1,4 +1,4 @@
-# Tauri Security and Permissions
+# Security
 
 Security is a fundamental aspect of Tauri applications. Tauri provides a comprehensive security model that protects both the user and the application while maintaining flexibility for legitimate use cases. This article covers Tauri's security features, permission system, and best practices for building secure applications.
 

@@ -2,7 +2,7 @@
 order: 9
 ---
 
-# Window Management
+# Windows
 
 Window management is crucial for professional desktop applications. Tauri provides comprehensive APIs for creating, managing, and customizing application windows with full control over their appearance and behavior.
 

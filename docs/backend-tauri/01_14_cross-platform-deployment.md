@@ -1,4 +1,4 @@
-# Multi-Platform Build & Distribution for Tauri Applications
+# Cross-Platform Deployment
 
 Deploying Tauri applications across multiple platforms requires understanding of each operating system's requirements and packaging standards. This article covers strategies for building, signing, and distributing your applications to Windows, macOS, and Linux users.
 

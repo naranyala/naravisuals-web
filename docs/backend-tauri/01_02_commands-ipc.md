@@ -1,6 +1,6 @@
 ---
-title: Commands and Inter-Process Communication
-description: Comprehensive guide to creating, optimizing, and securing Tauri commands for robust IPC between Vue.js frontend and Rust backend.
+title: Commands & IPC
+description: Guide to Tauri commands and inter-process communication.
 order: 2
 difficulty: fundamental
 tags: [commands, ipc, communication, security, performance]
