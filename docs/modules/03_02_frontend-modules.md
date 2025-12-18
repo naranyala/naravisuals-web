@@ -1585,4 +1585,4 @@ Common frontend module challenges and solutions:
 
 Frontend module architecture in Vue for Tauri applications provides a clean separation of concerns by encapsulating components, stores, services, and types into focused modules. By following standardized patterns for module structure, state management, and inter-module communication, you can build maintainable and scalable frontend applications.
 
-Continue exploring related topics in our guide to [Backend Module Architecture](./03_07_backend-modules.md) to learn how to create modular backend services that complement your frontend modules.
+Continue exploring related topics in our guide to [Backend Modules](./03_01_backend-modules.md) to learn how to create modular backend services that complement your frontend modules.

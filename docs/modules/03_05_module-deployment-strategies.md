@@ -1049,4 +1049,4 @@ Common deployment challenges and solutions:
 
 Module deployment strategies are critical for the success of Tauri-Vue applications. By implementing dynamic loading, proper packaging, and robust deployment pipelines, you can create applications that are flexible, maintainable, and performant. The key is balancing between feature richness and deployment complexity.
 
-Continue exploring related topics in our guide to [Module Security Patterns](./03_05_module-security-patterns.md) to learn how to secure your modules effectively.
+Continue exploring related topics in our guide to [Security Patterns](./03_06_module-security-patterns.md) to learn how to secure your modules effectively.

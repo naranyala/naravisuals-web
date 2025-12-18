@@ -1365,4 +1365,4 @@ Common dialog system challenges and solutions:
 
 Effective dialog management in Tauri applications requires balancing native system integration with flexible Vue component architecture. By implementing modular, well-architected dialog systems with proper state management, you can create professional desktop applications with intuitive user interactions.
 
-Continue exploring related topics in our guide to [Drag & Drop Integration](./02_18_drag-drop-integration.md) to learn how to implement native drag and drop functionality in your applications.
+Continue exploring related topics in our guide to [Events](./02_07_vue-events.md) to learn how to implement user interactions in your applications.

@@ -1409,4 +1409,4 @@ Common security challenges and solutions:
 
 Module security in Tauri-Vue applications requires multiple layers of protection including permission systems, content security policies, secure communication channels, and proper isolation. By implementing these patterns, you can create a secure environment where modules can operate safely without compromising the entire application.
 
-Continue exploring related topics in our guide to [Module Performance Optimization](./03_06_module-performance-optimization.md) to learn how to optimize your modules for better performance without sacrificing security.
+Continue exploring related topics in our guide to [Performance](./03_09_module-performance.md) to learn how to optimize your modules for better performance without sacrificing security.

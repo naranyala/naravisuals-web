@@ -1201,4 +1201,4 @@ Common dependency management challenges and solutions:
 
 Module dependency management is fundamental to building scalable and maintainable applications. By implementing proper dependency resolution, lifecycle management, and service provisioning, you can create robust applications where modules can safely depend on each other without creating tight coupling or circular dependencies.
 
-Continue exploring related topics in our guide to [Module Deployment Strategies](./03_04_module-deployment-strategies.md) to learn how to package and deploy your modules effectively.
+Continue exploring related topics in our guide to [Deployment](./03_05_module-deployment-strategies.md) to learn how to package and deploy your modules effectively.

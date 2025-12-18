@@ -220,4 +220,4 @@ describe('User Module', () => {
 
 Frontend module architecture in Vue provides clean separation of concerns by encapsulating components, stores, and services into focused modules. This approach creates maintainable and scalable applications with clear boundaries between different features.
 
-Continue to [Backend Module Architecture](./03_07_backend-modules.md) for backend patterns.
+Continue to [Backend Modules](./03_01_backend-modules.md) for backend patterns.

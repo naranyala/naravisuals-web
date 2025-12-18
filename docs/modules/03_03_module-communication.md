@@ -1197,4 +1197,4 @@ Common inter-module communication challenges and solutions:
 
 Effective inter-module communication is essential for building scalable full-stack applications. By implementing centralized event systems, request-response patterns, and proper middleware, you can create flexible and maintainable communication channels between your modules. The key is balancing flexibility with performance and reliability.
 
-Continue exploring related topics in our guide to [Module Dependency Management](./03_03_module-dependency-management.md) to learn how to handle dependencies between modules effectively.
+Continue exploring related topics in our guide to [Dependency Management](./03_04_module-dependency-management.md) to learn how to handle dependencies between modules effectively.

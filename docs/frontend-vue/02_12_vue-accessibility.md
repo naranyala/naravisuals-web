@@ -755,9 +755,9 @@ const announce = (message) => {
     <nav role="navigation" aria-labelledby="toc-heading">
       <h2 id="toc-heading" class="sr-only">Table of Contents</h2>
       <ol>
-        <li><a href="#section-1">Introduction</a></li>
-        <li><a href="#section-2">Keyboard Navigation</a></li>
-        <li><a href="#section-3">Screen Readers</a></li>
+        <li>[Introduction](#section-1)</li>
+        <li>[Keyboard Navigation](#section-2)</li>
+        <li>[Screen Readers](#section-3)</li>
       </ol>
     </nav>
     
@@ -781,8 +781,8 @@ const announce = (message) => {
     <aside role="complementary" aria-labelledby="related-content">
       <h3 id="related-content">Related Articles</h3>
       <ul>
-        <li><a href="/keyboard-accessibility">Keyboard Accessibility</a></li>
-        <li><a href="/color-contrast">Color Contrast Guidelines</a></li>
+        <li>[Keyboard Accessibility](/keyboard-accessibility)</li>
+        <li>[Color Contrast Guidelines](/color-contrast)</li>
       </ul>
     </aside>
     

@@ -746,4 +746,4 @@ Common deployment challenges and solutions:
 
 Cross-platform deployment for Tauri applications requires careful attention to each platform's specific requirements, from code signing to packaging formats. With proper automation and testing, you can create native-like experiences across all major desktop platforms. The key is establishing consistent build processes and adhering to platform guidelines.
 
-Continue exploring related topics in our guide to [Authentication & Authorization](./01_15_authentication-authorization.md) to learn how to secure your distributed applications.
+Continue exploring related topics in our guide to [Security](./01_05_security.md) to learn how to secure your distributed applications.
