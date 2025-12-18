@@ -1,7 +1,0 @@
----
-isReadyToPublish: false
----
-
-# menggunakan vuejs 
-
-
