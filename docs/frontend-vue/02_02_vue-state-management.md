@@ -1,20 +1,26 @@
 ---
-order: 8
+title: Vue.js State Management with Pinia
+description: Learn how to implement effective state management in Tauri applications using Pinia, Vue.js's official state management library.
+order: 2
+difficulty: intermediate
+tags: [state-management, pinia, vue, stores, typescript]
 ---
 
 # Vue.js State Management with Pinia in Tauri
 
-State management is crucial for building maintainable Vue.js applications, especially when working with Tauri's backend commands. Pinia provides an excellent solution for managing application state with TypeScript support and excellent developer experience.
+State management is crucial for building maintainable Vue.js applications, especially when working with Tauri's backend commands. Pinia provides an excellent solution for managing application state with TypeScript support and excellent developer experience, making it the perfect choice for Tauri desktop applications.
 
 ## Why Pinia for Tauri Applications?
 
 Pinia is the official state management library for Vue.js and offers several advantages for Tauri applications:
 
-- **TypeScript support** with full type inference
-- **Lightweight** and minimal boilerplate
-- **Excellent DevTools** integration
-- **Modular store design** perfect for Tauri command organization
-- **Composition API friendly**
+- **TypeScript support** with full type inference and autocompletion
+- **Lightweight** and minimal boilerplate compared to Vuex
+- **Excellent DevTools** integration for debugging state changes
+- **Modular store design** perfect for organizing Tauri command responses
+- **Composition API friendly** with intuitive reactive patterns
+- **Server-side rendering compatibility** for future extensibility
+- **Hot module replacement** support for better development experience
 
 ## Setting Up Pinia
 
@@ -22,6 +28,16 @@ Pinia is the official state management library for Vue.js and offers several adv
 
 ```bash
 npm install pinia
+# or
+yarn add pinia
+# or
+pnpm add pinia
+```
+
+### TypeScript Support (Recommended)
+
+```bash
+npm install pinia @types/node
 ```
 
 ### Basic Setup
@@ -33,11 +49,45 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 
 const app = createApp(App)
-app.use(createPinia())
+const pinia = createPinia()
+
+app.use(pinia)
+app.mount('#app')
+```
+
+### TypeScript Setup
+
+```typescript
+// src/main.ts
+import { createApp } from 'vue'
+import { createPinia, type Pinia } from 'pinia'
+import App from './App.vue'
+import { invoke } from '@tauri-apps/api/tauri'
+
+const app = createApp(App)
+const pinia: Pinia = createPinia()
+
+// Provide Tauri API to all stores
+app.provide('tauri', { invoke })
+
+app.use(pinia)
 app.mount('#app')
 ```
 
 ## Store Structure for Tauri Applications
+
+### Organizing Stores by Feature
+
+Create stores that correspond to your backend command categories:
+
+```
+src/stores/
+├── auth.ts           # Authentication state
+├── files.ts          # File management state
+├── settings.ts       # Application settings
+├── notifications.ts  # System notifications
+└── index.ts         # Store exports
+```
 
 ### Organizing Stores by Feature
 

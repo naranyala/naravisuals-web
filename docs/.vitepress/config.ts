@@ -12,6 +12,12 @@ export default defineConfig({
   title: "naravisuals-web",
   description: "rust+tauri+vue",
   themeConfig: {
-    sidebar: createDynamicSidebar(docsPath)
+    sidebar: createDynamicSidebar(docsPath),
+    nav: [
+      { text: 'Home', link: '/' },
+      { text: 'Backend - Tauri', link: '/backend-tauri/01_01_introduction' },
+      { text: 'Frontend - Vue', link: '/frontend-vue/02_01_vue-frontend-setup' },
+      { text: 'Modules', link: '/modules/03_02_module-communication' }
+    ]
   }
 })

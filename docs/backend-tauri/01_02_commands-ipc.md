@@ -1,6 +1,14 @@
+---
+title: Commands and Inter-Process Communication
+description: Comprehensive guide to creating, optimizing, and securing Tauri commands for robust IPC between Vue.js frontend and Rust backend.
+order: 2
+difficulty: fundamental
+tags: [commands, ipc, communication, security, performance]
+---
+
 # Commands and Inter-Process Communication
 
-Commands are the fundamental communication mechanism between your Vue.js frontend and Rust backend in Tauri applications. This comprehensive guide covers creating, optimizing, and securing commands for robust IPC.
+Commands are the fundamental communication mechanism between your Vue.js frontend and Rust backend in Tauri applications. This comprehensive guide covers creating, optimizing, and securing commands for robust IPC, ensuring your desktop applications have efficient, type-safe communication layers.
 
 ## Command Fundamentals
 

@@ -44,11 +44,31 @@ function scanDirectory(dirPath, basePath = '') {
       const fullPath = join(dirPath, file)
       const relativePath = join(basePath, file.replace('.md', ''))
       const { title } = getFileInfo(fullPath)
-      return { file, title, link: `/${relativePath}` }
+
+      // Extract numbering from filename (assuming format like "01_02_article_title.md")
+      // The user wants the second number (xx) from format 01_xx, not the first
+      const numberingMatch = file.match(/^\d+_(\d+)_/)
+      let formattedTitle = title
+      if (numberingMatch) {
+        const numbering = numberingMatch[1]  // Get the second number (e.g., "02" from "01_02")
+        formattedTitle = `${numbering} - ${title}`
+      } else {
+        // If no numbering pattern found with two numbers, try to get at least the first number
+        const firstNumberMatch = file.match(/^(\d+)_/)
+        if (firstNumberMatch) {
+          const numbering = firstNumberMatch[1]
+          formattedTitle = `${numbering} - ${title}`
+        } else {
+          // If no numbering pattern found, just use the title as is
+          formattedTitle = title
+        }
+      }
+
+      return { file, title, formattedTitle, link: `/${relativePath}` }
     })
 
-    for (const { title, link } of fileInfos) {
-      items.push({ text: title, link })
+    for (const { formattedTitle, link } of fileInfos) {
+      items.push({ text: formattedTitle, link })
     }
 
     const directories = entries.filter(entry => {
@@ -59,8 +79,11 @@ function scanDirectory(dirPath, basePath = '') {
     for (const dir of directories) {
       const subItems = scanDirectory(join(dirPath, dir), join(basePath, dir))
       if (subItems.length > 0) {
+        // Count articles in this subdirectory for display purposes
+        const articleCount = subItems.filter(item => item.link).length
+        const countPrefix = articleCount > 0 ? `(${articleCount}) ` : ''
         items.push({
-          text: dir.charAt(0).toUpperCase() + dir.slice(1),
+          text: `${countPrefix}${dir.charAt(0).toUpperCase() + dir.slice(1)}`,
           items: subItems
         })
       }
@@ -80,8 +103,11 @@ export function createDynamicSidebar(docsPath) {
   if (statSync(backendPath).isDirectory()) {
     const backendItems = scanDirectory(backendPath, 'backend-tauri')
     if (backendItems.length > 0) {
+      // Count articles in this section for display purposes
+      const articleCount = backendItems.filter(item => item.link).length
+      const countPrefix = articleCount > 0 ? `(${articleCount}) ` : ''
       sidebar.push({
-        text: "Backend - Tauri",
+        text: `${countPrefix}Backend - Tauri`,
         items: backendItems
       })
     }
@@ -92,12 +118,31 @@ export function createDynamicSidebar(docsPath) {
   if (statSync(frontendPath).isDirectory()) {
     const frontendItems = scanDirectory(frontendPath, 'frontend-vue')
     if (frontendItems.length > 0) {
+      // Count articles in this section for display purposes
+      const articleCount = frontendItems.filter(item => item.link).length
+      const countPrefix = articleCount > 0 ? `(${articleCount}) ` : ''
       sidebar.push({
-        text: "Frontend - Vue",
+        text: `${countPrefix}Frontend - Vue`,
         items: frontendItems
       })
     }
   }
+
+  // Process modules directory
+  const modulesPath = join(docsPath, 'modules')
+  if (statSync(modulesPath).isDirectory()) {
+    const modulesItems = scanDirectory(modulesPath, 'modules')
+    if (modulesItems.length > 0) {
+      // Count articles in this section for display purposes
+      const articleCount = modulesItems.filter(item => item.link).length
+      const countPrefix = articleCount > 0 ? `(${articleCount}) ` : ''
+      sidebar.push({
+        text: `${countPrefix}Modules`,
+        items: modulesItems
+      })
+    }
+  }
+
 
   return sidebar
 }
