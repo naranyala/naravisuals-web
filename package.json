@@ -6,7 +6,8 @@
     "dev": "vitepress dev docs",
     "build": "vitepress build docs",
     "serve": "vitepress serve docs",
-    "sidebar": "node scripts/generate-sidebar.js docs"
+    "sidebar": "node scripts/generate-sidebar.js docs",
+    "deploy": "wrangler pages deploy ./docs/.vitepress/dist"
   },
   "devDependencies": {
     "vue": "3.2.44",
@@ -18,5 +19,8 @@
         "@algolia/client-search"
       ]
     }
+  },
+  "dependencies": {
+    "wrangler": "^4.56.0"
   }
 }

@@ -805,4 +805,4 @@ Common communication challenges and solutions:
 
 Module communication patterns are essential for building cohesive Tauri-Vue applications where frontend and backend modules can work together effectively. By implementing proper communication channels, middleware, and patterns like request-response and event-driven architectures, you can create robust and maintainable applications.
 
-Continue exploring related topics in our guide to [Module Security Implementation](./03_08_module-security-implementation.md) to learn how to secure your module communications effectively.
+Continue exploring related topics in our guide to [Security Implementation](./03_08_module-security-implementation.md) to learn how to secure your module communications effectively.

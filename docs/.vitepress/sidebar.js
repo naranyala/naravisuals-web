@@ -97,52 +97,89 @@ function scanDirectory(dirPath, basePath = '') {
 
 export function createDynamicSidebar(docsPath) {
   const sidebar = []
-
+  
+  // Function to scan and create section items
+  function createSectionItems(dirPath, basePath) {
+    const items = []
+    
+    try {
+      const entries = readdirSync(dirPath)
+      const files = entries.filter(entry => {
+        const fullPath = join(dirPath, entry)
+        return statSync(fullPath).isFile() && extname(entry) === '.md'
+      })
+      
+      // Sort files by filename
+      files.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
+      
+      for (const file of files) {
+        const fullPath = join(dirPath, file)
+        const { title } = getFileInfo(fullPath)
+        
+        // Extract numbering from filename
+        let numbering = ''
+        let formattedTitle = title
+        
+        const numberingMatch = file.match(/^\d+_(\d+)_/)
+        if (numberingMatch) {
+          numbering = numberingMatch[1]
+          formattedTitle = `${numbering} - ${title}`
+        } else {
+          const firstNumberMatch = file.match(/^(\d+)_/)
+          if (firstNumberMatch) {
+            numbering = firstNumberMatch[1]
+            formattedTitle = `${numbering} - ${title}`
+          }
+        }
+        
+        const link = `/${basePath}/${file.replace('.md', '')}`
+        items.push({ text: formattedTitle, link })
+      }
+    } catch (error) {
+      console.error(`Error scanning directory ${dirPath}:`, error)
+    }
+    
+    return items
+  }
+  
   // Process backend-tauri directory
   const backendPath = join(docsPath, 'backend-tauri')
   if (statSync(backendPath).isDirectory()) {
-    const backendItems = scanDirectory(backendPath, 'backend-tauri')
+    const backendItems = createSectionItems(backendPath, 'backend-tauri')
     if (backendItems.length > 0) {
-      // Count articles in this section for display purposes
-      const articleCount = backendItems.filter(item => item.link).length
-      const countPrefix = articleCount > 0 ? `(${articleCount}) ` : ''
       sidebar.push({
-        text: `${countPrefix}Backend - Tauri`,
+        text: `(${backendItems.length}) Backend - Tauri`,
+        collapsed: false,
         items: backendItems
       })
     }
   }
-
+  
   // Process frontend-vue directory
   const frontendPath = join(docsPath, 'frontend-vue')
   if (statSync(frontendPath).isDirectory()) {
-    const frontendItems = scanDirectory(frontendPath, 'frontend-vue')
+    const frontendItems = createSectionItems(frontendPath, 'frontend-vue')
     if (frontendItems.length > 0) {
-      // Count articles in this section for display purposes
-      const articleCount = frontendItems.filter(item => item.link).length
-      const countPrefix = articleCount > 0 ? `(${articleCount}) ` : ''
       sidebar.push({
-        text: `${countPrefix}Frontend - Vue`,
+        text: `(${frontendItems.length}) Frontend - Vue`,
+        collapsed: false,
         items: frontendItems
       })
     }
   }
-
+  
   // Process modules directory
   const modulesPath = join(docsPath, 'modules')
   if (statSync(modulesPath).isDirectory()) {
-    const modulesItems = scanDirectory(modulesPath, 'modules')
+    const modulesItems = createSectionItems(modulesPath, 'modules')
     if (modulesItems.length > 0) {
-      // Count articles in this section for display purposes
-      const articleCount = modulesItems.filter(item => item.link).length
-      const countPrefix = articleCount > 0 ? `(${articleCount}) ` : ''
       sidebar.push({
-        text: `${countPrefix}Modules`,
+        text: `(${modulesItems.length}) Modules`,
+        collapsed: false,
         items: modulesItems
       })
     }
   }
-
-
+  
   return sidebar
 }

@@ -1461,4 +1461,4 @@ Common performance challenges and solutions:
 
 Module performance optimization in Tauri-Vue applications requires a multi-layered approach covering frontend rendering, backend processing, communication efficiency, and resource management. By implementing proper optimization techniques like caching, virtualization, and resource limiting, you can create responsive and efficient applications that provide great user experience while maintaining security and functionality.
 
-Continue exploring related topics in our guide to [Module Testing Strategies](./03_10_module-testing.md) to learn how to effectively test your optimized modules.
+Continue exploring related topics in our guide to [Testing](./03_10_module-testing.md) to learn how to effectively test your optimized modules.

@@ -1061,4 +1061,4 @@ Common security challenges and solutions:
 
 Module security implementation is crucial for protecting Tauri-Vue applications from various security threats. By implementing proper isolation, permission management, validation, and auditing, you can create secure applications that maintain functionality while protecting sensitive operations and data. The key is balancing security with usability and performance.
 
-Continue exploring related topics in our guide to [Module Performance Optimization](./03_09_module-performance.md) to learn how to optimize your modules for better performance while maintaining security.
+Continue exploring related topics in our guide to [Performance](./03_09_module-performance.md) to learn how to optimize your modules for better performance while maintaining security.
