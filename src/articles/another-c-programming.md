@@ -1,17 +1,7 @@
 ---
-id: "random-04"
-slug: "random-04"
-title: "random-04"
+title: "System Programming in C: A Practical Guide"
 date: "December 23, 2025"
 references:
-  - authors: "Andrew S. Tanenbaum"
-    title: "Modern Operating Systems"
-    journal: "Prentice Hall"
-    year: "2007"
-  - authors: "Michael Kerrisk"
-    title: "The Linux Programming Interface"
-    journal: "No Starch Press"
-    year: "2010"
 ---
 
 # System Programming in C: A Practical Guide

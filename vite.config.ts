@@ -6,6 +6,8 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 // import vueDevTools from 'vite-plugin-vue-devtools'
 
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
+import rollupNodePolyfills from 'rollup-plugin-polyfill-node';
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,6 +15,8 @@ export default defineConfig({
     vue(),
     vueJsx(),
     // vueDevTools(),
+    nodePolyfills(),
+    // rollupNodePolyfills()
   ],
   resolve: {
     alias: {
@@ -21,15 +25,13 @@ export default defineConfig({
   },
  optimizeDeps: {
         esbuildOptions: {
-            // Node.js global to browser globalThis
             define: {
-                global: 'globalThis'
+                // global: 'globalThis'
             },
-            // Enable esbuild polyfill plugins
             plugins: [
-                NodeGlobalsPolyfillPlugin({
-                    buffer: true
-                })
+                // NodeGlobalsPolyfillPlugin({
+                //     buffer: true
+                // })
             ]
         }
     }

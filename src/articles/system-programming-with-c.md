@@ -1,17 +1,7 @@
 ---
-id: "sysprog-intro-c-001"
-slug: "introduction-to-system-programming-in-c"
 title: "Introduction to System Programming in C"
 date: "December 23, 2025"
 references:
-  - authors: "Brian W. Kernighan, Dennis M. Ritchie"
-    title: "The C Programming Language"
-    journal: "Prentice Hall"
-    year: "1988"
-  - authors: "Robert Love"
-    title: "Linux System Programming"
-    journal: "O'Reilly Media"
-    year: "2010"
 ---
 
 # Introduction to System Programming in C

@@ -1,86 +1,49 @@
 <script setup lang="ts">
 import AppShell from "./components/AppShell.jsx"
-import staticArticles from "./articles.json"
 import AboutMe from "./components/AboutMe.jsx"
+
+import CollapsibleSection from "./components/CollapsibleSection.jsx"
 
 import Projects from "./modal-content/Projects.jsx"
 import ModalFullscreen from "./components/ModalFullscreen.jsx"
 import ImageGallery from "./components/ImageGallery.jsx"
 import ImageEncoding from "./components/ImageEncoding.jsx"
 import ArticleDraft from "./components/ArticleDraft.jsx"
+import ProperEditor from "./components/ProperEditor.jsx"
+
+import {loadArticles} from "./loadArticles.ts"
+import staticArticles from "./articles.json"
 
 import {ref, onMounted, reactive} from "vue"
-import { marked } from 'marked';
-import matter from 'gray-matter';
-import { z } from 'zod';
-
-const ReferenceSchema = z.object({
-  authors: z.string(),
-  title: z.string(),
-  journal: z.string(),
-  year: z.string().regex(/^\d{4}$/),
-});
-
-const ArticleSchema = z.object({
-  id: z.string(),
-  slug: z.string(),
-  title: z.string(),
-  date: z.string().regex(/^\w+ \d{1,2}, \d{4}$/), // e.g., "December 15, 2025"
-  content: z.string(), // HTML after parsing
-  references: z.array(ReferenceSchema).optional().default([]),
-});
-
-function parseMarkdownArticle(rawMarkdown, sourcePath ) {
-  const { data: frontmatter, content: markdownBody } = matter(rawMarkdown);
-
-  const htmlContent = marked.parse(markdownBody, {
-    gfm: true,
-    breaks: true,
-  });
-
-  const rawArticle = {
-    ...frontmatter,
-    content: htmlContent,
-  };
-
-  // return rawArticle;
-
-  try {
-    return ArticleSchema.parse(rawArticle);
-  } catch (err) {
-    // throw error;
-    console.error(err)
-  }
-}
-
-const markdownModules = import.meta.glob('./articles/**/*.md', { query: '?raw', eager: true });
-
-async function loadArticles() {
-  const articles = [];
-
-  for (const [path, rawMarkdown] of Object.entries(markdownModules)) {
-    try {
-      const article = parseMarkdownArticle(rawMarkdown.default, path);
-      articles.push(article);
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  // console.log(articles)
-  return articles.sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  });
-}
+// import { marked } from 'marked';
+// import matter from 'gray-matter';
+// import { z } from 'zod';
 
 
-const articles = ref([] || staticArticles);
+const articles = ref([]);
 
 onMounted(async () => {
+
+  // articles.value = staticArticles;
   articles.value = await loadArticles();
 
   console.log("articles: ", articles.value)
 });
+
+
+// const isAllOpen = true;
+const isAllOpen = false;
+
+const accordionContent = ref([
+  {isOpen: isAllOpen, title: "siapa saya",
+    content: "saya adalah penggemar linux"},
+  {isOpen: isAllOpen, title: "keahlian utama",
+    content: "pemrograman web dan sistem"},
+  {isOpen: isAllOpen, title: "kegiatan selain pemrograman",
+    content: "baca buku dan olahraga"},
+  {isOpen: isAllOpen, title: "terkait tempat dan domisili sekarang",
+    content: "lahir dan besar di jawa timur, pernah berkuliah di yogyakarta; sekarang ada di madiun"},
+])
 
 const menuState = reactive({
   isAboutVisible: false,
@@ -119,6 +82,8 @@ const toggleDraft = () => menuState.isDraftVisible = !menuState.isDraftVisible;
     <ArticleDraft/>
   </ModalFullscreen>
 
+  <!-- <ProperEditor/> -->
+
   <div class="layout-footer">
     <button @click="toggleAbout" class="footer-btn">about-me</button>
     <button @click="toggleProject" class="footer-btn">projects</button>
@@ -130,9 +95,28 @@ const toggleDraft = () => menuState.isDraftVisible = !menuState.isDraftVisible;
   <AppShell :articles="articles"/>
 
 
+  <div class="layout-grid">
+    <CollapsibleSection v-for="section in accordionContent" :title="section.title" :defaultOpen="section.isOpen">
+      <p>{{section.content}}</p>
+    </CollapsibleSection>
+  </div>
+
 </template>
 
 <style scoped>
 .layout-footer { text-align: left; margin: 20px auto; padding: 40px;}
 .footer-btn { padding: 8px; margin: 8px; }
+.layout-grid {
+  padding: 40px;
+  display: grid;
+  grid-template-columns: 1fr; /* Two equal-width columns */
+  gap: 1rem; /* Optional: Adds space between columns */
+}
+
+@media (min-width: 600px) {
+  .layout-grid {
+    grid-template-columns: 1fr 1fr; /* Two columns */
+  }
+}
+
 </style>

@@ -293,7 +293,7 @@ export default defineComponent({
           // Use shiki for syntax highlighting
           const highlighted = await codeToHtml(code, {
             lang: language,
-            theme: 'vitesse-dark'
+            theme: 'tokyo-night'
           })
           return highlighted
         } catch (error) {
@@ -350,7 +350,7 @@ export default defineComponent({
         try {
           const highlighted = await codeToHtml(code, {
             lang: lang || 'text',
-            theme: 'vitesse-dark'
+            theme: 'tokyo-night'
           })
           html = html.replace(match, highlighted)
         } catch (error) {

@@ -1,17 +1,7 @@
 ---
-id: "sysprog-system-calls-002"
-slug: "understanding-system-calls-and-kernel-interaction"
 title: "Understanding System Calls and Kernel Interaction"
 date: "December 23, 2025"
 references:
-  - authors: "Andrew S. Tanenbaum"
-    title: "Modern Operating Systems"
-    journal: "Prentice Hall"
-    year: "2007"
-  - authors: "Michael Kerrisk"
-    title: "The Linux Programming Interface"
-    journal: "No Starch Press"
-    year: "2010"
 ---
 
 # Understanding System Calls and Kernel Interaction

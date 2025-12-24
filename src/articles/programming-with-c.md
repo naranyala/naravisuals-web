@@ -1,17 +1,7 @@
 ---
-id: "random-o3"
-slug: "random-03"
-title: "random-03"
+title: "Overview of Systems Programming"
 date: "December 23, 2025"
 references:
-  - authors: "Andrew S. Tanenbaum"
-    title: "Modern Operating Systems"
-    journal: "Prentice Hall"
-    year: "2007"
-  - authors: "Michael Kerrisk"
-    title: "The Linux Programming Interface"
-    journal: "No Starch Press"
-    year: "2010"
 ---
 
 ### Overview of Systems Programming
