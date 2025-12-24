@@ -120,6 +120,6 @@ const toggleGallery = () => isGalleryVisible.value = !isGalleryVisible.value;
 </template>
 
 <style scoped>
-.layout-footer { text-align: center; margin: 20px auto; padding: 40px;}
+.layout-footer { text-align: left; margin: 20px auto; padding: 40px;}
 .footer-btn { padding: 8px; margin: 8px; }
 </style>

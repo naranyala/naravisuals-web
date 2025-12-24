@@ -13,7 +13,8 @@
     "type-check": "vue-tsc --build",
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
     "lint:eslint": "eslint . --fix --cache",
-    "lint": "run-s lint:*"
+    "lint": "run-s lint:*",
+    "deploy": "wrangler pages deploy ./dist"
   },
   "dependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
@@ -27,6 +28,7 @@
     "shiki": "^3.20.0",
     "vue": "^3.5.25",
     "vue-router": "^4.6.3",
+    "wrangler": "^4.56.0",
     "zod": "^4.2.1"
   },
   "devDependencies": {
