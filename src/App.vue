@@ -3,11 +3,13 @@ import AppShell from "./components/AppShell.jsx"
 import staticArticles from "./articles.json"
 import AboutMe from "./components/AboutMe.jsx"
 
-import ModalFullscreen from "./components/ModalFullscreen.jsx"
 import Projects from "./modal-content/Projects.jsx"
+import ModalFullscreen from "./components/ModalFullscreen.jsx"
 import ImageGallery from "./components/ImageGallery.jsx"
+import ImageEncoding from "./components/ImageEncoding.jsx"
+import ArticleDraft from "./components/ArticleDraft.jsx"
 
-import {ref, onMounted} from "vue"
+import {ref, onMounted, reactive} from "vue"
 import { marked } from 'marked';
 import matter from 'gray-matter';
 import { z } from 'zod';
@@ -80,38 +82,49 @@ onMounted(async () => {
   console.log("articles: ", articles.value)
 });
 
+const menuState = reactive({
+  isAboutVisible: false,
+  isModalVisible: false,
+  isGalleryVisible: false,
+  isDraftVisible: false
+})
 
-const isAboutVisible = ref(false)
-const toggleAbout = () => isAboutVisible.value = !isAboutVisible.value;
-
-const isModalVisible = ref(false)
-const toggleModal = () => isModalVisible.value = !isModalVisible.value;
-
-
-const isGalleryVisible = ref(false)
-const toggleGallery = () => isGalleryVisible.value = !isGalleryVisible.value;
-
+const toggleAbout = () => menuState.isAboutVisible = !menuState.isAboutVisible;
+const toggleProject = () => menuState.isProjectVisible = !menuState.isProjectVisible;
+const toggleGallery = () => menuState.isGalleryVisible = !menuState.isGalleryVisible;
+const toggleEncoding = () => menuState.isEncodingVisible = !menuState.isEcodingVisible;
+const toggleDraft = () => menuState.isDraftVisible = !menuState.isDraftVisible;
 </script>
 
 <template>
 
 
-  <ModalFullscreen v-model="isAboutVisible">
+  <ModalFullscreen v-model="menuState.isAboutVisible">
     <AboutMe/>
   </ModalFullscreen>
 
-  <ModalFullscreen v-model="isModalVisible">
+  <ModalFullscreen v-model="menuState.isProjectVisible">
     <Projects/>
   </ModalFullscreen>
 
-  <ModalFullscreen v-model="isGalleryVisible">
+  <ModalFullscreen v-model="menuState.isGalleryVisible">
     <ImageGallery/>
+  </ModalFullscreen>
+
+  <ModalFullscreen v-model="menuState.isEncodingVisible">
+    <ImageEncoding/>
+  </ModalFullscreen>
+
+  <ModalFullscreen v-model="menuState.isDraftVisible">
+    <ArticleDraft/>
   </ModalFullscreen>
 
   <div class="layout-footer">
     <button @click="toggleAbout" class="footer-btn">about-me</button>
-    <button @click="toggleModal" class="footer-btn">projects</button>
+    <button @click="toggleProject" class="footer-btn">projects</button>
     <button @click="toggleGallery" class="footer-btn">gallery</button>
+    <button @click="toggleEncoding" class="footer-btn">encoding</button>
+    <button @click="toggleDraft" class="footer-btn">draft</button>
   </div>
 
   <AppShell :articles="articles"/>

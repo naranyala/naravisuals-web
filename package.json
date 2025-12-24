@@ -14,7 +14,7 @@
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
     "lint:eslint": "eslint . --fix --cache",
     "lint": "run-s lint:*",
-    "deploy": "wrangler pages deploy ./dist"
+    "deploy": "bun run build && wrangler pages deploy ./dist"
   },
   "dependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",

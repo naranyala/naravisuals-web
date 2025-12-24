@@ -1,45 +1,8 @@
-// ArticleReaderWithPrism.jsx
-import { defineComponent, ref, computed, watch, onBeforeUnmount, nextTick } from 'vue';
+import { defineComponent, ref, computed, watch, nextTick } from 'vue';
 import { css } from 'goober';
+import clsx from 'clsx';
 
-// Prism loader
-let prismReady = false;
-let prismPromise = null;
-
-function loadPrism() {
-  if (prismReady) return Promise.resolve();
-  if (prismPromise) return prismPromise;
-
-  prismPromise = new Promise((resolve) => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css';
-    document.head.appendChild(link);
-
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js';
-    script.setAttribute('data-manual', '');
-    script.onload = () => {
-      const langs = ['javascript', 'typescript', 'python', 'rust', 'go', 'c', 'cpp', 'java', 'css', 'html', 'json', 'bash'];
-      Promise.all(langs.map(lang => {
-        return new Promise(res => {
-          const s = document.createElement('script');
-          s.src = `https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-${lang}.min.js`;
-          s.onload = s.onerror = res;
-          document.head.appendChild(s);
-        });
-      })).then(() => {
-        prismReady = true;
-        resolve();
-      });
-    };
-    document.head.appendChild(script);
-  });
-
-  return prismPromise;
-}
-
-// Dedent utility for raw HTML content
+// Dedent utility
 function dedent(str) {
   const lines = str.split('\n');
   const indents = lines.filter(l => l.trim()).map(l => l.match(/^\s*/)[0].length);
@@ -47,30 +10,28 @@ function dedent(str) {
   return lines.map(l => l.slice(min)).join('\n').trim();
 }
 
-// Fuzzy search function
-function fuzzySearch(searchTerm, text) {
-  if (!searchTerm) return true;
+// Shiki loader
+let shikiInstance = null;
+let shikiPromise = null;
 
-  searchTerm = searchTerm.toLowerCase();
-  text = text.toLowerCase();
+async function loadShiki() {
+  if (shikiInstance) return shikiInstance;
+  if (shikiPromise) return shikiPromise;
 
-  let searchIndex = 0;
-  let textIndex = 0;
+  shikiPromise = (async () => {
+    const shiki = await import('https://esm.sh/shiki@1.0.0');
+    shikiInstance = await shiki.getHighlighter({
+      themes: ['github-dark'],
+      langs: ['javascript', 'typescript', 'python', 'rust', 'go', 'c', 'cpp', 'java', 'css', 'html', 'json', 'bash']
+    });
+    return shikiInstance;
+  })();
 
-  while (searchIndex < searchTerm.length && textIndex < text.length) {
-    if (searchTerm[searchIndex] === text[textIndex]) {
-      searchIndex++;
-    }
-    textIndex++;
-  }
-
-  return searchIndex === searchTerm.length;
+  return shikiPromise;
 }
 
-// Process article content
 async function processContent(html) {
-  await loadPrism();
-
+  const highlighter = await loadShiki();
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
 
@@ -78,15 +39,156 @@ async function processContent(html) {
     const lang = (code.className.match(/language-(\w+)/) || [])[1] || 'text';
     const text = code.textContent;
 
-    if (window.Prism?.languages[lang]) {
-      const highlighted = window.Prism.highlight(text, window.Prism.languages[lang], lang);
-      code.innerHTML = highlighted;
-      code.parentElement.className = `language-${lang}`;
+    try {
+      const highlighted = highlighter.codeToHtml(text, {
+        lang: lang,
+        theme: 'github-dark'
+      });
+
+      // Extract just the code part from shiki's output
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = highlighted;
+      const preElement = tempDiv.querySelector('pre');
+
+      if (preElement) {
+        code.innerHTML = preElement.querySelector('code')?.innerHTML || text;
+        code.className = `language-${lang}`;
+        code.setAttribute('data-lang', lang);
+        code.setAttribute('data-code', text);
+      }
+    } catch (e) {
+      console.warn(`Failed to highlight ${lang}:`, e);
+      code.textContent = text;
       code.className = `language-${lang}`;
+      code.setAttribute('data-lang', lang);
+      code.setAttribute('data-code', text);
     }
   });
 
   return doc.body.innerHTML;
+}
+
+const defaultArticles = [
+  {
+    id: '1',
+    title: 'Memory Layout in 2025',
+    date: 'Jan 10, 2025',
+    content: dedent(`
+      <h2>Understanding Modern Memory</h2>
+      <p>Modern operating systems use virtual memory.</p>
+      <pre><code class="language-c">#include <stdio.h>
+int main() {
+    printf("Hello\\n");
+    return 0;
+}</code></pre>
+    `)
+  },
+  {
+    id: '2',
+    title: 'Async JavaScript',
+    date: 'Jan 15, 2025',
+    content: dedent(`
+      <h2>Async Patterns</h2>
+      <pre><code class="language-javascript">async function fetchData() {
+  const res = await getData();
+  return res;
+}</code></pre>
+    `)
+  },
+  {
+    id: '3',
+    title: 'Advanced Rust',
+    date: 'Jan 20, 2025',
+    content: dedent(`
+      <h2>Ownership in Rust</h2>
+      <p>Rust's ownership system ensures memory safety.</p>
+      <pre><code class="language-rust">fn main() {
+    let s = String::from("hello");
+    println!("{}", s);
+}</code></pre>
+    `)
+  },
+  {
+    id: '4',
+    title: 'Python Basics',
+    date: 'Jan 30, 2025',
+    content: dedent(`
+      <h2>Python Functions</h2>
+      <p>Python makes it easy to write clean code.</p>
+      <pre><code class="language-python">def greet(name):
+    # Print a greeting
+    return f"Hello, {name}!"
+
+print(greet("World"))</code></pre>
+    `)
+  }
+];
+
+const s = {
+  app: css`min-height:100vh;padding:28px;max-width:1100px;margin:0 auto;font-family:system-ui;color:#e6eef8;background:#0a0e1a;`,
+  title: css`font-size:20px;margin-bottom:18px;`,
+  search: css`width:100%;padding:12px;margin-bottom:20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e6eef8;font-size:14px;&:focus{outline:none;border-color:rgba(100,180,255,0.4);}`,
+  list: css`display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;`,
+  card: css`background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);padding:14px;border-radius:10px;cursor:pointer;transition:transform 0.2s;&:hover{transform:translateY(-4px);}`,
+  cardTitle: css`font-size:15px;margin-bottom:8px;`,
+  date: css`font-size:12px;color:rgba(230,240,255,0.6);`,
+  modal: css`position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;z-index:100;`,
+  reader: css`width:100%;height:100%;display:flex;flex-direction:column;background:#0f1420;overflow:auto;`,
+  header: css`padding:18px;border-bottom:1px solid rgba(255,255,255,0.05);`,
+  btn: css`background:rgba(255,255,255,0.1);border:none;padding:8px 16px;border-radius:6px;color:#e6eef8;cursor:pointer;&:hover{background:rgba(255,255,255,0.15);}`,
+  readerTitle: css`margin:8px 0 0;font-size:18px;`,
+  body: css`padding:28px;max-width:800px;margin:0 auto;font-size:16px;line-height:1.8;color:#d7e7fb;
+    h2{font-size:24px;color:#f6fbff;margin:20px 0 12px;}
+    p{margin:12px 0;}
+    code:not(pre code){background:rgba(255,255,255,0.05);padding:3px 6px;border-radius:4px;font-family:monospace;font-size:0.9em;color:#a7d7ff;}
+  `,
+  codeWrapper: css`position:relative;margin:16px 0;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.05);background:#0d1117;`,
+  codeHeader: css`display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(255,255,255,0.02);border-bottom:1px solid rgba(255,255,255,0.05);`,
+  codeLang: css`font-size:12px;color:rgba(230,240,255,0.5);text-transform:uppercase;font-weight:600;`,
+  copyBtn: css`background:rgba(255,255,255,0.05);border:none;padding:6px 12px;border-radius:6px;color:rgba(230,240,255,0.7);cursor:pointer;font-size:12px;transition:all 0.2s;display:flex;align-items:center;gap:6px;&:hover{background:rgba(255,255,255,0.1);color:#fff;}&.copied{background:rgba(16,185,129,0.15);color:#10b981;}`,
+  pre: css`margin:0!important;background:transparent!important;`,
+  preCode: css`display:block;padding:14px;font-family:'Fira Code',monospace;font-size:14px;line-height:1.6;background:transparent!important;overflow-x:auto;`,
+  loading: css`padding:20px;color:rgba(230,240,255,0.7);text-align:center;`
+};
+
+function CodeBlock({ code, lang }) {
+  const copied = ref(false);
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(code).then(() => {
+      copied.value = true;
+      setTimeout(() => copied.value = false, 2000);
+    });
+  };
+
+  return (
+    <div class={s.codeWrapper}>
+      <div class={s.codeHeader}>
+        <span class={s.codeLang}>{lang}</span>
+        <button class={clsx(s.copyBtn, copied.value && 'copied')} onClick={copyCode}>
+          {copied.value ? (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Copied!
+            </>
+          ) : (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copy
+            </>
+          )}
+        </button>
+      </div>
+      <pre class={s.pre}>
+        <code class={s.preCode} innerHTML={code}></code>
+      </pre>
+    </div>
+  );
 }
 
 export default defineComponent({
@@ -94,213 +196,96 @@ export default defineComponent({
   props: {
     articles: {
       type: Array,
-      default: () => [
-        {
-          id: '1',
-          title: 'Memory Layout in 2025',
-          date: 'January 10, 2025',
-          content: dedent(`
-            <h2>Understanding Modern Memory</h2>
-            <p>Modern operating systems use virtual memory.</p>
-            <pre><code class="language-c">#include &lt;stdio.h&gt;
-            int main() {
-                printf("Hello\\n");
-                return 0;
-            }</code></pre>
-            <pre><code class="language-rust">fn main() {
-                println!("Rust!");
-            }</code></pre>
-          `),
-          references: [
-            { authors: 'Tanenbaum, A.', title: 'Modern OS', journal: 'Pearson', year: '2023' }
-          ]
-        },
-        {
-          id: '2',
-          title: 'Async JavaScript',
-          date: 'January 15, 2025',
-          content: dedent(`
-            <h2>Async Patterns</h2>
-            <pre><code class="language-javascript">async function fetch() {
-              const res = await getData();
-              return res;
-            }</code></pre>
-          `),
-          references: []
-        },
-        {
-          id: '3',
-          title: 'Advanced Rust Programming',
-          date: 'January 20, 2025',
-          content: dedent(`
-            <h2>Ownership in Rust</h2>
-            <p>Rust's ownership system ensures memory safety.</p>
-            <pre><code class="language-rust">fn main() {
-                let s = String::from("hello");
-                let len = calculate_length(&s);
-                println!("Length: {}", len);
-            }</code></pre>
-          `),
-          references: [
-            { authors: 'Klabnik, S.', title: 'The Rust Programming Language', year: '2023' }
-          ]
-        },
-        {
-          id: '4',
-          title: 'JavaScript Performance Optimization',
-          date: 'January 25, 2025',
-          content: dedent(`
-            <h2>V8 Engine Internals</h2>
-            <p>Understanding how V8 optimizes JavaScript execution.</p>
-            <pre><code class="language-javascript">function optimizeMe() {
-              const arr = new Array(1000);
-              // Optimized code here
-            }</code></pre>
-          `),
-          references: []
-        }
-      ]
+      default: () => defaultArticles
     }
   },
   setup(props) {
-    const selectedId = ref(null);
-    const searchQuery = ref('');
-    const article = computed(() => props.articles.find(a => a.id === selectedId.value));
+    const selected = ref(null);
+    const search = ref('');
     const html = ref('');
     const loading = ref(false);
+    const codeBlocks = ref([]);
 
-    // Filter articles based on fuzzy search
-    const filteredArticles = computed(() => {
-      if (!searchQuery.value.trim()) {
-        return props.articles;
-      }
+    const filtered = computed(() =>
+      props.articles.filter(a => a.title.toLowerCase().includes(search.value.toLowerCase()))
+    );
 
-      return props.articles.filter(article =>
-        fuzzySearch(searchQuery.value, article.title)
-      );
-    });
+    const article = computed(() => props.articles.find(a => a.id === selected.value));
 
     watch(article, async (art) => {
       if (!art) {
         html.value = '';
+        codeBlocks.value = [];
         return;
       }
       loading.value = true;
-      html.value = await processContent(art.content);
-      loading.value = false;
+      const processed = await processContent(art.content);
+      html.value = processed;
+
+      // Extract code blocks for proper rendering
       await nextTick();
-    });
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(processed, 'text/html');
+      codeBlocks.value = Array.from(doc.querySelectorAll('pre > code')).map(code => ({
+        lang: code.getAttribute('data-lang') || 'text',
+        code: code.getAttribute('data-code') || code.textContent,
+        html: code.innerHTML
+      }));
 
-    function open(id) {
-      selectedId.value = id;
-      document.body.style.overflow = 'hidden';
-    }
-
-    function close() {
-      selectedId.value = null;
-      document.body.style.overflow = '';
-    }
-
-    function clearSearch() {
-      searchQuery.value = '';
-    }
-
-    onBeforeUnmount(() => {
-      document.body.style.overflow = '';
+      loading.value = false;
     });
 
     return () => (
       <div class={s.app}>
-        <div class={s.headerContainer}>
-          <h1 class={s.title}>Articles</h1>
+        <h1 class={s.title}>Articles</h1>
 
-          <div class={s.searchContainer}>
-            <div class={s.searchWrapper}>
-              <svg class={s.searchIcon} width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
-                      stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-              <input
-                type="text"
-                class={s.searchInput}
-                placeholder="Search articles by title..."
-                value={searchQuery.value}
-                onInput={(e) => searchQuery.value = e.target.value}
-              />
-              {searchQuery.value && (
-                <button class={s.clearButton} onClick={clearSearch}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </button>
-              )}
-            </div>
-
-            {searchQuery.value && (
-              <div class={s.searchStats}>
-                Found {filteredArticles.value.length} article{filteredArticles.value.length !== 1 ? 's' : ''}
-              </div>
-            )}
-          </div>
-        </div>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={search.value}
+          onInput={e => search.value = e.target.value}
+          class={s.search}
+        />
 
         <div class={s.list}>
-          {filteredArticles.value.length > 0 ? (
-            filteredArticles.value.map(a => (
-              <div key={a.id} class={s.card} onClick={() => open(a.id)}>
-                <h3>{highlightMatch(a.title, searchQuery.value)}</h3>
-                <div class={s.date}>{a.date}</div>
-              </div>
-            ))
-          ) : (
-            <div class={s.noResults}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                <path d="M9.172 18.828L12 16M12 16L14.828 18.828M12 16V21M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                      stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-              <div class={s.noResultsText}>
-                No articles found for "{searchQuery.value}"
-              </div>
-              <button class={s.clearSearchButton} onClick={clearSearch}>
-                Clear search
-              </button>
+          {filtered.value.map(a => (
+            <div key={a.id} class={s.card} onClick={() => selected.value = a.id}>
+              <h3 class={s.cardTitle}>{a.title}</h3>
+              <div class={s.date}>{a.date}</div>
             </div>
-          )}
+          ))}
         </div>
 
         {article.value && (
-          <div class={s.backdrop} onClick={e => e.target === e.currentTarget && close()}>
+          <div class={s.modal} onClick={e => e.target === e.currentTarget && (selected.value = null)}>
             <div class={s.reader}>
-              <div class={s.modalHeader}>
-                <button onClick={close} class={s.back}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2"/>
-                  </svg>
-                </button>
-                <div>
-                  <h3 class={s.readerTitle}>{article.value.title}</h3>
-                  <div class={s.date}>{article.value.date}</div>
-                </div>
+              <div class={s.header}>
+                <button class={s.btn} onClick={() => selected.value = null}>← Back</button>
+                <h2 class={s.readerTitle}>{article.value.title}</h2>
+                <div class={s.date}>{article.value.date}</div>
               </div>
 
               <div class={s.body}>
                 {loading.value ? (
-                  <div class={s.loading}>
-                    <div class={s.spinner}></div> Loading…
-                  </div>
+                  <div class={s.loading}>Loading syntax highlighting...</div>
                 ) : (
-                  <div innerHTML={html.value}></div>
-                )}
-
-                {article.value.references?.length > 0 && (
-                  <div class={s.refs}>
-                    <strong>References</strong>
-                    <ul>
-                      {article.value.references.map((r, i) => (
-                        <li key={i}>{r.authors} — {r.title} ({r.year})</li>
+                  <>
+                    {/* Render content with code blocks replaced */}
+                    <div>
+                      {html.value.split(/<pre>.*?<\/pre>/gs).map((part, i) => (
+                        <span key={i}>
+                          <div innerHTML={part}></div>
+                          {codeBlocks.value[i] && (
+                            <CodeBlock
+                              code={codeBlocks.value[i].code}
+                              lang={codeBlocks.value[i].lang}
+                              key={`code-${i}`}
+                            />
+                          )}
+                        </span>
                       ))}
-                    </ul>
-                  </div>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
@@ -310,45 +295,3 @@ export default defineComponent({
     );
   }
 });
-
-// Helper function to highlight matching text
-function highlightMatch(text, query) {
-  if (!query.trim()) return text;
-
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  const parts = text.split(regex);
-
-  return parts.map((part, index) =>
-    part.toLowerCase() === query.toLowerCase()
-      ? <mark key={index} class={s.highlight}>{part}</mark>
-      : part
-  );
-}
-
-const s = {
-  app: css`min-height:100vh;padding:28px;max-width:1100px;margin:0 auto;font-family:Inter,system-ui;color:#e6eef8;background:#0a0e1a;`,
-  headerContainer: css`margin-bottom:28px;`,
-  title: css`font-size:20px;font-weight:700;margin:0 0 18px;color:#f1f8ff;`,
-  searchContainer: css`margin-bottom:24px;`,
-  searchWrapper: css`position:relative;display:flex;align-items:center;margin-bottom:8px;`,
-  searchIcon: css`position:absolute;left:14px;color:rgba(230,240,255,0.5);pointer-events:none;`,
-  searchInput: css`width:100%;padding:14px 40px 14px 44px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#e6f0ff;font-size:14px;transition:all 200ms;font-family:inherit;&:focus{outline:none;border-color:rgba(100,180,255,0.4);background:rgba(255,255,255,0.05);box-shadow:0 0 0 3px rgba(100,180,255,0.1);} &::placeholder{color:rgba(230,240,255,0.4);}`,
-  clearButton: css`position:absolute;right:12px;background:none;border:none;cursor:pointer;color:rgba(230,240,255,0.5);padding:6px;border-radius:6px;display:flex;align-items:center;justify-content:center;&:hover{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.8);}`,
-  searchStats: css`font-size:13px;color:rgba(230,240,255,0.6);margin-left:4px;`,
-  list: css`display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;`,
-  card: css`background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);padding:14px;border-radius:12px;cursor:pointer;transition:transform 160ms,box-shadow 160ms;box-shadow:0 6px 18px rgba(2,6,23,0.6);&:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(2,6,23,0.7);} h3{font-size:15px;font-weight:700;margin:0 0 8px;color:#eaf4ff;}`,
-  date: css`font-size:12px;color:rgba(230,240,255,0.65);`,
-  highlight: css`background:linear-gradient(120deg,rgba(255,200,100,0.2),rgba(255,180,80,0.15));padding:2px 4px;border-radius:4px;color:#ffd699;`,
-  noResults: css`grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;color:rgba(230,240,255,0.5); svg{margin-bottom:16px;color:rgba(230,240,255,0.3);}`,
-  noResultsText: css`font-size:16px;margin-bottom:20px;color:rgba(230,240,255,0.6);`,
-  clearSearchButton: css`background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(230,240,255,0.8);padding:8px 20px;border-radius:8px;font-size:14px;cursor:pointer;transition:all 200ms;font-family:inherit;&:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12);}`,
-  backdrop: css`position:fixed;inset:0;background:rgba(2,6,23,0.92);display:flex;z-index:1400;`,
-  reader: css`width:100%;height:100%;display:flex;flex-direction:column;background:linear-gradient(180deg,#071025,#04121a);overflow:auto;`,
-  modalHeader: css`height:64px;display:flex;align-items:center;gap:12px;padding:0 18px;border-bottom:1px solid rgba(255,255,255,0.04);`,
-  back: css`width:44px;height:44px;border-radius:10px;border:none;background:transparent;cursor:pointer;color:#cfe7ff;display:flex;align-items:center;justify-content:center;&:hover{background:rgba(255,255,255,0.03);}`,
-  readerTitle: css`margin:0;font-size:16px;font-weight:700;color:#e6f0ff;`,
-  body: css`padding:36px 28px;max-width:900px;margin:0 auto 80px;font-size:18px;line-height:1.8;color:#d7e7fb; h2{font-size:26px;color:#f6fbff;margin:28px 0 12px;} h3{font-size:20px;color:#f6fbff;margin:24px 0 12px;} p{margin:12px 0;} code:not(pre code){background:rgba(255,255,255,0.05);padding:3px 7px;border-radius:5px;font-family:monospace;font-size:0.92em;color:#a7d7ff;} pre{margin:20px 0;border-radius:10px;overflow:auto;border:1px solid rgba(255,255,255,0.05);background:#1a1f2e!important;} pre code{display:block;padding:16px;font-family:monospace;font-size:14px;line-height:1.7;background:transparent!important;}`,
-  loading: css`display:flex;align-items:center;gap:12px;padding:24px;color:rgba(230,240,255,0.7);`,
-  spinner: css`width:16px;height:16px;border:2px solid rgba(255,255,255,0.1);border-top-color:rgba(255,255,255,0.6);border-radius:50%;animation:spin 0.6s linear infinite;@keyframes spin{to{transform:rotate(360deg);}}`,
-  refs: css`margin-top:32px;padding:16px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);color:rgba(230,240,255,0.85); strong{display:block;margin-bottom:8px;color:#f1f8ff;} ul{margin:0;padding-left:20px;} li{margin:6px 0;font-size:14px;}`
-};
