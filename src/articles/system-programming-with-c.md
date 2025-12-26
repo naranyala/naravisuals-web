@@ -1,6 +1,10 @@
 ---
 title: "Introduction to System Programming in C"
 date: "December 23, 2025"
+tags:
+ - c-code
+ - coding
+ - awesome
 references:
 ---
 

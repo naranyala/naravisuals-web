@@ -3,15 +3,16 @@ import matter from 'gray-matter';
 import { z } from 'zod';
 
 const ReferenceSchema = z.object({
-  authors: z.string(),
+  writer: z.string(),
   title: z.string(),
-  journal: z.string(),
+  source: z.string(),
   year: z.string().regex(/^\d{4}$/),
 });
 
 const ArticleSchema = z.object({
   title: z.string(),
   date: z.string().regex(/^\w+ \d{1,2}, \d{4}$/),
+  tags: z.array(z.string()),
   content: z.string(),
   // references: z.array(ReferenceSchema).optional().default([]),
 });

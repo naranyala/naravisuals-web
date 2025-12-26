@@ -1,6 +1,10 @@
 ---
 title: "System Programming in C: A Practical Guide"
 date: "December 23, 2025"
+tags:
+ - random
+ - coding
+ - awesome
 references:
 ---
 

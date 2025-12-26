@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import AppShell from "./components/AppShell.jsx"
-import AboutMe from "./components/AboutMe.jsx"
+import AppShell from "./components/AppShell.tsx"
+import AboutMe from "./components/AboutMe.tsx"
 
-import CollapsibleSection from "./components/CollapsibleSection.jsx"
+import CollapsibleSection from "./components/CollapsibleSection.tsx"
 
-import Projects from "./modal-content/Projects.jsx"
-import ModalFullscreen from "./components/ModalFullscreen.jsx"
-import ImageGallery from "./components/ImageGallery.jsx"
-import ImageEncoding from "./components/ImageEncoding.jsx"
-import ArticleDraft from "./components/ArticleDraft.jsx"
-import ProperEditor from "./components/ProperEditor.jsx"
+import Projects from "./modal-content/Projects.tsx"
+import ModalFullscreen from "./components/ModalFullscreen.tsx"
+import ImageGallery from "./components/ImageGallery.tsx"
+import ImageEncoding from "./components/ImageEncoding.tsx"
+import ArticleDraft from "./components/ArticleDraft.tsx"
+import ProperEditor from "./components/ProperEditor.tsx"
 
 import {loadArticles} from "./loadArticles.ts"
 import staticArticles from "./articles.json"
@@ -31,7 +31,7 @@ onMounted(async () => {
 });
 
 
-// const isAllOpen = true;
+/*
 const isAllOpen = false;
 
 const accordionContent = ref([
@@ -44,6 +44,21 @@ const accordionContent = ref([
   {isOpen: isAllOpen, title: "terkait tempat dan domisili sekarang",
     content: "lahir dan besar di jawa timur, pernah berkuliah di yogyakarta; sekarang ada di madiun"},
 ])
+*/
+
+import ProductList from "./use-cases/ProductList.tsx"
+import TaskDemoMain from "./use-cases/TaskDemoMain.tsx"
+import DatePicker from "./components/DatePicker.tsx"
+
+const demoState = reactive({
+  isProductVisible: false,
+  isTaskVisible: false,
+  isDateVisible: false,
+})
+
+const toggleProduct = () => demoState.isProductVisible = !demoState.isProductVisible;
+const toggleTaskDemo = () => demoState.isTaskVisible = !demoState.isTaskVisible;
+const toggleDatePicker = () => demoState.isDateVisible = !demoState.isDateVisible;
 
 const menuState = reactive({
   isAboutVisible: false,
@@ -84,9 +99,12 @@ const toggleDraft = () => menuState.isDraftVisible = !menuState.isDraftVisible;
 
   <!-- <ProperEditor/> -->
 
+
   <div class="layout-footer">
+  <h3>MAIN MENU</h3>
+
     <button @click="toggleAbout" class="footer-btn">about-me</button>
-    <button @click="toggleProject" class="footer-btn">projects</button>
+    <button @click="toggleProject" class="footer-btn">gh-projects</button>
     <button @click="toggleGallery" class="footer-btn">gallery</button>
     <button @click="toggleEncoding" class="footer-btn">encoding</button>
     <button @click="toggleDraft" class="footer-btn">draft</button>
@@ -95,17 +113,46 @@ const toggleDraft = () => menuState.isDraftVisible = !menuState.isDraftVisible;
   <AppShell :articles="articles"/>
 
 
+
+
+  <div class="layout-footer">
+    <h3>UI-DEVELOPMENT</h3>
+    <button @click="toggleProduct" class="footer-btn">product-list</button>
+    <button @click="toggleTaskDemo" class="footer-btn">task-demo</button>
+    <button @click="toggleDatePicker" class="footer-btn">date-picker</button>
+  </div>
+
+
+  <ModalFullscreen v-model="demoState.isProductVisible">
+    <ProductList/>
+  </ModalFullscreen>
+
+  <ModalFullscreen v-model="demoState.isTaskVisible">
+    <TaskDemoMain/>
+  </ModalFullscreen>
+
+
+  <ModalFullscreen v-model="demoState.isDateVisible">
+    <DatePicker/>
+  </ModalFullscreen>
+
+  <!--
   <div class="layout-grid">
     <CollapsibleSection v-for="section in accordionContent" :title="section.title" :defaultOpen="section.isOpen">
       <p>{{section.content}}</p>
     </CollapsibleSection>
   </div>
+  -->
 
 </template>
 
 <style scoped>
 .layout-footer { text-align: left; margin: 20px auto; padding: 40px;}
-.footer-btn { padding: 8px; margin: 8px; }
+.footer-btn {
+  padding: 8px; margin: 8px 8px 8px 0px; border-radius: 0;
+
+  &:hover { background: #00FF00; color: black; }
+}
 .layout-grid {
   padding: 40px;
   display: grid;

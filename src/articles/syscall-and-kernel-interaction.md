@@ -1,6 +1,10 @@
 ---
 title: "Understanding System Calls and Kernel Interaction"
 date: "December 23, 2025"
+tags:
+ - random
+ - coding
+ - awesome
 references:
 ---
 
