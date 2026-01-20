@@ -10,7 +10,7 @@ async function loadShiki() {
     const { createHighlighter } = await import('shiki');
     shikiInstance = await createHighlighter({
       themes: ['github-dark'],
-      langs: ['c', 'rust', 'javascript', 'python', 'typescript', 'bash', 'json', 'html', 'css']
+      langs: ['c', 'rust', 'javascript', 'vue', 'typescript', 'bash', 'json', 'html', 'css', 'jsx', 'tsx']
     });
     return shikiInstance;
   })();

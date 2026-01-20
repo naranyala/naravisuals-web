@@ -1,8 +1,7 @@
 import { defineComponent, ref, computed, watch, nextTick } from 'vue';
 import { css } from 'goober';
 import clsx from 'clsx';
-import { processMarkdownWithShiki } from '../shikiProcessor';
-
+import { marked } from 'marked';
 
 // Dedent utility
 function dedent(str) {
@@ -12,12 +11,72 @@ function dedent(str) {
   return lines.map(l => l.slice(min)).join('\n').trim();
 }
 
+// Shiki highlighter instance with lazy loading
+let shikiInstance = null;
+let shikiPromise = null;
+
+async function loadShiki() {
+  if (shikiInstance) return shikiInstance;
+  if (shikiPromise) return shikiPromise;
+
+  shikiPromise = (async () => {
+    // Dynamically import shiki only when needed
+    const { createHighlighter } = await import('shiki');
+
+    shikiInstance = await createHighlighter({
+      themes: ['github-dark'],
+      langs: ['c', 'rust', 'javascript']
+    });
+    return shikiInstance;
+  })();
+
+  return shikiPromise;
+}
+
+
+async function processContent(html) {
+  const highlighter = await loadShiki();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  doc.querySelectorAll('pre > code').forEach(code => {
+    const lang = (code.className.match(/language-(\w+)/) || [])[1] || 'text';
+    const text = code.textContent;
+
+    try {
+      const highlighted = highlighter.codeToHtml(text, {
+        lang: lang,
+        theme: 'github-dark'
+      });
+
+      // Extract just the code part from shiki's output
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = highlighted;
+      const preElement = tempDiv.querySelector('pre');
+
+      if (preElement) {
+        code.innerHTML = preElement.querySelector('code')?.innerHTML || text;
+        code.className = `language-${lang}`;
+        code.setAttribute('data-lang', lang);
+        code.setAttribute('data-code', text);
+      }
+    } catch (e) {
+      console.warn(`Failed to highlight ${lang}:`, e);
+      code.textContent = text;
+      code.className = `language-${lang}`;
+      code.setAttribute('data-lang', lang);
+      code.setAttribute('data-code', text);
+    }
+  });
+
+  return doc.body.innerHTML;
+}
+
 const defaultArticles = [
   {
     id: '1',
     title: 'Memory Layout in 2025',
     date: 'Jan 10, 2025',
-    tags: ['memory', 'c', 'systems', 'low-level'],
     content: dedent(`
       ## Understanding Modern Memory
 
@@ -36,7 +95,6 @@ const defaultArticles = [
     id: '2',
     title: 'Async JavaScript',
     date: 'Jan 15, 2025',
-    tags: ['javascript', 'async', 'web'],
     content: dedent(`
       ## Async Patterns
 
@@ -52,7 +110,6 @@ const defaultArticles = [
     id: '3',
     title: 'Advanced Rust',
     date: 'Jan 20, 2025',
-    tags: ['rust', 'ownership', 'systems', 'safety'],
     content: dedent(`
       ## Ownership in Rust
 
@@ -70,7 +127,6 @@ const defaultArticles = [
     id: '4',
     title: 'Python Basics',
     date: 'Jan 30, 2025',
-    tags: ['python', 'basics', 'scripting'],
     content: dedent(`
       ## Python Functions
 
@@ -88,11 +144,9 @@ const defaultArticles = [
 ];
 
 const s = {
-  app: css`min-height:min-content;padding:40px;max-width:1100px;margin:0 auto;font-family:system-ui;color:#e6eef8;`,
+  app: css`min-height:100vh;padding:28px;max-width:1100px;margin:0 auto;font-family:system-ui;color:#e6eef8;background:#0a0e1a;`,
   title: css`font-size:20px;margin-bottom:18px;`,
-  tagsContainer: css`display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;`,
-  tag: css`padding:6px 12px;border-radius:20px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);font-size:13px;cursor:pointer;transition:all 0.2s;&:hover{background:rgba(255,255,255,0.15);}&.active{background:rgba(100,180,255,0.3);border-color:rgba(100,180,255,0.6);color:#fff;}`,
-  clearBtn: css`align-self:flex-start;padding:6px 12px;font-size:13px;background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(230,240,255,0.7);border-radius:6px;cursor:pointer;&:hover{background:rgba(255,255,255,0.1);color:#fff;}`,
+  search: css`width:100%;padding:12px;margin-bottom:20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e6eef8;font-size:14px;&:focus{outline:none;border-color:rgba(100,180,255,0.4);}`,
   list: css`display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;`,
   card: css`background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);padding:14px;border-radius:10px;cursor:pointer;transition:transform 0.2s;&:hover{transform:translateY(-4px);}`,
   cardTitle: css`font-size:15px;margin-bottom:8px;`,
@@ -127,89 +181,123 @@ export default defineComponent({
     }
   },
   setup(props) {
-    const selected = ref<string | null>(null);
-    const selectedTags = ref<string[]>([]);
+    const selected = ref(null);
+    const search = ref('');
     const html = ref('');
     const loading = ref(false);
+    const shikiLoaded = ref(false);
 
-    const allTags = computed(() => {
-      const set = new Set<string>();
-      props.articles.forEach((a: any) => a.tags?.forEach((t: string) => set.add(t)));
-      return Array.from(set).sort();
-    });
+    const filtered = computed(() =>
+      props.articles.filter(a => a.title.toLowerCase().includes(search.value.toLowerCase()))
+    );
 
-    const filtered = computed(() => {
-      if (selectedTags.value.length === 0) return props.articles;
-      return props.articles.filter((a: any) =>
-        a.tags?.some((tag: string) => selectedTags.value.includes(tag))
-      );
-    });
+    const article = computed(() => props.articles.find(a => a.id === selected.value));
 
-    const article = computed(() => props.articles.find((a: any) => a.id === selected.value));
-
-    const toggleTag = (tag: string) => {
-      selectedTags.value = selectedTags.value.includes(tag)
-        ? selectedTags.value.filter(t => t !== tag)
-        : [...selectedTags.value, tag];
+    // Preload shiki when user opens the first article
+    const preloadShiki = () => {
+      if (!shikiLoaded.value) {
+        loadShiki().then(() => {
+          shikiLoaded.value = true;
+        });
+      }
     };
 
-    const clearFilters = () => { selectedTags.value = []; };
-
-    watch(article, async (art: any) => {
+    watch(article, async (art) => {
       if (!art) {
         html.value = '';
         return;
       }
 
       loading.value = true;
+
       try {
-        html.value = await processMarkdownWithShiki(art.content);
-      } catch (err) {
-        console.error('Failed to process markdown:', err);
-        html.value = art.content; // fallback
+        // Process markdown content with shiki highlighting
+        const processed = await processContent(art.content);
+        html.value = processed;
+      } catch (error) {
+        console.error('Error processing content:', error);
+        html.value = art.content; // Fallback to raw content
       } finally {
         loading.value = false;
       }
     });
 
-    const enhanceCodeBlocks = (el: HTMLElement) => {
+    // Watch for article selection to preload shiki
+    watch(() => selected.value, (newVal) => {
+      if (newVal && !shikiLoaded.value) {
+        preloadShiki();
+      }
+    }, { immediate: true });
+
+    // Function to enhance code blocks with copy buttons
+    const enhanceCodeBlocks = (el) => {
       if (!el) return;
 
-      el.querySelectorAll('pre').forEach(pre => {
+      const preElements = el.querySelectorAll('pre');
+
+      preElements.forEach((pre) => {
+        pre.style.padding = '0 30px'
+
         const code = pre.querySelector('code');
-        if (!code || pre.parentElement?.classList.contains(s.codeWrapper)) return;
 
-        const lang = code.getAttribute('data-lang') || 'text';
 
+        if (!code) return;
+
+        // Skip if already enhanced
+        if (pre.parentElement?.classList?.contains(s.codeWrapper.replace(/\s+/g, ' ').trim())) {
+          return;
+        }
+
+        // Extract language
+        const classList = Array.from(code.classList);
+        const langClass = classList.find(c => c.startsWith('language-'));
+        const lang = langClass ? langClass.replace('language-', '') : 'text';
+
+        // Create wrapper
         const wrapper = document.createElement('div');
         wrapper.className = s.codeWrapper;
 
+        // Create header
         const header = document.createElement('div');
         header.className = s.codeHeader;
 
+        // Create language label
         const langSpan = document.createElement('span');
         langSpan.className = s.codeLang;
         langSpan.textContent = lang;
 
+        // Create copy button
         const copyBtn = document.createElement('button');
         copyBtn.className = s.copyBtn;
-        copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-        </svg> Copy`;
+        copyBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          Copy
+        `;
 
+        let copied = false;
         copyBtn.addEventListener('click', () => {
-          const text = code.getAttribute('data-code') || code.textContent || '';
-          navigator.clipboard.writeText(text).then(() => {
-            copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg> Copied!`;
+          const codeText = code.textContent || '';
+          navigator.clipboard.writeText(codeText).then(() => {
+            copied = true;
+            copyBtn.innerHTML = `
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Copied!
+            `;
             copyBtn.classList.add('copied');
             setTimeout(() => {
-              copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg> Copy`;
+              copied = false;
+              copyBtn.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy
+              `;
               copyBtn.classList.remove('copied');
             }, 2000);
           });
@@ -219,47 +307,36 @@ export default defineComponent({
         header.appendChild(copyBtn);
         wrapper.appendChild(header);
         wrapper.appendChild(pre.cloneNode(true));
-        pre.parentNode?.replaceChild(wrapper, pre);
+
+        pre.parentNode.replaceChild(wrapper, pre);
       });
     };
 
     return () => (
       <div class={s.app}>
-        <h3 class={s.title}>ARTICLES</h3>
+        <h1 class={s.title}>Articles</h1>
 
-        <div class={s.tagsContainer}>
-          {allTags.value.map(tag => (
-            <button
-              key={tag}
-              class={clsx(s.tag, { active: selectedTags.value.includes(tag) })}
-              onClick={() => toggleTag(tag)}
-            >
-              {tag}
-            </button>
-          ))}
-          {selectedTags.value.length > 0 && (
-            <button class={s.clearBtn} onClick={clearFilters}>
-              ❌
-            </button>
-          )}
-        </div>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={search.value}
+          onInput={e => search.value = e.target.value}
+          class={s.search}
+        />
 
         <div class={s.list}>
-          {filtered.value.map((a: any) => (
+          {filtered.value.map(a => (
             <div
               key={a.id}
               class={s.card}
-              onClick={() => selected.value = a.id}
-              onMouseEnter={() => {
-                // Optional: preload shiki on hover
-                import('../shikiProcessor');
+              onClick={() => {
+                selected.value = a.id;
+                preloadShiki();
               }}
+              onMouseEnter={preloadShiki} // Preload on hover for better UX
             >
               <h3 class={s.cardTitle}>{a.title}</h3>
               <div class={s.date}>{a.date}</div>
-              <div style="margin-top:8px;font-size:12px;opacity:0.7;">
-                {a.tags?.map((t: string) => <span key={t} style="margin-right:6px;">#{t}</span>)}
-              </div>
             </div>
           ))}
         </div>
@@ -275,16 +352,21 @@ export default defineComponent({
 
               <div class={s.body}>
                 {loading.value ? (
-                  <div class={s.loading}>Processing content with syntax highlighting...</div>
+                  <div class={s.loading}>
+                    {shikiLoaded.value ? 'Processing content...' : 'Loading syntax highlighter...'}
+                  </div>
                 ) : (
                   <div
-                    ref={el => {
+                    ref={(el) => {
                       if (el && html.value) {
-                        (el as HTMLElement).innerHTML = html.value;
-                        nextTick(() => enhanceCodeBlocks(el as HTMLElement));
+                        el.innerHTML = html.value;
+                        // Wait a tick for DOM to update, then enhance code blocks
+                        nextTick(() => {
+                          enhanceCodeBlocks(el);
+                        });
                       }
                     }}
-                  />
+                  ></div>
                 )}
               </div>
             </div>

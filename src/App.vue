@@ -46,19 +46,8 @@ const accordionContent = ref([
 ])
 */
 
-import ProductList from "./use-cases/ProductList.tsx"
-import TaskDemoMain from "./use-cases/TaskDemoMain.tsx"
+
 import DatePicker from "./components/DatePicker.tsx"
-
-const demoState = reactive({
-  isProductVisible: false,
-  isTaskVisible: false,
-  isDateVisible: false,
-})
-
-const toggleProduct = () => demoState.isProductVisible = !demoState.isProductVisible;
-const toggleTaskDemo = () => demoState.isTaskVisible = !demoState.isTaskVisible;
-const toggleDatePicker = () => demoState.isDateVisible = !demoState.isDateVisible;
 
 const menuState = reactive({
   isAboutVisible: false,
@@ -72,6 +61,23 @@ const toggleProject = () => menuState.isProjectVisible = !menuState.isProjectVis
 const toggleGallery = () => menuState.isGalleryVisible = !menuState.isGalleryVisible;
 const toggleEncoding = () => menuState.isEncodingVisible = !menuState.isEcodingVisible;
 const toggleDraft = () => menuState.isDraftVisible = !menuState.isDraftVisible;
+
+import ProductList from "./use-cases/ProductList.tsx"
+import TaskDemoMain from "./use-cases/TaskDemoMain.tsx"
+import MotherOfDashboard from "./use-cases/MotherOfDashboard.vue"
+
+const demoState = reactive({
+  isProductVisible: false,
+  isTaskVisible: false,
+  isDateVisible: false,
+  isDashboard: false,
+})
+
+const toggleProduct = () => demoState.isProductVisible = !demoState.isProductVisible;
+const toggleTaskDemo = () => demoState.isTaskVisible = !demoState.isTaskVisible;
+const toggleDatePicker = () => demoState.isDateVisible = !demoState.isDateVisible;
+const toggleDashboard = () => demoState.isDashboard = !demoState.isDashboard;
+
 </script>
 
 <template>
@@ -101,7 +107,7 @@ const toggleDraft = () => menuState.isDraftVisible = !menuState.isDraftVisible;
 
 
   <div class="layout-footer">
-  <h3>MAIN MENU</h3>
+  <h3>THINK TO FOCUS</h3>
 
     <button @click="toggleAbout" class="footer-btn">about-me</button>
     <button @click="toggleProject" class="footer-btn">gh-projects</button>
@@ -110,16 +116,16 @@ const toggleDraft = () => menuState.isDraftVisible = !menuState.isDraftVisible;
     <button @click="toggleDraft" class="footer-btn">draft</button>
   </div>
 
+
   <AppShell :articles="articles"/>
 
 
-
-
   <div class="layout-footer">
-    <h3>UI-DEVELOPMENT</h3>
+    <h3>RANDOM EXAMPLES</h3>
     <button @click="toggleProduct" class="footer-btn">product-list</button>
     <button @click="toggleTaskDemo" class="footer-btn">task-demo</button>
     <button @click="toggleDatePicker" class="footer-btn">date-picker</button>
+    <button @click="toggleDashboard" class="footer-btn">dashboard</button>
   </div>
 
 
@@ -134,6 +140,11 @@ const toggleDraft = () => menuState.isDraftVisible = !menuState.isDraftVisible;
 
   <ModalFullscreen v-model="demoState.isDateVisible">
     <DatePicker/>
+  </ModalFullscreen>
+
+
+  <ModalFullscreen v-model="demoState.isDashboard">
+    <MotherOfDashboard/>
   </ModalFullscreen>
 
   <!--
