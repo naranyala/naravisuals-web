@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { type CardCategory } from '../card-list/card-list.component';
 
 export interface Card {
   title: string;
@@ -8,6 +9,7 @@ export interface Card {
   color: string;
   content?: string;
   link?: string;
+  category: CardCategory;
 }
 
 @Component({

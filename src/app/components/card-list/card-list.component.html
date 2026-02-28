@@ -3,7 +3,7 @@
     <input
       type="text"
       class="search-input"
-      placeholder="Search technologies..."
+      placeholder="Search components..."
       [ngModel]="searchQuery()"
       (ngModelChange)="onSearchChange($event)"
     />
@@ -13,12 +13,29 @@
     }
   </div>
 
+  <div class="category-tabs">
+    @for (tab of categories; track tab.id) {
+      <button
+        type="button"
+        class="category-tab"
+        [class.active]="selectedCategory() === tab.id"
+        (click)="selectCategory(tab.id)"
+      >
+        <span class="tab-icon">{{ tab.icon }}</span>
+        <span class="tab-label">{{ tab.label }}</span>
+      </button>
+    }
+  </div>
+
   <div class="cards-grid">
     @for (card of filteredCards(); track card.title) {
       <app-card [card]="card" (cardClick)="onCardClick($event)" />
     } @empty {
       <div class="no-results">
-        <p>No results found for "{{ searchQuery() }}"</p>
+        <p>No components found</p>
+        @if (searchQuery()) {
+          <p class="no-results-hint">Try adjusting your search or filter</p>
+        }
       </div>
     }
   </div>

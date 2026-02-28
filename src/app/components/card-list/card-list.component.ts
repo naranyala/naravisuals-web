@@ -5,6 +5,14 @@ import { type Card, CardComponent } from '../card/card.component';
 
 export type { Card };
 
+export type CardCategory = 'all' | 'state' | 'ui' | 'advanced' | 'forms' | 'performance';
+
+export interface CategoryTab {
+  id: CardCategory;
+  label: string;
+  icon: string;
+}
+
 @Component({
   selector: 'app-card-list',
   standalone: true,
@@ -17,16 +25,38 @@ export class CardListComponent {
   @Output() cardClick = new EventEmitter<Card>();
 
   searchQuery = signal('');
+  selectedCategory = signal<CardCategory>('all');
+
+  readonly categories: CategoryTab[] = [
+    { id: 'all', label: 'All', icon: '📋' },
+    { id: 'state', label: 'State', icon: '📦' },
+    { id: 'ui', label: 'UI', icon: '🎨' },
+    { id: 'advanced', label: 'Advanced', icon: '🚀' },
+    { id: 'forms', label: 'Forms', icon: '📝' },
+    { id: 'performance', label: 'Performance', icon: '⚡' },
+  ];
 
   filteredCards = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
-    if (!query) {
-      return this.cards;
+    const category = this.selectedCategory();
+    
+    let result = this.cards;
+    
+    // Filter by category
+    if (category !== 'all') {
+      result = result.filter((card) => card.category === category);
     }
-    return this.cards.filter(
-      (card) =>
-        card.title.toLowerCase().includes(query) || card.description.toLowerCase().includes(query)
-    );
+    
+    // Filter by search query
+    if (query) {
+      result = result.filter(
+        (card) =>
+          card.title.toLowerCase().includes(query) || 
+          card.description.toLowerCase().includes(query)
+      );
+    }
+    
+    return result;
   });
 
   onSearchChange(value: string): void {
@@ -34,6 +64,11 @@ export class CardListComponent {
   }
 
   clearSearch(): void {
+    this.searchQuery.set('');
+  }
+
+  selectCategory(category: CardCategory): void {
+    this.selectedCategory.set(category);
     this.searchQuery.set('');
   }
 
