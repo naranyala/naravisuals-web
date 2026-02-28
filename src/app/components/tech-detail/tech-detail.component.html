@@ -1,0 +1,43 @@
+<div class="tech-detail" [style.--accent-color]="detail.color">
+  <header class="tech-header">
+    <div class="tech-icon" [style.background]="detail.color">
+      {{ detail.icon }}
+    </div>
+    <div class="tech-title">
+      <h2>{{ detail.title }}</h2>
+      <p>{{ detail.description }}</p>
+    </div>
+  </header>
+
+  <section class="features-section">
+    <h3>Key Features</h3>
+    <ul class="features-list">
+      @for (feature of detail.features; track feature) {
+        <li>{{ feature }}</li>
+      }
+    </ul>
+  </section>
+
+  @if (detail.codeExamples?.length) {
+    <section class="code-section">
+      <h3>Code Examples</h3>
+      @for (example of detail.codeExamples; track example.filename) {
+        <div class="code-block">
+          <div class="code-header">
+            <span class="filename">{{ example.filename }}</span>
+            <span class="language">{{ example.language || 'typescript' }}</span>
+          </div>
+          <pre><code>{{ example.code }}</code></pre>
+        </div>
+      }
+    </section>
+  }
+
+  @if (detail.link) {
+    <footer class="tech-footer">
+      <a [href]="detail.link" target="_blank" class="learn-more">
+        Visit {{ detail.title }} Website →
+      </a>
+    </footer>
+  }
+</div>

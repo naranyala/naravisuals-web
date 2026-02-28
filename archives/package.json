@@ -1,0 +1,29 @@
+{
+  "name": "naravisuals-rsbuild",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "rsbuild build",
+    "check": "biome check --write",
+    "dev": "rsbuild dev",
+    "format": "biome format --write",
+    "preview": "rsbuild preview",
+    "deploy": "bun run build && wrangler pages deploy ./dist"
+  },
+  "dependencies": {
+    "marked": "^17.0.1",
+    "mathjax": "^4.1.0",
+    "mermaid": "^11.12.2",
+    "motion": "^12.29.0",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.26",
+    "wrangler": "^4.60.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.8",
+    "@rsbuild/core": "^1.7.1",
+    "@rsbuild/plugin-vue": "^1.2.2",
+    "typescript": "^5.9.3"
+  }
+}

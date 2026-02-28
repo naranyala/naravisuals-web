@@ -1,0 +1,146 @@
+.tech-detail {
+  padding: 24px;
+  color: #e6edf3;
+  height: 100%;
+  overflow-y: auto;
+  background: #161b22;
+}
+
+.tech-header {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #30363d;
+}
+
+.tech-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.tech-title {
+  h2 {
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+    color: #e6edf3;
+  }
+
+  p {
+    margin: 0;
+    color: #8b949e;
+    line-height: 1.5;
+  }
+}
+
+.features-section {
+  margin-bottom: 24px;
+
+  h3 {
+    font-size: 1rem;
+    color: #e6edf3;
+    margin: 0 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+
+  li {
+    position: relative;
+    padding-left: 20px;
+    color: #8b949e;
+    line-height: 1.5;
+
+    &::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--accent-color, #58a6ff);
+      font-weight: bold;
+    }
+  }
+}
+
+.code-section {
+  margin-bottom: 24px;
+
+  h3 {
+    font-size: 1rem;
+    color: #e6edf3;
+    margin: 0 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.code-block {
+  background: #0d1117;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid #30363d;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+}
+
+.filename {
+  font-family: 'Fira Code', 'Monaco', monospace;
+  font-size: 0.85rem;
+  color: #e6edf3;
+}
+
+.language {
+  font-size: 0.75rem;
+  color: #8b949e;
+  text-transform: uppercase;
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 16px;
+  overflow-x: auto;
+}
+
+.code-block code {
+  font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #c9d1d9;
+  white-space: pre;
+}
+
+.tech-footer {
+  padding-top: 20px;
+  border-top: 1px solid #30363d;
+}
+
+.learn-more {
+  color: var(--accent-color, #58a6ff);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
