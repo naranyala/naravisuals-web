@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, inject, type OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, inject, type OnInit, OnDestroy, Output, signal } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
+import { marked } from 'marked';
 import type { Article } from '../../../services/article.service';
 import { TablerIconComponent } from '../../../shared/components/tabler-icon/tabler-icon.component';
 import {
@@ -10,7 +11,7 @@ import {
 @Component({
   selector: 'app-article-reader',
   standalone: true,
-  imports: [TableOfContentsComponent, TablerIconComponent],
+  imports: [TablerIconComponent],
   template: `
     <div class="article-fullscreen">
       <div class="sticky-bar">
@@ -18,15 +19,37 @@ import {
           <tabler-icon name="arrowLeft" [size]="18" />
           <span>Back</span>
         </button>
+        <button class="toc-toggle-btn" (click)="toggleToc()" aria-label="Toggle table of contents">
+          <tabler-icon [name]="tocExpanded() ? 'x' : 'list'" [size]="18" />
+          <span class="toc-toggle-text">{{ tocExpanded() ? 'Close' : 'Contents' }}</span>
+        </button>
       </div>
       <div class="article-layout">
         <article class="article-content" [innerHTML]="renderedContent()"></article>
 
         @if (tableOfContents().length > 0) {
-          <app-table-of-contents
-            [items]="tableOfContents()"
-            (itemClick)="onTocClick($event)">
-          </app-table-of-contents>
+          <aside class="toc-sidebar" [class.toc-expanded]="tocExpanded()">
+            <div class="toc-header">
+              <h3>On this page</h3>
+              <button class="toc-close-btn" (click)="toggleToc()" aria-label="Close table of contents">
+                <tabler-icon name="x" [size]="18" />
+              </button>
+            </div>
+            <nav class="toc-nav">
+              <ul class="toc-list">
+                @for (item of tableOfContents(); track item.id) {
+                  <li class="toc-item" [class.level-2]="item.level === 2" [class.level-3]="item.level === 3">
+                    <a
+                      [href]="'#' + item.id"
+                      (click)="onTocClick($event, item.id)"
+                      [class.active]="activeHeading() === item.id">
+                      {{ item.text }}
+                    </a>
+                  </li>
+                }
+              </ul>
+            </nav>
+          </aside>
         }
       </div>
     </div>
@@ -39,13 +62,13 @@ import {
 
     .article-fullscreen {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      inset: 0;
       background: #0d1117;
       z-index: 1000;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      contain: layout style paint;
     }
 
     .sticky-bar {
@@ -58,6 +81,8 @@ import {
       z-index: 10;
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
     }
 
     .back-btn {
@@ -81,6 +106,43 @@ import {
       color: #e6edf3;
     }
 
+    .toc-toggle-btn {
+      background: transparent;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toc-toggle-btn:hover {
+      background: #21262d;
+      border-color: #484f58;
+      color: #e6edf3;
+    }
+
+    @media (max-width: 1024px) {
+      .toc-toggle-btn {
+        display: flex;
+      }
+    }
+
+    .toc-toggle-text {
+      display: none;
+    }
+
+    @media (min-width: 640px) {
+      .toc-toggle-text {
+        display: inline;
+      }
+    }
+
     .article-layout {
       display: grid;
       grid-template-columns: 1fr 260px;
@@ -88,6 +150,9 @@ import {
       max-width: 1200px;
       margin: 0 auto;
       padding: 48px 48px;
+      overflow-y: auto;
+      flex: 1;
+      scroll-behavior: smooth;
     }
 
     @media (max-width: 1024px) {
@@ -102,6 +167,134 @@ import {
       .article-layout {
         padding: 24px 20px;
       }
+    }
+
+    /* ===== TOC SIDEBAR ===== */
+    .toc-sidebar {
+      position: sticky;
+      top: 80px;
+      align-self: flex-start;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 20px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+
+    @media (max-width: 1024px) {
+      .toc-sidebar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-height: none;
+        z-index: 1000;
+        border-radius: 0;
+        border: none;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+        background: #0d1117;
+      }
+
+      .toc-sidebar.toc-expanded {
+        transform: translateY(0);
+      }
+    }
+
+    .toc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .toc-header h3 {
+      margin: 0;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .toc-close-btn {
+      background: transparent;
+      border: none;
+      color: #8b949e;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      display: none;
+      transition: all 0.2s;
+    }
+
+    .toc-close-btn:hover {
+      background: #21262d;
+      color: #e6edf3;
+    }
+
+    @media (max-width: 1024px) {
+      .toc-close-btn {
+        display: flex;
+      }
+    }
+
+    .toc-nav {
+      overflow-y: auto;
+      max-height: calc(100vh - 200px);
+    }
+
+    @media (max-width: 1024px) {
+      .toc-nav {
+        max-height: none;
+      }
+    }
+
+    .toc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .toc-item {
+      margin-bottom: 8px;
+    }
+
+    .toc-item.level-2 {
+      margin-left: 12px;
+    }
+
+    .toc-item.level-3 {
+      margin-left: 24px;
+    }
+
+    .toc-item a {
+      display: block;
+      padding: 8px 12px;
+      color: #8b949e;
+      text-decoration: none;
+      font-size: 0.875rem;
+      line-height: 1.4;
+      border-radius: 6px;
+      transition: all 0.2s;
+      border-left: 2px solid transparent;
+    }
+
+    .toc-item a:hover {
+      background: rgba(139, 148, 158, 0.1);
+      color: #e6edf3;
+      border-left-color: #8b949e;
+    }
+
+    .toc-item a.active {
+      background: rgba(88, 166, 255, 0.1);
+      color: #58a6ff;
+      border-left-color: #58a6ff;
+      font-weight: 500;
     }
 
     .article-content {
@@ -194,6 +387,7 @@ import {
       border-collapse: collapse;
       margin: 24px 0;
       font-size: 0.9375rem;
+      border: 1px solid #30363d;
     }
 
     .article-content :global(th),
@@ -210,6 +404,11 @@ import {
       font-size: 0.875rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      border: 1px solid #30363d;
+    }
+
+    .article-content :global(tr) {
+      border: 1px solid #30363d;
     }
 
     .article-content :global(tr:nth-child(even)) {
@@ -227,22 +426,64 @@ import {
       border-radius: 8px;
       border: 1px solid #30363d;
     }
+
+    /* Inline code */
+    .article-content :global(.inline-code) {
+      background: rgba(110, 118, 129, 0.2);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.875em;
+      color: #e6edf3;
+      white-space: nowrap;
+    }
+
+    /* Article images */
+    .article-content :global(.article-image) {
+      display: block;
+      margin: 24px auto;
+      max-height: 600px;
+      object-fit: cover;
+    }
   `,
   ],
 })
-export class ArticleReaderComponent implements OnInit {
+export class ArticleReaderComponent implements OnInit, OnDestroy {
   @Input() article: Article | null = null;
   @Output() back = new EventEmitter<void>();
 
   readonly renderedContent = signal<SafeHtml>('');
   readonly tableOfContents = signal<TocItem[]>([]);
+  readonly activeHeading = signal<string>('');
+  readonly tocExpanded = signal<boolean>(false);
 
   private readonly sanitizer = inject(DomSanitizer);
+  private observer?: IntersectionObserver;
 
   ngOnInit() {
+    // Lock body scroll when article reader opens
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    
     if (this.article) {
       this.loadArticle(this.article);
     }
+  }
+
+  ngOnDestroy() {
+    // Restore body scroll when component destroys
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+    
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  }
+
+  toggleToc() {
+    this.tocExpanded.update(v => !v);
   }
 
   ngOnChanges() {
@@ -258,7 +499,7 @@ export class ArticleReaderComponent implements OnInit {
       this.renderedContent.set(this.sanitizer.bypassSecurityTrustHtml(html));
 
       setTimeout(() => {
-        this.expandTocAndScrollToFirst(toc);
+        this.setupScrollSpy();
       }, 100);
     } catch (error) {
       console.error('[ArticleReader] Failed to render article:', error);
@@ -271,6 +512,34 @@ export class ArticleReaderComponent implements OnInit {
       `)
       );
     }
+  }
+
+  private setupScrollSpy() {
+    // Clean up previous observer
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+
+    // Wait for content to render
+    setTimeout(() => {
+      const headings = document.querySelectorAll('.article-content h2, .article-content h3, .article-content h4');
+      
+      this.observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              this.activeHeading.set(entry.target.id);
+            }
+          });
+        },
+        {
+          rootMargin: '-100px 0px -60% 0px',
+          threshold: 0,
+        }
+      );
+
+      headings.forEach(heading => this.observer!.observe(heading));
+    }, 100);
   }
 
   private expandTocAndScrollToFirst(toc: TocItem[]) {
@@ -298,154 +567,99 @@ export class ArticleReaderComponent implements OnInit {
     this.back.emit();
   }
 
-  onTocClick(headingId: string) {}
+  onTocClick(event: Event, headingId: string) {
+    event.preventDefault();
+    const element = document.getElementById(headingId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      this.activeHeading.set(headingId);
+      // Close TOC on mobile after clicking
+      if (window.innerWidth < 1024) {
+        this.tocExpanded.set(false);
+      }
+    }
+  }
 
   private async renderMarkdown(content: string): Promise<{ html: string; toc: TocItem[] }> {
     const toc: TocItem[] = [];
-    let md = content;
 
-    if (!md || typeof md !== 'string') {
+    if (!content || typeof content !== 'string') {
       throw new Error('Invalid markdown content');
     }
 
-    md = md.replace(/^(#{1,4})\s+(.+)$/gm, (_, hs, text) => {
-      const lvl = hs.length;
-      const id = this.slugify(text);
-      toc.push({ id, text, level: lvl });
-      return `<h${lvl} id="${id}">${text}</h${lvl}>`;
+    // Configure marked with GFM support (includes tables)
+    marked.setOptions({
+      gfm: true,        // GitHub Flavored Markdown (tables, etc.)
+      breaks: true,     // Convert \n to <br>
+      async: false,
     });
 
-    md = md.replace(/```[\s\S]*?```/g, '');
+    // Parse markdown to tokens
+    const tokens = marked.lexer(content);
 
-    md = md.replace(/`[^`]+`/g, '');
-
-    md = md.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    md = md.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-    md = md.replace(/~~([^~]+)~~/g, '<del>$1</del>');
-    md = md.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-    md = md.replace(/^>\s+(.*)$/gm, '<blockquote>$1</blockquote>');
-    md = md.replace(/^---\s*$/gm, '<hr>');
-
-    const lines = md.split('\n');
-    const out: string[] = [];
-    let inUl = false,
-      inOl = false,
-      inBlockquote = false,
-      inTable = false;
-    let tableRows: string[] = [];
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed) {
-        if (inUl) {
-          out.push('</ul>');
-          inUl = false;
-        }
-        if (inOl) {
-          out.push('</ol>');
-          inOl = false;
-        }
-        if (inBlockquote) {
-          out.push('</blockquote>');
-          inBlockquote = false;
-        }
-        continue;
+    // Process tokens to add IDs to headings and extract TOC
+    const processedTokens = tokens.map((token: any) => {
+      if (token.type === 'heading') {
+        const id = this.slugify(token.text);
+        toc.push({ id, text: token.text, level: token.depth });
+        return { ...token, id };
       }
+      return token;
+    });
 
-      if (trimmed.startsWith('<h') || trimmed.startsWith('<app-') || trimmed.startsWith('<hr')) {
-        if (inUl) {
-          out.push('</ul>');
-          inUl = false;
+    // Convert tokens back to HTML
+    const html = marked.parser(processedTokens);
+
+    // Post-process HTML to wrap code blocks and add mermaid components
+    const processedHtml = this.processHtmlForComponents(html);
+
+    return { html: processedHtml, toc };
+  }
+
+  private processHtmlForComponents(html: string): string {
+    let processed = html;
+
+    // Convert code blocks to app-code-block components
+    processed = processed.replace(
+      /<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,
+      (match, lang, code) => {
+        if (lang === 'mermaid') {
+          const diagramId = 'mermaid-' + Math.random().toString(36).substring(2, 9);
+          return `<app-mermaid-diagram diagram-id="${diagramId}" code="${this.escapeHtml(code)}"></app-mermaid-diagram>`;
         }
-        if (inOl) {
-          out.push('</ol>');
-          inOl = false;
-        }
-        if (inBlockquote) {
-          out.push('</blockquote>');
-          inBlockquote = false;
-        }
-        out.push(trimmed);
-        continue;
+        const title = lang === 'plaintext' ? 'Code' : lang.toUpperCase();
+        return `<app-code-block code="${this.escapeHtml(code)}" lang="${lang}" title="${title}" enable-highlighting="true"></app-code-block>`;
       }
+    );
 
-      if (trimmed.startsWith('<blockquote')) {
-        if (!inBlockquote) out.push('<blockquote>');
-        out.push(trimmed.replace(/^<blockquote[^>]*>/, ''));
-        inBlockquote = true;
-        continue;
-      }
+    // Convert inline code
+    processed = processed.replace(
+      /<code>([^<]+)<\/code>/g,
+      '<code class="inline-code">$1</code>'
+    );
 
-      if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
-        if (!inTable) {
-          inTable = true;
-          tableRows = [];
-        }
-        const cells = trimmed
-          .slice(1, -1)
-          .split('|')
-          .map((c: string) => c.trim());
-        if (!cells.some((c: string) => /^-+$/.test(c))) {
-          tableRows.push('<tr>' + cells.map((c: string) => `<td>${c}</td>`).join('') + '</tr>');
-        }
-        continue;
-      } else if (inTable) {
-        out.push('<table>' + tableRows.join('') + '</table>');
-        tableRows = [];
-        inTable = false;
-      }
-
-      if (/^(\d+\.|-)\s/.test(trimmed)) {
-        const isOrdered = /^\d+\./.test(trimmed);
-        const text = trimmed.replace(/^(\d+\.|-)\s/, '');
-        if (isOrdered) {
-          if (!inOl) out.push('<ol>');
-          inOl = true;
-        } else {
-          if (!inUl) out.push('<ul>');
-          inUl = true;
-        }
-        out.push(`<li>${text}</li>`);
-        continue;
-      }
-
-      if (inUl) {
-        out.push('</ul>');
-        inUl = false;
-      }
-      if (inOl) {
-        out.push('</ol>');
-        inOl = false;
-      }
-      if (inBlockquote) {
-        out.push(trimmed + '</blockquote>');
-        inBlockquote = false;
-      } else out.push(`<p>${trimmed}</p>`);
-    }
-
-    if (inUl) out.push('</ul>');
-    if (inOl) out.push('</ol>');
-    if (inBlockquote) out.push('</blockquote>');
-    if (inTable) out.push('<table>' + tableRows.join('') + '</table>');
-
-    const html = out.join('\n');
-
-    return { html, toc };
+    return processed;
   }
 
   private slugify(text: string): string {
     return text
       .toLowerCase()
+      .trim()
       .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .trim();
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 
-  private escape(s: string): string {
-    return s
+  private stripHtml(html: string): string {
+    return html.replace(/<[^>]*>/g, '');
+  }
+
+  private escapeHtml(text: string): string {
+    return text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 }

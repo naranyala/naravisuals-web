@@ -10,16 +10,15 @@ const DOCS_DIR = join(__dirname, '..', 'docs');
 const OUTPUT_DIR = join(__dirname, '..', 'src', 'app', 'shared');
 const OUTPUT_FILE = join(OUTPUT_DIR, 'articles.bundle.ts');
 
-// Articles to include in the bundle
-const ARTICLES_TO_INCLUDE = [
-  '01-welcome.md',
-  '02-cape-town-adventure.md',
-  '03-finding-balance-wellness.md',
-  '04-art-of-slow-living.md',
-  '05-creative-confidence.md',
-  '06-photography-journey.md',
-  'README.md',
-];
+// Articles to include in the bundle (auto-discover all numbered articles)
+function getArticlesToInclude(): string[] {
+  const files = readdirSync(DOCS_DIR);
+  return files
+    .filter(file => /^\d+-[\w-]+\.md$/.test(file)) // Match pattern: XX-slug.md
+    .sort(); // Sort alphabetically (which sorts by number)
+}
+
+const ARTICLES_TO_INCLUDE = getArticlesToInclude();
 
 interface Article {
   id: string;
