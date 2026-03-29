@@ -1,10 +1,10 @@
 <div class="demo-container">
   <h1>Technology Cards</h1>
   <p class="subtitle">Explore the technologies powering this demo</p>
-  
+
   <div class="search-container">
-    <input 
-      type="text" 
+    <input
+      type="text"
       class="search-input"
       placeholder="Search technologies..."
       [(ngModel)]="searchQuery"
@@ -14,15 +14,17 @@
       <button type="button" class="clear-btn" (click)="searchQuery = ''">×</button>
     }
   </div>
-  
+
   <div class="cards-grid">
     @for (card of filteredCards; track card.title) {
       <div class="card" (click)="openCard(card)">
         <div class="card-icon" [style.background]="card.color">
           {{ card.icon }}
         </div>
-        <h3 class="card-title">{{ card.title }}</h3>
-        <p class="card-description">{{ card.description }}</p>
+        <div class="card-content">
+          <h3 class="card-title">{{ card.title }}</h3>
+          <p class="card-description">{{ card.description }}</p>
+        </div>
         <span class="click-hint">Click to learn more</span>
       </div>
     } @empty {

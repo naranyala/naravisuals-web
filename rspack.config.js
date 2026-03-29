@@ -1,10 +1,31 @@
 const path = require('path');
 const HtmlRspackPlugin = require('html-rspack-plugin');
+const rspack = require('@rspack/core');
+const { execSync } = require('child_process');
 
 /**
  * Rspack configuration for Angular with Bun runtime
  * Uses custom Angular Linker loader for JIT fallback
  */
+
+// Generate articles bundle before build
+function generateArticlesBundle() {
+  console.log('[Rspack] Generating articles bundle...');
+  try {
+    execSync('bun run scripts/generate-articles.ts', {
+      stdio: 'inherit',
+      cwd: __dirname,
+    });
+    console.log('[Rspack] Articles bundle generated successfully');
+  } catch (error) {
+    console.error('[Rspack] Failed to generate articles bundle:', error);
+    throw error;
+  }
+}
+
+// Run article generation before build
+generateArticlesBundle();
+
 module.exports = {
   entry: {
     winbox: 'winbox/dist/winbox.bundle.min.js',
@@ -21,6 +42,9 @@ module.exports = {
       path: false,
       fs: false,
     },
+  },
+  experiments: {
+    asyncWebAssembly: true,
   },
   module: {
     rules: [
@@ -85,16 +109,34 @@ module.exports = {
       scriptLoading: 'blocking',
       entryNames: ['winbox', 'main'],
     }),
+    new rspack.CopyRspackPlugin({
+      patterns: [
+        {
+          from: 'node_modules/mermaid/dist/mermaid.min.js',
+          to: 'libs/mermaid.min.js',
+        },
+        {
+          from: 'node_modules/mathjax-full/es5/tex-svg.js',
+          to: 'libs/tex-svg.js',
+        },
+      ],
+    }),
   ],
   optimization: {
     minimize: true,
   },
   devServer: {
-    port: 4201,
+    port: parseInt(process.env.PORT, 10) || 4201,
     historyApiFallback: true,
-    static: {
-      directory: path.resolve(__dirname, 'src'),
-    },
+    static: [
+      {
+        directory: path.resolve(__dirname, 'src'),
+      },
+      {
+        directory: path.resolve(__dirname, 'docs'),
+        publicPath: '/docs',
+      },
+    ],
     client: {
       overlay: {
         errors: true,
