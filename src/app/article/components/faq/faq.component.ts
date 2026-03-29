@@ -34,6 +34,14 @@ import { AppContentService, type FAQItem } from '../../../shared/services/app-co
       border-radius: 16px;
       padding: 24px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 20px;
+        border-radius: 12px;
+      }
     }
 
     .card h2 {

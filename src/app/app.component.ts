@@ -5,6 +5,7 @@ import {
   FaqComponent,
   SocialLinksComponent,
   AboutCardComponent,
+  PublicLinksComponent,
 } from './article/components';
 import { type Article, ArticleService } from './services/article.service';
 import { SITE_CONFIG } from './shared/config/site.config';
@@ -30,7 +31,7 @@ import { SITE_CONFIG } from './shared/config/site.config';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [FaqComponent, ArticleListComponent, ArticleReaderComponent, SocialLinksComponent, AboutCardComponent],
+  imports: [FaqComponent, ArticleListComponent, ArticleReaderComponent, SocialLinksComponent, AboutCardComponent, PublicLinksComponent],
   template: `
     <div class="development-banner">
       <div class="banner-content">
@@ -76,6 +77,8 @@ import { SITE_CONFIG } from './shared/config/site.config';
               (articleSelected)="onArticleSelected($event)">
             </app-article-list>
           }
+          
+          <app-public-links />
         </div>
       </section>
 
@@ -107,9 +110,36 @@ import { SITE_CONFIG } from './shared/config/site.config';
     .development-banner {
       background: linear-gradient(90deg, #7f1d1d 0%, #991b1b 50%, #7f1d1d 100%);
       border-bottom: 2px solid #dc2626;
-      padding: 12px 20px;
+      padding: 12px 40px;
       margin-bottom: 20px;
       box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+    }
+
+    @media (max-width: 1200px) {
+      .development-banner {
+        padding: 12px 32px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .development-banner {
+        padding: 12px 24px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .development-banner {
+        padding: 10px 20px;
+        margin-bottom: 16px;
+      }
+
+      .banner-text {
+        font-size: 0.8rem;
+      }
+
+      .banner-icon {
+        font-size: 1rem;
+      }
     }
 
     .banner-content {
@@ -149,7 +179,7 @@ import { SITE_CONFIG } from './shared/config/site.config';
     .container {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 20px 40px;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -158,13 +188,38 @@ import { SITE_CONFIG } from './shared/config/site.config';
     .columns {
       display: grid;
       grid-template-columns: 400px 1fr;
-      gap: 32px;
+      gap: 48px;
       flex: 1;
+    }
+
+    @media (max-width: 1200px) {
+      .container {
+        padding: 20px 32px;
+      }
+      
+      .columns {
+        gap: 40px;
+      }
     }
 
     @media (max-width: 900px) {
       .columns {
         grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      
+      .container {
+        padding: 16px 24px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 12px 20px;
+      }
+      
+      .columns {
+        gap: 24px;
       }
     }
 
@@ -175,9 +230,29 @@ import { SITE_CONFIG } from './shared/config/site.config';
     /* ===== FOOTER ===== */
     .footer {
       text-align: center;
-      padding: 40px 20px 30px;
+      padding: 40px 60px 30px;
       margin-top: 60px;
       border-top: 1px solid #30363d;
+    }
+
+    @media (max-width: 1200px) {
+      .footer {
+        padding: 40px 48px 30px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .footer {
+        padding: 32px 32px 24px;
+        margin-top: 48px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .footer {
+        padding: 24px 20px 20px;
+        margin-top: 40px;
+      }
     }
 
     .footer-text {

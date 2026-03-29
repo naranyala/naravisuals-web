@@ -38,6 +38,15 @@ export interface SiteConfig {
     youtube?: string;
   };
   
+  // Public Google Drive Links
+  publicLinks: {
+    enabled: boolean;
+    links: Array<{
+      title: string;
+      url: string;
+    }>;
+  };
+  
   // Feature Flags
   features: {
     showDevelopmentBanner: boolean;
@@ -81,6 +90,28 @@ export const SITE_CONFIG: SiteConfig = {
     linkedin: 'https://linkedin.com',
     github: 'https://github.com',
     youtube: 'https://youtube.com',
+  },
+  
+  publicLinks: {
+    enabled: true, // Set to false to hide the public links card
+    links: [
+      {
+        title: 'Photography Resources',
+        url: 'https://drive.google.com/drive/folders/YOUR_FOLDER_ID', // Update with your actual link
+      },
+      {
+        title: 'Travel Templates',
+        url: 'https://drive.google.com/drive/folders/YOUR_FOLDER_ID', // Update with your actual link
+      },
+      {
+        title: 'Creative Assets',
+        url: 'https://drive.google.com/drive/folders/YOUR_FOLDER_ID', // Update with your actual link
+      },
+      {
+        title: 'Wellness Guides',
+        url: 'https://drive.google.com/drive/folders/YOUR_FOLDER_ID', // Update with your actual link
+      },
+    ],
   },
   
   features: {

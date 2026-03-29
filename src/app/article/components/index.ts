@@ -8,3 +8,4 @@ export { MermaidDiagramComponent } from './mermaid-diagram/mermaid-diagram.compo
 export { RenderingControlsComponent } from './rendering-controls/rendering-controls.component';
 export { SocialLinksComponent } from './social-links/social-links.component';
 export { AboutCardComponent } from '../../shared/components/about-card/about-card.component';
+export { PublicLinksComponent } from '../../shared/components/public-links/public-links.component';
