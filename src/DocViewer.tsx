@@ -69,6 +69,28 @@ async function renderMermaid(container: HTMLElement | null) {
         svgEl.style.height = "auto";
         svgEl.style.display = "block";
         svgEl.style.margin = "0 auto";
+
+        // Force dark text and shapes for readability on light backgrounds
+        // Mermaid's neutral theme generates inline styles that may have light text
+        svgEl.querySelectorAll("text").forEach((textEl) => {
+          textEl.style.fill = "#1a1a1a";
+          textEl.style.color = "#1a1a1a";
+        });
+        svgEl.querySelectorAll("path, line").forEach((shapeEl) => {
+          const stroke = shapeEl.getAttribute("stroke");
+          // Only override very light or missing strokes
+          if (!stroke || stroke === "none" || stroke === "transparent" || stroke === "#e5e7eb" || stroke === "#d1d5db") {
+            shapeEl.style.stroke = "#374151";
+          }
+        });
+        svgEl.querySelectorAll("rect, circle, ellipse, polygon").forEach((shapeEl) => {
+          const fill = shapeEl.getAttribute("fill");
+          // Only override very light fills (keep white backgrounds)
+          if (fill && fill !== "#fff" && fill !== "#ffffff" && fill !== "white" && fill !== "none") {
+            shapeEl.style.fill = "#ffffff";
+          }
+          shapeEl.style.stroke = "#6b7280";
+        });
       }
 
       if (errorEl) errorEl.style.display = "none";

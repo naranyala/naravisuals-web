@@ -626,4 +626,126 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+
+  /* Force dark text on mermaid SVGs for print readability */
+  .mermaid svg text {
+    fill: #1a1a1a !important;
+    color: #1a1a1a !important;
+  }
+
+  .mermaid svg path,
+  .mermaid svg line,
+  .mermaid svg rect,
+  .mermaid svg circle {
+    stroke: #333 !important;
+  }
+
+  .mermaid svg .edgePath path {
+    stroke: #333 !important;
+    stroke-width: 1.5px !important;
+  }
+
+  .mermaid svg .nodeRect {
+    fill: #fff !important;
+    stroke: #666 !important;
+  }
+
+  .mermaid svg .label {
+    fill: #1a1a1a !important;
+  }
+}
+
+/* Ensure dark text on mermaid diagrams in normal view for readability */
+/* Use !important to override Mermaid's inline styles */
+.mermaid svg text {
+  fill: #1a1a1a !important;
+  color: #1a1a1a !important;
+}
+
+.mermaid svg .label {
+  fill: #1a1a1a !important;
+}
+
+.mermaid svg .nodeRect {
+  fill: #fff !important;
+  stroke: #6b7280 !important;
+}
+
+.mermaid svg .edgePath path {
+  stroke: #374151 !important;
+  stroke-width: 1.5px !important;
+}
+
+.mermaid svg path,
+.mermaid svg line {
+  stroke: #374151 !important;
+}
+
+/* Target common Mermaid diagram classes */
+.mermaid svg .actor {
+  fill: #fff !important;
+  stroke: #6b7280 !important;
+}
+
+.mermaid svg .messageText {
+  fill: #1a1a1a !important;
+}
+
+.mermaid svg .noteText {
+  fill: #1a1a1a !important;
+}
+
+.mermaid svg .loopText {
+  fill: #1a1a1a !important;
+}
+
+.mermaid svg .classLabel text {
+  fill: #1a1a1a !important;
+}
+
+.mermaid svg .stateGroup rect {
+  fill: #fff !important;
+  stroke: #6b7280 !important;
+}
+
+.mermaid svg .stateGroup text {
+  fill: #1a1a1a !important;
+}
+
+.mermaid svg .task {
+  fill: #fff !important;
+  stroke: #6b7280 !important;
+}
+
+.mermaid svg .taskText {
+  fill: #1a1a1a !important;
+}
+
+.mermaid svg .section {
+  fill: #f9fafb !important;
+}
+
+.mermaid svg .sectionTitle {
+  fill: #1a1a1a !important;
+}
+
+.mermaid svg .grid .tick line {
+  stroke: #e5e7eb !important;
+}
+
+.mermaid svg .grid .tick text {
+  fill: #1a1a1a !important;
+}
+
+.mermaid svg .pieTitleText,
+.mermaid svg .pieSliceText {
+  fill: #1a1a1a !important;
+}
+
+.mermaid svg .mindmap-node text {
+  fill: #1a1a1a !important;
+}
+
+.mermaid svg .journey-task text {
+  fill: #1a1a1a !important;
 }

@@ -1,0 +1,153 @@
+/**
+ * Article References & Footnotes Panel Styles
+ * 
+ * Styles for the collapsible footnote/reference section in the footer
+ */
+
+.article-refs-panel {
+  margin: 1.5rem 0;
+  padding: 0;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  background: var(--bg-secondary, #f9fafb);
+  overflow: hidden;
+}
+
+.article-refs-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary, #374151);
+  transition: background-color 0.2s;
+}
+
+.article-refs-header:hover {
+  background: var(--bg-hover, #f3f4f6);
+}
+
+.article-refs-header-text {
+  flex: 1;
+  text-align: left;
+}
+
+.article-refs-chevron {
+  display: inline-block;
+  transition: transform 0.2s;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+.article-refs-chevron.open {
+  transform: rotate(180deg);
+}
+
+.article-refs-content {
+  padding: 1rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  background: var(--bg-primary, #ffffff);
+}
+
+.article-refs-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.article-ref-item {
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary, #f9fafb);
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  transition: all 0.2s;
+}
+
+.article-ref-item:hover {
+  background: var(--bg-hover, #f3f4f6);
+  border-color: var(--border-hover, #d1d5db);
+}
+
+.article-ref-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.article-ref-identifier {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #7c3aed;
+  font-family: "SF Mono", "Monaco", monospace;
+}
+
+.article-ref-identifier sup {
+  font-size: 0.75rem;
+  margin-right: 0.25rem;
+}
+
+.article-ref-warning {
+  font-size: 0.8rem;
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+.article-ref-definition {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-primary, #1a1a1a);
+  padding-left: 1rem;
+  border-left: 3px solid #7c3aed;
+  margin-top: 0.5rem;
+}
+
+.article-ref-definition p {
+  margin: 0.5rem 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .article-refs-panel {
+    margin: 1rem 0;
+  }
+
+  .article-refs-content {
+    padding: 0.75rem;
+  }
+
+  .article-ref-item {
+    padding: 0.5rem;
+  }
+
+  .article-ref-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .article-refs-panel {
+    --border-color: #374151;
+    --bg-secondary: #1f2937;
+    --bg-primary: #111827;
+    --bg-hover: #374151;
+    --border-hover: #4b5563;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+  }
+
+  .article-ref-identifier {
+    color: #a78bfa;
+  }
+}

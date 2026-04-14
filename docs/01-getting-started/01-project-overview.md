@@ -21,7 +21,8 @@ The six principles below form the foundation of this project. Understanding them
 
 ```mermaid:desc=Mindmap showing the six core architectural principles of the project centered around minimal dependencies and zero runtime APIs.
 mindmap
-  root(("docts\nArchitecture"))
+  classDef darkStyle fill:#000,stroke:#fff,color:#fff;
+  root(("docts Architecture"))
     Zero Runtime APIs
       All content in TS constants
       No network requests
@@ -30,6 +31,7 @@ mindmap
       Markdown to HTML at build
       TypeScript data files
       Pre-built bundles
+      class StaticGeneration darkStyle
     Client-Side Routing
       SPA with history.pushState
       No SSR needed

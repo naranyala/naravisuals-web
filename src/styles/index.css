@@ -45,6 +45,9 @@
 /* 13. Footer + pagination */
 @import "./doc-footer.css";
 
+/* 13.5. Article references panel */
+@import "./article-links-panel.css";
+
 /* 14. Loading / not-found states */
 @import "./states.css";
 

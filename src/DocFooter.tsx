@@ -1,7 +1,6 @@
 interface DocFooterProps {
   prevDoc?: { title: string; slug: string };
   nextDoc?: { title: string; slug: string };
-  editUrl?: string;
   lastUpdatedAt?: string;
   onNavigate?: (slug: string) => void;
 }
@@ -9,7 +8,6 @@ interface DocFooterProps {
 export function DocFooter({
   prevDoc,
   nextDoc,
-  editUrl,
   lastUpdatedAt,
   onNavigate,
 }: DocFooterProps) {
@@ -25,14 +23,6 @@ export function DocFooter({
 
   return (
     <footer className="doc-footer">
-      {editUrl && (
-        <div className="doc-footer-row">
-          <a href={editUrl} target="_blank" rel="noopener" className="edit-page-link">
-            ✏️ Edit this page
-          </a>
-          {lastUpdatedAt && <span className="last-updated">Last updated: {lastUpdatedAt}</span>}
-        </div>
-      )}
       {(prevDoc || nextDoc) && (
         <div className="pagination-nav">
           {prevDoc ? (

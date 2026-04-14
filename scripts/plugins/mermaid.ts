@@ -7,6 +7,7 @@
  */
 
 import type { MarkdownPlugin } from "./types.ts";
+import { validateMermaidContent } from "./validators/mermaid-content.ts";
 
 interface MermaidBlock {
   id: string;
@@ -54,6 +55,38 @@ export const mermaidPlugin: MarkdownPlugin = {
         .replace(/&amp;#39;/g, "'")
         .replace(/<\/?span[^>]*>/g, "")
         .trim();
+
+      // Validate diagram content
+      const validationErrors = validateMermaidContent(decoded);
+      if (validationErrors.length > 0) {
+        const errorDetails = validationErrors
+          .map((err) => `  - ${err.message}: ${err.detail}`)
+          .join("\n");
+        console.error(
+          `\n❌ Mermaid validation error(s) in diagram ${id}:`,
+          `\n${errorDetails}`
+        );
+        // Create error container instead of failing completely
+        const errorContainer = [
+          `<div class="mermaid-diagram" data-processed="false" data-zoom="${zoomEnabled}" data-validation-error="true">`,
+          `  <div class="mermaid-diagram-header">`,
+          `    <span class="mermaid-diagram-label">Diagram</span>`,
+          `    <div class="mermaid-diagram-actions">`,
+          `      <span class="mermaid-loading">Loading...</span>`,
+          `    </div>`,
+          `  </div>`,
+          `  <div class="mermaid" style="display:none;">${escapeHtml(decoded)}</div>`,
+          `  <div class="mermaid-error" style="display:block;">`,
+          `    <div class="mermaid-error-title">⚠ Validation Error</div>`,
+          `    <details>`,
+          `      <summary>${validationErrors[0].message}</summary>`,
+          `      <pre>${escapeHtml(errorDetails)}</pre>`,
+          `    </details>`,
+          `  </div>`,
+          `</div>`,
+        ].join("\n");
+        return errorContainer;
+      }
 
       // Decode description HTML entities
       const decodedDesc = desc
