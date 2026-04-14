@@ -1,0 +1,126 @@
+/* ─── Admonitions / Callouts ─── */
+.admonition {
+  border-left: 4px solid var(--ifm-color-primary);
+  border-radius: 0.35rem;
+  margin: 1.25rem 0;
+  overflow: hidden;
+  background: var(--bg-surface);
+}
+
+.admonition-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.85rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid var(--border);
+}
+
+.admonition-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.admonition-content {
+  padding: 0.75rem 0.85rem;
+}
+
+.admonition-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Type variants */
+.admonition-note {
+  border-left-color: #3b82f6;
+}
+.admonition-note .admonition-heading {
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.admonition-tip {
+  border-left-color: #22c55e;
+}
+.admonition-tip .admonition-heading {
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.admonition-info {
+  border-left-color: #8b5cf6;
+}
+.admonition-info .admonition-heading {
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.admonition-warning {
+  border-left-color: #f59e0b;
+}
+.admonition-warning .admonition-heading {
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.admonition-danger,
+.admonition-caution {
+  border-left-color: #ef4444;
+}
+.admonition-danger .admonition-heading,
+.admonition-caution .admonition-heading {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.doc-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.75rem 0;
+}
+
+.doc-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.35rem;
+  margin: 0.75rem 0;
+}
+
+.doc-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+}
+.doc-content th,
+.doc-content td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+}
+.doc-content th {
+  background: var(--bg-surface);
+  font-weight: 600;
+}
+.doc-content tr:nth-child(even) {
+  background: var(--bg-surface);
+}
+
+.hash-link {
+  opacity: 0;
+  margin-left: 0.35rem;
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  transition: opacity 0.12s;
+  font-weight: 400;
+  flex-shrink: 0;
+}
+.doc-content h1:hover .hash-link,
+.doc-content h2:hover .hash-link,
+.doc-content h3:hover .hash-link,
+.doc-content h4:hover .hash-link,
+.doc-content h5:hover .hash-link,
+.doc-content h6:hover .hash-link {
+  opacity: 1;
+}
+.hash-link:hover {
+  text-decoration: none;
+}

@@ -1,0 +1,133 @@
+/* ============================================
+   PRINT VIEW
+   ============================================ */
+
+.print-view {
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.print-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.print-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.print-close-btn {
+  background: none;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 0.35rem;
+  font-size: 0.875rem;
+  color: var(--text);
+  transition: background 0.15s;
+}
+
+.print-close-btn:hover {
+  background: var(--bg-surface);
+}
+
+.print-toc {
+  margin-bottom: 3rem;
+  padding: 1rem 1.5rem;
+  background: var(--bg-surface);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+}
+
+.print-toc h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.print-toc ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.35rem 1rem;
+}
+
+.print-toc li {
+  padding: 0.25rem 0;
+}
+
+.print-toc a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.15s;
+}
+
+.print-toc a:hover {
+  color: var(--ifm-color-primary);
+}
+
+.print-doc {
+  margin-bottom: 3rem;
+}
+
+.print-doc h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  scroll-margin-top: 1rem;
+}
+
+.print-doc hr {
+  margin-top: 2rem;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+.print-footer {
+  text-align: center;
+  padding: 2rem 0;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+}
+
+.print-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.print-actions .print-btn {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--ifm-color-primary);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+}
+
+.print-actions .print-btn:hover {
+  background: var(--ifm-color-primary-dark);
+}

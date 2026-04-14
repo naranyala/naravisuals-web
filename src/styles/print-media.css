@@ -1,0 +1,77 @@
+/* ============================================
+   BROWSER PRINT STYLES
+   ============================================ */
+
+@media print {
+  /* Hide all UI elements */
+  .top-bar,
+  .sidebar,
+  .toc-container,
+  .scroll-panel,
+  .breadcrumbs,
+  .doc-footer,
+  .scroll-to-top-btn,
+  .print-btn,
+  .font-switcher,
+  .theme-toggle,
+  .menu-btn,
+  .toc-mobile-collapsible {
+    display: none !important;
+  }
+
+  /* Reset layout for print */
+  .site-wrapper {
+    min-height: auto;
+  }
+
+  .doc-page-layout {
+    display: block;
+  }
+
+  .main-content {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  /* Code blocks print-friendly */
+  .code-block {
+    break-inside: avoid;
+    border: 1px solid #ccc;
+    page-break-inside: avoid;
+  }
+
+  .code-header {
+    background: #f5f5f5 !important;
+    border-bottom: 1px solid #ccc;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .code-copy-btn {
+    display: none !important;
+  }
+
+  .doc-content .code-block pre {
+    background: #fafafa !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .doc-content .code-block pre .line::before {
+    color: #888 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Links show URL */
+  .doc-content a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.75em;
+    color: #666;
+  }
+
+  /* Mermaid diagrams */
+  .mermaid-diagram {
+    break-inside: avoid;
+  }
+}

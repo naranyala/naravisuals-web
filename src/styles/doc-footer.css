@@ -1,0 +1,61 @@
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.doc-footer {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.doc-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  font-size: 0.78rem;
+}
+
+.edit-page-link {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+.edit-page-link:hover {
+  text-decoration: underline;
+}
+.last-updated {
+  color: var(--text-secondary);
+}
+
+.pagination-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.pagination-link {
+  display: block;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  text-decoration: none;
+  transition: all 0.12s;
+}
+
+.pagination-link:hover {
+  border-color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+.pagination-subtitle {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.1rem;
+}
+.pagination-title {
+  display: block;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+  font-size: 0.83rem;
+}

@@ -1,0 +1,242 @@
+/**
+ * Dependency Injection Container
+ *
+ * Provides a typed service container for browser APIs.
+ * Services can be swapped for testing, SSR, or different implementations.
+ */
+
+// ─── Service Interfaces ───────────────────────────────────────────────────
+
+/**
+ * Storage service - wraps localStorage/sessionStorage
+ */
+export interface IStorageService {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem(key: string): void;
+  clear(): void;
+}
+
+/**
+ * Router service - wraps History API and URL management
+ */
+export interface IRouterService {
+  getCurrentPath(): string;
+  pushState(state: unknown, title: string, url: string): void;
+  replaceState(state: unknown, title: string, url: string): void;
+  onPopState(callback: () => void): () => void; // returns unsubscribe fn
+  buildUrl(prefix: string, slug: string): string;
+}
+
+/**
+ * DOM service - wraps DOM manipulation APIs
+ */
+export interface IDomService {
+  getScrollY(): number;
+  scrollTo(x: number, y: number): void;
+  setAttribute(element: Element, name: string, value: string): void;
+  getAttribute(element: Element, name: string): string | null;
+  querySelectorAll(selectors: string): NodeList;
+  getElementById(id: string): HTMLElement | null;
+  setBodyOverflow(value: string): void;
+  getViewportWidth(): number;
+  onResize(callback: () => void): () => void;
+  onKeydown(callback: (e: KeyboardEvent) => void): () => void;
+}
+
+/**
+ * Theme service - manages theme state and persistence
+ */
+export interface IThemeService {
+  getInitialTheme(): boolean; // true = dark
+  applyTheme(isDark: boolean): void;
+  toggleTheme(current: boolean): boolean;
+}
+
+/**
+ * App configuration
+ */
+export interface IAppConfig {
+  siteTitle: string;
+  repoEditUrl: string;
+  mobileBreakpoint: number;
+  tocBreakpoint: number;
+  routes: {
+    docs: string;
+  };
+}
+
+// ─── Service Container ────────────────────────────────────────────────────
+
+export interface ServiceContainer {
+  storage: IStorageService;
+  router: IRouterService;
+  dom: IDomService;
+  theme: IThemeService;
+  config: IAppConfig;
+}
+
+// ─── Default Implementations ──────────────────────────────────────────────
+
+/**
+ * Default localStorage-based storage
+ */
+export const createStorageService = (): IStorageService => ({
+  getItem: (key: string) => {
+    if (typeof window === "undefined") return null;
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, value: string) => {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Silently fail (e.g., private browsing)
+    }
+  },
+  removeItem: (key: string) => {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.removeItem(key);
+    } catch {}
+  },
+  clear: () => {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.clear();
+    } catch {}
+  },
+});
+
+/**
+ * Default History API-based router
+ */
+export const createRouterService = (): IRouterService => ({
+  getCurrentPath: () => {
+    if (typeof window === "undefined") return "/";
+    return window.location.pathname;
+  },
+  pushState: (state: unknown, title: string, url: string) => {
+    if (typeof window === "undefined") return;
+    window.history.pushState(state, title, url);
+  },
+  replaceState: (state: unknown, title: string, url: string) => {
+    if (typeof window === "undefined") return;
+    window.history.replaceState(state, title, url);
+  },
+  onPopState: (callback: () => void) => {
+    if (typeof window === "undefined") return () => {};
+    window.addEventListener("popstate", callback);
+    return () => window.removeEventListener("popstate", callback);
+  },
+  buildUrl: (prefix: string, slug: string) => {
+    return `/${prefix}/${slug}`;
+  },
+});
+
+/**
+ * Default DOM service
+ */
+export const createDomService = (): IDomService => ({
+  getScrollY: () => (typeof window === "undefined" ? 0 : window.scrollY),
+  scrollTo: (x: number, y: number) => {
+    if (typeof window === "undefined") return;
+    window.scrollTo(x, y);
+  },
+  setAttribute: (element: Element, name: string, value: string) => {
+    element.setAttribute(name, value);
+  },
+  getAttribute: (element: Element, name: string) => {
+    return element.getAttribute(name);
+  },
+  querySelectorAll: (selectors: string) => {
+    if (typeof document === "undefined") return new NodeList([]);
+    return document.querySelectorAll(selectors);
+  },
+  getElementById: (id: string) => {
+    if (typeof document === "undefined") return null;
+    return document.getElementById(id);
+  },
+  setBodyOverflow: (value: string) => {
+    if (typeof document === "undefined") return;
+    document.body.style.overflow = value;
+  },
+  getViewportWidth: () => (typeof window === "undefined" ? 1024 : window.innerWidth),
+  onResize: (callback: () => void) => {
+    if (typeof window === "undefined") return () => {};
+    window.addEventListener("resize", callback);
+    return () => window.removeEventListener("resize", callback);
+  },
+  onKeydown: (callback: (e: KeyboardEvent) => void) => {
+    if (typeof window === "undefined") return () => {};
+    window.addEventListener("keydown", callback);
+    return () => window.removeEventListener("keydown", callback);
+  },
+});
+
+/**
+ * Default theme service
+ */
+export const createThemeService = (storage: IStorageService): IThemeService => ({
+  getInitialTheme: () => {
+    const stored = storage.getItem("theme");
+    if (stored !== null) return stored === "dark";
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  },
+  applyTheme: (isDark: boolean) => {
+    if (typeof document === "undefined") return;
+    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+  },
+  toggleTheme: (current: boolean) => {
+    const next = !current;
+    storage.setItem("theme", next ? "dark" : "light");
+    return next;
+  },
+});
+
+/**
+ * Default app config
+ */
+export const createAppConfig = (overrides?: Partial<IAppConfig>): IAppConfig => ({
+  siteTitle: "Docs",
+  repoEditUrl: "https://github.com/your-org/your-repo/edit/main",
+  mobileBreakpoint: 800,
+  tocBreakpoint: 1100,
+  routes: {
+    docs: "docs",
+  },
+  ...overrides,
+});
+
+// ─── Container Builder ────────────────────────────────────────────────────
+
+export interface ContainerOptions {
+  config?: Partial<IAppConfig>;
+  storage?: IStorageService;
+  router?: IRouterService;
+  dom?: IDomService;
+  theme?: IThemeService;
+}
+
+/**
+ * Build a service container with optional overrides
+ */
+export function createContainer(options: ContainerOptions = {}): ServiceContainer {
+  const storage = options.storage ?? createStorageService();
+  const router = options.router ?? createRouterService();
+  const dom = options.dom ?? createDomService();
+  const theme = options.theme ?? createThemeService(storage);
+  const config = createAppConfig(options.config);
+
+  return { storage, router, dom, theme, config };
+}
+
+/**
+ * Default container instance
+ */
+export const defaultContainer = createContainer();

@@ -1,0 +1,55 @@
+/* ============================================
+   SHIKI
+   ============================================ */
+
+.shiki {
+  margin-bottom: 1rem;
+}
+.shiki code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace !important;
+  font-size: 0.78rem !important;
+  line-height: 1.6 !important;
+}
+
+/* ─── Shiki Code Theme System ───────────────────────────────── */
+/*
+ * Shiki renders code at BUILD TIME with github-dark theme.
+ * At RUNTIME we transform the appearance using CSS filters.
+ * Each data-code-theme value applies a filter chain to the
+ * entire .code-block wrapper (header + highlighted content).
+ */
+
+/* paperlike-white: light theme, slight warm tint */
+[data-code-theme="paperlike-white"] .code-block {
+  filter: invert(1) hue-rotate(180deg) brightness(1.02);
+}
+
+/* paperlike-gray: neutral gray, readable */
+[data-code-theme="paperlike-gray"] .code-block {
+  filter: invert(1) hue-rotate(180deg) saturate(0.8) brightness(1.05);
+}
+
+/* paperlike-sepia: warm sepia tones */
+[data-code-theme="paperlike-sepia"] .code-block {
+  filter: sepia(0.3) saturate(1.2) brightness(1.05) hue-rotate(10deg);
+}
+
+/* paperlike-dark-gray: dark gray, high contrast */
+[data-code-theme="paperlike-dark-gray"] .code-block {
+  filter: saturate(0.9) brightness(0.95) contrast(1.1);
+}
+
+/* paperlike-dark-sepia: dark warm tones */
+[data-code-theme="paperlike-dark-sepia"] .code-block {
+  filter: sepia(0.2) saturate(1.1) brightness(0.95) hue-rotate(15deg) contrast(1.05);
+}
+
+/* navy: light blue-tinted */
+[data-code-theme="navy"] .code-block {
+  filter: invert(1) hue-rotate(200deg) saturate(1.1) brightness(1.03);
+}
+
+/* dark-navy: deep blue tones */
+[data-code-theme="dark-navy"] .code-block {
+  filter: saturate(1.2) hue-rotate(210deg) brightness(0.9) contrast(1.1);
+}

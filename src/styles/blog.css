@@ -1,0 +1,37 @@
+/* ============================================
+   BLOG
+   ============================================ */
+
+.blog-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+.blog-date {
+  color: var(--text-secondary);
+}
+.blog-author {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.blog-tags {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+.blog-tag {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  padding: 0.12rem 0.4rem;
+  border-radius: 1rem;
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+}

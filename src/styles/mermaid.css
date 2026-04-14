@@ -1,0 +1,629 @@
+/* ============================================
+   MERMAID DIAGRAMS
+   ============================================ */
+
+.mermaid-diagram {
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: var(--bg-surface);
+  padding-bottom: 0;
+}
+
+.mermaid-diagram-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-code);
+  border-bottom: 1px solid var(--border);
+}
+
+.mermaid-diagram-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mermaid-zoom-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: all 0.15s;
+  line-height: 0;
+}
+
+.mermaid-zoom-btn:hover {
+  background: rgba(128, 128, 128, 0.15);
+  color: var(--text);
+}
+
+.mermaid-download-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: all 0.15s;
+  line-height: 0;
+}
+
+.mermaid-download-btn:hover {
+  background: rgba(128, 128, 128, 0.15);
+  color: var(--text);
+}
+
+.mermaid-download-btn svg,
+.mermaid-zoom-btn svg {
+  display: block;
+}
+
+.mermaid-diagram-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.68rem;
+}
+
+.mermaid-diagram-desc {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  font-style: italic;
+  opacity: 0.85;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-code);
+  border-top: 1px solid var(--border);
+}
+
+.mermaid-diagram-desc::before {
+  content: "ℹ ";
+  font-style: normal;
+  margin-right: 0.25rem;
+  opacity: 0.7;
+}
+
+/* Hide zoom button when disabled via metadata */
+.mermaid-diagram[data-zoom="false"] .mermaid-zoom-btn {
+  display: none;
+}
+
+/* ============================================
+   MERMAID SVG — INLINE + FULLSCREEN
+   Same theme everywhere: white background, colorful nodes.
+   ============================================ */
+
+.mermaid {
+  padding: 1rem;
+  overflow-x: auto;
+  text-align: center;
+  background: #ffffff;
+}
+
+.mermaid svg,
+.mermaid-fullscreen-content svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---- Text & labels: dark for readability on white ---- */
+.mermaid svg text,
+.mermaid-fullscreen-content svg text,
+.mermaid svg .titleText,
+.mermaid-fullscreen-content svg .titleText,
+.mermaid svg .edgeLabel,
+.mermaid-fullscreen-content svg .edgeLabel,
+.mermaid svg .label,
+.mermaid-fullscreen-content svg .label,
+.mermaid svg .taskText,
+.mermaid-fullscreen-content svg .taskText,
+.mermaid svg .actor-text,
+.mermaid-fullscreen-content svg .actor-text,
+.mermaid svg .activation-text,
+.mermaid-fullscreen-content svg .activation-text,
+.mermaid svg .messageText,
+.mermaid-fullscreen-content svg .messageText,
+.mermaid svg .noteText,
+.mermaid-fullscreen-content svg .noteText,
+.mermaid svg .loopText,
+.mermaid-fullscreen-content svg .loopText,
+.mermaid svg .labelText,
+.mermaid-fullscreen-content svg .labelText,
+.mermaid svg .legend-text,
+.mermaid-fullscreen-content svg .legend-text,
+.mermaid svg .sectionTitle,
+.mermaid-fullscreen-content svg .sectionTitle,
+.mermaid svg .grid-title,
+.mermaid-fullscreen-content svg .grid-title,
+.mermaid svg .classTitle text,
+.mermaid-fullscreen-content svg .classTitle text,
+.mermaid svg .entity-label text,
+.mermaid-fullscreen-content svg .entity-label text,
+.mermaid svg .relationship-label text,
+.mermaid-fullscreen-content svg .relationship-label text,
+.mermaid svg .branch-label text,
+.mermaid-fullscreen-content svg .branch-label text,
+.mermaid svg .blockLabel text,
+.mermaid-fullscreen-content svg .blockLabel text,
+.mermaid svg .packet text,
+.mermaid-fullscreen-content svg .packet text {
+  fill: #1a1a2e !important;
+  color: #1a1a2e !important;
+}
+
+/* ---- Node fills: distinct pastel colors for variety ---- */
+.mermaid svg rect.node,
+.mermaid-fullscreen-content svg rect.node,
+.mermaid svg .node rect,
+.mermaid-fullscreen-content svg .node rect,
+.mermaid svg circle.node,
+.mermaid-fullscreen-content svg circle.node,
+.mermaid svg .node circle,
+.mermaid-fullscreen-content svg .node circle,
+.mermaid svg ellipse.node,
+.mermaid-fullscreen-content svg ellipse.node,
+.mermaid svg .node ellipse,
+.mermaid-fullscreen-content svg .node ellipse,
+.mermaid svg polygon.node,
+.mermaid-fullscreen-content svg polygon.node,
+.mermaid svg .node polygon,
+.mermaid-fullscreen-content svg .node polygon,
+.mermaid svg .node path,
+.mermaid-fullscreen-content svg .node path {
+  fill: #e8f5e9 !important;
+  stroke: #2e7d32 !important;
+}
+
+/* ---- Secondary nodes: blue tint ---- */
+.mermaid svg .cluster rect,
+.mermaid-fullscreen-content svg .cluster rect,
+.mermaid svg rect.cluster,
+.mermaid-fullscreen-content svg rect.cluster,
+.mermaid svg .state-group rect,
+.mermaid-fullscreen-content svg .state-group rect,
+.mermaid svg .classGroup rect,
+.mermaid-fullscreen-content svg .classGroup rect,
+.mermaid svg .classGroup .comps,
+.mermaid-fullscreen-content svg .classGroup .comps {
+  fill: #e3f2fd !important;
+  stroke: #1565c0 !important;
+}
+
+/* ---- Lines, paths, arrows: dark ---- */
+.mermaid svg path.edgeLine,
+.mermaid-fullscreen-content svg path.edgeLine,
+.mermaid svg .edgePath .path,
+.mermaid-fullscreen-content svg .edgePath .path,
+.mermaid svg .edgePath path,
+.mermaid-fullscreen-content svg .edgePath path,
+.mermaid svg .relation,
+.mermaid-fullscreen-content svg .relation,
+.mermaid svg .transition,
+.mermaid-fullscreen-content svg .transition,
+.mermaid svg .messageLine0,
+.mermaid-fullscreen-content svg .messageLine0,
+.mermaid svg .messageLine1,
+.mermaid-fullscreen-content svg .messageLine1,
+.mermaid svg .actor-line,
+.mermaid-fullscreen-content svg .actor-line,
+.mermaid svg .messageLine,
+.mermaid-fullscreen-content svg .messageLine,
+.mermaid svg .loopLine,
+.mermaid-fullscreen-content svg .loopLine,
+.mermaid svg .activation0,
+.mermaid-fullscreen-content svg .activation0,
+.mermaid svg line,
+.mermaid-fullscreen-content svg line {
+  stroke: #37474f !important;
+}
+
+/* ---- Edge label backgrounds ---- */
+.mermaid svg .edgeLabel rect,
+.mermaid-fullscreen-content svg .edgeLabel rect,
+.mermaid svg .edgeLabel,
+.mermaid-fullscreen-content svg .edgeLabel {
+  fill: #ffffff !important;
+}
+
+/* ---- Sequence / actor elements ---- */
+.mermaid svg .actor-man rect,
+.mermaid-fullscreen-content svg .actor-man rect,
+.mermaid svg .actor-man line,
+.mermaid-fullscreen-content svg .actor-man line,
+.mermaid svg .actor-man circle,
+.mermaid-fullscreen-content svg .actor-man circle,
+.mermaid svg .activation,
+.mermaid-fullscreen-content svg .activation {
+  fill: #e8f5e9 !important;
+  stroke: #2e7d32 !important;
+}
+
+/* ---- Class diagram elements ---- */
+.mermaid svg .entityBox rect,
+.mermaid-fullscreen-content svg .entityBox rect {
+  fill: #fff3e0 !important;
+  stroke: #e65100 !important;
+}
+
+/* ---- Git graph ---- */
+.mermaid svg .commit rect,
+.mermaid-fullscreen-content svg .commit rect {
+  fill: #f3e5f5 !important;
+  stroke: #6a1b9a !important;
+}
+
+.mermaid svg .branch-label text,
+.mermaid-fullscreen-content svg .branch-label text {
+  fill: #6a1b9a !important;
+}
+
+/* ---- Gantt / task ---- */
+.mermaid svg .task rect,
+.mermaid-fullscreen-content svg .task rect,
+.mermaid svg .task-state rect,
+.mermaid-fullscreen-content svg .task-state rect {
+  fill: #e0f2f1 !important;
+  stroke: #00695c !important;
+}
+
+.mermaid svg .taskText,
+.mermaid-fullscreen-content svg .taskText {
+  fill: #004d40 !important;
+}
+
+/* ---- Pie chart slices ---- */
+.mermaid svg .slice,
+.mermaid-fullscreen-content svg .slice {
+  stroke: #ffffff !important;
+}
+
+/* ---- Mindmap ---- */
+.mermaid svg .mindmap-node rect,
+.mermaid-fullscreen-content svg .mindmap-node rect {
+  fill: #fce4ec !important;
+  stroke: #c62828 !important;
+}
+
+/* ---- Journey ---- */
+.mermaid svg .tile rect,
+.mermaid-fullscreen-content svg .tile rect {
+  fill: #e8eaf6 !important;
+  stroke: #283593 !important;
+}
+
+/* ---- Quadrant ---- */
+.mermaid svg .quadrant rect,
+.mermaid-fullscreen-content svg .quadrant rect {
+  fill: #f1f8e9 !important;
+  stroke: #558b2f !important;
+}
+
+/* ---- Axis lines ---- */
+.mermaid svg .xAxis .tick line,
+.mermaid-fullscreen-content svg .xAxis .tick line,
+.mermaid svg .yAxis .tick line,
+.mermaid-fullscreen-content svg .yAxis .tick line,
+.mermaid svg .xAxis path,
+.mermaid-fullscreen-content svg .xAxis path,
+.mermaid svg .yAxis path,
+.mermaid-fullscreen-content svg .yAxis path {
+  stroke: #90a4ae !important;
+}
+
+/* ---- Sankey links ---- */
+.mermaid svg .sankey-link,
+.mermaid-fullscreen-content svg .sankey-link {
+  fill: #78909c !important;
+  opacity: 0.5 !important;
+}
+
+/* ---- Block-beta ---- */
+.mermaid svg .block rect,
+.mermaid-fullscreen-content svg .block rect {
+  fill: #ede7f6 !important;
+  stroke: #4527a0 !important;
+}
+
+.mermaid svg .blockLabel text,
+.mermaid-fullscreen-content svg .blockLabel text {
+  fill: #1a1a2e !important;
+}
+
+/* ---- Packet diagram ---- */
+.mermaid svg .packet rect,
+.mermaid-fullscreen-content svg .packet rect {
+  fill: #e0f7fa !important;
+  stroke: #00838f !important;
+}
+
+.mermaid svg .packet text,
+.mermaid-fullscreen-content svg .packet text {
+  fill: #1a1a2e !important;
+}
+
+/* ---- Timeline / state ---- */
+.mermaid svg .state,
+.mermaid-fullscreen-content svg .state,
+.mermaid svg .state-group rect,
+.mermaid-fullscreen-content svg .state-group rect {
+  fill: #fff8e1 !important;
+  stroke: #f9a825 !important;
+}
+
+.mermaid svg .transition,
+.mermaid-fullscreen-content svg .transition {
+  stroke: #37474f !important;
+}
+
+/* ---- Requirement diagram ---- */
+.mermaid svg .req text,
+.mermaid-fullscreen-content svg .req text {
+  fill: #1a1a2e !important;
+}
+
+/* ---- ER diagram ---- */
+.mermaid svg .relationship-label text,
+.mermaid-fullscreen-content svg .relationship-label text {
+  fill: #1a1a2e !important;
+}
+
+/* ============================================
+   ERROR STATES
+   ============================================ */
+
+.mermaid-error {
+  padding: 0.75rem 1rem;
+  background: var(--bg-code);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-family: monospace;
+  border-top: 1px solid var(--border);
+}
+
+.mermaid-error-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: #f38ba8;
+}
+
+.mermaid-error-details {
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.mermaid-error-details summary {
+  cursor: pointer;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: background 0.15s;
+  font-size: 0.75rem;
+}
+
+.mermaid-error-details summary:hover {
+  background: rgba(128, 128, 128, 0.1);
+}
+
+.mermaid-error-msg {
+  background: var(--bg-surface);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  margin: 0.5rem 0;
+  overflow-x: auto;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.mermaid-error-source {
+  background: var(--bg-code);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  margin: 0.5rem 0;
+  overflow-x: auto;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border: 1px solid var(--border);
+}
+
+/* ============================================
+   MERMAID FULLSCREEN MODAL
+   ============================================ */
+
+.mermaid-fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.mermaid-fullscreen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--bg-code);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.mermaid-fullscreen-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mermaid-fullscreen-zoom-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--border);
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: all 0.15s;
+  line-height: 0;
+}
+
+.mermaid-fullscreen-zoom-btn:hover {
+  background: var(--bg-surface);
+}
+
+.mermaid-fullscreen-zoom-btn svg {
+  display: block;
+}
+
+.mermaid-zoom-level {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  min-width: 3.5rem;
+  text-align: center;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}
+
+.mermaid-fullscreen-title {
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.mermaid-fullscreen-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--border);
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.mermaid-fullscreen-close:hover {
+  background: var(--bg-surface);
+}
+
+.mermaid-fullscreen-close svg {
+  display: block;
+}
+
+.mermaid-fullscreen-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.mermaid-fullscreen-viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+  position: relative;
+}
+
+.mermaid-fullscreen-viewport:active {
+  cursor: grabbing;
+}
+
+.mermaid-fullscreen-content .mermaid-diagram-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(0px, 0px) scale(1);
+  transform-origin: center center;
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+}
+
+.mermaid-fullscreen-content svg {
+  max-width: none;
+  max-height: none;
+  width: auto;
+  height: auto;
+  display: block;
+}
+
+/* Print-friendly mermaid diagrams */
+@media print {
+  .mermaid-diagram {
+    break-inside: avoid;
+    border: 1px solid #ccc;
+    page-break-inside: avoid;
+  }
+
+  .mermaid-diagram-header {
+    background: #f5f5f5 !important;
+    border-bottom: 1px solid #ccc;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .mermaid-diagram-desc {
+    background: #fafafa !important;
+    border-top: 1px solid #ccc;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .mermaid-zoom-btn,
+  .mermaid-download-btn {
+    display: none !important;
+  }
+
+  .mermaid-loading {
+    display: none !important;
+  }
+
+  .mermaid-error {
+    display: none !important;
+  }
+
+  .mermaid svg {
+    max-width: 100% !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

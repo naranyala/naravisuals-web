@@ -1,0 +1,307 @@
+/**
+ * Reference & Footnote Validator Plugin (STRICT)
+ *
+ * Enforces strict validation for:
+ * 1. External links must have a References/See Also section
+ * 2. All footnote references must have matching definitions
+ * 3. All footnote definitions must be referenced
+ * 4. Reference sections must contain actual link entries
+ * 5. External links must be valid URLs (basic format check)
+ * 6. No broken/orphaned footnote definitions
+ * 7. No duplicate footnote identifiers
+ *
+ * This is STRICT validation - fails build if any violations found.
+ */
+
+import type { MarkdownValidator, ValidationIssue, ValidationResult } from "./types.ts";
+
+interface FootnoteEntry {
+  identifier: string;
+  line: number;
+  isReference: boolean; // true if [^1], false if [^1]:
+}
+
+interface ExternalLink {
+  url: string;
+  text: string;
+  line: number;
+  isValid: boolean;
+}
+
+export const referenceValidator: MarkdownValidator = {
+  name: "references",
+  label: "Reference & Footnote Validator",
+  isStrict: true,
+
+  validate(content: string, filePath: string): ValidationResult {
+    const issues: ValidationIssue[] = [];
+    const lines = content.split("\n");
+
+    const externalLinks: ExternalLink[] = [];
+    const internalLinkCount = 0;
+    const footnoteEntries: FootnoteEntry[] = [];
+    const footnoteIdentifiers = new Set<string>();
+    const duplicateIdentifiers: string[] = [];
+
+    let hasReferencesSection = false;
+    let referencesSectionLine = -1;
+    let referencesSectionEntries = 0;
+
+    // Track code blocks to skip validation inside them
+    let inCodeBlock = false;
+
+    // ===== PASS 1: Extract all data =====
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Track code blocks
+      if (line.trimStart().startsWith("```")) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
+      if (inCodeBlock) continue;
+
+      // Check for References/See Also section
+      const refSectionMatch = line.match(
+        /^(#{1,3})\s+(References|See Also|Further Reading|External Links|Notes|Footnotes|Bibliography)/i
+      );
+      if (refSectionMatch) {
+        hasReferencesSection = true;
+        referencesSectionLine = i;
+      }
+
+      // Extract external links
+      const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+      let linkMatch: RegExpExecArray | null;
+      while ((linkMatch = linkRegex.exec(line)) !== null) {
+        const url = linkMatch[2];
+        const text = linkMatch[1];
+
+        // Skip internal links
+        if (
+          url.startsWith("/") ||
+          url.startsWith("#") ||
+          url.startsWith("docs/") ||
+          url.startsWith("./") ||
+          url.startsWith("../")
+        ) {
+          continue;
+        }
+
+        // Basic URL validation
+        const isValidUrl = /^https?:\/\/[^\s]+$/.test(url);
+
+        externalLinks.push({
+          url,
+          text,
+          line: i + 1,
+          isValid: isValidUrl,
+        });
+      }
+
+      // Extract footnote references [^identifier]
+      const footnoteRefRegex = /\[\^([^\]]+)\]/g;
+      let refMatch: RegExpExecArray | null;
+      while ((refMatch = footnoteRefRegex.exec(line)) !== null) {
+        const identifier = refMatch[1];
+
+        // Check if this is a definition (line starts with [^id]:)
+        const isDef = line.trim().startsWith(`[^${identifier}]:`);
+
+        if (!isDef) {
+          // This is a reference
+          footnoteEntries.push({
+            identifier,
+            line: i + 1,
+            isReference: true,
+          });
+
+          // Track for duplicate detection
+          if (footnoteIdentifiers.has(`ref:${identifier}`)) {
+            issues.push({
+              severity: "error",
+              file: filePath,
+              line: i + 1,
+              message: `Duplicate footnote reference: [^${identifier}]`,
+              detail: "Each footnote should be referenced only once per article",
+            });
+          }
+          footnoteIdentifiers.add(`ref:${identifier}`);
+        }
+      }
+
+      // Extract footnote definitions [^identifier]:
+      const footnoteDefRegex = /^\s*\[\^([^\]]+)\]:\s*(.*)$/;
+      const defMatch = line.match(footnoteDefRegex);
+      if (defMatch) {
+        const identifier = defMatch[1];
+        const definitionText = defMatch[2];
+
+        footnoteEntries.push({
+          identifier,
+          line: i + 1,
+          isReference: false,
+        });
+
+        // Check for empty definitions
+        if (!definitionText.trim()) {
+          issues.push({
+            severity: "error",
+            file: filePath,
+            line: i + 1,
+            message: `Empty footnote definition: [^${identifier}]`,
+            detail: "Footnote definitions must contain text content",
+          });
+        }
+
+        // Check for duplicate definitions
+        if (footnoteIdentifiers.has(`def:${identifier}`)) {
+          duplicateIdentifiers.push(identifier);
+          issues.push({
+            severity: "error",
+            file: filePath,
+            line: i + 1,
+            message: `Duplicate footnote definition: [^${identifier}]:`,
+            detail: "Each footnote identifier must be unique",
+          });
+        }
+        footnoteIdentifiers.add(`def:${identifier}`);
+      }
+    }
+
+    // ===== PASS 2: Count reference section entries =====
+
+    if (hasReferencesSection) {
+      for (let i = referencesSectionLine + 1; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Stop at next heading
+        if (/^#{1,3}\s+/.test(line)) break;
+
+        // Count list items that look like reference entries
+        if (/^\s*[-*]\s+\[/.test(line) || /^\s*\d+\.\s+\[/.test(line)) {
+          referencesSectionEntries++;
+        }
+      }
+
+      // Check if reference section is empty
+      if (referencesSectionEntries === 0 && externalLinks.length > 0) {
+        issues.push({
+          severity: "error",
+          file: filePath,
+          line: referencesSectionLine + 1,
+          message: `References section exists but has no link entries`,
+          detail: `Found ${externalLinks.length} external link(s) but reference section has 0 entries. Add links as list items: - [Name](URL)`,
+        });
+      }
+    }
+
+    // ===== PASS 3: Validate external links =====
+
+    // Check for invalid URLs
+    const invalidUrls = externalLinks.filter((l) => !l.isValid);
+    for (const link of invalidUrls) {
+      issues.push({
+        severity: "error",
+        file: filePath,
+        line: link.line,
+        message: `Invalid external URL: ${link.url}`,
+        detail: "External links must start with http:// or https://",
+      });
+    }
+
+    // Check for external links without references section
+    const validExternalLinks = externalLinks.filter((l) => l.isValid);
+    if (validExternalLinks.length > 0 && !hasReferencesSection) {
+      issues.push({
+        severity: "error",
+        file: filePath,
+        message: `${validExternalLinks.length} external link(s) but no References section`,
+        detail:
+          "Add a ## References or ## See Also section at the end of the article with link entries",
+      });
+    }
+
+    // Check if all external links are in references section
+    if (hasReferencesSection && validExternalLinks.length > 0 && referencesSectionEntries > 0) {
+      // This is informational - we can't perfectly match URLs, but we can check count
+      if (referencesSectionEntries < validExternalLinks.length) {
+        issues.push({
+          severity: "warning",
+          file: filePath,
+          line: referencesSectionLine + 1,
+          message: `References section has ${referencesSectionEntries} entries but article has ${validExternalLinks.length} external links`,
+          detail: "Consider adding all external links to the References section",
+        });
+      }
+    }
+
+    // ===== PASS 4: Validate footnotes =====
+
+    const references = footnoteEntries.filter((e) => e.isReference);
+    const definitions = footnoteEntries.filter((e) => !e.isReference);
+
+    const refIdentifiers = new Set(references.map((r) => r.identifier));
+    const defIdentifiers = new Set(definitions.map((d) => d.identifier));
+
+    // Check for references without definitions
+    const orphanedRefs = references.filter((r) => !defIdentifiers.has(r.identifier));
+    for (const orphan of orphanedRefs) {
+      issues.push({
+        severity: "error",
+        file: filePath,
+        line: orphan.line,
+        message: `Footnote reference [^${orphan.identifier}] has no matching definition`,
+        detail: `Add definition: [^${orphan.identifier}]: Source description`,
+      });
+    }
+
+    // Check for definitions without references (orphaned definitions)
+    const orphanedDefs = definitions.filter((d) => !refIdentifiers.has(d.identifier));
+    for (const orphan of orphanedDefs) {
+      issues.push({
+        severity: "error",
+        file: filePath,
+        line: orphan.line,
+        message: `Footnote definition [^${orphan.identifier}]: is never referenced`,
+        detail: "Remove unused footnote definitions or add references in the text",
+      });
+    }
+
+    // Check for mismatched counts (only if no orphaned issues already reported)
+    if (orphanedRefs.length === 0 && orphanedDefs.length === 0) {
+      if (references.length !== definitions.length) {
+        issues.push({
+          severity: "error",
+          file: filePath,
+          message: `Footnote reference count (${references.length}) != definition count (${definitions.length})`,
+          detail: "Ensure every [^ref] has a matching [^ref]: definition",
+        });
+      }
+    }
+
+    // ===== Build stats =====
+
+    const stats: Record<string, any> = {
+      externalLinks: validExternalLinks.length,
+      invalidUrls: invalidUrls.length,
+      internalLinks: internalLinkCount,
+      hasReferencesSection: hasReferencesSection,
+      referencesSectionEntries,
+      footnoteReferences: references.length,
+      footnoteDefinitions: definitions.length,
+      orphanedFootnoteRefs: orphanedRefs.length,
+      orphanedFootnoteDefs: orphanedDefs.length,
+      duplicateIdentifiers: duplicateIdentifiers.length,
+    };
+
+    return {
+      checked: validExternalLinks.length + references.length + definitions.length,
+      issues,
+      stats,
+    };
+  },
+};
+
+export default referenceValidator;

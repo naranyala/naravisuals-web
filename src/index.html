@@ -1,13 +1,63 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>AngularRspackDemo</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-</head>
-<body style="margin: 0; background: #0d1117;">
-  <app-root></app-root>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Documentation Site" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    
+    <!-- SEO: Canonical URL (updated dynamically by frontend.tsx) -->
+    <link id="canonical" rel="canonical" href="" />
+    
+    <!-- Open Graph (updated dynamically) -->
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Documentation Site" />
+    <meta property="og:title" content="Documentation Site" />
+    <meta property="og:description" content="Documentation Site" />
+    <meta property="og:url" content="" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter Card (updated dynamically) -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Documentation Site" />
+    <meta name="twitter:description" content="Documentation Site" />
+    
+    <title>Documentation Site</title>
+    
+    <!-- MathJax for rendering math notation -->
+    <script>
+      window.MathJax = {
+              tex: {
+                inlineMath: [["$", "$"], ["\\(", "\\)"]],
+                displayMath: [["$$", "$$"], ["\\[", "\\]"]],
+                processEscapes: true,
+                processEnvironments: true,
+              },
+              options: {
+                skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+              },
+              startup: {
+                ready: () => {
+                  MathJax.startup.defaultReady();
+                },
+              },
+            };
+    </script>
+    <!-- Try local MathJax first, fallback to CDN -->
+    <script id="MathJax-script" async src="/mathjax/tex-svg.js"
+            onerror="this.src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js'"></script>
+  </head>
+  <body>
+    <!-- Structured Data: WebSite (updated dynamically) -->
+    <script type="application/ld+json" id="structured-data">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Documentation Site",
+      "url": ""
+    }
+    </script>
+    
+    <div id="root"></div>
+  </body>
 </html>

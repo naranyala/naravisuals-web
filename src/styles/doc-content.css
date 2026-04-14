@@ -1,0 +1,72 @@
+/* ============================================
+   DOC CONTENT
+   ============================================ */
+
+.doc-content {
+  line-height: 1.6;
+}
+
+.doc-content h1 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.25;
+  scroll-margin-top: calc(var(--topbar-height) + 1rem);
+}
+.doc-content h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-top: 2.25rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+  scroll-margin-top: calc(var(--topbar-height) + 1rem);
+}
+.doc-content h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.4rem;
+  scroll-margin-top: calc(var(--topbar-height) + 1rem);
+}
+.doc-content h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  scroll-margin-top: calc(var(--topbar-height) + 1rem);
+}
+.doc-content h5 {
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  scroll-margin-top: calc(var(--topbar-height) + 1rem);
+}
+.doc-content h6 {
+  font-size: 0.82rem;
+  font-weight: 500;
+  margin-top: 0.85rem;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  opacity: 0.8;
+  scroll-margin-top: calc(var(--topbar-height) + 1rem);
+}
+
+.doc-content p {
+  margin-bottom: 0.85rem;
+}
+.doc-content a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.doc-content a:hover {
+  text-decoration-thickness: 2px;
+}
