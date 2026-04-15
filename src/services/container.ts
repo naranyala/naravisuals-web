@@ -51,6 +51,9 @@ export interface IThemeService {
   getInitialTheme(): boolean; // true = dark
   applyTheme(isDark: boolean): void;
   toggleTheme(current: boolean): boolean;
+  getMermaidLoading(): boolean;
+  setMermaidLoading(loading: boolean): void;
+  onMermaidLoadingChange(callback: (loading: boolean) => void): () => void;
 }
 
 /**
@@ -181,23 +184,37 @@ export const createDomService = (): IDomService => ({
 /**
  * Default theme service
  */
-export const createThemeService = (storage: IStorageService): IThemeService => ({
-  getInitialTheme: () => {
-    const stored = storage.getItem("theme");
-    if (stored !== null) return stored === "dark";
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
-  },
-  applyTheme: (isDark: boolean) => {
-    if (typeof document === "undefined") return;
-    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
-  },
-  toggleTheme: (current: boolean) => {
-    const next = !current;
-    storage.setItem("theme", next ? "dark" : "light");
-    return next;
-  },
-});
+export const createThemeService = (storage: IStorageService): IThemeService => {
+  let mermaidLoading = false;
+  const mermaidLoadingCallbacks: Set<(loading: boolean) => void> = new Set();
+
+  return {
+    getInitialTheme: () => {
+      const stored = storage.getItem("theme");
+      if (stored !== null) return stored === "dark";
+      if (typeof window === "undefined") return false;
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    },
+    applyTheme: (isDark: boolean) => {
+      if (typeof document === "undefined") return;
+      document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+    },
+    toggleTheme: (current: boolean) => {
+      const next = !current;
+      storage.setItem("theme", next ? "dark" : "light");
+      return next;
+    },
+    getMermaidLoading: () => mermaidLoading,
+    setMermaidLoading: (loading: boolean) => {
+      mermaidLoading = loading;
+      mermaidLoadingCallbacks.forEach((cb) => cb(loading));
+    },
+    onMermaidLoadingChange: (callback: (loading: boolean) => void) => {
+      mermaidLoadingCallbacks.add(callback);
+      return () => mermaidLoadingCallbacks.delete(callback);
+    },
+  };
+};
 
 /**
  * Default app config

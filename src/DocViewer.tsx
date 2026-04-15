@@ -1,10 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 declare global {
   interface Window {
     MathJax?: {
       typesetPromise: (elements: HTMLElement[]) => Promise<void>;
     };
+    __mermaidUnbind__?: () => void;
+    __mermaidLoading__?: boolean;
   }
 }
 
@@ -17,6 +19,9 @@ async function renderMermaid(container: HTMLElement | null) {
 
   const diagrams = container.querySelectorAll<HTMLElement>(".mermaid-diagram");
   if (diagrams.length === 0) return;
+
+  // Set loading state globally
+  window.__mermaidLoading__ = true;
 
   let mermaid: import("mermaid").default;
   try {
@@ -79,14 +84,26 @@ async function renderMermaid(container: HTMLElement | null) {
         svgEl.querySelectorAll("path, line").forEach((shapeEl) => {
           const stroke = shapeEl.getAttribute("stroke");
           // Only override very light or missing strokes
-          if (!stroke || stroke === "none" || stroke === "transparent" || stroke === "#e5e7eb" || stroke === "#d1d5db") {
+          if (
+            !stroke ||
+            stroke === "none" ||
+            stroke === "transparent" ||
+            stroke === "#e5e7eb" ||
+            stroke === "#d1d5db"
+          ) {
             shapeEl.style.stroke = "#374151";
           }
         });
         svgEl.querySelectorAll("rect, circle, ellipse, polygon").forEach((shapeEl) => {
           const fill = shapeEl.getAttribute("fill");
           // Only override very light fills (keep white backgrounds)
-          if (fill && fill !== "#fff" && fill !== "#ffffff" && fill !== "white" && fill !== "none") {
+          if (
+            fill &&
+            fill !== "#fff" &&
+            fill !== "#ffffff" &&
+            fill !== "white" &&
+            fill !== "none"
+          ) {
             shapeEl.style.fill = "#ffffff";
           }
           shapeEl.style.stroke = "#6b7280";
@@ -109,15 +126,16 @@ async function renderMermaid(container: HTMLElement | null) {
       mermaidEl.style.opacity = "1";
     }
   }
+
+  // Reset loading state when done
+  window.__mermaidLoading__ = false;
 }
 
 async function renderMath(container: HTMLElement | null) {
   if (!container) return;
 
   // Find all math elements that haven't been processed yet
-  const mathElements = container.querySelectorAll<HTMLElement>(
-    ".math-inline, .math-display"
-  );
+  const mathElements = container.querySelectorAll<HTMLElement>(".math-inline, .math-display");
   if (mathElements.length === 0) return;
 
   // If MathJax is already loaded, typeset immediately without loading state
@@ -460,7 +478,7 @@ export function DocViewer({ html }: DocViewerProps) {
           let svgString = serializer.serializeToString(svgClone);
 
           // Add XML declaration for proper encoding
-          svgString = '<?xml version="1.0" encoding="UTF-8"?>\n' + svgString;
+          svgString = `<?xml version="1.0" encoding="UTF-8"?>\n${svgString}`;
 
           // Create blob and download link
           const blob = new Blob([svgString], { type: "image/svg+xml" });
@@ -469,11 +487,12 @@ export function DocViewer({ html }: DocViewerProps) {
           // Generate a meaningful filename from diagram description or fallback
           const descEl = diagramWrapper.querySelector(".mermaid-diagram-desc");
           const descText = descEl?.textContent?.trim() || "diagram";
-          const filename = descText
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)/g, "")
-            .slice(0, 50) || "diagram";
+          const filename =
+            descText
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/(^-|-$)/g, "")
+              .slice(0, 50) || "diagram";
 
           const link = document.createElement("a");
           link.href = url;

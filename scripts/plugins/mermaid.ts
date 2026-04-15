@@ -37,71 +37,73 @@ export const mermaidPlugin: MarkdownPlugin = {
     const mermaidRegex =
       /<div class="code-block"[^>]*>([\s\S]*?)<div class="code-header">([\s\S]*?)<span class="code-lang">Mermaid<\/span>([\s\S]*?)<\/div>([\s\S]*?)<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>([\s\S]*?)(?:<div class="code-desc">([\s\S]*?)<\/div>)?([\s\S]*?)<\/div>/gi;
 
-    let result = html.replace(mermaidRegex, (match, _pre, _hdrPre, _hdrPost, _prePre, diagram, _postPre, desc, _postPost) => {
-      const id = `MERMAIDBLOCK${index++}END`;
+    let result = html.replace(
+      mermaidRegex,
+      (match, _pre, _hdrPre, _hdrPost, _prePre, diagram, _postPre, desc, _postPost) => {
+        const id = `MERMAIDBLOCK${index++}END`;
 
-      // Extract data-zoom if present on the outer div
-      const zoomMatch = match.match(/data-zoom="([^"]*)"/i);
-      const zoomEnabled = zoomMatch ? zoomMatch[1] === "true" : true;
+        // Extract data-zoom if present on the outer div
+        const zoomMatch = match.match(/data-zoom="([^"]*)"/i);
+        const zoomEnabled = zoomMatch ? zoomMatch[1] === "true" : true;
 
-      // Decode HTML entities back to original diagram text
-      // Also strip Shiki-generated <span> tags
-      const decoded = diagram
-        .replace(/&amp;/g, "&")
-        .replace(/&lt;/g, "<")
-        .replace(/&gt;/g, ">")
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'")
-        .replace(/&amp;#39;/g, "'")
-        .replace(/<\/?span[^>]*>/g, "")
-        .trim();
+        // Decode HTML entities back to original diagram text
+        // Also strip Shiki-generated <span> tags
+        const decoded = diagram
+          .replace(/&amp;/g, "&")
+          .replace(/&lt;/g, "<")
+          .replace(/&#x3c;/gi, "<")
+          .replace(/&gt;/g, ">")
+          .replace(/&#x3e;/gi, ">")
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .replace(/&amp;#39;/g, "'")
+          .replace(/<\/?span[^>]*>/g, "")
+          .trim();
 
-      // Validate diagram content
-      const validationErrors = validateMermaidContent(decoded);
-      if (validationErrors.length > 0) {
-        const errorDetails = validationErrors
-          .map((err) => `  - ${err.message}: ${err.detail}`)
-          .join("\n");
-        console.error(
-          `\n❌ Mermaid validation error(s) in diagram ${id}:`,
-          `\n${errorDetails}`
-        );
-        // Create error container instead of failing completely
-        const errorContainer = [
-          `<div class="mermaid-diagram" data-processed="false" data-zoom="${zoomEnabled}" data-validation-error="true">`,
-          `  <div class="mermaid-diagram-header">`,
-          `    <span class="mermaid-diagram-label">Diagram</span>`,
-          `    <div class="mermaid-diagram-actions">`,
-          `      <span class="mermaid-loading">Loading...</span>`,
-          `    </div>`,
-          `  </div>`,
-          `  <div class="mermaid" style="display:none;">${escapeHtml(decoded)}</div>`,
-          `  <div class="mermaid-error" style="display:block;">`,
-          `    <div class="mermaid-error-title">⚠ Validation Error</div>`,
-          `    <details>`,
-          `      <summary>${validationErrors[0].message}</summary>`,
-          `      <pre>${escapeHtml(errorDetails)}</pre>`,
-          `    </details>`,
-          `  </div>`,
-          `</div>`,
-        ].join("\n");
-        return errorContainer;
+        // Validate diagram content
+        const validationErrors = validateMermaidContent(decoded);
+        if (validationErrors.length > 0) {
+          const errorDetails = validationErrors
+            .map((err) => `  - ${err.message}: ${err.detail}`)
+            .join("\n");
+          console.error(`\n❌ Mermaid validation error(s) in diagram ${id}:`, `\n${errorDetails}`);
+          // Create error container instead of failing completely
+          const errorContainer = [
+            `<div class="mermaid-diagram" data-processed="false" data-zoom="${zoomEnabled}" data-validation-error="true">`,
+            `  <div class="mermaid-diagram-header">`,
+            `    <span class="mermaid-diagram-label">Diagram</span>`,
+            `    <div class="mermaid-diagram-actions">`,
+            `      <span class="mermaid-loading">Loading...</span>`,
+            `    </div>`,
+            `  </div>`,
+            `  <div class="mermaid" style="display:none;">${escapeHtml(decoded)}</div>`,
+            `  <div class="mermaid-error" style="display:block;">`,
+            `    <div class="mermaid-error-title">⚠ Validation Error</div>`,
+            `    <details>`,
+            `      <summary>${validationErrors[0].message}</summary>`,
+            `      <pre>${escapeHtml(errorDetails)}</pre>`,
+            `    </details>`,
+            `  </div>`,
+            `</div>`,
+          ].join("\n");
+          return errorContainer;
+        }
+
+        // Decode description HTML entities
+        const decodedDesc = desc
+          ? desc
+              .replace(/&amp;/g, "&")
+              .replace(/&lt;/g, "<")
+              .replace(/&gt;/g, ">")
+              .replace(/&quot;/g, '"')
+              .replace(/&#39;/g, "'")
+              .trim()
+          : undefined;
+
+        blocks.push({ id, diagram: decoded, desc: decodedDesc, zoom: zoomEnabled });
+        return id;
       }
-
-      // Decode description HTML entities
-      const decodedDesc = desc
-        ? desc
-            .replace(/&amp;/g, "&")
-            .replace(/&lt;/g, "<")
-            .replace(/&gt;/g, ">")
-            .replace(/&quot;/g, '"')
-            .replace(/&#39;/g, "'")
-            .trim()
-        : undefined;
-
-      blocks.push({ id, diagram: decoded, desc: decodedDesc, zoom: zoomEnabled });
-      return id;
-    });
+    );
 
     // Replace sentinels with mermaid containers
     for (const block of blocks) {

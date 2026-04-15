@@ -7,7 +7,7 @@
  * Placed at the very bottom of the article (after DocFooter).
  */
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 
 interface FootnoteEntry {
   identifier: string;
@@ -18,12 +18,11 @@ interface FootnoteEntry {
 }
 
 interface ArticleRefsPanelProps {
-  contentHtml: string;
   /** AST tokens from marked parser */
   markdownAst?: any[];
 }
 
-export function ArticleRefsPanel({ contentHtml, markdownAst }: ArticleRefsPanelProps) {
+export function ArticleRefsPanel({ markdownAst }: ArticleRefsPanelProps) {
   const [isOpen, setIsOpen] = useState(true); // Expanded by default
 
   // Extract footnotes from AST tokens
@@ -40,7 +39,7 @@ export function ArticleRefsPanel({ contentHtml, markdownAst }: ArticleRefsPanelP
         // Check for footnote references: tokens with text containing [^...]
         if (token.text && typeof token.text === "string") {
           const refRegex = /\[\^([^\]]+)\]/g;
-          let match;
+          let match: RegExpExecArray | null;
           while ((match = refRegex.exec(token.text)) !== null) {
             const identifier = match[1];
             if (!footnotesMap.has(identifier)) {
@@ -64,9 +63,11 @@ export function ArticleRefsPanel({ contentHtml, markdownAst }: ArticleRefsPanelP
               const identifier = defMatch[1];
               const definitionText = defMatch[2]?.trim() || "";
               if (footnotesMap.has(identifier)) {
-                const entry = footnotesMap.get(identifier)!;
-                entry.definitionText = definitionText;
-                entry.hasDefinition = definitionText.length > 0;
+                const entry = footnotesMap.get(identifier);
+                if (entry) {
+                  entry.definitionText = definitionText;
+                  entry.hasDefinition = definitionText.length > 0;
+                }
               } else {
                 footnotesMap.set(identifier, {
                   identifier,
@@ -115,7 +116,7 @@ export function ArticleRefsPanel({ contentHtml, markdownAst }: ArticleRefsPanelP
         <div className="article-refs-content">
           <ol className="article-refs-list">
             {footnotes.map((footnote, idx) => (
-              <li key={idx} className="article-ref-item">
+              <li key={footnote.identifier} className="article-ref-item">
                 <div className="article-ref-header">
                   <span className="article-ref-identifier">
                     <sup>{idx + 1}</sup> [{footnote.identifier}]

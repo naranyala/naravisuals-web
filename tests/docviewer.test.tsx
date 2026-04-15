@@ -64,7 +64,7 @@ describe("DocViewer", () => {
   });
 
   test("handles deeply nested HTML", () => {
-    const nestedHtml = "<div>".repeat(50) + "Deep content" + "</div>".repeat(50);
+    const nestedHtml = `${"<div>".repeat(50)}Deep content${"</div>".repeat(50)}`;
     renderWithServices(<DocViewer html={nestedHtml} />);
     expect(document.querySelector(".doc-content")?.textContent).toBe("Deep content");
   });

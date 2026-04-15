@@ -1,11 +1,11 @@
 /**
  * Doc Stats Footer
- * 
+ *
  * Displays comprehensive statistics about the current document
  * in a collapsible footer panel.
  */
 
-import { useState, useEffect, useMemo } from "react";
+import { useMemo, useState } from "react";
 
 interface DocStats {
   wordCount: number;
@@ -72,9 +72,7 @@ export function DocStatsFooter({ contentHtml }: DocStatsFooterProps) {
 
     // Count words (rough estimate from text content)
     const textContent = tempDiv.textContent || "";
-    const wordCount = textContent
-      .split(/\s+/)
-      .filter((w) => w.length > 0).length;
+    const wordCount = textContent.split(/\s+/).filter((w) => w.length > 0).length;
 
     return {
       wordCount,
@@ -99,9 +97,7 @@ export function DocStatsFooter({ contentHtml }: DocStatsFooterProps) {
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
       >
-        <span className="doc-stats-toggle-text">
-          {isOpen ? "Hide" : "Show"} Document Stats
-        </span>
+        <span className="doc-stats-toggle-text">{isOpen ? "Hide" : "Show"} Document Stats</span>
         <span className={`doc-stats-chevron ${isOpen ? "open" : ""}`}>▾</span>
       </button>
 

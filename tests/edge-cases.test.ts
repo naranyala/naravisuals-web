@@ -5,12 +5,11 @@
  * that could cause issues as the project grows over time.
  */
 
-import { beforeEach, describe, expect, mock, test } from "bun:test";
-import { Diagnostics, validateFrontmatter, validateInternalLinks, validateUniqueSlugs } from "../scripts/diagnostics.ts";
+import { describe, expect, test } from "bun:test";
+import { Diagnostics, validateInternalLinks, validateUniqueSlugs } from "../scripts/diagnostics.ts";
 import { admonitionsPlugin } from "../scripts/plugins/admonitions.ts";
 import { mathPlugin } from "../scripts/plugins/math.ts";
 import { mermaidPlugin } from "../scripts/plugins/mermaid.ts";
-import { renderWithServices } from "./test-utils";
 
 // ─── Large-Scale Content Edge Cases ─────────────────────────────────────
 
@@ -49,7 +48,7 @@ ${longContent}
 
   test("handles special characters in frontmatter", () => {
     const md = `---
-title: "Title with \\\"escaped quotes\\\" and backslashes"
+title: "Title with \\"escaped quotes\\" and backslashes"
 description: "Description with: colons, semicolons; and commas,"
 tags: ["tag-with-dash", "tag_with_underscore", "tag.with.dots"]
 ---
@@ -87,7 +86,7 @@ describe("Frontmatter edge cases", () => {
     const md = `---
 ---
 # Content`;
-    // Empty frontmatter: the regex ^---\n([\s\S]*?)\n---\n?([\s\S]*)$ 
+    // Empty frontmatter: the regex ^---\n([\s\S]*?)\n---\n?([\s\S]*)$
     // requires at least a newline between the --- fences.
     // "---\n---\n" has empty content between fences.
     const { fm, content } = parseFrontmatter(md);
@@ -181,13 +180,25 @@ Content`;
 describe("Slug validation edge cases", () => {
   test("handles empty slugs", () => {
     const diags = new Diagnostics();
-    validateUniqueSlugs([{ id: "a", slug: "" }, { id: "b", slug: "docs/b" }], diags);
+    validateUniqueSlugs(
+      [
+        { id: "a", slug: "" },
+        { id: "b", slug: "docs/b" },
+      ],
+      diags
+    );
     expect(diags.hasErrors()).toBe(false);
   });
 
   test("handles multiple empty slugs (reports as duplicate)", () => {
     const diags = new Diagnostics();
-    validateUniqueSlugs([{ id: "a", slug: "" }, { id: "b", slug: "" }], diags);
+    validateUniqueSlugs(
+      [
+        { id: "a", slug: "" },
+        { id: "b", slug: "" },
+      ],
+      diags
+    );
     expect(diags.errors()).toHaveLength(1);
   });
 
@@ -340,7 +351,7 @@ describe("Math plugin edge cases", () => {
   });
 
   test("handles very long math expressions", () => {
-    const longMath = "$" + "x + ".repeat(100) + "y$";
+    const longMath = `$${"x + ".repeat(100)}y$`;
     const result = mathPlugin.preProcess?.(longMath);
     expect(result).toContain("MATHINLINE");
   });
@@ -593,7 +604,10 @@ function parseFrontmatter(md: string) {
       const ci = line.indexOf(":");
       if (ci > 0) {
         const key = line.slice(0, ci).trim();
-        const rawVal = line.slice(ci + 1).trim().replace(/^["']|["']$/g, "");
+        const rawVal = line
+          .slice(ci + 1)
+          .trim()
+          .replace(/^["']|["']$/g, "");
 
         if (rawVal === "") {
           currentKey = key;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { ASTViewer } from "./ASTViewer";
 import { ArticleRefsPanel } from "./ArticleRefsPanel";
+import { ASTViewer } from "./ASTViewer";
 import { DocFooter } from "./DocFooter";
 import { DocViewer } from "./DocViewer";
 import { allDocs, type DocEntry, type SidebarItem, sidebarData } from "./generated";
@@ -36,6 +36,7 @@ export function App() {
   // ─── State ─────────────────────────────────────────────────────────
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [tocVisible, setTocVisible] = useState(false);
+  const [mermaidLoading, setMermaidLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(
     () => services.dom.getViewportWidth() <= services.config.mobileBreakpoint
   );
@@ -98,7 +99,13 @@ export function App() {
             });
             svgEl.querySelectorAll("rect, circle, ellipse, polygon").forEach((shapeEl) => {
               const fill = shapeEl.getAttribute("fill");
-              if (fill && fill !== "#fff" && fill !== "#ffffff" && fill !== "white" && fill !== "none") {
+              if (
+                fill &&
+                fill !== "#fff" &&
+                fill !== "#ffffff" &&
+                fill !== "white" &&
+                fill !== "none"
+              ) {
                 shapeEl.style.fill = "#ffffff";
               }
               shapeEl.style.stroke = "#6b7280";
@@ -124,9 +131,11 @@ export function App() {
       const clone = docContentEl.cloneNode(true) as HTMLElement;
 
       // Clean up interactive elements
-      clone.querySelectorAll(".code-copy-btn, .mermaid-zoom-btn, .mermaid-download-btn").forEach((el) => {
-        el.remove();
-      });
+      clone
+        .querySelectorAll(".code-copy-btn, .mermaid-zoom-btn, .mermaid-download-btn")
+        .forEach((el) => {
+          el.remove();
+        });
       clone.querySelectorAll(".code-header").forEach((el) => {
         (el as HTMLElement).style.display = "none";
       });
@@ -667,6 +676,17 @@ export function App() {
     return unsubscribe;
   }, [services]);
 
+  // Poll for mermaid loading state
+  useEffect(() => {
+    let rafId: number;
+    const checkLoading = () => {
+      setMermaidLoading(window.__mermaidLoading__ || false);
+      rafId = requestAnimationFrame(checkLoading);
+    };
+    rafId = requestAnimationFrame(checkLoading);
+    return () => cancelAnimationFrame(rafId);
+  }, []);
+
   // Close sidebar/TOC on Escape
   useEffect(() => {
     const unsubscribe = services.dom.onKeydown((e) => {
@@ -724,7 +744,10 @@ export function App() {
     const items: { label: string; href?: string }[] = [];
 
     // Add "Docs" link that goes to welcome page
-    items.push({ label: "Docs", href: services.router.buildUrl(services.config.routes.docs, "welcome") });
+    items.push({
+      label: "Docs",
+      href: services.router.buildUrl(services.config.routes.docs, "welcome"),
+    });
 
     if (currentDoc.slug !== "welcome") {
       const parts = currentDoc.slug.split("/");
@@ -812,6 +835,12 @@ export function App() {
           >
             Docs
           </h1>
+          {/* Mermaid loading indicator */}
+          {mermaidLoading && (
+            <span className="mermaid-loading-indicator" title="Loading diagrams...">
+              <span className="mermaid-spinner" />
+            </span>
+          )}
           <span className="top-bar-sep">/</span>
           <span className="top-bar-current">{currentDoc.sidebar_label || currentDoc.title}</span>
         </div>

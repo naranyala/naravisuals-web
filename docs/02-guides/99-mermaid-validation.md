@@ -1,3 +1,8 @@
+---
+title: Mermaid Diagram Validation Guide
+description: Guide for understanding and resolving mermaid diagram validation errors.
+---
+
 # Mermaid Diagram Validation Guide
 
 ## Overview
@@ -99,13 +104,13 @@ bun run validate:llm
 ### Error: "Invalid diagram type"
 
 **Problem:**
-```mermaid
+```mermaid:desc=Example of an invalid diagram type error where package is used instead of a valid diagram type.
 package
     A --> B
 ```
 
 **Fix:**
-```mermaid
+```mermaid:desc=Corrected diagram type using graph TD.
 graph TD
     A --> B
 ```
@@ -113,13 +118,13 @@ graph TD
 ### Error: "Empty quotes detected"
 
 **Problem:**
-```mermaid
+```mermaid:desc=Example of a diagram with empty node labels.
 graph TD
     A[""] --> B
 ```
 
 **Fix:**
-```mermaid
+```mermaid:desc=Corrected diagram with descriptive node labels.
 graph TD
     A["Start"] --> B["End"]
 ```
@@ -127,13 +132,13 @@ graph TD
 ### Error: "Quotes contain only special characters"
 
 **Problem:**
-```mermaid
+```mermaid:desc=Example of a diagram with invalid characters in node labels.
 graph TD
     A["&&*^%"] --> B
 ```
 
 **Fix:**
-```mermaid
+```mermaid:desc=Corrected diagram with valid node labels.
 graph TD
     A["Special Node"] --> B
 ```
@@ -141,13 +146,13 @@ graph TD
 ### Error: "Unbalanced brackets"
 
 **Problem:**
-```mermaid
+```mermaid:desc=Example of a diagram with unbalanced brackets.
 graph TD
     A[Node --> B
 ```
 
 **Fix:**
-```mermaid
+```mermaid:desc=Corrected diagram with balanced brackets.
 graph TD
     A[Node] --> B
 ```
@@ -155,13 +160,13 @@ graph TD
 ### Error: "HTML entity in diagram"
 
 **Problem:**
-```mermaid
+```mermaid:desc=Example of a diagram containing invalid HTML entities.
 graph TD
     A --> B&#x26;C
 ```
 
 **Fix:**
-```mermaid
+```mermaid:desc=Corrected diagram with valid characters instead of HTML entities.
 graph TD
     A --> B
 ```

@@ -1,16 +1,10 @@
 interface DocFooterProps {
   prevDoc?: { title: string; slug: string };
   nextDoc?: { title: string; slug: string };
-  lastUpdatedAt?: string;
   onNavigate?: (slug: string) => void;
 }
 
-export function DocFooter({
-  prevDoc,
-  nextDoc,
-  lastUpdatedAt,
-  onNavigate,
-}: DocFooterProps) {
+export function DocFooter({ prevDoc, nextDoc, onNavigate }: DocFooterProps) {
   const handleNavigate = (slug: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     if (onNavigate) {

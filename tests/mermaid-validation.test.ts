@@ -4,7 +4,7 @@
  * Tests the strict validation of Mermaid diagram content
  */
 
-import { describe, test, expect } from "bun:test";
+import { describe, expect, test } from "bun:test";
 import { validateMermaidContent } from "../scripts/plugins/validators/mermaid-content.ts";
 
 describe("Mermaid Content Validation", () => {
@@ -24,161 +24,121 @@ describe("Mermaid Content Validation", () => {
 
   describe("Invalid pattern detection", () => {
     test("rejects HTML entity patterns like &#x26;", () => {
-      const errors = validateMermaidContent(
-        "graph TD;\nA-->B;\nB-->C&#x26;D;"
-      );
+      const errors = validateMermaidContent("graph TD;\nA-->B;\nB-->C&#x26;D;");
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("HTML entity"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("HTML entity"))).toBe(true);
     });
 
     test("rejects double-encoded ampersands", () => {
-      const errors = validateMermaidContent(
-        "graph TD;\nA&amp;&amp;B-->C;"
-      );
+      const errors = validateMermaidContent("graph TD;\nA&amp;&amp;B-->C;");
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("Double-encoded"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("Double-encoded"))).toBe(true);
     });
 
     test("rejects hex escape sequences", () => {
-      const errors = validateMermaidContent(
-        "graph TD;\nA-->B\\x26C;"
-      );
+      const errors = validateMermaidContent("graph TD;\nA-->B\\x26C;");
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("Hex escape"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("Hex escape"))).toBe(true);
     });
 
     test("rejects unicode escape sequences", () => {
-      const errors = validateMermaidContent(
-        "graph TD;\nA-->B\\u0026C;"
-      );
+      const errors = validateMermaidContent("graph TD;\nA-->B\\u0026C;");
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("Unicode escape"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("Unicode escape"))).toBe(true);
     });
 
     test("rejects URL-encoded characters", () => {
-      const errors = validateMermaidContent(
-        "graph TD;\nA-->B%26C;"
-      );
+      const errors = validateMermaidContent("graph TD;\nA-->B%26C;");
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("URL-encoded"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("URL-encoded"))).toBe(true);
     });
   });
 
   describe("Quote validation", () => {
     test("rejects empty quotes", () => {
-      const errors = validateMermaidContent(
-        'graph TD;\nA[""]-->B;'
-      );
+      const errors = validateMermaidContent('graph TD;\nA[""]-->B;');
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("Empty quotes"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("Empty quotes"))).toBe(true);
     });
 
     test("rejects whitespace-only quotes", () => {
-      const errors = validateMermaidContent(
-        "graph TD;\nA['  ']-->B;"
-      );
+      const errors = validateMermaidContent("graph TD;\nA['  ']-->B;");
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("Empty quotes"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("Empty quotes"))).toBe(true);
     });
 
     test("rejects quotes with only special characters", () => {
-      const errors = validateMermaidContent(
-        'graph TD;\nA["&&*^%"]-->B;'
-      );
+      const errors = validateMermaidContent('graph TD;\nA["&&*^%"]-->B;');
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("only special characters"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("only special characters"))).toBe(true);
     });
 
     test("allows valid quoted text", () => {
-      const errors = validateMermaidContent(
-        'graph TD;\nA["Valid Label"]-->B["Another Label"];'
-      );
+      const errors = validateMermaidContent('graph TD;\nA["Valid Label"]-->B["Another Label"];');
       expect(errors).toHaveLength(0);
     });
 
     test("allows quoted text with unicode", () => {
-      const errors = validateMermaidContent(
-        'graph TD;\nA["中文标签"]-->B["日本語"];'
-      );
+      const errors = validateMermaidContent('graph TD;\nA["中文标签"]-->B["日本語"];');
       expect(errors).toHaveLength(0);
     });
   });
 
   describe("Bracket balance validation", () => {
     test("rejects unbalanced braces", () => {
-      const errors = validateMermaidContent(
-        "graph TD;\nA[Node-->B;"
-      );
+      const errors = validateMermaidContent("graph TD;\nA[Node-->B;");
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("Unbalanced"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("Unbalanced"))).toBe(true);
     });
 
     test("rejects unbalanced brackets", () => {
-      const errors = validateMermaidContent(
-        "graph TD;\nA{Node-->B;"
-      );
+      const errors = validateMermaidContent("graph TD;\nA{Node-->B;");
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("Unbalanced"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("Unbalanced"))).toBe(true);
     });
 
     test("rejects unbalanced parentheses", () => {
-      const errors = validateMermaidContent(
-        "graph TD;\nA(Node-->B;"
-      );
+      const errors = validateMermaidContent("graph TD;\nA(Node-->B;");
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("Unbalanced"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("Unbalanced"))).toBe(true);
     });
 
     test("allows balanced brackets", () => {
-      const errors = validateMermaidContent(
-        "graph TD;\nA[Node]-->B[Node2];"
-      );
+      const errors = validateMermaidContent("graph TD;\nA[Node]-->B[Node2];");
       expect(errors).toHaveLength(0);
     });
   });
 
   describe("Diagram type validation", () => {
     test("rejects missing diagram type", () => {
-      const errors = validateMermaidContent(
-        "A-->B;\nB-->C;"
-      );
+      const errors = validateMermaidContent("A-->B;\nB-->C;");
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("Invalid diagram type"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("Invalid diagram type"))).toBe(true);
     });
 
     test("rejects invalid diagram type", () => {
-      const errors = validateMermaidContent(
-        "invalidType TD;\nA-->B;"
-      );
+      const errors = validateMermaidContent("invalidType TD;\nA-->B;");
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes("Invalid diagram type"))).toBe(true);
+      expect(errors.some((e) => e.message.includes("Invalid diagram type"))).toBe(true);
     });
 
     test("allows graph type", () => {
-      const errors = validateMermaidContent(
-        "graph TD;\nA-->B;"
-      );
+      const errors = validateMermaidContent("graph TD;\nA-->B;");
       expect(errors).toHaveLength(0);
     });
 
     test("allows flowchart type", () => {
-      const errors = validateMermaidContent(
-        "flowchart LR;\nA-->B;"
-      );
+      const errors = validateMermaidContent("flowchart LR;\nA-->B;");
       expect(errors).toHaveLength(0);
     });
 
     test("allows sequenceDiagram type", () => {
-      const errors = validateMermaidContent(
-        "sequenceDiagram\nA->>B: Hello"
-      );
+      const errors = validateMermaidContent("sequenceDiagram\nA->>B: Hello");
       expect(errors).toHaveLength(0);
     });
 
     test("allows directive syntax", () => {
-      const errors = validateMermaidContent(
-        "%%{init: {'theme':'base'}}%%\ngraph TD;\nA-->B;"
-      );
+      const errors = validateMermaidContent("%%{init: {'theme':'base'}}%%\ngraph TD;\nA-->B;");
       expect(errors).toHaveLength(0);
     });
   });
@@ -232,9 +192,7 @@ describe("Mermaid Content Validation", () => {
 
   describe("Edge cases", () => {
     test("handles HTML entities in labels", () => {
-      const errors = validateMermaidContent(
-        'graph TD;\nA["&amp;"]-->B;'
-      );
+      const errors = validateMermaidContent('graph TD;\nA["&amp;"]-->B;');
       // After decoding, this becomes &, which should be caught
       expect(errors.length).toBeGreaterThanOrEqual(0);
     });
@@ -248,9 +206,7 @@ describe("Mermaid Content Validation", () => {
     });
 
     test("rejects multiple issues", () => {
-      const errors = validateMermaidContent(
-        'invalidType;\nA[""]-->B&#x26;C;'
-      );
+      const errors = validateMermaidContent('invalidType;\nA[""]-->B&#x26;C;');
       expect(errors.length).toBeGreaterThan(1);
     });
   });
