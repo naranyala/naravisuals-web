@@ -52,6 +52,7 @@ interface DocEntry {
   original_category?: string; // Folder name with numeric prefix for ordering (e.g., "02-guides")
   description: string;
   content: string;
+  rawContent: string;
   toc: { value: string; id: string; level: number }[];
   date?: string;
   author?: string;
@@ -419,6 +420,7 @@ function scanMdFiles(baseDir: string, section: "docs" | "blog", diags: Diagnosti
           original_category: section === "blog" ? undefined : originalCategory || undefined,
           description: (fm.description as string) || "",
           content: html,
+          rawContent: content,
           toc: extractTOC(content),
           date: fm.date as string | undefined,
           author: fm.author as string | undefined,
@@ -909,6 +911,7 @@ export const ${slugToVarName(d.id)}: DocEntry = {
   category: '${escapeSingleLineJson(d.category)}',
   description: '${escapeSingleLineJson(d.description)}',
   content: '${escapeSingleLineJson(d.content)}',
+  rawContent: '${escapeSingleLineJson(d.rawContent)}',
   toc: ${JSON.stringify(d.toc)},
   date: ${d.date ? `'${d.date}'` : "undefined"},
   author: ${d.author ? `'${d.author}'` : "undefined"},

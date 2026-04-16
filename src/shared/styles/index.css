@@ -62,3 +62,5 @@
 
 /* 18. Error boundary fallback UI */
 @import "./error-boundary.css";
+@import "./view-mode.css";
+@import "./sidebar-navigation.css";

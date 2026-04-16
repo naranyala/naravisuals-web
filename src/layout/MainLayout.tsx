@@ -17,10 +17,12 @@ export function MainLayout() {
   // ─── State ─────────────────────────────────────────────────────────
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [tocVisible, setTocVisible] = useState(false);
+  const [viewMode, setViewMode] = useState<"view" | "raw">("view");
   const [mermaidLoading, setMermaidLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(
     () => services.dom.getViewportWidth() <= services.config.mobileBreakpoint
   );
+
   const [isTocMobileBreakpoint, setIsTocMobileBreakpoint] = useState(
     () => services.dom.getViewportWidth() <= services.config.tocBreakpoint
   );
@@ -709,18 +711,34 @@ export function MainLayout() {
 
   const sidebar: SidebarItem[] = sidebarData;
 
-  const navigate = (slug: string) => {
+  const navigate = (target: string) => {
+    const [slug, hash] = target.split("#");
     setCurrentSlug(slug);
-    services.router.pushState({}, "", services.router.buildUrl(services.config.routes.docs, slug));
+    services.router.pushState(
+      {},
+      "",
+      services.router.buildUrl(services.config.routes.docs, target)
+    );
     setSidebarVisible(!isMobile);
     setTocVisible(false);
-    // scrollTo is handled by the useEffect watching currentSlug
-    // (scrolling here would fire before React updates the DOM)
   };
 
-  // Scroll to top AFTER every navigation commit (DOM has updated)
+  // Scroll to top or to anchor AFTER every navigation commit (DOM has updated)
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    const hash = window.location.hash;
+    if (hash) {
+      // Delay slightly to allow React to render the content
+      setTimeout(() => {
+        const element = document.getElementById(hash.substring(1));
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+          window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        }
+      }, 100);
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
   }, [currentSlug]);
 
   // Default to welcome page if on root or no current slug
@@ -939,6 +957,19 @@ export function MainLayout() {
 
         {/* Main content */}
         <main className="main-content">
+          {/* View Mode Switcher */}
+          <div className="view-mode-container">
+            <div className={`view-mode-switcher ${viewMode}`}>
+              <div className="view-mode-slider" />
+              <button className="view-mode-btn" onClick={() => setViewMode("view")}>
+                View
+              </button>
+              <button className="view-mode-btn" onClick={() => setViewMode("raw")}>
+                Raw
+              </button>
+            </div>
+          </div>
+
           {/* h1 title hidden — breadcrumbs already shows current page as title */}
           <h1 className="sr-only">{currentDoc.title}</h1>
 
@@ -957,22 +988,30 @@ export function MainLayout() {
             </div>
           )}
 
-          <MetadataPanel metadata={currentDoc.metadata} />
-          <DocViewer html={currentDoc.content} slug={currentSlug} />
-
-          <DocFooter
-            prevDoc={
-              prevDoc
-                ? { title: prevDoc.sidebar_label || prevDoc.title, slug: prevDoc.slug }
-                : undefined
-            }
-            nextDoc={
-              nextDoc
-                ? { title: nextDoc.sidebar_label || nextDoc.title, slug: nextDoc.slug }
-                : undefined
-            }
-            onNavigate={navigate}
-          />
+          {viewMode === "view" ? (
+            <>
+              <MetadataPanel metadata={currentDoc.metadata} />
+              <DocViewer html={currentDoc.content} slug={currentDoc.slug} />
+              <DocFooter
+                prevDoc={
+                  prevDoc
+                    ? { title: prevDoc.sidebar_label || prevDoc.title, slug: prevDoc.slug }
+                    : undefined
+                }
+                nextDoc={
+                  nextDoc
+                    ? { title: nextDoc.sidebar_label || nextDoc.title, slug: nextDoc.slug }
+                    : undefined
+                }
+                onNavigate={navigate}
+              />
+            </>
+          ) : (
+            <div className="raw-content-viewer">
+              <pre className="raw-markdown">{currentDoc.rawContent}</pre>
+            </div>
+          )}
+          {/* ArticleRefsPanel disabled as requested */}
           {/* <ArticleRefsPanel contentHtml={currentDoc.content} markdownAst={currentDoc.ast} /> */}
         </main>
 
