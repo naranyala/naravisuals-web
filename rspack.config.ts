@@ -96,6 +96,10 @@ export default defineConfig({
   ],
   devtool: isProd ? false : "source-map",
   stats: "errors-warnings",
+  infrastructureLogging: {
+    level: "warn",
+    console: false,
+  },
   devServer: {
     port: 3000,
     hot: true,

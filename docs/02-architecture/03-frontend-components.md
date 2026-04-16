@@ -11,8 +11,8 @@ This document covers the React component architecture of the rspack-react-docs S
 
 ## Component Hierarchy
 
-```mermaid
-graph TD
+```mermaid:desc=React component hierarchy showing the main components and their relationships
+flowchart td
     A["frontend.tsx\n(Entry Point)"] --> B["ErrorBoundary"]
     B --> C["ServicesProvider\n(DI Container)"]
     C --> D["App.tsx\n(Root Component)"]
@@ -48,7 +48,7 @@ The application bootstraps in `/media/naranyala/Data/projects-remote/deepdive-tt
 3. Mounts the React tree inside `<StrictMode>` with `ErrorBoundary` and `ServicesProvider`
 4. Configures React Refresh (HMR) for development
 
-```tsx
+```tsx:desc=React app entry point with StrictMode and providers
 root.render(
   <StrictMode>
     <ErrorBoundary>
@@ -68,7 +68,7 @@ root.render(
 
 The component holds these key pieces of state:
 
-```tsx
+```tsx:desc=React component state management in App.tsx
 const [sidebarVisible, setSidebarVisible] = useState(true);
 const [tocVisible, setTocVisible] = useState(false);
 const [mermaidLoading, setMermaidLoading] = useState(false);
@@ -82,7 +82,7 @@ const [astOpen, setAstOpen] = useState(false);
 
 The `navigate()` function updates the slug, pushes history state, and toggles sidebar/TOC visibility:
 
-```tsx
+```tsx:desc=Navigation function in App.tsx
 const navigate = (slug: string) => {
   setCurrentSlug(slug);
   services.router.pushState({}, "", services.router.buildUrl(services.config.routes.docs, slug));
@@ -93,7 +93,7 @@ const navigate = (slug: string) => {
 
 After every navigation commit, a `useEffect` scrolls to the top:
 
-```tsx
+```tsx:desc=Scroll to top effect on navigation
 useEffect(() => {
   window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 }, [currentSlug]);
@@ -109,7 +109,7 @@ Global shortcuts are registered via the `useKeyboardShortcut` hook (see [Keyboar
 | `Cmd+T` / `Ctrl+T` | Toggle table of contents |
 | `Escape` | Close TOC, then sidebar |
 
-```tsx
+```tsx:desc=Keyboard shortcut registration in App.tsx
 useKeyboardShortcut(() => setSidebarVisible((v) => !v), { key: "b", meta: true });
 useKeyboardShortcut(
   () => { if (currentDoc?.toc.length) setTocVisible((v) => !v); },
@@ -119,7 +119,7 @@ useKeyboardShortcut(
 
 The Escape key handler is wired through `services.dom.onKeydown`:
 
-```tsx
+```tsx:desc=Escape key handler for closing panels
 useEffect(() => {
   const unsubscribe = services.dom.onKeydown((e) => {
     if (e.key === "Escape") {
@@ -135,7 +135,7 @@ useEffect(() => {
 
 A `requestAnimationFrame` poll checks `window.__mermaidLoading__` and shows a spinner in the top bar:
 
-```tsx
+```tsx:desc=Mermaid loading indicator using requestAnimationFrame
 useEffect(() => {
   let rafId: number;
   const checkLoading = () => {
@@ -149,7 +149,7 @@ useEffect(() => {
 
 The indicator renders conditionally in the top bar:
 
-```tsx
+```tsx:desc=Mermaid loading indicator rendering
 {mermaidLoading && (
   <span className="mermaid-loading-indicator" title="Loading diagrams...">
     <span className="mermaid-spinner" />
@@ -161,7 +161,7 @@ The indicator renders conditionally in the top bar:
 
 The top bar includes buttons for print, settings (font size, line height, font family, code theme), and theme toggle. The settings panel renders theme swatches from the `THEMES` constant and font options from `FONTS`:
 
-```tsx
+```tsx:desc=Theme configuration constant in App.tsx
 const THEMES = [
   { id: "paperlike-white", label: "Paper White", bg: "#ffffff", accent: "#2563eb" },
   { id: "paperlike-gray", label: "Paper Gray", bg: "#e8e8e8", accent: "#5b8db8" },
@@ -180,7 +180,7 @@ The `printAllDocs` async function renders all Mermaid diagrams in the current vi
 
 On mobile (viewport <= `config.mobileBreakpoint`, default 800px), the sidebar renders as an overlay and body scroll is locked:
 
-```tsx
+```tsx:desc=Mobile sidebar overlay and body overflow handling
 useEffect(() => {
   const isOverlayOpen = isMobile && sidebarVisible;
   services.dom.setBodyOverflow(isOverlayOpen ? "hidden" : "");
@@ -196,13 +196,13 @@ Uses the `useDocsTheme()` hook which unifies UI theme, code (Shiki) theme, font 
 
 The sidebar is loaded from generated data:
 
-```tsx
+```tsx:desc=Sidebar data loading in App.tsx
 const sidebar: SidebarItem[] = sidebarData;
 ```
 
 Previous/next docs are computed by sorting all docs in sidebar order and finding the current index:
 
-```tsx
+```tsx:desc=Previous/next document navigation computation
 const sorted = getDocsInSidebarOrder();
 const idx = sorted.findIndex((d) => d.slug === currentSlug || d.id === currentSlug);
 const prevDoc = idx > 0 ? sorted[idx - 1] : null;
@@ -215,7 +215,7 @@ const nextDoc = idx < sorted.length - 1 ? sorted[idx + 1] : null;
 
 ### Rendering Pipeline
 
-```mermaid
+```mermaid:desc=Sequence diagram showing the rendering pipeline from React to Mermaid and MathJax
 sequenceDiagram
     participant React as React (useEffect)
     participant DOM as DOM (dangerouslySetInnerHTML)
@@ -256,7 +256,7 @@ Each diagram gets zoom and download buttons attached via event listeners:
 - **Zoom controls**: Zoom in/out/reset buttons, mouse wheel zoom, drag to pan, touch pinch-to-zoom
 - **Close**: Escape key, close button, or click on overlay background
 
-```tsx
+```tsx:desc=Mermaid fullscreen overlay HTML template
 overlay.innerHTML = `
   <div class="mermaid-fullscreen-header">
     <span class="mermaid-fullscreen-title">Diagram</span>
@@ -278,7 +278,7 @@ overlay.innerHTML = `
 
 Pan state tracks `scale`, `pointX`, `pointY` and applies a CSS transform:
 
-```tsx
+```tsx:desc=Pan and zoom transform application
 container.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
 ```
 
@@ -286,7 +286,7 @@ container.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})
 
 The download handler clones the SVG, serializes it with `XMLSerializer`, adds XML declaration, and triggers a download with a filename derived from the diagram description:
 
-```tsx
+```tsx:desc=SVG download handler with serialization
 const svgClone = svgEl.cloneNode(true) as SVGElement;
 svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 const serializer = new XMLSerializer();
@@ -308,7 +308,7 @@ The `renderMath()` function:
 
 A second `useEffect` sets up an `IntersectionObserver` on all `h2` and `h3` headings. As headings enter the viewport (with `rootMargin: "0px 0px -80% 0px"`), it updates the URL hash:
 
-```tsx
+```tsx:desc=IntersectionObserver for TOC heading tracking
 const observer = new IntersectionObserver(
   (entries) => {
     for (const entry of entries) {
@@ -327,7 +327,7 @@ const observer = new IntersectionObserver(
 
 The component renders content via `dangerouslySetInnerHTML`:
 
-```tsx
+```tsx:desc=DocViewer content rendering with dangerouslySetInnerHTML
 return <div ref={ref} className="doc-content" dangerouslySetInnerHTML={{ __html: html }} />;
 ```
 
@@ -342,7 +342,7 @@ Two sub-components handle the two sidebar item types:
 - **`CategoryItem`**: Renders a collapsible category header and a sublist of doc links. Highlights the category header when any child is the active page.
 - **`DocLink`**: Renders a single doc link (for uncategorized pages).
 
-```tsx
+```tsx:desc=CategoryItem component implementation
 function CategoryItem({ item, currentSlug, onNavigate }) {
   const hasActive = item.items.some(
     (child) => child.slug === currentSlug || child.id === currentSlug
@@ -374,7 +374,7 @@ function CategoryItem({ item, currentSlug, onNavigate }) {
 
 Uses its own `IntersectionObserver` to detect which heading is currently in view and highlights the matching TOC item:
 
-```tsx
+```tsx:desc=IntersectionObserver for active TOC heading tracking
 useEffect(() => {
   const observer = new IntersectionObserver(
     (entries) => {
@@ -396,7 +396,7 @@ useEffect(() => {
 
 The `cleanTOCText()` function strips Markdown formatting from TOC labels:
 
-```tsx
+```tsx:desc=Text cleaning function for TOC labels
 function cleanTOCText(raw: string): string {
   return raw
     .replace(/`([^`]+)`/g, "$1")       // inline code
@@ -411,7 +411,7 @@ function cleanTOCText(raw: string): string {
 
 `/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/Breadcrumbs.tsx` renders a breadcrumb trail. Each item can be a link or plain text (the current page):
 
-```tsx
+```tsx:desc=Breadcrumbs component implementation
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
   return (
     <nav className="breadcrumbs" aria-label="Breadcrumb">
@@ -433,7 +433,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
 
 `/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/MetadataPanel.tsx` renders arbitrary frontmatter metadata as a collapsible `<details>` panel. Array values (like tags) render as styled badges:
 
-```tsx
+```tsx:desc=MetadataValue component for rendering metadata
 function MetadataValue({ value }: { value: string | string[] }) {
   if (Array.isArray(value)) {
     return (
@@ -456,7 +456,7 @@ function MetadataValue({ value }: { value: string | string[] }) {
 
 Stats are computed via `useMemo` by creating a temporary `<div>`, setting `innerHTML`, and querying with `querySelectorAll`:
 
-```tsx
+```tsx:desc=DocStatsFooter statistics computation
 const stats = useMemo<DocStats | null>(() => {
   const tempDiv = document.createElement("div");
   tempDiv.innerHTML = contentHtml;
@@ -468,9 +468,9 @@ const stats = useMemo<DocStats | null>(() => {
 
 ## ArticleRefsPanel.tsx
 
-`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/ArticleRefsPanel.tsx` extracts footnote references (`[^identifier]`) and their definitions from the raw AST tokens. It walks the token tree recursively:
+`ArticleRefsPanel.tsx` extracts footnote references and their definitions from the raw AST tokens. It walks the token tree recursively:
 
-```tsx
+```tsx:desc=Token tree walking for footnote extraction
 function walkTokens(tokens: any[]) {
   for (const token of tokens) {
     if (token.text && typeof token.text === "string") {
@@ -502,7 +502,7 @@ The tree supports expand/collapse all, search by type, and shows metadata (headi
 
 `/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/ErrorBoundary.tsx` is a class component using `getDerivedStateFromError` and `componentDidCatch`:
 
-```tsx
+```tsx:desc=ErrorBoundary class component implementation
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error, info: null };
@@ -527,7 +527,7 @@ It wraps the entire app tree in `frontend.tsx`. Supports an optional `fallback` 
 
 `/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/DocFooter.tsx` renders previous/next page navigation links:
 
-```tsx
+```tsx:desc=DocFooter component implementation
 export function DocFooter({ prevDoc, nextDoc, onNavigate }: DocFooterProps) {
   return (
     <footer className="doc-footer">
@@ -546,7 +546,7 @@ export function DocFooter({ prevDoc, nextDoc, onNavigate }: DocFooterProps) {
 
 `/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/hooks/useKeyboardShortcut.ts` registers keyboard shortcuts with modifier key support:
 
-```tsx
+```tsx:desc=useKeyboardShortcut hook implementation
 export function useKeyboardShortcut(
   handler: () => void,
   { key, meta = false, alt = false, shift = false, preventDefault = true }: ShortcutOptions
@@ -571,7 +571,7 @@ export function useKeyboardShortcut(
 
 `/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/hooks/useDocsTheme.ts` unifies all theme and reading preferences:
 
-```tsx
+```tsx:desc=DocsTheme interface definition
 export interface DocsTheme {
   isDark: boolean;
   toggleTheme: () => void;

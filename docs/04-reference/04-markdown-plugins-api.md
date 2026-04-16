@@ -11,8 +11,8 @@ The markdown plugin system allows transforming content before and after the `mar
 
 ## Plugin Pipeline
 
-```mermaid
-graph LR
+```mermaid:desc=Plugin pipeline diagram
+flowchart lr
     A["Raw .md"] --> B["preProcess plugins"]
     B --> C["marked.parse()"]
     C --> D["HTML output"]
@@ -28,7 +28,7 @@ The execution order is:
 
 ## MarkdownPlugin Interface
 
-```ts
+```ts:desc=MarkdownPlugin interface definition
 export interface MarkdownPlugin {
   /** Unique plugin name */
   name: string;
@@ -55,7 +55,7 @@ Both `preProcess` and `postProcess` are optional. A plugin can implement one, bo
 
 The plugin registry (`scripts/plugins/index.ts`) exports the active plugins array:
 
-```ts
+```ts:desc=MarkdownPlugin interface definition
 import { mathPlugin } from "./math.ts";
 import { admonitionsPlugin } from "./admonitions.ts";
 import { mermaidPlugin } from "./mermaid.ts";
@@ -75,7 +75,7 @@ export const plugins: MarkdownPlugin[] = [mathPlugin, admonitionsPlugin, mermaid
 
 Validators analyze markdown content for quality checks. They run independently of the build pipeline and can be invoked via `bun run validate` commands.
 
-```ts
+```ts:desc=MarkdownPlugin interface definition
 export interface MarkdownValidator {
   /** Unique validator name */
   name: string;
@@ -93,7 +93,7 @@ export interface MarkdownValidator {
 
 ### ValidationIssue
 
-```ts
+```ts:desc=MarkdownPlugin interface definition
 export type ValidationSeverity = "error" | "warning" | "info";
 
 export interface ValidationIssue {
@@ -115,7 +115,7 @@ export interface ValidationIssue {
 
 ### ValidationResult
 
-```ts
+```ts:desc=MarkdownPlugin interface definition
 export interface ValidationResult {
   /** Number of items checked */
   checked: number;
@@ -130,7 +130,7 @@ export interface ValidationResult {
 
 The validator registry (`scripts/plugins/validators/index.ts`) exports:
 
-```ts
+```ts:desc=MarkdownPlugin interface definition
 export const validators: MarkdownValidator[] = [
   codeblockValidator,     // STRICT - fails build if missing descriptions
   mermaidValidator,       // STRICT - fails build if invalid mermaid content
@@ -148,7 +148,7 @@ Strict validators (`isStrict: true`) cause the build to fail when errors are fou
 
 A plugin that transforms a custom `!!important!!` syntax into an admonition:
 
-```ts
+```ts:desc=MarkdownPlugin interface definition
 import type { MarkdownPlugin } from "./types.ts";
 
 export const importantPlugin: MarkdownPlugin = {
@@ -162,7 +162,7 @@ export const importantPlugin: MarkdownPlugin = {
 
 Add it to the registry:
 
-```ts
+```ts:desc=MarkdownPlugin interface definition
 // scripts/plugins/index.ts
 import { importantPlugin } from "./important.ts";
 
@@ -178,7 +178,7 @@ export const plugins: MarkdownPlugin[] = [
 
 A plugin that injects a script after all HTML is generated:
 
-```ts
+```ts:desc=MarkdownPlugin interface definition
 import type { MarkdownPlugin } from "./types.ts";
 
 export const injectAnalyticsPlugin: MarkdownPlugin = {
@@ -196,7 +196,7 @@ export const injectAnalyticsPlugin: MarkdownPlugin = {
 
 The build script wraps plugin execution in try/catch blocks. If a plugin throws an error, it is logged as a diagnostic but does not crash the entire build:
 
-```ts
+```ts:desc=MarkdownPlugin interface definition
 for (const plugin of plugins) {
   if (plugin.preProcess) {
     try {
@@ -217,11 +217,10 @@ PostProcess hooks run in **reverse order** with the same error handling.
 
 Checks that all fenced code blocks have a language specified and a meaningful description via the `desc` metadata:
 
-````
+`````markdown:desc=Codeblock syntax example
 ```typescript:desc=Example usage of the DI container
 const container = createContainer();
-```
-````
+```````
 
 Missing descriptions generate a **warning**. Missing language generates an **error** in strict mode.
 
@@ -253,7 +252,7 @@ Analyzes admonition usage across documents. Reports:
 
 Validates footnote references. Checks that:
 
-- All `[^ref]` references have a matching `[^ref]: definition`
+- All footnote references have a matching definition
 - No orphaned footnote definitions exist
 
 ## Validation CLI Commands

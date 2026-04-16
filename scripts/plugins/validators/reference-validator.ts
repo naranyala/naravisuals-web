@@ -124,7 +124,8 @@ export const referenceValidator: MarkdownValidator = {
               file: filePath,
               line: i + 1,
               message: `Duplicate footnote reference: [^${identifier}]`,
-              detail: "Each footnote should be referenced only once per article",
+              detail:
+                "Ensure each footnote is used only once. For repeated references, consider rephrasing or combining notes.",
             });
           }
           footnoteIdentifiers.add(`ref:${identifier}`);
@@ -219,7 +220,7 @@ export const referenceValidator: MarkdownValidator = {
         file: filePath,
         message: `${validExternalLinks.length} external link(s) but no References section`,
         detail:
-          "Add a ## References or ## See Also section at the end of the article with link entries",
+          "Include a ## References or ## See Also section at the end of the document, listing each external link as bullet points.",
       });
     }
 
@@ -253,7 +254,7 @@ export const referenceValidator: MarkdownValidator = {
         file: filePath,
         line: orphan.line,
         message: `Footnote reference [^${orphan.identifier}] has no matching definition`,
-        detail: `Add definition: [^${orphan.identifier}]: Source description`,
+        detail: `Provide a definition for the footnote reference. For example: [^${orphan.identifier}]: Brief explanation or source.`,
       });
     }
 
@@ -265,7 +266,8 @@ export const referenceValidator: MarkdownValidator = {
         file: filePath,
         line: orphan.line,
         message: `Footnote definition [^${orphan.identifier}]: is never referenced`,
-        detail: "Remove unused footnote definitions or add references in the text",
+        detail:
+          "Either delete unused footnote definitions or include references to these definitions within the article.",
       });
     }
 

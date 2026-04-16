@@ -76,7 +76,7 @@ export const codeblockValidator: MarkdownValidator = {
             file: filePath,
             line: startLine,
             message: `Codeblock missing description`,
-            detail: `${language} codeblock at line ${startLine} has no desc= attribute`,
+            detail: `Provide a description for the codeblock using the :desc= attribute. For example: \`\`\`${language}:desc=A brief explanation of the code's purpose.`,
           });
         }
       } else if (inCodeBlock && line.match(/^(```|~~~)\s*$/)) {
@@ -84,20 +84,38 @@ export const codeblockValidator: MarkdownValidator = {
       }
     }
 
-    const statsRecord: Record<string, number> = {
-      total: codeBlocksCount,
-      withDescription,
-      withoutDescription,
-    };
+    // Prepare the stats breakdown by codeblock type
+    const breakdown: Record<string, number> = {};
+    Object.entries(categoryStats).forEach(([key, data]) => {
+      breakdown[key] = data.total;
+    });
 
-    for (const [cat, data] of Object.entries(categoryStats)) {
-      statsRecord[`${cat}_total`] = data.total;
+    // Create single-line codeblock summary message
+    let message = "";
+    if (codeBlocksCount === 0) {
+      message = "Codeblocks: 0";
+    } else {
+      const typesStr = Object.entries(breakdown)
+        .map(([type, count]) => `${type}:${count}`)
+        .join(" ");
+      message = `Codeblocks: ${codeBlocksCount} | ${typesStr} | withDesc:${withDescription} withoutDesc:${withoutDescription}`;
     }
+    // Add summary one-liner for every file
+    issues.push({
+      severity: "info",
+      file: filePath,
+      message,
+    });
 
     return {
       checked: codeBlocksCount,
       issues,
-      stats: statsRecord,
+      stats: {
+        total: codeBlocksCount,
+        withDescription,
+        withoutDescription,
+        breakdown,
+      },
     };
   },
 };

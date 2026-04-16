@@ -21,64 +21,22 @@
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import net from "node:net";
-import { join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
+import { colors, Logger } from "./core/index.ts";
+import { paths } from "./core/paths.ts";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = resolve(join(__filename, ".."));
-const projectRoot = process.cwd();
-
-// Colors for terminal output
-const colors = {
-  reset: "\x1b[0m",
-  bright: "\x1b[1m",
-  dim: "\x1b[2m",
-  red: "\x1b[31m",
-  green: "\x1b[32m",
-  yellow: "\x1b[33m",
-  blue: "\x1b[34m",
-  magenta: "\x1b[35m",
-  cyan: "\x1b[36m",
-  white: "\x1b[37m",
-  bgBlue: "\x1b[44m",
-  bgGreen: "\x1b[42m",
-  bgYellow: "\x1b[43m",
-  bgRed: "\x1b[41m",
-};
-
-function log(message = "", color = colors.reset) {
-  console.log(`${color}${message}${colors.reset}`);
-}
-
-function logError(message) {
-  log(`✖ ${message}`, colors.red);
-}
-
-function logSuccess(message) {
-  log(`✓ ${message}`, colors.green);
-}
-
-function logInfo(message) {
-  log(`ℹ ${message}`, colors.blue);
-}
-
-function logWarn(message) {
-  log(`⚠ ${message}`, colors.yellow);
-}
-
-function logStep(message) {
-  log(`\n${colors.bright}${colors.cyan}▸ ${message}${colors.reset}`);
-}
+const logger = new Logger();
+const projectRoot = paths.root;
 
 function banner() {
-  log("", colors.cyan);
-  log("╔═══════════════════════════════════════════════════╗", colors.cyan);
-  log("║                                                   ║", colors.cyan);
-  log("║   SSG Documentation Site Generator                ║", colors.cyan);
-  log("║   rspack + React + ShikiJS                        ║", colors.cyan);
-  log("║                                                   ║", colors.cyan);
-  log("╚═══════════════════════════════════════════════════╝", colors.cyan);
-  log("", colors.cyan);
+  logger.raw("", colors.cyan);
+  logger.raw("╔═══════════════════════════════════════════════════╗", colors.cyan);
+  logger.raw("║                                                   ║", colors.cyan);
+  logger.raw("║   SSG Documentation Site Generator                ║", colors.cyan);
+  logger.raw("║   rspack + React + ShikiJS                        ║", colors.cyan);
+  logger.raw("║                                                   ║", colors.cyan);
+  logger.raw("╚═══════════════════════════════════════════════════╝", colors.cyan);
+  logger.raw("", colors.cyan);
 }
 
 function runCommand(command, args, options = {}) {
@@ -150,93 +108,93 @@ async function cmdDev(options) {
   const port = await findAvailablePort(startPort);
 
   if (port !== startPort) {
-    logWarn(`Port ${startPort} is in use, using port ${port} instead`);
+    logger.warn(`Port ${startPort} is in use, using port ${port} instead`);
   }
 
-  logInfo("Starting development server...");
-  logInfo("Hot Module Replacement (HMR) enabled");
-  logInfo(`Port: ${port}`);
-  log("");
+  logger.info("Starting development server...");
+  logger.info("Hot Module Replacement (HMR) enabled");
+  logger.info(`Port: ${port}`);
+  logger.blank();
 
   try {
     // Step 0: Build docs (validation happens in CI/build, not during dev)
     // Dev mode skips validation to allow rapid iteration
-    logStep("Building documentation...");
+    logger.step("Building documentation...");
     await runCommand("bun", ["run", "scripts/build-docs.mts"]);
-    logSuccess("Documentation built");
+    logger.success("Documentation built");
 
     // Step 2: Start rspack dev server
-    logStep("Starting rspack dev server...");
-    log("");
-    log(`${colors.dim}Waiting for file changes...${colors.reset}`);
-    log("");
+    logger.step("Starting rspack dev server...");
+    logger.blank();
+    logger.raw(`Waiting for file changes...${colors.reset}`);
+    logger.blank();
 
     // Pass port as CLI argument, not just env var
     await runCommand("bunx", ["rspack", "serve", "--port", String(port)]);
   } catch (error) {
-    logError(`Development server failed: ${error.message}`);
+    logger.error(`Development server failed: ${error.message}`);
     process.exit(1);
   }
 }
 
 async function cmdBuild(options) {
   banner();
-  logInfo("Building for production...");
-  log("");
+  logger.info("Building for production...");
+  logger.blank();
 
   const startTime = Date.now();
 
   try {
     // Step 1: Clean dist
     if (!options.skipClean) {
-      logStep("Cleaning dist directory...");
+      logger.step("Cleaning dist directory...");
       await runCommand("rm", ["-rf", "dist"]);
-      logSuccess("Dist cleaned");
+      logger.success("Dist cleaned");
     }
 
     // Step 2: Build docs
-    logStep("Building documentation...");
+    logger.step("Building documentation...");
     await runCommand("bun", ["run", "scripts/build-docs.mts"]);
-    logSuccess("Documentation built");
+    logger.success("Documentation built");
 
     // Step 3: Lint (optional)
     if (!options.skipLint) {
-      logStep("Running lint checks...");
+      logger.step("Running lint checks...");
       try {
         await runCommand("bunx", ["biome", "check", "."]);
-        logSuccess("Lint checks passed");
+        logger.success("Lint checks passed");
       } catch {
         if (options.strict) {
-          logError("Lint checks failed. Use --no-strict to continue anyway.");
+          logger.error("Lint checks failed. Use --no-strict to continue anyway.");
           process.exit(1);
         }
-        logWarn("Lint issues found, continuing build...");
+        logger.warn("Lint issues found, continuing build...");
       }
     }
 
     // Step 4: Production build
-    logStep("Running rspack production build...");
+    logger.step("Running rspack production build...");
     await runCommand("bunx", ["rspack", "build"], {
       env: { NODE_ENV: "production" },
     });
-    logSuccess("Production bundle created");
+    logger.success("Production bundle created");
 
     // Step 5: Copy third-party libraries
-    logStep("Copying third-party libraries...");
+    logger.step("Copying third-party libraries...");
     try {
       await runCommand("bun", ["run", "scripts/copy-libs.mts"]);
-      logSuccess("Libraries copied to dist/");
+      logger.success("Libraries copied to dist/");
     } catch {
-      logWarn("Failed to copy libraries (using CopyRspackPlugin fallback)");
+      logger.warn("Failed to copy libraries (using CopyRspackPlugin fallback)");
     }
 
     // Summary
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-    log("");
-    log(`${colors.bright}${colors.bgGreen} BUILD COMPLETE ${colors.reset}`);
-    log(`${colors.green}Build completed in ${duration}s${colors.reset}`);
-    log(`${colors.green}Output: dist/${colors.reset}`);
-    log("");
+    logger.blank();
+    logger.raw(`${colors.bgGreen} BUILD COMPLETE ${colors.reset}`);
+    logger.raw(`Build completed in ${duration}s${colors.reset}`);
+    logger.raw(`Output: dist/${colors.reset}`);
+    logger.blank();
 
     // Show build stats
     if (existsSync(join(projectRoot, "dist"))) {
@@ -247,10 +205,10 @@ async function cmdBuild(options) {
         return acc + stat.size;
       }, 0);
 
-      logInfo(`Generated ${files.length} files (${(totalSize / 1024).toFixed(1)} KB)`);
+      logger.info(`Generated ${files.length} files (${(totalSize / 1024).toFixed(1)} KB)`);
     }
   } catch (error) {
-    logError(`Build failed: ${error.message}`);
+    logger.error(`Build failed: ${error.message}`);
     process.exit(1);
   }
 }
@@ -262,85 +220,85 @@ async function cmdStart(options) {
   const port = await findAvailablePort(startPort);
 
   if (port !== startPort) {
-    logWarn(`Port ${startPort} is in use, using port ${port} instead`);
+    logger.warn(`Port ${startPort} is in use, using port ${port} instead`);
   }
 
   // Check if dist exists
   if (!existsSync(join(projectRoot, "dist"))) {
-    logError("Production build not found. Run 'docts build' first.");
-    logInfo("Or use 'docts preview' to build and serve in one command.");
+    logger.error("Production build not found. Run 'docts build' first.");
+    logger.info("Or use 'docts preview' to build and serve in one command.");
     process.exit(1);
   }
 
-  logInfo(`Serving production build on port ${port}...`);
-  logInfo("Static files with SPA fallback");
-  log("");
+  logger.info(`Serving production build on port ${port}...`);
+  logger.info("Static files with SPA fallback");
+  logger.blank();
 
   try {
     await runCommand("npx", ["serve", "dist", "-p", String(port), "-s"]);
   } catch (error) {
-    logError(`Server failed: ${error.message}`);
+    logger.error(`Server failed: ${error.message}`);
     process.exit(1);
   }
 }
 
 async function cmdPreview(options) {
   banner();
-  logInfo("Build + Preview mode");
-  log("");
+  logger.info("Build + Preview mode");
+  logger.blank();
 
   try {
     // Build first
     await cmdBuild(options);
 
-    log("");
-    logStep("Starting preview server...");
-    log("");
-    log(`${colors.dim}Press Ctrl+C to stop${colors.reset}`);
-    log("");
+    logger.blank();
+    logger.step("Starting preview server...");
+    logger.blank();
+    logger.raw(`Press Ctrl+C to stop${colors.reset}`);
+    logger.blank();
 
     // Then serve with port detection
     const startPort = Number(options.port) || Number(process.env.PORT) || 3000;
     const port = await findAvailablePort(startPort);
 
     if (port !== startPort) {
-      logWarn(`Port ${startPort} is in use, using port ${port} instead`);
+      logger.warn(`Port ${startPort} is in use, using port ${port} instead`);
     }
 
-    logInfo(`Serving on port ${port}...`);
-    log("");
+    logger.info(`Serving on port ${port}...`);
+    logger.blank();
 
     await runCommand("npx", ["serve", "dist", "-p", String(port), "-s"]);
   } catch (error) {
-    logError(`Preview failed: ${error.message}`);
+    logger.error(`Preview failed: ${error.message}`);
     process.exit(1);
   }
 }
 
 async function cmdDocs(options = {}) {
   banner();
-  logInfo("Regenerating documentation...");
-  log("");
+  logger.info("Regenerating documentation...");
+  logger.blank();
 
   try {
     // Validate before building
     if (!options.skipValidation) {
-      logInfo("Validating content...");
+      logger.info("Validating content...");
       try {
         await runCommand("bun", ["run", "validate:strict"]);
-        logSuccess("All validations passed");
+        logger.success("All validations passed");
       } catch (_error) {
-        logError("Strict validation failed. Please fix the issues before building.");
-        logInfo("Run 'bun run validate' to see details");
-        logInfo("Use --skip-validation to bypass this check");
+        logger.error("Strict validation failed. Please fix the issues before building.");
+        logger.info("Run 'bun run validate' to see details");
+        logger.info("Use --skip-validation to bypass this check");
         process.exit(1);
       }
     }
 
     await runCommand("bun", ["run", "scripts/build-docs.mts"]);
-    logSuccess("Documentation regenerated");
-    log("");
-    logInfo("Output: src/generated/");
+    logger.success("Documentation regenerated");
+    logger.blank();
+    logger.info("Output: src/generated/");
 
     // Count docs
     const docsDir = join(projectRoot, "docs");
@@ -348,30 +306,30 @@ async function cmdDocs(options = {}) {
       const docs = readdirSync(docsDir, { recursive: true }).filter(
         (f) => typeof f === "string" && f.endsWith(".md")
       );
-      logInfo(`Found ${docs.length} markdown files`);
+      logger.info(`Found ${docs.length} markdown files`);
     }
   } catch (error) {
-    logError(`Docs build failed: ${error.message}`);
+    logger.error(`Docs build failed: ${error.message}`);
     process.exit(1);
   }
 }
 
 async function cmdLint(options) {
   banner();
-  logInfo("Checking code quality...");
-  log("");
+  logger.info("Checking code quality...");
+  logger.blank();
 
   try {
     if (options.fix) {
       await runCommand("bunx", ["biome", "check", "--write", "."]);
-      logSuccess("Lint issues auto-fixed");
+      logger.success("Lint issues auto-fixed");
     } else {
       await runCommand("bunx", ["biome", "check", "."]);
-      logSuccess("All checks passed");
+      logger.success("All checks passed");
     }
   } catch {
     if (!options.fix) {
-      logError("Lint issues found. Run 'docts lint:fix' to auto-fix.");
+      logger.error("Lint issues found. Run 'docts lint:fix' to auto-fix.");
     }
     process.exit(1);
   }
@@ -379,8 +337,8 @@ async function cmdLint(options) {
 
 async function cmdTest(options) {
   banner();
-  logInfo("Running test suite...");
-  log("");
+  logger.info("Running test suite...");
+  logger.blank();
 
   try {
     const args = ["test"];
@@ -390,52 +348,52 @@ async function cmdTest(options) {
     await runCommand("bun", args);
 
     if (options.coverage) {
-      log("");
-      logInfo("Coverage report: coverage/index.html");
+      logger.blank();
+      logger.info("Coverage report: coverage/index.html");
     }
   } catch (error) {
-    logError(`Tests failed: ${error.message}`);
+    logger.error(`Tests failed: ${error.message}`);
     process.exit(1);
   }
 }
 
 async function cmdClean() {
   banner();
-  logInfo("Cleaning build artifacts...");
-  log("");
+  logger.info("Cleaning build artifacts...");
+  logger.blank();
 
   try {
     await runCommand("rm", ["-rf", "dist"]);
-    logSuccess("dist/ cleaned");
+    logger.success("dist/ cleaned");
 
     await runCommand("rm", ["-rf", "coverage"]);
-    logSuccess("coverage/ cleaned");
+    logger.success("coverage/ cleaned");
 
-    log("");
-    logSuccess("Clean complete");
+    logger.blank();
+    logger.success("Clean complete");
   } catch (error) {
-    logError(`Clean failed: ${error.message}`);
+    logger.error(`Clean failed: ${error.message}`);
     process.exit(1);
   }
 }
 
 async function cmdInfo() {
   banner();
-  log(`${colors.bright}Project Information${colors.reset}`);
-  log("");
+  logger.raw(`Project Information${colors.reset}`);
+  logger.blank();
 
   // Read package.json
   const pkgPath = join(projectRoot, "package.json");
   if (!existsSync(pkgPath)) {
-    logError("package.json not found. Are you in the project root?");
+    logger.error("package.json not found. Are you in the project root?");
     process.exit(1);
   }
 
   const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
 
-  log(`${colors.bright}Name:${colors.reset}        ${pkg.name || "N/A"}`);
-  log(`${colors.bright}Version:${colors.reset}     ${pkg.version || "N/A"}`);
-  log("");
+  logger.raw(`Name:${colors.reset}        ${pkg.name || "N/A"}`);
+  logger.raw(`Version:${colors.reset}     ${pkg.version || "N/A"}`);
+  logger.blank();
 
   // Count docs
   const docsDir = join(projectRoot, "docs");
@@ -455,37 +413,37 @@ async function cmdInfo() {
     ).length;
   }
 
-  log(`${colors.bright}Documentation:${colors.reset}`);
-  log(`  Docs:  ${docCount} files`);
-  log(`  Blog:  ${blogCount} files`);
-  log("");
+  logger.raw(`Documentation:${colors.reset}`);
+  logger.raw(`  Docs:  ${docCount} files`);
+  logger.raw(`  Blog:  ${blogCount} files`);
+  logger.blank();
 
   // Check build status
   const distExists = existsSync(join(projectRoot, "dist"));
-  log(`${colors.bright}Build:${colors.reset}`);
-  log(
+  logger.raw(`Build:${colors.reset}`);
+  logger.raw(
     `  Status:  ${distExists ? `${colors.green}Built${colors.reset}` : `${colors.yellow}Not built${colors.reset}`}`
   );
 
   if (distExists) {
     const files = readdirSync(join(projectRoot, "dist"));
-    log(`  Files:   ${files.length}`);
+    logger.raw(`  Files:   ${files.length}`);
   }
-  log("");
+  logger.blank();
 
   // Dependencies
-  log(`${colors.bright}Dependencies:${colors.reset}`);
+  logger.raw(`Dependencies:${colors.reset}`);
   const deps = { ...pkg.dependencies, ...pkg.devDependencies };
   const keyDeps = ["react", "marked", "shiki", "mermaid", "@rspack/core", "@biomejs/biome"];
   for (const dep of keyDeps) {
     if (deps[dep]) {
-      log(`  ${dep.padEnd(20)} ${deps[dep]}`);
+      logger.raw(`  ${dep.padEnd(20)} ${deps[dep]}`);
     }
   }
-  log("");
+  logger.blank();
 
   // Scripts
-  log(`${colors.bright}Available Commands:${colors.reset}`);
+  logger.raw(`Available Commands:${colors.reset}`);
   if (pkg.scripts) {
     const commands = [
       ["docts dev", "Start development server"],
@@ -501,59 +459,61 @@ async function cmdInfo() {
     ];
 
     for (const [cmd, desc] of commands) {
-      log(`  ${cmd.padEnd(18)} ${desc}`);
+      logger.raw(`  ${cmd.padEnd(18)} ${desc}`);
     }
   }
-  log("");
+  logger.blank();
 }
 
 function showHelp() {
   banner();
-  log(`${colors.bright}Usage:${colors.reset}`);
-  log("  docts <command> [options]");
-  log("");
-  log(`${colors.bright}Commands:${colors.reset}`);
-  log("");
-  log(`  ${colors.green}dev${colors.reset}              Start development server with hot reload`);
-  log(`  ${colors.green}build${colors.reset}            Build for production`);
-  log(`  ${colors.green}start${colors.reset}            Serve production build`);
-  log(`  ${colors.green}preview${colors.reset}          Build + serve production locally`);
-  log(`  ${colors.green}docs${colors.reset}             Regenerate documentation only`);
-  log(`  ${colors.green}lint${colors.reset}             Check code quality`);
-  log(`  ${colors.green}lint:fix${colors.reset}         Auto-fix lint issues`);
-  log(`  ${colors.green}test${colors.reset}             Run test suite`);
-  log(`  ${colors.green}clean${colors.reset}            Clean build artifacts`);
-  log(`  ${colors.green}info${colors.reset}             Show project information`);
-  log("");
-  log(`${colors.bright}Options:${colors.reset}`);
-  log("");
-  log("  --port, -p <port>    Specify port number (default: 3000)");
-  log("  --no-lint            Skip lint checks during build");
-  log("  --skip-validation    Skip codeblock description validation");
-  log("  --strict             Fail build on lint errors");
-  log("  --watch              Watch mode (for tests)");
-  log("  --coverage           Generate coverage report");
-  log("  --help, -h           Show this help message");
-  log("  --version, -v        Show version");
-  log("");
-  log(`${colors.bright}Examples:${colors.reset}`);
-  log("");
-  log("  docts dev                    # Start dev server on port 3000");
-  log("  docts dev -p 8080            # Start dev server on port 8080");
-  log("  docts build                  # Full production build");
-  log("  docts build --no-lint        # Build without lint");
-  log("  docts preview                # Build + preview locally");
-  log("  docts test --coverage        # Run tests with coverage");
-  log("");
+  logger.raw(`Usage:${colors.reset}`);
+  logger.raw("  docts <command> [options]");
+  logger.blank();
+  logger.raw(`Commands:${colors.reset}`);
+  logger.blank();
+  logger.raw(
+    `  ${colors.green}dev${colors.reset}              Start development server with hot reload`
+  );
+  logger.raw(`  ${colors.green}build${colors.reset}            Build for production`);
+  logger.raw(`  ${colors.green}start${colors.reset}            Serve production build`);
+  logger.raw(`  ${colors.green}preview${colors.reset}          Build + serve production locally`);
+  logger.raw(`  ${colors.green}docs${colors.reset}             Regenerate documentation only`);
+  logger.raw(`  ${colors.green}lint${colors.reset}             Check code quality`);
+  logger.raw(`  ${colors.green}lint:fix${colors.reset}         Auto-fix lint issues`);
+  logger.raw(`  ${colors.green}test${colors.reset}             Run test suite`);
+  logger.raw(`  ${colors.green}clean${colors.reset}            Clean build artifacts`);
+  logger.raw(`  ${colors.green}info${colors.reset}             Show project information`);
+  logger.blank();
+  logger.raw(`Options:${colors.reset}`);
+  logger.blank();
+  logger.raw("  --port, -p <port>    Specify port number (default: 3000)");
+  logger.raw("  --no-lint            Skip lint checks during build");
+  logger.raw("  --skip-validation    Skip codeblock description validation");
+  logger.raw("  --strict             Fail build on lint errors");
+  logger.raw("  --watch              Watch mode (for tests)");
+  logger.raw("  --coverage           Generate coverage report");
+  logger.raw("  --help, -h           Show this help message");
+  logger.raw("  --version, -v        Show version");
+  logger.blank();
+  logger.raw(`Examples:${colors.reset}`);
+  logger.blank();
+  logger.raw("  docts dev                    # Start dev server on port 3000");
+  logger.raw("  docts dev -p 8080            # Start dev server on port 8080");
+  logger.raw("  docts build                  # Full production build");
+  logger.raw("  docts build --no-lint        # Build without lint");
+  logger.raw("  docts preview                # Build + preview locally");
+  logger.raw("  docts test --coverage        # Run tests with coverage");
+  logger.blank();
 }
 
 function showVersion() {
   const pkgPath = join(projectRoot, "package.json");
   if (existsSync(pkgPath)) {
     const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
-    log(`SSG Documentation Generator v${pkg.version || "0.1.0"}`);
+    logger.raw(`SSG Documentation Generator v${pkg.version || "0.1.0"}`);
   } else {
-    log("SSG Documentation Generator v0.1.0");
+    logger.raw("SSG Documentation Generator v0.1.0");
   }
 }
 
@@ -670,10 +630,10 @@ async function main() {
     }
   } catch (error) {
     if (error.code === "ENOENT") {
-      logError(`Command not found: ${args.command}`);
-      logInfo("Run 'docts --help' for available commands");
+      logger.error(`Command not found: ${args.command}`);
+      logger.info("Run 'docts --help' for available commands");
     } else {
-      logError(`Unexpected error: ${error.message}`);
+      logger.error(`Unexpected error: ${error.message}`);
     }
     process.exit(1);
   }

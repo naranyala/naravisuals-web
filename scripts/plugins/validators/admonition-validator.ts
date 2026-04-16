@@ -2,22 +2,25 @@
  * Admonition Validator Plugin
  *
  * Validates and tracks admonition blocks across markdown content.
- * Reports enrichment statistics and recommendations.
- * NOT strict - only informs about enrichment opportunities.
+ * Reports one-line stats summary per file with compact type codes.
+ * NOT strict - only stats/info.
  */
 
 import type { MarkdownValidator, ValidationIssue, ValidationResult } from "./types.ts";
 
-const ADMONITION_TYPES = [
-  "note",
-  "tip",
-  "warning",
-  "danger",
-  "caution",
-  "info",
-  "important",
-  "seealso",
-];
+// Compact type code mapping for shorter output
+const TYPE_CODES: Record<string, string> = {
+  note: "n",
+  tip: "t",
+  info: "i",
+  warning: "w",
+  danger: "d",
+  caution: "c",
+};
+
+function getTypeCode(type: string): string {
+  return TYPE_CODES[type.toLowerCase()] || type.toLowerCase()[0];
+}
 
 export const admonitionValidator: MarkdownValidator = {
   name: "admonitions",
@@ -37,27 +40,26 @@ export const admonitionValidator: MarkdownValidator = {
         const type = match[1].toLowerCase();
         totalAdmonitions++;
         typeCounts[type] = (typeCounts[type] || 0) + 1;
-
-        if (!ADMONITION_TYPES.includes(type)) {
-          issues.push({
-            severity: "warning",
-            file: filePath,
-            line: i + 1,
-            message: `Unknown admonition type: ${type}`,
-            detail: `Valid types: ${ADMONITION_TYPES.join(", ")}`,
-          });
-        }
       }
     }
 
+    let message = "";
     if (totalAdmonitions === 0) {
-      issues.push({
-        severity: "info",
-        file: filePath,
-        message: "No admonitions found - enrichment candidate",
-        detail: "Consider adding :::tip, :::warning, :::note for context and clarity",
-      });
+      message = "✓ No admonitions";
+    } else {
+      // Sort types alphabetically and use compact codes
+      const breakdown = Object.entries(typeCounts)
+        .sort(([typeA], [typeB]) => typeA.localeCompare(typeB))
+        .map(([type, count]) => `${getTypeCode(type)}:${count}`)
+        .join(" ");
+      message = `${totalAdmonitions} adm (${breakdown})`;
     }
+
+    issues.push({
+      severity: "info",
+      file: filePath,
+      message,
+    });
 
     return {
       checked: totalAdmonitions,

@@ -35,7 +35,6 @@ Five services cover all browser API needs:
 ```mermaid:desc=Class diagram showing the five service interfaces and their methods.
 classDiagram
     class IStorageService {
-        <<interface>>
         +getItem(key: string): string | null
         +setItem(key: string, value: string): void
         +removeItem(key: string): void
@@ -43,7 +42,6 @@ classDiagram
     }
 
     class IRouterService {
-        <<interface>>
         +getCurrentPath(): string
         +pushState(state, title, url): void
         +replaceState(state, title, url): void
@@ -52,7 +50,6 @@ classDiagram
     }
 
     class IDomService {
-        <<interface>>
         +getScrollY(): number
         +scrollTo(x, y): void
         +setAttribute(el, name, value): void
@@ -64,7 +61,6 @@ classDiagram
     }
 
     class IThemeService {
-        <<interface>>
         +getInitialTheme(): boolean
         +applyTheme(isDark: boolean): void
         +toggleTheme(current: boolean): boolean
@@ -74,7 +70,6 @@ classDiagram
     }
 
     class IAppConfig {
-        <<interface>>
         +siteTitle: string
         +repoEditUrl: string
         +mobileBreakpoint: number

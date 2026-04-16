@@ -61,7 +61,7 @@ mindmap
 ## How It Works
 
 ```mermaid:desc=Data flow from authoring markdown to viewing in browser.
-flowchart LR
+flowchart lr
     A["Author\nwrites .md"] --> B["build-docs.mts\nscans + parses"]
     B --> C["Plugins transform\nmath, admonitions, mermaid"]
     C --> D["Shiki highlights\ncode blocks"]
@@ -94,7 +94,7 @@ There is no server, no API routes, and no database. Everything is static. The "d
 
 ## Project Structure
 
-```
+```:desc=Project directory tree structure
 rspack-react-docs/
 ├── docs/                       # Markdown documentation source
 │   ├── 00-welcome.md           # Welcome page

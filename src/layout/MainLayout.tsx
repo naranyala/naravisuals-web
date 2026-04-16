@@ -1,36 +1,17 @@
 import { useEffect, useState } from "react";
-import { ArticleRefsPanel } from "./ArticleRefsPanel";
-import { ASTViewer } from "./ASTViewer";
-import { DocFooter } from "./DocFooter";
-import { DocViewer } from "./DocViewer";
-import { allDocs, type DocEntry, type SidebarItem, sidebarData } from "./generated";
-import { useKeyboardShortcut, useTitle } from "./hooks";
-import { useDocsTheme } from "./hooks/useDocsTheme";
-import { useSeo } from "./hooks/useSeo";
-import { MetadataPanel } from "./MetadataPanel";
-import { Sidebar } from "./Sidebar";
-import { useServices } from "./services";
-import { TableOfContents } from "./TableOfContents";
-import "./styles/index.css";
+import { AVAILABLE_FONTS, AVAILABLE_THEMES } from "../core/constants";
+import { ASTViewer } from "../features/ast-viewer";
+import { DocFooter, DocViewer } from "../features/docs";
+import { ArticleRefsPanel, MetadataPanel } from "../features/metadata";
+import { Sidebar, TableOfContents } from "../features/navigation";
+import { useSeo } from "../features/seo";
+import { useDocsTheme } from "../features/theme";
+import { allDocs, type DocEntry, type SidebarItem, sidebarData } from "../generated";
+import { useServices } from "../services";
+import { useKeyboardShortcut, useTitle } from "../shared/hooks";
+import "../shared/styles/index.css";
 
-const THEMES = [
-  { id: "paperlike-white", label: "Paper White", bg: "#ffffff", accent: "#2563eb" },
-  { id: "paperlike-gray", label: "Paper Gray", bg: "#e8e8e8", accent: "#5b8db8" },
-  { id: "paperlike-sepia", label: "Paper Sepia", bg: "#f4ecd8", accent: "#8b6914" },
-  { id: "paperlike-dark-gray", label: "Paper Dark", bg: "#2a2a2a", accent: "#7ba3cc" },
-  { id: "navy", label: "Navy", bg: "#f0f4f8", accent: "#3b82f6" },
-  { id: "dark-navy", label: "Dark Navy", bg: "#0f172a", accent: "#60a5fa" },
-] as const;
-
-const FONTS = [
-  { id: "system", label: "System", css: "system-ui, -apple-system, sans-serif" },
-  { id: "serif", label: "Serif", css: 'Georgia, "Times New Roman", serif' },
-  { id: "mono", label: "Mono", css: '"SFMono-Regular", Consolas, monospace' },
-  { id: "inter", label: "Inter", css: '"Inter", system-ui, sans-serif' },
-  { id: "source-sans", label: "Source Sans", css: '"Source Sans 3", system-ui, sans-serif' },
-] as const;
-
-export function App() {
+export function MainLayout() {
   const services = useServices();
 
   // ─── State ─────────────────────────────────────────────────────────
@@ -43,6 +24,7 @@ export function App() {
   const [isTocMobileBreakpoint, setIsTocMobileBreakpoint] = useState(
     () => services.dom.getViewportWidth() <= services.config.tocBreakpoint
   );
+
   const printAllDocs = async () => {
     // First, render all mermaid diagrams in the current view
     const mermaidDiagrams = document.querySelectorAll(".mermaid-diagram[data-processed='false']");
@@ -57,7 +39,22 @@ export function App() {
       const { default: mermaid } = await import("mermaid");
       mermaid.initialize({
         startOnLoad: false,
-        theme: "neutral",
+        theme: "base",
+        themeVariables: {
+          primaryColor: "#e8f5e9",
+          primaryTextColor: "#1a1a2e",
+          primaryBorderColor: "#2e7d32",
+          lineColor: "#374151",
+          secondaryColor: "#e3f2fd",
+          tertiaryColor: "#fff3e0",
+          background: "#ffffff",
+          mainBkg: "#ffffff",
+          nodeBorder: "#6b7280",
+          clusterBkg: "#f3f4f6",
+          clusterBorder: "#d1d5db",
+          titleColor: "#1a1a2e",
+          edgeLabelBackground: "#ffffff",
+        },
         securityLevel: "loose",
         fontFamily: "system-ui, -apple-system, sans-serif",
       });
@@ -887,7 +884,7 @@ export function App() {
             <div className="settings-section">
               <div className="settings-label">Theme</div>
               <div className="theme-grid">
-                {THEMES.map((t) => (
+                {AVAILABLE_THEMES.map((t) => (
                   <button
                     key={t.id}
                     className={`theme-chip ${docsTheme.codeTheme === t.id ? "active" : ""}`}
@@ -909,7 +906,7 @@ export function App() {
             <div className="settings-section">
               <div className="settings-label">Font</div>
               <div className="font-grid">
-                {FONTS.map((f) => (
+                {AVAILABLE_FONTS.map((f) => (
                   <button
                     key={f.id}
                     className={`font-chip ${docsTheme.font === f.id ? "active" : ""}`}
@@ -961,7 +958,8 @@ export function App() {
           )}
 
           <MetadataPanel metadata={currentDoc.metadata} />
-          <DocViewer html={currentDoc.content} />
+          <DocViewer html={currentDoc.content} slug={currentSlug} />
+
           <DocFooter
             prevDoc={
               prevDoc
@@ -975,7 +973,7 @@ export function App() {
             }
             onNavigate={navigate}
           />
-          <ArticleRefsPanel contentHtml={currentDoc.content} markdownAst={currentDoc.ast} />
+          {/* <ArticleRefsPanel contentHtml={currentDoc.content} markdownAst={currentDoc.ast} /> */}
         </main>
 
         {/* AST Viewer Panel */}
@@ -1002,4 +1000,4 @@ export function App() {
   );
 }
 
-export default App;
+export default MainLayout;

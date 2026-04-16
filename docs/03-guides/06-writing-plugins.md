@@ -11,7 +11,7 @@ The markdown plugin system allows you to extend the build pipeline with custom t
 
 ## Plugin Interface
 
-```typescript
+```typescript:desc=TypeScript code example
 // scripts/plugins/types.ts
 
 export interface MarkdownPlugin {
@@ -36,8 +36,8 @@ export interface MarkdownPlugin {
 
 ## Build Pipeline
 
-```mermaid
-graph LR
+```mermaid:desc=Build pipeline plugin flow diagram
+flowchart lr
     Raw[raw .md file] -->|preProcess| Plugins[All plugins in order]
     Plugins -->|combined md| Marked[marked parser]
     Marked -->|HTML| PostPlugins[All plugins in REVERSE order]
@@ -46,7 +46,7 @@ graph LR
 
 The full pipeline:
 
-```
+```:desc=Build pipeline overview
 raw .md → preProcess (plugins in order) → marked → postProcess (plugins in REVERSE order) → docs-data.ts
 ```
 
@@ -59,7 +59,7 @@ raw .md → preProcess (plugins in order) → marked → postProcess (plugins in
 
 With the default plugin registry (`math` → `admonitions` → `mermaid`):
 
-```
+```:desc=Plugin execution order example
 preProcess:  math → admonitions → mermaid (identity)
 postProcess: mermaid → admonitions → math
 ```
@@ -68,7 +68,7 @@ The reverse order in postProcess is critical: admonition content may contain mat
 
 ## Registered Plugins
 
-```typescript
+```typescript:desc=TypeScript code example
 // scripts/plugins/index.ts
 
 export const plugins: MarkdownPlugin[] = [mathPlugin, admonitionsPlugin, mermaidPlugin];
@@ -82,7 +82,7 @@ export const plugins: MarkdownPlugin[] = [mathPlugin, admonitionsPlugin, mermaid
 
 ## Plugin Execution Flow
 
-```mermaid
+```mermaid:desc=Plugin execution flow sequence diagram
 sequenceDiagram
     participant MD as Raw Markdown
     participant Math as mathPlugin
@@ -112,7 +112,7 @@ Both `mathPlugin` and `admonitionsPlugin` use the sentinel pattern:
 
 Sentinels follow the pattern: `PLUGIN_TYPE{index}END`
 
-```
+```:desc=Sentinel format examples
 MATHINLINE0END       → Inline math
 MATHDISPLAY1END      → Display math
 ADMONITION0END       → Admonition block
@@ -132,7 +132,7 @@ MERMAIDBLOCK0END     → Mermaid diagram
 
 Create a new file in `scripts/plugins/`, e.g., `scripts/plugins/toc-marker.ts`:
 
-```typescript
+```typescript:desc=TypeScript code example
 import type { MarkdownPlugin } from "./types.ts";
 
 interface TocMarkerBlock {
@@ -208,7 +208,7 @@ export const tocMarkerPlugin: MarkdownPlugin = {
 
 Add it to `scripts/plugins/index.ts`:
 
-```typescript
+```typescript:desc=TypeScript code example
 import { tocMarkerPlugin } from "./toc-marker.ts";
 
 export const plugins: MarkdownPlugin[] = [mathPlugin, admonitionsPlugin, tocMarkerPlugin, mermaidPlugin];
@@ -222,7 +222,7 @@ Place it in the correct position based on dependencies:
 
 If your plugin generates HTML that needs styling, add CSS to the appropriate file in `src/styles/`:
 
-```css
+```css:desc=CSS for toc-marker plugin
 /* admonitions.css or new file */
 .toc-marker {
   border-left: 3px solid var(--ifm-color-primary);
@@ -235,7 +235,7 @@ If your plugin generates HTML that needs styling, add CSS to the appropriate fil
 
 Build the docs and verify the output:
 
-```bash
+```bash:desc=Test commands for plugin development
 bun run build:docs    # Regenerate src/generated/
 bun run dev           # Preview in browser
 ```

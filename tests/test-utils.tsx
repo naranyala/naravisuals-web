@@ -2,6 +2,18 @@
  * Test utilities and helpers
  */
 
+if (typeof window !== "undefined" && !window.requestAnimationFrame) {
+  window.requestAnimationFrame = (callback: FrameRequestCallback) => {
+    return setTimeout(() => callback(performance.now()), 16);
+  };
+}
+
+if (typeof window !== "undefined" && !window.cancelAnimationFrame) {
+  window.cancelAnimationFrame = (id: number) => {
+    clearTimeout(id);
+  };
+}
+
 import {
   cleanup,
   type RenderOptions,

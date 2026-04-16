@@ -12,15 +12,15 @@ declare global {
 
 interface DocViewerProps {
   html: string;
+  slug: string;
 }
 
-async function renderMermaid(container: HTMLElement | null) {
+async function renderMermaid(container: HTMLElement | null, slug: string) {
   if (!container) return;
 
   const diagrams = container.querySelectorAll<HTMLElement>(".mermaid-diagram");
   if (diagrams.length === 0) return;
 
-  // Pre-load mermaid module before starting render
   window.__mermaidLoading__ = true;
 
   let mermaid: import("mermaid").default;
@@ -30,7 +30,22 @@ async function renderMermaid(container: HTMLElement | null) {
 
     mermaid.initialize({
       startOnLoad: false,
-      theme: "neutral",
+      theme: "base",
+      themeVariables: {
+        primaryColor: "#e8f5e9",
+        primaryTextColor: "#1a1a2e",
+        primaryBorderColor: "#2e7d32",
+        lineColor: "#374151",
+        secondaryColor: "#e3f2fd",
+        tertiaryColor: "#fff3e0",
+        background: "#ffffff",
+        mainBkg: "#ffffff",
+        nodeBorder: "#6b7280",
+        clusterBkg: "#f3f4f6",
+        clusterBorder: "#d1d5db",
+        titleColor: "#1a1a2e",
+        edgeLabelBackground: "#ffffff",
+      },
       securityLevel: "loose",
       fontFamily: "system-ui, -apple-system, sans-serif",
     });
@@ -40,95 +55,87 @@ async function renderMermaid(container: HTMLElement | null) {
     return;
   }
 
-  const renderPromises: Promise<void>[] = [];
+  const observer = new IntersectionObserver(
+    async (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const wrapper = entry.target as HTMLElement;
 
-  for (const wrapper of diagrams) {
-    if (wrapper.dataset.processed === "true") continue;
+          // Extract the index from the dataset
+          const index = wrapper.dataset.index || "0";
 
-    const mermaidEl = wrapper.querySelector<HTMLElement>(".mermaid");
-    const errorEl = wrapper.querySelector<HTMLElement>(".mermaid-error");
-    const loadingEl = wrapper.querySelector<HTMLElement>(".mermaid-loading");
-
-    if (!mermaidEl) continue;
-
-    const diagramSource = mermaidEl.textContent?.trim();
-    if (!diagramSource) continue;
-
-    const renderPromise = (async () => {
-      try {
-        // Use renderAsync which is more reliable than parse + render
-        const uniqueId = `mermaid-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-        const { svg } = await mermaid.render(uniqueId, diagramSource);
-
-        wrapper.dataset.processed = "true";
-
-        if (loadingEl) loadingEl.style.display = "none";
-        mermaidEl.innerHTML = svg;
-        mermaidEl.style.display = "block";
-        mermaidEl.style.opacity = "1";
-
-        const svgEl = mermaidEl.querySelector("svg");
-        if (svgEl) {
-          svgEl.style.maxWidth = "100%";
-          svgEl.style.height = "auto";
-          svgEl.style.display = "block";
-          svgEl.style.margin = "0 auto";
-
-          svgEl.querySelectorAll("text").forEach((textEl) => {
-            textEl.style.fill = "#1a1a1a";
-            textEl.style.color = "#1a1a1a";
-          });
-          svgEl.querySelectorAll("path, line").forEach((shapeEl) => {
-            const stroke = shapeEl.getAttribute("stroke");
-            if (
-              !stroke ||
-              stroke === "none" ||
-              stroke === "transparent" ||
-              stroke === "#e5e7eb" ||
-              stroke === "#d1d5db"
-            ) {
-              shapeEl.style.stroke = "#374151";
-            }
-          });
-          svgEl.querySelectorAll("rect, circle, ellipse, polygon").forEach((shapeEl) => {
-            const fill = shapeEl.getAttribute("fill");
-            if (
-              fill &&
-              fill !== "#fff" &&
-              fill !== "#ffffff" &&
-              fill !== "white" &&
-              fill !== "none"
-            ) {
-              shapeEl.style.fill = "#ffffff";
-            }
-            shapeEl.style.stroke = "#6b7280";
-          });
+          observer.unobserve(wrapper);
+          await renderSingleDiagram(wrapper, mermaid, slug, parseInt(index));
         }
-
-        if (errorEl) errorEl.style.display = "none";
-      } catch (err) {
-        if (loadingEl) loadingEl.style.display = "none";
-        if (errorEl) {
-          const msg = err instanceof Error ? err.message : String(err);
-          errorEl.style.display = "block";
-          errorEl.innerHTML = `<div class="mermaid-error-title">⚠ Failed to render</div><pre>${msg}</pre><pre>${diagramSource}</pre>`;
-        }
-        mermaidEl.style.display = "block";
-        mermaidEl.style.whiteSpace = "pre-wrap";
-        mermaidEl.style.padding = "1rem";
-        mermaidEl.style.background = "var(--bg-code)";
-        mermaidEl.style.color = "var(--text)";
-        mermaidEl.style.opacity = "1";
       }
-    })();
+    },
+    { rootMargin: "1000px" }
+  );
 
-    renderPromises.push(renderPromise);
-  }
-
-  // Wait for all diagrams to render in parallel
-  await Promise.all(renderPromises);
+  diagrams.forEach((wrapper, index) => {
+    wrapper.dataset.index = index.toString();
+    observer.observe(wrapper);
+  });
 
   window.__mermaidLoading__ = false;
+}
+
+async function renderSingleDiagram(
+  wrapper: HTMLElement,
+  mermaid: any,
+  slug: string,
+  index: number
+) {
+  if (wrapper.dataset.processed === "true") return;
+
+  const mermaidEl = wrapper.querySelector<HTMLElement>(".mermaid");
+  const errorEl = wrapper.querySelector<HTMLElement>(".mermaid-error");
+  const loadingEl = wrapper.querySelector<HTMLElement>(".mermaid-loading");
+
+  if (!mermaidEl) return;
+
+  const diagramSource = mermaidEl.textContent?.trim();
+  if (!diagramSource) return;
+
+  try {
+    const uniqueId = `mermaid-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const { svg } = await mermaid.render(uniqueId, diagramSource);
+
+    wrapper.dataset.processed = "true";
+
+    if (loadingEl) loadingEl.style.display = "none";
+    mermaidEl.innerHTML = svg;
+    mermaidEl.style.display = "block";
+    mermaidEl.style.opacity = "1";
+
+    if (errorEl) errorEl.style.display = "none";
+
+    console.log(`✅ [Mermaid Frontend] Rendered successfully:`, {
+      slug,
+      index,
+      id: uniqueId,
+      source: diagramSource.slice(0, 50) + "...",
+    });
+  } catch (err) {
+    console.error(`❌ [Mermaid Frontend] Render failed:`, {
+      slug,
+      index,
+      error: err instanceof Error ? err.message : String(err),
+      source: diagramSource,
+    });
+    if (loadingEl) loadingEl.style.display = "none";
+    if (errorEl) {
+      const msg = err instanceof Error ? err.message : String(err);
+      errorEl.style.display = "block";
+      errorEl.innerHTML = `<div class="mermaid-error-title">⚠ Failed to render</div><pre>${msg}</pre><pre>${diagramSource}</pre>`;
+    }
+    mermaidEl.style.display = "block";
+    mermaidEl.style.whiteSpace = "pre-wrap";
+    mermaidEl.style.padding = "1rem";
+    mermaidEl.style.background = "var(--bg-code)";
+    mermaidEl.style.color = "var(--text)";
+    mermaidEl.style.opacity = "1";
+  }
 }
 
 async function renderMath(container: HTMLElement | null) {
@@ -197,7 +204,7 @@ async function renderMath(container: HTMLElement | null) {
   }
 }
 
-export function DocViewer({ html }: DocViewerProps) {
+export function DocViewer({ html, slug }: DocViewerProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -526,7 +533,7 @@ export function DocViewer({ html }: DocViewerProps) {
       if (!mounted || !ref.current) return;
 
       // Render Mermaid diagrams
-      await renderMermaid(ref.current);
+      await renderMermaid(ref.current, slug);
 
       if (!mounted || !ref.current) return;
 
@@ -546,12 +553,7 @@ export function DocViewer({ html }: DocViewerProps) {
 
     // Start rendering
     renderContent();
-
-    // Cleanup function
-    return () => {
-      mounted = false;
-    };
-  }, [html]);
+  }, [html, slug]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

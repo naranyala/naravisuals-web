@@ -2,6 +2,11 @@
    MERMAID DIAGRAMS
    ============================================ */
 
+/* Hide dynamically generated mermaid containers that might be residuals */
+[id^="dmermaid-"] {
+  display: none !important;
+}
+
 .mermaid-diagram {
   margin-bottom: 1.25rem;
   border: 1px solid var(--border);
@@ -24,6 +29,30 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.mermaid-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.mermaid-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: mermaid-spin 0.8s linear infinite;
+}
+
+@keyframes mermaid-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .mermaid-zoom-btn {
@@ -162,8 +191,28 @@
   fill: #1a1a2e !important;
   color: #1a1a2e !important;
 }
-
 /* ---- Node fills: distinct pastel colors for variety ---- */
+
+/* Least specific selectors first */
+.mermaid svg line,
+.mermaid svg path {
+  stroke: #374151 !important;
+}
+
+.mermaid svg .noteText,
+.mermaid svg .loopText,
+.mermaid svg .classLabel text,
+.mermaid svg .stateGroup text,
+.mermaid svg .taskText,
+.mermaid svg .sectionTitle,
+.mermaid svg .grid .tick text,
+.mermaid svg .pieTitleText,
+.mermaid svg .pieSliceText,
+.mermaid svg .mindmap-node text,
+.mermaid svg .journey-task text {
+  fill: #1a1a1a !important;
+}
+
 .mermaid svg rect.node,
 .mermaid-fullscreen-content svg rect.node,
 .mermaid svg .node rect,
@@ -647,13 +696,28 @@
   }
 }
 
-/* Ensure dark text on mermaid diagrams in normal view for readability */
-/* Use !important to override Mermaid's inline styles */
+/* ============================================
+   NORMAL VIEW STYLES
+   ============================================ */
 
 /* Most specific selectors first */
 .mermaid svg .edgePath path {
   stroke: #374151 !important;
   stroke-width: 1.5px !important;
+}
+
+.mermaid svg .noteText,
+.mermaid svg .loopText,
+.mermaid svg .classLabel text,
+.mermaid svg .stateGroup text,
+.mermaid svg .taskText,
+.mermaid svg .sectionTitle,
+.mermaid svg .grid .tick text,
+.mermaid svg .pieTitleText,
+.mermaid svg .pieSliceText,
+.mermaid svg .mindmap-node text,
+.mermaid svg .journey-task text {
+  fill: #1a1a1a !important;
 }
 
 /* Medium specificity selectors */
@@ -680,31 +744,9 @@
   fill: #1a1a1a !important;
 }
 
-/* Least specific selectors last */
-.mermaid svg path,
-.mermaid svg line {
-  stroke: #374151 !important;
-}
-
-.mermaid svg .noteText {
-  fill: #1a1a1a !important;
-}
-
-.mermaid svg .loopText {
-  fill: #1a1a1a !important;
-}
-
-.mermaid svg .classLabel text {
-  fill: #1a1a1a !important;
-}
-
 .mermaid svg .stateGroup rect {
   fill: #fff !important;
   stroke: #6b7280 !important;
-}
-
-.mermaid svg .stateGroup text {
-  fill: #1a1a1a !important;
 }
 
 .mermaid svg .task {
@@ -712,35 +754,16 @@
   stroke: #6b7280 !important;
 }
 
-.mermaid svg .taskText {
-  fill: #1a1a1a !important;
-}
-
 .mermaid svg .section {
   fill: #f9fafb !important;
-}
-
-.mermaid svg .sectionTitle {
-  fill: #1a1a1a !important;
 }
 
 .mermaid svg .grid .tick line {
   stroke: #e5e7eb !important;
 }
 
-.mermaid svg .grid .tick text {
-  fill: #1a1a1a !important;
-}
-
-.mermaid svg .pieTitleText,
-.mermaid svg .pieSliceText {
-  fill: #1a1a1a !important;
-}
-
-.mermaid svg .mindmap-node text {
-  fill: #1a1a1a !important;
-}
-
-.mermaid svg .journey-task text {
-  fill: #1a1a1a !important;
+/* Most specific selectors last */
+.mermaid svg .edgePath path {
+  stroke: #374151 !important;
+  stroke-width: 1.5px !important;
 }

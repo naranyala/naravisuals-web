@@ -13,7 +13,7 @@ The build pipeline is the heart of rspack-react-docs. It transforms raw Markdown
 ## Pipeline Overview
 
 ```mermaid:desc=Complete build pipeline from markdown source to generated TypeScript files.
-flowchart TB
+flowchart tb
     subgraph Scan["Content Scanner"]
         Walk["Walk docs/ directory"]
         Parse["Parse frontmatter\nYAML between ---"]
@@ -95,7 +95,7 @@ function scanMdFiles(baseDir: string, section: "docs" | "blog"): DocEntry[] {
 
 Supports standard YAML frontmatter with multi-line list syntax:
 
-```yaml:title=docs/01-getting-started/01-project-overview.md
+```yaml:title=docs/01-getting-started/01-project-overview.md:desc=YAML frontmatter example
 ---
 title: Project Overview
 description: What this project is about
@@ -107,7 +107,7 @@ tags: [overview, architecture]
 
 Also supports multi-line lists:
 
-```yaml
+```yaml:desc=Multi-line YAML list syntax
 tags:
   - overview
   - architecture

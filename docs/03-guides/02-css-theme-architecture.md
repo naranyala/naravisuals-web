@@ -25,7 +25,7 @@ The project ships with **7 visual themes**, each configured through the `data-th
 
 Each theme defines a complete set of CSS custom properties:
 
-```css
+```css:desc=Paper-like dark gray theme CSS custom properties
 [data-theme="paperlike-dark-gray"] {
   --ifm-color-primary: #7ba3cc;
   --ifm-color-primary-dark: #5b8db8;
@@ -43,8 +43,8 @@ Each theme defines a complete set of CSS custom properties:
 
 The styles are organized into **22 CSS files** in `src/styles/`:
 
-```mermaid
-graph TD
+```mermaid:desc=CSS file organization diagram
+flowchart td
     Root[index.css] --> Vars[variables.css]
     Root --> Layout[layout.css]
     Root --> States[states.css]
@@ -95,7 +95,7 @@ graph TD
 
 ## Theme Switching Architecture
 
-```mermaid
+```mermaid:desc=Theme switching sequence diagram
 sequenceDiagram
     participant User
     participant Hook as useDocsTheme
@@ -108,7 +108,7 @@ sequenceDiagram
     Hook->>LS: setItem("shiki-code-theme", "paperlike-sepia")
     DOM->>CSS: [data-theme="paperlike-sepia"] rules activate
     CSS->>CSS: --bg, --text, --border variables update
-    Note over CSS,Shiki: Code blocks transform via<br/>data-code-theme filter chain
+    Note over CSS,Shiki: Code blocks transform via\ndata-code-theme filter chain
 ```
 
 ### UI Theme vs Code Theme
@@ -124,7 +124,7 @@ When you call `setCodeTheme(theme)`, it sets **both** attributes so the UI and c
 
 Shiki renders syntax highlighting at **build time** with inline styles using the `github-dark` theme. At runtime, we transform the appearance using CSS filter chains -- no re-build needed.
 
-```css
+```css:desc=CSS filter chains for Shiki theme switching
 /* shiki-themes.css */
 
 /* paperlike-white: light theme, slight warm tint */
@@ -169,7 +169,7 @@ This approach means Shiki only needs to render once (as `github-dark`), and all 
 
 The project uses [goober](https://github.com/cristianbote/goober) for CSS-in-JS in specific components. It is configured with a custom `createElement` pragma:
 
-```typescript
+```typescript:desc=Goober setup with createElement pragma
 import { setup } from "goober";
 import { createElement } from "react";
 
@@ -178,7 +178,7 @@ setup(createElement);
 
 This allows components to use the `css` tagged template literal for scoped styles:
 
-```typescript
+```typescript:desc=Goober css tagged template literal example
 const buttonStyle = css`
   background: var(--ifm-color-primary);
   color: white;
@@ -206,21 +206,21 @@ These are read on initialization by `useDocsTheme` and `useShikiTheme`, and writ
 
 The theme system exposes user-adjustable CSS custom properties on `document.documentElement`:
 
-```css
+```css:desc=Custom CSS properties for reading preferences
 --docs-font-size: 15px;    /* Font size (12-20px) */
 --docs-line-height: 1.6;   /* Line height (1.2-2.2) */
 ```
 
 Applied via:
 
-```typescript
+```typescript:desc=Setting custom CSS properties in JavaScript
 document.documentElement.style.setProperty("--docs-font-size", `${fontSize}px`);
 document.documentElement.style.setProperty("--docs-line-height", String(lineHeight));
 ```
 
 The base `html` rule in `variables.css` uses these as fallback-aware values:
 
-```css
+```css:desc=HTML and body CSS with fallback values
 html {
   font-size: var(--docs-font-size, 15px);
   scroll-behavior: smooth;
@@ -236,3 +236,7 @@ body {
 - [React Hooks](/docs/guides/react-hooks) -- `useDocsTheme`, `useShikiTheme`, and `useTheme` hooks
 - [Print Export](/docs/guides/print-export) -- Print-friendly theme overrides
 - [CLI Reference](/docs/guides/cli-reference) -- `docts build` generates the static assets
+
+## References
+
+- [goober](https://github.com/cristianbote/goober) -- CSS-in-JS library

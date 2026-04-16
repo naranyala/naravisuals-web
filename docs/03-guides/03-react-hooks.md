@@ -9,8 +9,8 @@ sidebar_position: 3
 
 The project includes **16 custom React hooks** in `src/hooks/`. Each hook solves a specific problem in the documentation site -- from theme management to SEO to keyboard shortcuts.
 
-```mermaid
-graph TD
+```mermaid:desc=Diagram showing the 16 React hooks organized by category
+flowchart td
     subgraph Theme Hooks
         UT[useTheme]
         UDT[useDocsTheme]
@@ -44,7 +44,7 @@ graph TD
 
 All hooks are barrel-exported from `src/hooks/index.ts`:
 
-```typescript
+```typescript:desc=Hooks barrel export showing all 16 exported hooks
 export { useActiveSection } from "./useActiveSection";
 export { useClipboard } from "./useClipboard";
 export { useCopyCode } from "./useCopyCode";
@@ -72,7 +72,7 @@ Tracks which heading section is currently visible in the viewport using `Interse
 
 **Signature:**
 
-```typescript
+```typescript:desc=useActiveSection function signature with selector parameter
 function useActiveSection(
   selector?: string  // default: ".doc-content h2, .doc-content h3"
 ): string
@@ -80,7 +80,7 @@ function useActiveSection(
 
 **Usage:**
 
-```typescript
+```typescript:desc=useActiveSection usage example
 const activeId = useActiveSection();
 // Returns: "getting-started", "installation", etc.
 
@@ -106,7 +106,7 @@ Generic copy-to-clipboard utility with "copied!" feedback state.
 
 **Signature:**
 
-```typescript
+```typescript:desc=useClipboard hook interface and function signature
 interface UseClipboardOptions {
   duration?: number;  // default: 2000ms
 }
@@ -116,7 +116,7 @@ function useClipboard(options?: UseClipboardOptions): [copied: boolean, copy: (t
 
 **Usage:**
 
-```typescript
+```typescript:desc=useClipboard hook usage example
 const [copied, copy] = useClipboard({ duration: 1500 });
 
 <button onClick={() => copy("some text")}>
@@ -140,7 +140,7 @@ Hook for the "Copy" button on code blocks. Extracts `textContent` from a code bl
 
 **Signature:**
 
-```typescript
+```typescript:desc=UseCopyCode hook interface definition
 interface UseCopyCodeOptions {
   duration?: number;  // default: 2000ms
 }
@@ -150,7 +150,7 @@ function useCopyCode(options?: UseCopyCodeOptions): { copied: boolean; copyCode:
 
 **Usage:**
 
-```typescript
+```typescript:desc=useCopyCode hook usage example
 const { copied, copyCode } = useCopyCode();
 
 <button onClick={() => copyCode(preElement)}>
@@ -174,13 +174,13 @@ Debounces a value -- returns a stable version that only updates after the specif
 
 **Signature:**
 
-```typescript
+```typescript:desc=useDebounce hook signature
 function useDebounce<T>(value: T, delayMs?: number): T  // default delay: 300ms
 ```
 
 **Usage:**
 
-```typescript
+```typescript:desc=useDebounce usage example
 const [search, setSearch] = useState("");
 const debouncedSearch = useDebounce(search, 300);
 
@@ -205,7 +205,7 @@ Unified theme hook that manages **both UI theme and code block (Shiki) theme**, 
 
 **Signature:**
 
-```typescript
+```typescript:desc=useDocsTheme hook interface and function signature
 interface DocsTheme {
   isDark: boolean;
   toggleTheme: () => void;
@@ -225,7 +225,7 @@ function useDocsTheme(): DocsTheme
 
 **Usage:**
 
-```typescript
+```typescript:desc=useDocsTheme hook usage example
 const { isDark, toggleTheme, codeTheme, setCodeTheme, fontSize, setFontSize } = useDocsTheme();
 
 // Toggle dark/light
@@ -261,7 +261,7 @@ Registers global keyboard shortcuts with modifier key support.
 
 **Signature:**
 
-```typescript
+```typescript:desc=useKeyboardShortcut hook interface and function signature
 interface ShortcutOptions {
   key: string;          // e.g., "k", "Escape", "/"
   meta?: boolean;       // Requires Cmd/Ctrl
@@ -278,7 +278,7 @@ function useKeyboardShortcut(
 
 **Usage:**
 
-```typescript
+```typescript:desc=useKeyboardShortcut usage examples
 // Cmd+B to toggle sidebar
 useKeyboardShortcut(() => toggleSidebar(), { key: "b", meta: true });
 
@@ -306,7 +306,7 @@ Syncs React state with `localStorage`. Auto-serializes/deserializes.
 
 **Signature:**
 
-```typescript
+```typescript:desc=useLocalStorage hook signature
 function useLocalStorage<T>(
   key: string,
   initialValue: T
@@ -315,7 +315,7 @@ function useLocalStorage<T>(
 
 **Usage:**
 
-```typescript
+```typescript:desc=useLocalStorage usage example
 const [collapsed, setCollapsed] = useLocalStorage("sidebar-collapsed", false);
 
 // Supports updater function (like useState)
@@ -340,13 +340,13 @@ Reactively tracks a CSS media query's match state.
 
 **Signature:**
 
-```typescript
+```typescript:desc=useMediaQuery hook signature
 function useMediaQuery(query: string): boolean
 ```
 
 **Usage:**
 
-```typescript
+```typescript:desc=useMediaQuery usage example
 const isMobile = useMediaQuery("(max-width: 800px)");
 const prefersDark = useMediaQuery("(prefers-color-scheme: dark)");
 
@@ -369,7 +369,7 @@ Estimates reading time in minutes based on word count.
 
 **Signature:**
 
-```typescript
+```typescript:desc=useReadingTime hook signature
 function useReadingTime(
   text: string | undefined | null,
   wordsPerMinute?: number  // default: 225
@@ -378,7 +378,7 @@ function useReadingTime(
 
 **Usage:**
 
-```typescript
+```typescript:desc=useReadingTime usage example
 const { minutes, words, formatted } = useReadingTime(docContent);
 // { minutes: 5, words: 1125, formatted: "5 min read" }
 
@@ -402,7 +402,7 @@ Returns a value between 0 and 1 representing how far the user has scrolled throu
 
 **Signature:**
 
-```typescript
+```typescript:desc=useScrollProgress hook signature
 function useScrollProgress(
   contentSelector?: string  // default: ".main-content"
 ): number
@@ -410,7 +410,7 @@ function useScrollProgress(
 
 **Usage:**
 
-```typescript
+```typescript:desc=useScrollProgress usage example
 const progress = useScrollProgress();
 
 <div className="progress-bar" style={{ width: `${progress * 100}%` }} />
@@ -433,7 +433,7 @@ Returns a scroll-to-top function and a visibility flag.
 
 **Signature:**
 
-```typescript
+```typescript:desc=useScrollToTop hook interface and function signature
 interface UseScrollToTopOptions {
   threshold?: number;       // Show after this many px (default: 300)
   behavior?: ScrollBehavior; // default: "smooth"
@@ -444,7 +444,7 @@ function useScrollToTop(options?: UseScrollToTopOptions): { visible: boolean; sc
 
 **Usage:**
 
-```typescript
+```typescript:desc=useScrollToTop usage example
 const { visible, scrollToTop } = useScrollToTop({ threshold: 400 });
 
 {visible && (
@@ -470,7 +470,7 @@ Dynamically updates SEO meta tags, structured data, and social sharing tags base
 
 **Signature:**
 
-```typescript
+```typescript:desc=useSeo hook interface and function signature
 interface UseSeoOptions {
   title?: string;
   description?: string;
@@ -488,7 +488,7 @@ function useSeo(options?: UseSeoOptions): void
 
 **Usage:**
 
-```typescript
+```typescript:desc=useSeo hook usage example
 useSeo({
   title: doc.title,
   description: doc.description,
@@ -519,7 +519,7 @@ Manages code block syntax highlighting theme independently from UI theme.
 
 **Signature:**
 
-```typescript
+```typescript:desc=useShikiTheme hook type and function signature
 type ShikiCodeTheme =
   | "paperlike-white"
   | "paperlike-gray"
@@ -534,7 +534,7 @@ function useShikiTheme(): [ShikiCodeTheme, (theme: ShikiCodeTheme) => void]
 
 **Usage:**
 
-```typescript
+```typescript:desc=useShikiTheme usage example
 const [codeTheme, setCodeTheme] = useShikiTheme();
 
 <select value={codeTheme} onChange={e => setCodeTheme(e.target.value)}>
@@ -560,13 +560,13 @@ Basic dark/light theme toggle using the DI theme service.
 
 **Signature:**
 
-```typescript
+```typescript:desc=useTheme hook signature
 function useTheme(): [isDark: boolean, toggleTheme: () => void]
 ```
 
 **Usage:**
 
-```typescript
+```typescript:desc=useTheme hook usage example
 const [isDark, toggleTheme] = useTheme();
 
 <button onClick={toggleTheme}>
@@ -591,13 +591,13 @@ Updates the document title with cleanup on unmount.
 
 **Signature:**
 
-```typescript
+```typescript:desc=useTitle hook signature
 function useTitle(docTitle: string, siteName?: string): void  // default siteName: "Docs"
 ```
 
 **Usage:**
 
-```typescript
+```typescript:desc=useTitle hook usage example
 useTitle("Getting Started", "My Docs");
 // Sets document.title to "Getting Started – My Docs"
 ```

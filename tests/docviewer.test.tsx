@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, test } from "bun:test";
-import { DocViewer } from "../src/DocViewer";
+import { DocViewer } from "../src/features/docs/DocViewer";
 import { renderWithServices } from "./test-utils";
 
 describe("DocViewer", () => {

@@ -30,7 +30,7 @@ This guide covers migrating documentation from Docusaurus, VitePress, MkDocs, an
 
 Copy all `.md` files from your Docusaurus `docs/` directory to this project's `docs/` directory. Use numeric prefixes to control ordering:
 
-```bash
+```bash:desc=Copy markdown files command example
 # Create category folders with numeric prefixes
 mkdir -p docs/01-getting-started
 mkdir -p docs/02-architecture
@@ -45,7 +45,7 @@ cp ../my-docusaurus-docs/docs/*.md docs/
 
 Docusaurus and rspack-react-docs share most frontmatter fields. The core fields are directly compatible:
 
-```yaml
+```yaml:desc=YAML frontmatter example
 ---
 title: "Page Title"           # Same in both
 description: "Page desc"      # Same in both
@@ -70,7 +70,7 @@ slug: "custom/slug"           # Auto-derived from filename in rspack-react-docs
 
 Docusaurus uses `sidebars.js` for explicit sidebar configuration. rspack-react-docs **auto-generates** the sidebar from the file structure:
 
-```js
+```js:desc=Docusaurus sidebars.js example
 // Docusaurus: sidebars.js (REMOVE THIS FILE)
 module.exports = {
   mySidebar: [
@@ -85,7 +85,7 @@ module.exports = {
 
 In rspack-react-docs, the sidebar is determined by folder structure and filename prefixes:
 
-```
+```:desc=Sidebar folder structure example
 docs/
 ├── 00-welcome.md                          # Position 0
 ├── 01-getting-started/
@@ -101,7 +101,7 @@ The numeric prefix in filenames (e.g., `01-`) sets `sidebar_position`. Numeric p
 
 Admonition syntax is **fully compatible**:
 
-```markdown
+```markdown:desc=Admonition syntax examples
 :::note
 This is a note.
 :::
@@ -134,7 +134,7 @@ The `:::caution` type maps to `:::note` in rspack-react-docs.
 
 Code block syntax is compatible. rspack-react-docs supports additional metadata in the info string:
 
-````markdown
+`````markdown:desc=Codeblock syntax comparison example
 <!-- Docusaurus (compatible) -->
 ```typescript
 const x = 1;
@@ -146,10 +146,9 @@ const x = 1;
 ```
 
 ```mermaid:desc=User flow:zoom=true
-graph TD
+flowchart td
   A --> B
-```
-````
+```````
 
 ### What You Lose
 
@@ -198,7 +197,7 @@ graph TD
 
 1. **Convert admonitions**: MkDocs uses `!!! note` while rspack-react-docs uses `:::note`:
 
-```markdown
+```markdown:desc=MkDocs to rspack-react-docs admonition conversion
 <!-- MkDocs (before) -->
 !!! note "Title"
     Content here
@@ -218,7 +217,7 @@ Content here
 
 ### 1. Audit Existing Documentation
 
-```bash
+```bash:desc=Audit documentation commands
 # Count files by type
 find docs/ -name "*.md" | wc -l
 
@@ -231,7 +230,7 @@ grep -r ":::" docs/ | grep -oP ':[a-z]+' | sort | uniq -c
 
 ### 2. Set Up Project Structure
 
-```bash
+```bash:desc=Create project structure
 # Create category directories
 mkdir -p docs/{01-getting-started,02-architecture,03-guides,04-reference,05-contributing}
 
@@ -241,7 +240,7 @@ mkdir -p docs/{01-getting-started,02-architecture,03-guides,04-reference,05-cont
 
 ### 3. Rebuild Documentation
 
-```bash
+```bash:desc=Rebuild documentation commands
 # Generate TypeScript data from markdown
 bun run build:docs
 

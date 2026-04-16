@@ -121,7 +121,7 @@ The output in `dist/` is a fully static site — no server-side rendering, no AP
 
 The CLI automatically finds an available port starting from 3000:
 
-```
+```:desc=Port already in use warning message
 ⚠ Port 3000 is in use, using port 3001 instead
 ```
 

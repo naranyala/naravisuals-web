@@ -39,7 +39,8 @@ export const frontmatterValidator: MarkdownValidator = {
         severity: "info",
         file: filePath,
         message: "No frontmatter found",
-        detail: "Consider adding frontmatter with title, description, and sidebar metadata",
+        detail:
+          "Add frontmatter at the beginning of your file. Example:\n---\ntitle: Article Title\ndescription: A brief overview.\nsidebar_label: Short Label\nsidebar_position: 1\n---",
       });
       return {
         checked: 0,

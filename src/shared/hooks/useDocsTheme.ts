@@ -12,7 +12,7 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
-import { useServices } from "../services";
+import { useServices } from "../../services";
 import type { ShikiCodeTheme } from "./useShikiTheme";
 
 const FONT_SIZE_KEY = "docs-font-size";

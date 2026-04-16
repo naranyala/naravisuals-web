@@ -1,15 +1,18 @@
 /**
  * Entry point for the React app with Dependency Injection.
+ *
+ * This module initializes the React application with the dependency injection
+ * container, error boundary, and root layout component.
  */
 
 import { setup } from "goober";
 import type { ReactElement, ReactNode } from "react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { App } from "./App";
-import { ErrorBoundary } from "./ErrorBoundary";
+import { ErrorBoundary } from "./core/error-handling";
+import { MainLayout } from "./layout";
 import { defaultContainer, ServicesProvider } from "./services";
-import "./styles/error-boundary.css";
+import "./shared/styles/error-boundary.css";
 
 // Setup goober with React createElement
 const createElement = (
@@ -47,7 +50,7 @@ root.render(
   <StrictMode>
     <ErrorBoundary>
       <ServicesProvider container={defaultContainer}>
-        <App />
+        <MainLayout />
       </ServicesProvider>
     </ErrorBoundary>
   </StrictMode>

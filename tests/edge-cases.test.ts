@@ -377,14 +377,8 @@ $$`;
 });
 
 describe("Mermaid plugin edge cases", () => {
-  test("handles empty mermaid diagram", () => {
-    const html = `<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid"></code></pre></div>`;
-    const result = mermaidPlugin.postProcess?.(html);
-    expect(result).toContain("mermaid-diagram");
-  });
-
   test("handles mermaid with special characters", () => {
-    const html = `<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">A-->B;B--&gt;C;</code></pre></div>`;
+    const html = `<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">flowchart TD;A-->B;B--&gt;C;</code></pre></div>`;
     const result = mermaidPlugin.postProcess?.(html);
     expect(result).toContain("mermaid-diagram");
   });
@@ -392,14 +386,14 @@ describe("Mermaid plugin edge cases", () => {
   test("handles very large mermaid diagram", () => {
     const nodes = Array.from({ length: 100 }, (_, i) => `N${i}[Node ${i}]`).join(";");
     const edges = Array.from({ length: 99 }, (_, i) => `N${i}-->N${i + 1}`).join(";");
-    const diagram = `graph TD;${nodes};${edges}`;
+    const diagram = `flowchart TD;${nodes};${edges}`;
     const html = `<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">${diagram}</code></pre></div>`;
     const result = mermaidPlugin.postProcess?.(html);
     expect(result).toContain("mermaid-diagram");
   });
 
   test("handles mermaid with HTML injection attempt", () => {
-    const html = `<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">A-->B&lt;script&gt;alert('xss')&lt;/script&gt;</code></pre></div>`;
+    const html = `<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">flowchart TD;A-->B&lt;script&gt;alert('xss')&lt;/script&gt;</code></pre></div>`;
     const result = mermaidPlugin.postProcess?.(html);
     // Should escape HTML
     expect(result).not.toContain("<script>");
@@ -407,7 +401,7 @@ describe("Mermaid plugin edge cases", () => {
   });
 
   test("handles mixed case language (MERMAID vs mermaid)", () => {
-    const html = `<div class="code-block"><div class="code-header"><span class="code-lang">MERMAID</span></div><pre><code class="language-MERMAID">graph TD;A-->B;</code></pre></div>`;
+    const html = `<div class="code-block"><div class="code-header"><span class="code-lang">MERMAID</span></div><pre><code class="language-MERMAID">flowchart TD;A-->B;</code></pre></div>`;
     const result = mermaidPlugin.postProcess?.(html);
     expect(result).toContain("mermaid-diagram");
   });

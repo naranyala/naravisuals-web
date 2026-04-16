@@ -11,8 +11,8 @@ The documentation site includes a comprehensive SEO system that dynamically upda
 
 ## Overview
 
-```mermaid
-graph TD
+```mermaid:desc=SEO system overview diagram
+flowchart td
     subgraph Document Level
         Title[Page Title]
         Desc[Meta Description]
@@ -49,7 +49,7 @@ graph TD
 
 The `useSeo` hook (`src/hooks/useSeo.ts`) is the central engine for dynamic SEO. It runs on every navigation to update the document's meta information.
 
-```typescript
+```typescript:desc=useSeo hook usage example
 useSeo({
   title: "CLI Reference",
   description: "Complete reference for the docts CLI commands",
@@ -87,7 +87,7 @@ useSeo({
 
 The hook generates an `Article` schema using Schema.org vocabulary:
 
-```json
+```json:desc=JSON-LD Article schema example
 {
   "@context": "https://schema.org",
   "@type": "Article",
@@ -144,7 +144,7 @@ The `hasPart` sections include anchor links to each TOC item, enabling search en
 
 Open Graph tags enable rich previews when the page is shared on social platforms:
 
-```html
+```html:desc=Open Graph meta tags example
 <meta property="og:title" content="CLI Reference -- Documentation">
 <meta property="og:description" content="Complete reference for the docts CLI commands">
 <meta property="og:url" content="https://your-docs-site.com/docs/guides/cli-reference">
@@ -156,7 +156,7 @@ Open Graph tags enable rich previews when the page is shared on social platforms
 
 Twitter Card tags control how the page appears when shared on X/Twitter:
 
-```html
+```html:desc=Twitter Card meta tags example
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CLI Reference -- Documentation">
 <meta name="twitter:description" content="Complete reference for the docts CLI commands">
@@ -168,7 +168,7 @@ The `summary` card type creates a compact preview with title, description, and t
 
 The canonical URL link element prevents duplicate content issues:
 
-```html
+```html:desc=Canonical URL link element
 <link rel="canonical" id="canonical" href="https://your-docs-site.com/docs/guides/cli-reference">
 ```
 
@@ -180,7 +180,7 @@ The `#canonical` element must exist in the HTML template. The hook finds it by I
 
 Located at the project root, `sitemap.xml` lists all available pages for search engine crawlers:
 
-```xml
+```xml:desc=sitemap.xml example
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -195,7 +195,7 @@ Located at the project root, `sitemap.xml` lists all available pages for search 
 
 The `robots.txt` file at the project root controls crawler behavior:
 
-```
+```:desc=robots.txt example
 User-agent: *
 Allow: /
 
@@ -206,7 +206,7 @@ Sitemap: https://your-docs-site.com/sitemap.xml
 
 The `useSeo` hook also adds `data-*` attributes to the `#root` element for machine-readable content hints:
 
-```html
+```html:desc=LLM-friendly data attributes example
 <div id="root"
   data-page-slug="guides/cli-reference"
   data-page-title="CLI Reference"
@@ -229,7 +229,7 @@ The build pipeline generates semantic HTML that reinforces SEO:
 
 Because this is a SPA, `useSeo` runs as a side effect whenever the user navigates between documents:
 
-```mermaid
+```mermaid:desc=Dynamic SEO update sequence diagram
 sequenceDiagram
     participant Router
     participant Component as DocViewer

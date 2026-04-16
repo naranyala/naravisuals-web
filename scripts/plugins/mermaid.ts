@@ -48,8 +48,9 @@ export const mermaidPlugin: MarkdownPlugin = {
 
         // Decode HTML entities back to original diagram text
         // Also strip Shiki-generated <span> tags
-        const decoded = diagram
+        let decoded = diagram
           .replace(/&amp;/g, "&")
+          .replace(/&#x26;/g, "&")
           .replace(/&lt;/g, "<")
           .replace(/&#x3c;/gi, "<")
           .replace(/&gt;/g, ">")
@@ -60,14 +61,23 @@ export const mermaidPlugin: MarkdownPlugin = {
           .replace(/<\/?span[^>]*>/g, "")
           .trim();
 
+        // Replace newlines inside labels ([], (), {}) with <br/>
+        // This fixes Lexical errors when labels span multiple lines
+        decoded = decoded.replace(
+          /([\[\(\{])([\s\S]*?)([\]\)\}])/g,
+          (match, open, content, close) => {
+            return `${open}${content.replace(/\n/g, "<br/>")}${close}`;
+          }
+        );
+
         // Validate diagram content
         const validationErrors = validateMermaidContent(decoded);
         if (validationErrors.length > 0) {
           const errorDetails = validationErrors
             .map((err) => `  - ${err.message}: ${err.detail}`)
             .join("\n");
-          console.error(`\n❌ Mermaid validation error(s) in diagram ${id}:`, `\n${errorDetails}`);
-          // Create error container instead of failing completely
+          console.error(`\n⚠️ Mermaid validation warning in diagram ${id}:`, `\n${errorDetails}`);
+          // Render the diagram anyway, but keep the error details available in the UI
           const errorContainer = [
             `<div class="mermaid-diagram" data-processed="false" data-zoom="${zoomEnabled}" data-validation-error="true">`,
             `  <div class="mermaid-diagram-header">`,
@@ -76,9 +86,9 @@ export const mermaidPlugin: MarkdownPlugin = {
             `      <span class="mermaid-loading"><span class="mermaid-spinner"></span></span>`,
             `    </div>`,
             `  </div>`,
-            `  <div class="mermaid" style="display:none;">${escapeHtml(decoded)}</div>`,
+            `  <div class="mermaid">${escapeHtml(decoded)}</div>`,
             `  <div class="mermaid-error" style="display:block;">`,
-            `    <div class="mermaid-error-title">⚠ Validation Error</div>`,
+            `    <div class="mermaid-error-title">⚠ Validation Warning</div>`,
             `    <details>`,
             `      <summary>${validationErrors[0].message}</summary>`,
             `      <pre>${escapeHtml(errorDetails)}</pre>`,

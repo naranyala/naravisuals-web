@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, mock, test } from "bun:test";
-import { Sidebar } from "../src/Sidebar";
+import { Sidebar } from "../src/features/navigation/Sidebar";
 import { renderWithServices } from "./test-utils";
 
 const mockSidebar = [

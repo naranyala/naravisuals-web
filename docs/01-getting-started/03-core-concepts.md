@@ -13,7 +13,7 @@ This guide explains the fundamental concepts behind rspack-react-docs: how markd
 ## The Build Pipeline
 
 ```mermaid:desc=Detailed build pipeline showing each transformation step from raw markdown to generated TypeScript.
-flowchart TB
+flowchart tb
     subgraph Input["Input: docs/**/*.md"]
         MD["Raw Markdown Files"]
     end
@@ -111,7 +111,7 @@ These objects are written to `src/generated/` as TypeScript files and imported b
 ## The Frontend
 
 ```mermaid:desc=React component hierarchy showing how the app renders.
-flowchart TB
+flowchart tb
     A["frontend.tsx\nEntry Point"] --> B["ErrorBoundary"]
     B --> C["ServicesProvider\nDI Context"]
     C --> D["App.tsx\nRoot Component"]

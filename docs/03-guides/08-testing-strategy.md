@@ -11,7 +11,7 @@ The project uses **Bun's built-in test runner** with **Testing Library** for com
 
 ## Test Structure
 
-```
+```:desc=Test directory structure
 tests/
 ├── setup.ts                    # Global test setup
 ├── test-utils.tsx              # renderWithServices, mock data
@@ -36,7 +36,7 @@ tests/
 
 ## Running Tests
 
-```bash
+```bash:desc=Test running commands
 bun run test              # Run all tests once
 bun run test:watch        # Watch mode -- re-runs on file changes
 bun run test:coverage     # With coverage report (coverage/index.html)
@@ -53,7 +53,7 @@ docts test --coverage     # Coverage report
 
 The primary utility for testing React components. It wraps components with the DI provider using mock services:
 
-```typescript
+```typescript:desc=TypeScript code example
 // tests/test-utils.tsx
 
 export function renderWithServices(
@@ -89,7 +89,7 @@ export function renderWithServices(
 
 Pre-built mock data for common test scenarios:
 
-```typescript
+```typescript:desc=TypeScript code example
 export const mockDocEntry = {
   id: "test/doc",
   slug: "test/doc",
@@ -124,8 +124,8 @@ export const mockSidebarData = [
 
 The DI system (`src/services/container.ts`) defines 5 service interfaces that can be swapped for testing:
 
-```mermaid
-graph TD
+```mermaid:desc=Service container diagram
+flowchart td
     Container[ServiceContainer] --> Storage[IStorageService]
     Container --> Router[IRouterService]
     Container --> Dom[IDomService]
@@ -155,7 +155,7 @@ graph TD
 
 ### Example: Mock Storage Service
 
-```typescript
+```typescript:desc=TypeScript code example
 export function createMockStorage(): IStorageService {
   const store = new Map<string, string>();
   return {
@@ -171,7 +171,7 @@ export function createMockStorage(): IStorageService {
 
 Component tests use Testing Library queries and user interactions:
 
-```typescript
+```typescript:desc=TypeScript code example
 import { renderWithServices, screen } from "./test-utils";
 import { Sidebar } from "../src/components/Sidebar";
 
@@ -199,7 +199,7 @@ test("renders sidebar with categories", () => {
 
 Tests for the DI container and service implementations:
 
-```typescript
+```typescript:desc=TypeScript code example
 // tests/services.test.ts
 
 test("createContainer returns all services", () => {
@@ -223,7 +223,7 @@ test("theme service persists to storage", () => {
 
 Tests for the markdown processing pipeline:
 
-```typescript
+```typescript:desc=TypeScript code example
 // tests/build-pipeline.test.ts
 
 test("plugins transform markdown correctly", () => {
@@ -242,7 +242,7 @@ test("generated output matches expected structure", () => {
 
 Tests for the mermaid content validator:
 
-```typescript
+```typescript:desc=TypeScript code example
 // tests/mermaid-validation.test.ts
 
 test("validates valid mermaid syntax", () => {
@@ -260,7 +260,7 @@ test("detects invalid mermaid syntax", () => {
 
 Tests for boundary conditions and error handling:
 
-```typescript
+```typescript:desc=TypeScript code example
 // tests/edge-cases.test.ts
 
 test("handles empty markdown content", () => { /* ... */ });
@@ -273,7 +273,7 @@ test("handles missing services gracefully", () => { /* ... */ });
 
 Tests for the diagnostic system used by the build pipeline:
 
-```typescript
+```typescript:desc=TypeScript code example
 // tests/diagnostics.test.ts
 
 test("collects errors and warnings", () => {

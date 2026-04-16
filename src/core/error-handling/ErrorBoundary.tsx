@@ -75,5 +75,11 @@ interface DefaultErrorFallbackProps {
 
 function DefaultErrorFallback({ error }: DefaultErrorFallbackProps) {
   console.error("Error caught by boundary:", error.message);
-  return null;
+  return (
+    <div className="error-fallback">
+      <h2>Something went wrong.</h2>
+      <p>{error.message}</p>
+      <button onClick={() => window.location.reload()}>Reload Page</button>
+    </div>
+  );
 }

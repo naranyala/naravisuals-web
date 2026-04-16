@@ -13,7 +13,7 @@ The application uses a dependency injection container (`src/services/container.t
 
 The `IAppConfig` interface defines runtime application settings:
 
-```ts
+```ts:desc=IAppConfig interface definition
 export interface IAppConfig {
   siteTitle: string;          // Site title displayed in the top bar
   repoEditUrl: string;        // Base URL for "Edit this page" links
@@ -27,7 +27,7 @@ export interface IAppConfig {
 
 ### Default Values
 
-```ts
+```ts:desc=IAppConfig interface definition
 const defaultConfig: IAppConfig = {
   siteTitle: "Docs",
   repoEditUrl: "https://github.com/your-org/your-repo/edit/main",
@@ -41,7 +41,7 @@ const defaultConfig: IAppConfig = {
 
 Override config values when creating the container in `src/frontend.tsx`:
 
-```ts
+```ts:desc=IAppConfig interface definition
 import { createContainer } from "./services";
 
 const container = createContainer({
@@ -62,7 +62,7 @@ With this config, URLs will use `/documentation/slug` instead of `/docs/slug`, t
 
 Wraps `localStorage` for theme and preference persistence:
 
-```ts
+```ts:desc=IAppConfig interface definition
 export interface IStorageService {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
@@ -77,7 +77,7 @@ The default implementation (`createStorageService`) uses `localStorage` with sil
 
 Wraps the History API for client-side routing:
 
-```ts
+```ts:desc=IAppConfig interface definition
 export interface IRouterService {
   getCurrentPath(): string;
   pushState(state: unknown, title: string, url: string): void;
@@ -89,7 +89,7 @@ export interface IRouterService {
 
 The `buildUrl` method constructs URLs using the configured `routes.docs` prefix:
 
-```ts
+```ts:desc=IAppConfig interface definition
 // With routes.docs = "docs":
 router.buildUrl("docs", "getting-started/installation")
 // Returns: "/docs/getting-started/installation"
@@ -99,7 +99,7 @@ router.buildUrl("docs", "getting-started/installation")
 
 Wraps DOM manipulation APIs for viewport tracking, scrolling, and event subscriptions:
 
-```ts
+```ts:desc=IAppConfig interface definition
 export interface IDomService {
   getScrollY(): number;
   scrollTo(x: number, y: number): void;
@@ -120,7 +120,7 @@ All event subscription methods return an unsubscribe function for cleanup.
 
 Manages theme state and Mermaid loading status:
 
-```ts
+```ts:desc=IAppConfig interface definition
 export interface IThemeService {
   getInitialTheme(): boolean;                // true = dark
   applyTheme(isDark: boolean): void;
@@ -137,7 +137,7 @@ export interface IThemeService {
 
 The `ServiceContainer` interface aggregates all five services:
 
-```ts
+```ts:desc=IAppConfig interface definition
 export interface ServiceContainer {
   storage: IStorageService;
   router: IRouterService;
@@ -151,7 +151,7 @@ export interface ServiceContainer {
 
 The `createContainer()` function accepts a `ContainerOptions` object for overriding any service:
 
-```ts
+```ts:desc=IAppConfig interface definition
 export interface ContainerOptions {
   config?: Partial<IAppConfig>;
   storage?: IStorageService;
@@ -163,7 +163,7 @@ export interface ContainerOptions {
 
 ### Creating the Container
 
-```ts
+```ts:desc=IAppConfig interface definition
 export function createContainer(options: ContainerOptions = {}): ServiceContainer
 ```
 
@@ -175,8 +175,8 @@ Services are created in dependency order:
 4. `theme` -- depends on `storage` (for theme persistence)
 5. `config` -- built from defaults merged with overrides
 
-```mermaid
-graph TD
+```mermaid:desc=Service container creation diagram
+flowchart td
     A["ContainerOptions"] --> B["createStorageService"]
     A --> C["createRouterService"]
     A --> D["createDomService"]
@@ -200,7 +200,7 @@ graph TD
 
 ### Available Themes
 
-```ts
+```ts:desc=IAppConfig interface definition
 const THEMES = [
   { id: "paperlike-white", label: "Paper White", bg: "#ffffff", accent: "#2563eb" },
   { id: "paperlike-gray", label: "Paper Gray", bg: "#e8e8e8", accent: "#5b8db8" },
@@ -215,8 +215,8 @@ The default theme (when no preference is stored) is `paperlike-dark-gray`.
 
 ## Responsive Breakpoints
 
-```mermaid
-graph LR
+```mermaid:desc=Responsive breakpoints flow diagram
+flowchart lr
     A["Viewport Width"] --> B{"< 800px?"}
     B -->|yes| C["Mobile: sidebar overlay, hamburger menu"]
     B -->|no| D{"< 1100px?"}
@@ -231,7 +231,7 @@ graph LR
 
 These are evaluated reactively via `services.dom.onResize` in `App.tsx`:
 
-```ts
+```ts:desc=IAppConfig interface definition
 useEffect(() => {
   const update = () => {
     const w = services.dom.getViewportWidth();
@@ -259,7 +259,7 @@ The root path `/` and the docs prefix path (e.g., `/docs/`) both resolve to the 
 
 Services are provided via React context using `ServicesProvider`:
 
-```tsx
+```ts:desc=IAppConfig interface definitionx
 // frontend.tsx -- entry point
 <ServicesProvider container={defaultContainer}>
   <App />

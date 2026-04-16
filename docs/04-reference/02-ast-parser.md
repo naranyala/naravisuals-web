@@ -31,7 +31,7 @@ Marked.js produces tokens for each block-level element in markdown:
 
 A type union that adds optional fields to marked's base `Token` type so that subtype-specific properties are accessible without type casting:
 
-```ts
+```ts:desc=TypeScript type definition
 type ExtendedToken = Token & {
   raw?: string;       // Raw markdown text
   text?: string;      // Rendered text content
@@ -51,7 +51,7 @@ type ExtendedToken = Token & {
 
 A simplified tree node used for display and analysis:
 
-```ts
+```ts:desc=TypeScript type definition
 export interface ASTTokenNode {
   type: string;       // Token type name (e.g., "heading", "paragraph")
   raw?: string;
@@ -75,7 +75,7 @@ export interface ASTTokenNode {
 
 Converts a flat `Token[]` array from marked into a tree of `ASTTokenNode[]`:
 
-```ts
+```ts:desc=TypeScript type definition
 export function tokensToAST(tokens: Token[]): ASTTokenNode[]
 ```
 
@@ -86,8 +86,8 @@ The function recursively processes each token and nests children based on the to
 - `header` cells become children
 - `rows` are wrapped in a `"row"` node type with cell children
 
-```mermaid
-graph TD
+```mermaid:desc=tokensToAST function flow diagram
+flowchart td
     A["tokensToAST(tokens)"] --> B["tokenToNode(token)"]
     B --> C{has ext.tokens?}
     C -->|yes| D["recurse on tokens"]
@@ -108,13 +108,13 @@ graph TD
 
 Counts the total number of nodes in the AST tree:
 
-```ts
+```ts:desc=TypeScript type definition
 export function countNodes(ast: ASTTokenNode[]): number
 ```
 
 Recursively sums 1 for each node plus the count of all its children:
 
-```ts
+```ts:desc=TypeScript type definition
 // Example: a document with 1 heading + 1 paragraph + 1 code block
 // countNodes returns 3
 ```
@@ -123,11 +123,11 @@ Recursively sums 1 for each node plus the count of all its children:
 
 Returns a sorted array of all unique token type names found in the AST:
 
-```ts
+```ts:desc=TypeScript type definition
 export function getUniqueTypes(ast: ASTTokenNode[]): string[]
 ```
 
-```ts
+```ts:desc=TypeScript type definition
 // Example output: ["code", "heading", "list", "paragraph", "table"]
 ```
 
@@ -137,11 +137,11 @@ Useful for quickly understanding what kinds of elements a document contains.
 
 Returns the maximum nesting depth of the AST:
 
-```ts
+```ts:desc=TypeScript type definition
 export function getASTDepth(ast: ASTTokenNode[]): number
 ```
 
-```ts
+```ts:desc=TypeScript type definition
 // A flat document with only top-level tokens returns 1
 // A document with a list containing nested code returns 2+
 ```
@@ -161,7 +161,7 @@ Access it in the application via the AST viewer button in the top bar. It is gat
 
 ## Usage Example
 
-```ts
+```ts:desc=TypeScript type definition
 import { tokensToAST, countNodes, getUniqueTypes, getASTDepth } from "./ast-parser";
 
 // Get tokens from marked
@@ -182,8 +182,8 @@ console.log(`${total} nodes, types: ${types.join(", ")}, depth: ${depth}`);
 
 The AST data flows through the build pipeline as follows:
 
-```mermaid
-graph LR
+```mermaid:desc=Pipeline integration diagram
+flowchart lr
     A["Raw .md file"] --> B["marked.Lexer.lex()"]
     B --> C["Token[] array"]
     C --> D["Stored in DocEntry.ast"]

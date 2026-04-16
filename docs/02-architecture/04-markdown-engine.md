@@ -11,8 +11,8 @@ This document explains how the rspack-react-docs SSG converts raw Markdown files
 
 ## Overview
 
-```mermaid
-graph LR
+```mermaid:desc=Markdown processing pipeline overview
+flowchart lr
     A["Raw .md\nfiles"] --> B["parseFrontmatter"]
     B --> C["Extract content\nstring"]
     C --> D["preProcess plugins\nmath → admonitions"]
@@ -31,7 +31,7 @@ graph LR
 
 The build pipeline in `/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/scripts/build-docs.mts` orchestrates everything:
 
-```tsx
+```typescript:desc=Build pipeline plugin execution
 // Run preProcess plugins (in order)
 for (const plugin of plugins) {
   if (plugin.preProcess) {
@@ -55,7 +55,7 @@ for (let i = plugins.length - 1; i >= 0; i--) {
 
 `/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/scripts/plugins/types.ts` defines the `MarkdownPlugin` interface:
 
-```tsx
+```typescript:desc=MarkdownPlugin interface definition
 export interface MarkdownPlugin {
   /** Unique plugin name */
   name: string;
@@ -79,7 +79,7 @@ export interface MarkdownPlugin {
 
 `/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/scripts/plugins/index.ts` registers all plugins in execution order:
 
-```tsx
+```typescript:desc=Plugin registry definition
 import { admonitionsPlugin } from "./admonitions.ts";
 import { mathPlugin } from "./math.ts";
 import { mermaidPlugin } from "./mermaid.ts";
@@ -100,7 +100,7 @@ The build script creates a custom `marked.Renderer()` and overrides two methods:
 
 ### Code Block Renderer with Shiki
 
-```tsx
+```typescript:desc=Custom code renderer with Shiki highlighting
 renderer.code = ({ text, lang: rawLang }) => {
   const meta = parseCodeInfo(rawLang);
 
@@ -119,7 +119,7 @@ renderer.code = ({ text, lang: rawLang }) => {
 
 The `codeBlockWrapper` function produces a structured container:
 
-```tsx
+```typescript:desc=Code block wrapper function implementation
 function codeBlockWrapper(inner: string, meta: CodeBlockMeta) {
   const langLabel = meta.label || (meta.lang
     ? meta.lang.charAt(0).toUpperCase() + meta.lang.slice(1) : "");
@@ -143,7 +143,7 @@ function codeBlockWrapper(inner: string, meta: CodeBlockMeta) {
 
 The `parseCodeInfo` function parses the fence info string to extract optional parameters:
 
-```tsx
+```typescript:desc=Code info parsing function with supported syntaxes
 /**
  * Supported syntaxes:
  *   ```typescript
@@ -170,7 +170,7 @@ The supported metadata keys:
 
 ### Heading Renderer with Docusaurus-Compatible Slugifier
 
-```tsx
+```typescript:desc=Custom heading renderer with Docusaurus-compatible slugifier
 renderer.heading = ({ text, depth }) => {
   const id = slugifyHeading(text);
   return `<h${depth} id="${id}">${text}<a class="hash-link" href="#${id}" aria-label="${text} permalink">#</a></h${depth}>`;
@@ -179,7 +179,7 @@ renderer.heading = ({ text, depth }) => {
 
 The `slugifyHeading` function produces Docusaurus-compatible URL slugs:
 
-```tsx
+```typescript:desc=Slugify heading function implementation
 const SPECIAL_CASES: Record<string, string> = {
   "c++": "c-plus-plus",
   "c#": "c-sharp",
@@ -212,7 +212,7 @@ Examples:
 
 The build script initializes Shiki once at the top:
 
-```tsx
+```typescript:desc=Shiki highlighter initialization
 const highlighter = await createHighlighter({
   themes: ["github-dark"],
   langs: [
@@ -266,7 +266,7 @@ Handles three math formats:
    ```
    Replaces with `MATHINLINE2END`.
 
-```tsx
+```typescript:desc=Math plugin preProcess implementation
 preProcess(md: string): string {
   blocks.length = 0;
   let index = 0;
@@ -291,7 +291,7 @@ preProcess(md: string): string {
 
 Replaces each sentinel with the appropriate HTML wrapper containing MathJax delimiters (`\(...\)` for inline, `\[...\]` for display):
 
-```tsx
+```typescript:desc=Math plugin postProcess implementation
 postProcess(html: string): string {
   for (const block of blocks) {
     if (block.display) {
@@ -328,7 +328,7 @@ Implements Docusaurus-style callout blocks with `:::type` syntax.
 #### Input/Output
 
 **Input:**
-```markdown
+```markdown:desc=Admonition input example
 :::tip
 This is a tip with **markdown** support.
 
@@ -338,7 +338,7 @@ This is a tip with **markdown** support.
 ```
 
 **Output:**
-```html
+```html:desc=Admonition HTML output
 <div class="admonition admonition-tip">
   <div class="admonition-heading">
     <span class="admonition-icon">💡</span> Tip
@@ -354,7 +354,7 @@ This is a tip with **markdown** support.
 
 You can override the default title:
 
-```markdown
+```markdown:desc=Admonition with custom title
 :::note My Custom Title
 Content here.
 :::
@@ -372,7 +372,7 @@ The content between the opening and closing `:::` is preserved as raw markdown (
 
 For each sentinel, the inner content is passed through `marked.parse()` to convert it to HTML, then wrapped in the admonition structure:
 
-```tsx
+```typescript:desc=Admonitions plugin postProcess implementation
 postProcess(html: string): string {
   for (const block of blocks) {
     const meta = ADMONITION_META[block.type] || { ... };
@@ -407,7 +407,7 @@ Transforms ` ```mermaid ` code blocks (produced by Shiki + custom renderer) into
 
 The mermaid plugin does nothing in `preProcess` -- it lets marked process the markdown normally so Shiki highlights the mermaid code block:
 
-```tsx
+```typescript:desc=Mermaid plugin preProcess pass-through
 preProcess(md: string): string {
   return md; // No transformation needed
 }
@@ -417,7 +417,7 @@ preProcess(md: string): string {
 
 In `postProcess`, it matches the HTML output of the code block wrapper looking for `Mermaid` language labels:
 
-```tsx
+```typescript:desc=Mermaid plugin regex for code block matching
 const mermaidRegex =
   /<div class="code-block"[^>]*>([\s\S]*?)<div class="code-header">([\s\S]*?)
     <span class="code-lang">Mermaid<\/span>([\s\S]*?)<\/div>
@@ -436,7 +436,7 @@ For each match:
 
 After all replacements, sentinels are replaced with mermaid diagram containers:
 
-```tsx
+```typescript:desc=Mermaid diagram container HTML generation
 const container = [
   `<div class="mermaid-diagram" data-processed="false" data-zoom="${block.zoom}">`,
   `  <div class="mermaid-diagram-header">`,
@@ -462,7 +462,7 @@ The plugin calls `validateMermaidContent()` from `/scripts/plugins/validators/me
 
 ## Complete Plugin Execution Flow
 
-```mermaid
+```mermaid:desc=Sequence diagram showing complete plugin execution flow
 sequenceDiagram
     participant Build as build-docs.mts
     participant Math as math plugin
@@ -501,7 +501,7 @@ sequenceDiagram
 
 Separate from the plugin pipeline, the `extractTOC()` function scans the raw markdown content (before plugin processing) for headings:
 
-```tsx
+```typescript:desc=TOC extraction function implementation
 function extractTOC(content: string) {
   const toc: DocEntry["toc"] = [];
   const re = /^(#{2,3})\s+(.+)$/gm;
@@ -522,7 +522,7 @@ Only `h2` (`##`) and `h3` (`###`) headings are included. The TOC data is stored 
 
 The `parseFrontmatter()` function handles YAML-style frontmatter:
 
-```yaml
+```yaml:desc=YAML frontmatter example
 ---
 title: Build Pipeline
 description: How the SSG works

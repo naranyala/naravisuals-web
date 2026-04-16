@@ -11,8 +11,8 @@ The documentation site supports two print modes: **browser print** (via `window.
 
 ## Print Architecture
 
-```mermaid
-graph TD
+```mermaid:desc=Print architecture flow diagram
+flowchart td
     User[User clicks Print] --> PrintAll[printAllDocs in App.tsx]
     PrintAll --> Mermaid[Render Mermaid SVGs]
     Mermaid --> Clone[Clone doc-content DOM]
@@ -26,7 +26,7 @@ graph TD
 
 Located in `src/App.tsx`, `printAllDocs` is triggered by the print button in the top bar:
 
-```typescript
+```typescript:desc=printAllDocs function implementation
 const printAllDocs = async () => {
   // 1. Render all mermaid diagrams as SVGs
   // 2. Clone the DOM content
@@ -44,7 +44,7 @@ Before print, all Mermaid diagrams must be rendered from their raw text source i
 1. Finds all `.mermaid-diagram[data-processed='false']` elements
 2. Dynamically imports and initializes mermaid with print-friendly settings:
 
-```typescript
+```typescript:desc=Mermaid initialization for print
 const { default: mermaid } = await import("mermaid");
 mermaid.initialize({
   startOnLoad: false,
@@ -66,8 +66,8 @@ mermaid.initialize({
    - Filled shapes (non-white fills): `fill: "#ffffff"` (white background)
    - All shapes: `stroke: "#6b7280"` (visible border)
 
-```mermaid
-graph LR
+```mermaid:desc=Mermaid print rendering flow
+flowchart lr
     A[Raw mermaid text] --> B[mermaid.parse]
     B --> C[mermaid.render]
     C --> D[SVG output]
@@ -83,7 +83,7 @@ graph LR
 
 The function clones the `.doc-content` element to avoid modifying the live page:
 
-```typescript
+```typescript:desc=DOM clone for print
 const docContentEl = document.querySelector(".doc-content");
 const clone = docContentEl.cloneNode(true) as HTMLElement;
 ```
@@ -92,7 +92,7 @@ const clone = docContentEl.cloneNode(true) as HTMLElement;
 
 Removes elements that shouldn't appear in print:
 
-```typescript
+```typescript:desc=Remove interactive elements for print
 clone.querySelectorAll(
   ".code-copy-btn, .mermaid-zoom-btn, .mermaid-download-btn"
 ).forEach(el => el.remove());
@@ -119,7 +119,7 @@ The function creates a complete HTML document with:
 - **Print-specific page-break rules**: Avoid breaks inside code blocks, admonitions, diagrams, tables
 - **Serif font**: Georgia/Palatino for print readability
 
-```css
+```css:desc=Print page CSS rules
 @page {
   margin: 2cm 1.8cm;
   size: A4;
@@ -139,7 +139,7 @@ The function creates a complete HTML document with:
 
 Uses the `blob + window.open` approach:
 
-```typescript
+```typescript:desc=Open print window
 const printWindow = window.open("", "_blank");
 printWindow.document.write(printHtml);
 printWindow.document.close();
@@ -150,7 +150,7 @@ printWindow.document.close();
 
 `src/styles/print-media.css` provides `@media print` rules for the browser's native print:
 
-```css
+```css:desc=Print media CSS styles
 @media print {
   /* Hide all UI elements */
   .top-bar, .sidebar, .toc-container, .scroll-panel,
@@ -236,7 +236,7 @@ Mermaid diagrams are specially processed for print:
 
 `src/styles/print-view.css` provides styling for the dedicated print preview window:
 
-```css
+```css:desc=Print view CSS
 .print-view {
   min-height: 100vh;
   padding: 2rem;

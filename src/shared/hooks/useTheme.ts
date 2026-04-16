@@ -6,7 +6,7 @@
  */
 
 import { useCallback, useState } from "react";
-import { useServices } from "../services";
+import { useServices } from "../../services";
 
 export function useTheme(): [boolean, () => void] {
   const services = useServices();

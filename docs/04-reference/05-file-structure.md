@@ -11,7 +11,7 @@ This document provides a complete overview of the project directory tree and exp
 
 ## Directory Tree
 
-```
+```:desc=Directory tree example
 rspack-react-docs/
 ├── docs/                    # Markdown source files for documentation
 │   ├── 00-welcome.md        # Landing page (first doc in sidebar)
@@ -127,7 +127,7 @@ rspack-react-docs/
 
 Contains all markdown source files. Numeric prefixes (`00-`, `01-`, etc.) control the display order in the sidebar and are stripped from the final URLs.
 
-```
+```:desc=Doc file mapping example
 docs/01-getting-started/01-project-overview.md
                                        --> slug: "getting-started/project-overview"
                                        --> sidebar_position: 1 (from filename prefix)
@@ -169,8 +169,8 @@ Jest test files for unit and integration testing of components, hooks, and build
 
 ## Build Pipeline Overview
 
-```mermaid
-graph TB
+```mermaid:desc=Build pipeline overview diagram
+flowchart tb
     A["docs/*.md"] --> B["scripts/build-docs.mts"]
     B --> C["Parse frontmatter"]
     C --> D["Run preProcess plugins"]

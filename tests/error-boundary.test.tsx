@@ -5,7 +5,7 @@
 import { describe, expect, mock, spyOn, test } from "bun:test";
 import { render } from "@testing-library/react";
 import { createElement as h } from "react";
-import { ErrorBoundary } from "../src/ErrorBoundary";
+import { ErrorBoundary } from "../src/core/error-handling/ErrorBoundary";
 
 // Helper: component that throws during render
 function BrokenComponent() {
@@ -28,9 +28,9 @@ describe("ErrorBoundary", () => {
 
     const { getByText, getByRole } = render(h(ErrorBoundary, null, h(BrokenComponent)));
 
-    expect(getByText("Something went wrong")).toBeTruthy();
+    expect(getByText(/something went wrong/i)).toBeTruthy();
     expect(getByText("Test render error")).toBeTruthy();
-    expect(getByRole("button", { name: /try again/i })).toBeTruthy();
+    expect(getByRole("button", { name: /reload page/i })).toBeTruthy();
 
     spy.mockRestore();
   });

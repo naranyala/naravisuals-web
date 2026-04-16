@@ -11,7 +11,7 @@ The validation system scans all markdown files in the `docs/` and `blog/` direct
 
 ## Running Validation
 
-```bash
+```bash:desc=Validation commands
 bun run validate          # Human-readable output
 bun run validate:strict   # Exit code 1 on strict failures
 bun run validate:stats    # Summary statistics only
@@ -20,7 +20,7 @@ bun run validate:llm      # LLM-friendly action items
 
 These map to the underlying script:
 
-```bash
+```bash:desc=Underlying validation script commands
 bun run scripts/validate-all.mts           # All validators, human output
 bun run scripts/validate-all.mts --strict  # Exit 1 on strict failures
 bun run scripts/validate-all.mts --stats   # Summary only
@@ -29,8 +29,8 @@ bun run scripts/validate-all.mts --llm     # LLM action items format
 
 ## Validator Architecture
 
-```mermaid
-graph TD
+```mermaid:desc=Validator architecture diagram
+flowchart td
     Entry[validate-all.mts] --> Scan[Scan markdown files]
     Scan --> Mode{Output Mode}
     Mode -->|--llm| LLM[LLM Output Mode]
@@ -55,7 +55,7 @@ graph TD
 
 Validators are registered in `scripts/plugins/validators/index.ts`:
 
-```typescript
+```typescript:desc=Validator registry definition
 export const validators: MarkdownValidator[] = [
   codeblockValidator,    // STRICT
   mermaidValidator,      // STRICT
@@ -79,7 +79,7 @@ export const validators: MarkdownValidator[] = [
 
 The interface that all validators must implement:
 
-```typescript
+```typescript:desc=Validator registry definition
 export interface MarkdownValidator {
   /** Unique validator name */
   name: string;
@@ -99,7 +99,7 @@ export interface MarkdownValidator {
 
 What each validator returns:
 
-```typescript
+```typescript:desc=Validator registry definition
 export interface ValidationResult {
   /** Number of items checked */
   checked: number;
@@ -114,7 +114,7 @@ export interface ValidationResult {
 
 Individual issue details:
 
-```typescript
+```typescript:desc=Validator registry definition
 export type ValidationSeverity = "error" | "warning" | "info";
 
 export interface ValidationIssue {
@@ -132,10 +132,10 @@ export interface ValidationIssue {
 
 Provides colored terminal output with badges, per-validator sections, and issue details:
 
-```
+```:desc=Human mode validation output example
 ────────────────────────────────────────────────────────────────────────────────
   [icon]  Code Block Validator
-════════════════════════════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════════════════════════════
 
   [ERROR]  docs/01-getting-started/01-introduction.md:42
            Code block missing description
@@ -152,7 +152,7 @@ Provides colored terminal output with badges, per-validator sections, and issue 
 
 Per-validator summary table with PASS/FAIL status:
 
-```
+```:desc=Validator summary table example
 Code Block Validator     ✓ PASS   (clean)
 Mermaid Validator        ✗ FAIL   (strict)  (1 errors, 0 warnings, 0 info)
 Frontmatter Validator    ✓ PASS   (clean)
@@ -164,7 +164,7 @@ Reference Validator      ✓ PASS   (clean)
 
 Shows only the summary statistics without individual issue details:
 
-```
+```:desc=Stats mode output example
 Code Block Validator     ✓ PASS   (clean)
 Mermaid Validator        ✓ PASS   (clean)
 ...
@@ -174,7 +174,8 @@ Mermaid Validator        ✓ PASS   (clean)
 
 Outputs structured markdown with action items organized by priority. Designed for automated agents:
 
-```markdown
+```markdown:desc=LLM mode output example
+<!-- VALIDATION_START -->
 <!-- VALIDATION_START -->
 
 ## Validation Results
@@ -219,7 +220,7 @@ Issues are categorized with priority levels:
 
 When `--strict` is passed, the script exits with code 1 if any strict validator has errors:
 
-```bash
+```bash:desc=Strict mode validation command
 bun run scripts/validate-all.mts --strict
 # Exit code 1 if codeblockValidator, mermaidValidator, or referenceValidator found errors
 ```
@@ -252,8 +253,8 @@ Validation is integrated into the CLI's build process:
 - **Docs mode** (`docts docs`): Runs `validate:strict` before regenerating docs (unless `--skip-validation` is passed)
 - **CI/CD**: Use `bun run validate:strict` to enforce content quality gates
 
-```mermaid
-graph LR
+```mermaid:desc=Build pipeline integration diagram
+flowchart lr
     A[docts docs] --> B{skip-validation?}
     B -->|no| C[validate:strict]
     B -->|yes| D[build-docs.mts]
@@ -266,7 +267,7 @@ graph LR
 
 To add a new validator, implement the `MarkdownValidator` interface and register it in `scripts/plugins/validators/index.ts`:
 
-```typescript
+```typescript:desc=Validator registry definition
 import type { MarkdownValidator, ValidationResult } from "./types.ts";
 
 export const myValidator: MarkdownValidator = {
@@ -286,7 +287,7 @@ export const myValidator: MarkdownValidator = {
 
 Then add it to the registry:
 
-```typescript
+```typescript:desc=Validator registry definition
 export const validators: MarkdownValidator[] = [
   codeblockValidator,
   mermaidValidator,

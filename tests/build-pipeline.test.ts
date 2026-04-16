@@ -485,7 +485,7 @@ describe("mathPlugin — postProcess", () => {
 
 describe("mermaidPlugin — postProcess", () => {
   test("transforms mermaid code block", () => {
-    const html = `<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span><button>Copy</button></div><pre><code class="language-mermaid">graph TD;
+    const html = `<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span><button>Copy</button></div><pre><code class="language-mermaid">flowchart TD;
 A--&gt;B;</code></pre></div>`;
     const result = mermaidPlugin.postProcess?.(html);
     expect(result).toContain("mermaid-diagram");
@@ -496,7 +496,7 @@ A--&gt;B;</code></pre></div>`;
 
   test("handles multiple mermaid diagrams", () => {
     const html = [
-      '<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">graph TD;A--&gt;B;</code></pre></div>',
+      '<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">flowchart TD;A--&gt;B;</code></pre></div>',
       '<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">sequenceDiagram;A-&gt;&gt;B:Hello;</code></pre></div>',
     ].join("\n");
     const result = mermaidPlugin.postProcess?.(html);
@@ -509,7 +509,7 @@ A--&gt;B;</code></pre></div>`;
 
   test("decodes HTML entities in diagram source", () => {
     const html =
-      '<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">A--&gt;B;</code></pre></div>';
+      '<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">flowchart TD;A--&gt;B;</code></pre></div>';
     const result = mermaidPlugin.postProcess?.(html);
     // The plugin decodes entities then re-escapes for safe HTML embedding.
     // The resulting text in the .mermaid element is entity-encoded, which
@@ -706,7 +706,7 @@ More text.`;
     // the build script's renderer.  Simulate that by running the build-script
     // wrapper manually.
     const md = `\`\`\`mermaid
-graph TD;
+flowchart TD;
 A-->B;
 \`\`\``;
 

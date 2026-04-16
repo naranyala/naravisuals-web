@@ -9,7 +9,7 @@ sidebar_position: 1
 
 The `docts` CLI is the unified command-line interface for the SSG Documentation Site Generator. It handles everything from development to production deployment through a single entry point.
 
-```
+```:desc=CLI usage syntax
 docts <command> [options]
 ```
 
@@ -17,8 +17,8 @@ The CLI is defined in [scripts/cli.mts](/docs/guides/cli-reference) and is regis
 
 ## Command Overview
 
-```mermaid
-graph LR
+```mermaid:desc=CLI command overview diagram
+flowchart lr
     CLI[docts CLI] --> dev[dev]
     CLI --> build[build]
     CLI --> start[start]
@@ -37,7 +37,7 @@ graph LR
 
 Starts the development server with Hot Module Replacement (HMR). Builds documentation from markdown sources and starts the rspack dev server.
 
-```bash
+```bash:desc=Dev command examples
 docts dev              # Start on default port 3000
 docts dev -p 8080      # Start on port 8080
 docts serve            # Alias for dev
@@ -55,7 +55,7 @@ docts serve            # Alias for dev
 
 Builds the project for production. Runs a multi-step pipeline including cleaning, documentation generation, linting, rspack bundling, and asset copying.
 
-```bash
+```bash:desc=Build command examples
 docts build                    # Full production build
 docts build --no-lint          # Skip lint checks
 docts build --strict           # Fail on lint errors
@@ -66,8 +66,8 @@ docts bundle                   # Alias for build
 
 **Build pipeline:**
 
-```mermaid
-graph TD
+```mermaid:desc=Build pipeline flow diagram
+flowchart td
     A[build start] --> B[clean dist/]
     B --> C[build docs]
     C --> D{lint?}
@@ -95,7 +95,7 @@ graph TD
 
 Serves the production build from `dist/` as a static file server with SPA fallback. Requires a prior `build`.
 
-```bash
+```bash:desc=Start command examples
 docts start              # Serve on port 3000
 docts start -p 4000      # Serve on port 4000
 ```
@@ -106,7 +106,7 @@ Uses the `serve` package under the hood: `npx serve dist -p <port> -s`.
 
 Combines `build` + `start` in a single command. Builds the project and immediately serves it locally.
 
-```bash
+```bash:desc=Preview command examples
 docts preview            # Build + serve on port 3000
 docts preview -p 9000    # Build + serve on port 9000
 ```
@@ -117,7 +117,7 @@ All build options (`--no-lint`, `--strict`, `--no-clean`) apply to the build pha
 
 Regenerates documentation only -- scans markdown files and writes generated TypeScript to `src/generated/`. Does not trigger a rspack bundle build.
 
-```bash
+```bash:desc=Docs command examples
 docts docs                      # Regenerate docs
 docts docs --skip-validation    # Skip content validation
 ```
@@ -133,7 +133,7 @@ docts docs --skip-validation    # Skip content validation
 
 Runs Biome code quality checks across the project.
 
-```bash
+```bash:desc=Lint command examples
 docts lint              # Check code quality
 docts check             # Alias for lint
 ```
@@ -142,7 +142,7 @@ docts check             # Alias for lint
 
 Runs Biome with `--write` to auto-fix lint issues.
 
-```bash
+```bash:desc=Lint fix command
 docts lint:fix          # Auto-fix lint issues
 ```
 
@@ -150,7 +150,7 @@ docts lint:fix          # Auto-fix lint issues
 
 Runs the test suite using Bun's built-in test runner.
 
-```bash
+```bash:desc=Test command examples
 docts test              # Run tests once
 docts test --watch      # Watch mode
 docts test --coverage   # With coverage report
@@ -161,7 +161,7 @@ docts tests             # Alias for test
 
 Removes build artifacts (`dist/` and `coverage/`).
 
-```bash
+```bash:desc=Clean command
 docts clean             # Clean dist/ and coverage/
 ```
 
@@ -169,7 +169,7 @@ docts clean             # Clean dist/ and coverage/
 
 Displays project information including package details, file counts, build status, dependency versions, and available commands.
 
-```bash
+```bash:desc=Info command examples
 docts info              # Show project information
 docts status            # Alias for info
 ```
@@ -206,24 +206,26 @@ The CLI maps several alternative command names to the same handler:
 
 The project's `package.json` provides convenience scripts:
 
-```json
-"dev": "bun run scripts/cli.mts dev"
-"build": "bun run scripts/cli.mts build"
-"start": "bun run scripts/cli.mts start"
-"preview": "bun run scripts/cli.mts preview"
-"build:docs": "bun run scripts/cli.mts docs"
-"test": "bun run scripts/cli.mts test"
-"test:watch": "bun run scripts/cli.mts test --watch"
-"test:coverage": "bun run scripts/cli.mts test --coverage"
-"lint": "bun run scripts/cli.mts lint"
-"lint:fix": "bun run scripts/cli.mts lint:fix"
-"clean": "bun run scripts/cli.mts clean"
-"info": "bun run scripts/cli.mts info"
+```json:desc=NPM scripts in package.json
+{
+  "dev": "bun run scripts/cli.mts dev",
+  "build": "bun run scripts/cli.mts build",
+  "start": "bun run scripts/cli.mts start",
+  "preview": "bun run scripts/cli.mts preview",
+  "build:docs": "bun run scripts/cli.mts docs",
+  "test": "bun run scripts/cli.mts test",
+  "test:watch": "bun run scripts/cli.mts test --watch",
+  "test:coverage": "bun run scripts/cli.mts test --coverage",
+  "lint": "bun run scripts/cli.mts lint",
+  "lint:fix": "bun run scripts/cli.mts lint:fix",
+  "clean": "bun run scripts/cli.mts clean",
+  "info": "bun run scripts/cli.mts info"
+}
 ```
 
 Usage:
 
-```bash
+```bash:desc=Bun run examples
 bun run dev                    # Equivalent to docts dev
 bun run build                  # Equivalent to docts build
 bun run test:coverage          # Equivalent to docts test --coverage
@@ -231,7 +233,7 @@ bun run test:coverage          # Equivalent to docts test --coverage
 
 ## Examples
 
-```bash
+```bash:desc=CLI command examples
 # Development workflow
 docts dev                      # Start dev server on port 3000
 docts dev -p 8080              # Start dev server on port 8080
@@ -257,7 +259,7 @@ docts docs --skip-validation   # Skip validation
 
 ## CLI Architecture
 
-```mermaid
+```mermaid:desc=CLI architecture sequence diagram
 sequenceDiagram
     participant User
     participant CLI as cli.mts

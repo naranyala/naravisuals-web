@@ -78,7 +78,7 @@ Your dev server is now running at `http://localhost:3000`.
 ## Project at a Glance
 
 ```mermaid:desc=High-level architecture showing the build pipeline from markdown source to final SPA.
-flowchart TB
+flowchart tb
     subgraph Source["Source"]
         MD["docs/**/*.md"]
     end

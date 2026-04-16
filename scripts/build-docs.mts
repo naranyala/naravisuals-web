@@ -18,18 +18,10 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { colors, Logger } from "./core/index.ts";
+import { paths } from "./core/paths.ts";
 
-// Terminal colors for output
-const colors = {
-  reset: "\x1b[0m",
-  bright: "\x1b[1m",
-  dim: "\x1b[2m",
-  red: "\x1b[31m",
-  green: "\x1b[32m",
-  yellow: "\x1b[33m",
-  blue: "\x1b[34m",
-  cyan: "\x1b[36m",
-};
+const logger = new Logger();
 
 import { marked } from "marked";
 import { createHighlighter, type Language } from "shiki";
@@ -44,7 +36,7 @@ import { plugins } from "./plugins/index.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const ROOT = path.resolve(__dirname, "..");
+const ROOT = paths.root;
 const DOCS_DIR = path.join(ROOT, "docs");
 const BLOG_DIR = path.join(ROOT, "blog");
 const GEN_DIR = path.join(ROOT, "src", "generated");
@@ -545,22 +537,22 @@ function escapeSingleLineJson(s: string): string {
 // ---- Main ----
 const diags = new Diagnostics();
 
-console.log("📚 Scanning docs…");
+logger.raw("📚 Scanning docs…");
 const docs = scanMdFiles(DOCS_DIR, "docs", diags);
 const blogs = scanMdFiles(BLOG_DIR, "blog", diags);
 const all = [...docs, ...blogs];
 const sidebar = buildSidebar(all);
 
-console.log(`✅ Found ${docs.length} docs`);
+logger.raw(`✅ Found ${docs.length} docs`);
 
 // ─── AST/Token Summary ────────────────────────────────────────────
+const totalTokens = all.reduce((sum, doc) => sum + (doc.ast?.length || 0), 0);
+logger.raw(`📊 ${all.length} articles, ${totalTokens} total tokens`);
+
+// List article titles
 for (const doc of all) {
-  if (doc.ast && doc.ast.length > 0) {
-    const tokenTypes = new Set(doc.ast.map((t: any) => t.type));
-    console.log(
-      `  📊 ${doc.slug}: ${doc.ast.length} tokens, ${tokenTypes.size} types (${Array.from(tokenTypes).slice(0, 5).join(", ")}${tokenTypes.size > 5 ? "..." : ""})`
-    );
-  }
+  const tokenCount = doc.ast?.length || 0;
+  logger.raw(`  📄 ${doc.slug}: ${tokenCount} tokens`);
 }
 
 // ─── Deferred validations ─────────────────────────────────────────
@@ -615,15 +607,15 @@ for (const doc of all) {
 // ─── Report diagnostics ──────────────────────────────────────────
 const summary = diags.summary();
 if (summary.errors > 0 || summary.warnings > 0) {
-  console.log("");
-  console.log(diags.format());
-  console.log("");
+  logger.raw("");
+  logger.raw(diags.format());
+  logger.raw("");
 }
 
 // ─── Admonitions Analysis ──────────────────────────────────────────
-console.log("");
-console.log(`${colors.cyan}${colors.bright}📋 Admonitions Analysis${colors.reset}`);
-console.log("═".repeat(60));
+logger.raw("");
+logger.raw(`${colors.cyan}${colors.bright}📋 Admonitions Analysis${colors.reset}`);
+logger.raw("═".repeat(60));
 
 const allAdmonitions: Record<string, { total: number; byType: Record<string, number> }> = {};
 let filesWithAdmonitions = 0;
@@ -680,12 +672,12 @@ for (const [file, stats] of sortedFiles) {
   const types = Object.entries(stats.byType)
     .map(([type, count]) => `${type}: ${count}`)
     .join(", ");
-  console.log(`\n${colors.green}✓${colors.reset} ${file}`);
-  console.log(`   Total: ${stats.total} | ${types}`);
+  logger.raw(`\n${colors.green}✓${colors.reset} ${file}`);
+  logger.raw(`   Total: ${stats.total} | ${types}`);
 }
 
 if (filesWithoutAdmonitions > 0) {
-  console.log(
+  logger.raw(
     `\n${colors.yellow}⚠ Files without admonitions (${filesWithoutAdmonitions}):${colors.reset}`
   );
   let count = 0;
@@ -713,14 +705,14 @@ if (filesWithoutAdmonitions > 0) {
     }
     const analysis = analyzeAdmonitions(rawContent, doc.id, diags);
     if (!analysis.hasAdmonitions && count < 15) {
-      console.log(`   - ${doc.id}`);
+      logger.raw(`   - ${doc.id}`);
       count++;
     }
   }
   if (filesWithoutAdmonitions > 15) {
-    console.log(`   ... and ${filesWithoutAdmonitions - 15} more`);
+    logger.raw(`   ... and ${filesWithoutAdmonitions - 15} more`);
   }
-  console.log(
+  logger.raw(
     `\n${colors.dim}💡 Tip: Add :::tip, :::warning, :::note for better context and clarity${colors.reset}`
   );
 }
@@ -733,19 +725,19 @@ for (const stats of Object.values(allAdmonitions)) {
     typeTotals[type] = (typeTotals[type] || 0) + count;
   }
 }
-console.log(
+logger.raw(
   `\n${colors.bright}Summary:${colors.reset} ${totalAdmonitions} total admonitions across ${filesWithAdmonitions} files`
 );
-console.log(
+logger.raw(
   `By type: ${Object.entries(typeTotals)
     .map(([t, c]) => `${t}=${c}`)
     .join(", ")}`
 );
 
 // ─── Content Enrichment Analysis ───────────────────────────────────
-console.log("");
-console.log(`${colors.cyan}${colors.bright}📊 Content Enrichment Analysis${colors.reset}`);
-console.log("═".repeat(60));
+logger.raw("");
+logger.raw(`${colors.cyan}${colors.bright}📊 Content Enrichment Analysis${colors.reset}`);
+logger.raw("═".repeat(60));
 
 interface FileContentStats {
   codeBlocks: number;
@@ -810,56 +802,56 @@ const sortedByEnrichment = Object.entries(allContentStats).sort((a, b) => {
 });
 
 // Show files with least enrichment (most potential)
-console.log(`\n${colors.yellow}Files needing enrichment (sorted by priority):${colors.reset}`);
+logger.raw(`\n${colors.yellow}Files needing enrichment (sorted by priority):${colors.reset}`);
 let shown = 0;
 for (const [file, stats] of sortedByEnrichment) {
   if (shown >= 20) break;
   const score =
     stats.codeBlocks + stats.mermaidBlocks + stats.admonitions + stats.references + stats.footnotes;
   if (score < 5) {
-    console.log(`\n${colors.dim}${file}${colors.reset}`);
-    console.log(
+    logger.raw(`\n${colors.dim}${file}${colors.reset}`);
+    logger.raw(
       `   code: ${stats.codeBlocks} | mermaid: ${stats.mermaidBlocks} | admonitions: ${stats.admonitions} | refs: ${stats.references} | footnotes: ${stats.footnotes}`
     );
     shown++;
   }
 }
 
-console.log(`\n${colors.bright}Overall Summary:${colors.reset}`);
-console.log(`   Code blocks: ${totalCodeBlocks} (${totalMermaidBlocks} mermaid)`);
-console.log(`   Admonitions: ${totalAdmonitionsCount}`);
-console.log(`   References: ${totalReferences}`);
-console.log(`   Footnotes: ${totalFootnotes}`);
-console.log(
+logger.raw(`\n${colors.bright}Overall Summary:${colors.reset}`);
+logger.raw(`   Code blocks: ${totalCodeBlocks} (${totalMermaidBlocks} mermaid)`);
+logger.raw(`   Admonitions: ${totalAdmonitionsCount}`);
+logger.raw(`   References: ${totalReferences}`);
+logger.raw(`   Footnotes: ${totalFootnotes}`);
+logger.raw(
   `\n${colors.dim}💡 Higher counts = more enriched content. Files with low counts need attention.${colors.reset}`
 );
 
 // ─── Broken Links Summary ────────────────────────────────────────
 const brokenFiles = Object.keys(brokenLinksByFile);
 if (brokenFiles.length > 0) {
-  console.log("");
-  console.log(
+  logger.raw("");
+  logger.raw(
     `${colors.yellow}${colors.bright}🔗 Broken Links Summary (${brokenFiles.length} file(s))${colors.reset}`
   );
-  console.log("═".repeat(60));
+  logger.raw("═".repeat(60));
 
   for (const file of brokenFiles.sort()) {
     const links = brokenLinksByFile[file];
-    console.log(`\n${colors.cyan}📄 ${file}${colors.reset}`);
+    logger.raw(`\n${colors.cyan}📄 ${file}${colors.reset}`);
     for (const link of links) {
-      console.log(
+      logger.raw(
         `   ${colors.red}✗${colors.reset} "${link.text}" → ${colors.yellow}${link.href}${colors.reset}`
       );
-      console.log(`     ↪ ${colors.dim}Slug not found: ${link.slug}${colors.reset}`);
+      logger.raw(`     ↪ ${colors.dim}Slug not found: ${link.slug}${colors.reset}`);
     }
   }
 
   const totalLinks = brokenFiles.reduce((sum, f) => sum + brokenLinksByFile[f].length, 0);
-  console.log(
+  logger.raw(
     `\n${colors.bright}Total: ${totalLinks} broken link${totalLinks !== 1 ? "s" : ""} across ${brokenFiles.length} file(s)${colors.reset}`
   );
-  console.log(`${colors.dim}💡 Fix these links to point to valid document slugs${colors.reset}`);
-  console.log("");
+  logger.raw(`${colors.dim}💡 Fix these links to point to valid document slugs${colors.reset}`);
+  logger.raw("");
 }
 
 // Check for --json flag to output diagnostics as JSON
@@ -870,7 +862,7 @@ if (args.includes("--json")) {
     JSON.stringify(diags.toJSON(), null, 2),
     "utf-8"
   );
-  console.log("💾 Diagnostics written to diagnostics.json");
+  logger.raw("💾 Diagnostics written to diagnostics.json");
 }
 
 // Ensure output dirs exist
@@ -994,7 +986,7 @@ sitemapXml += `</urlset>\n`;
 
 // Write to project root (rspack CopyRspackPlugin will copy to dist)
 fs.writeFileSync(path.join(ROOT, "sitemap.xml"), sitemapXml, "utf-8");
-console.log("🗺️  Sitemap generated: sitemap.xml");
+logger.raw("🗺️  Sitemap generated: sitemap.xml");
 
 // ─── SEO: Generate robots.txt ──────────────────────────────────────
 const robotsTxt = `# robots.txt — Allow all crawlers
@@ -1009,7 +1001,7 @@ Crawl-delay: 1
 `;
 
 fs.writeFileSync(path.join(ROOT, "robots.txt"), robotsTxt, "utf-8");
-console.log("🤖 robots.txt generated: robots.txt");
+logger.raw("🤖 robots.txt generated: robots.txt");
 
-console.log(`💾 Written to ${GEN_DIR}/`);
-console.log("✨ Done!");
+logger.raw(`💾 Written to ${GEN_DIR}/`);
+logger.raw("✨ Done!");
