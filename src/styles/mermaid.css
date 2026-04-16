@@ -627,22 +627,14 @@
     print-color-adjust: exact;
   }
 
-  /* Force dark text on mermaid SVGs for print readability */
+  /* Force dark text on mermaid SVGs for print readability - use print-specific styles only */
   .mermaid svg text {
     fill: #1a1a1a !important;
     color: #1a1a1a !important;
   }
 
-  .mermaid svg path,
-  .mermaid svg line,
-  .mermaid svg rect,
-  .mermaid svg circle {
-    stroke: #333 !important;
-  }
-
-  .mermaid svg .edgePath path {
-    stroke: #333 !important;
-    stroke-width: 1.5px !important;
+  .mermaid svg .label {
+    fill: #1a1a1a !important;
   }
 
   .mermaid svg .nodeRect {
@@ -650,13 +642,21 @@
     stroke: #666 !important;
   }
 
-  .mermaid svg .label {
-    fill: #1a1a1a !important;
+  .mermaid svg .edgePath path {
+    stroke-width: 1.5px !important;
   }
 }
 
 /* Ensure dark text on mermaid diagrams in normal view for readability */
 /* Use !important to override Mermaid's inline styles */
+
+/* Most specific selectors first */
+.mermaid svg .edgePath path {
+  stroke: #374151 !important;
+  stroke-width: 1.5px !important;
+}
+
+/* Medium specificity selectors */
 .mermaid svg text {
   fill: #1a1a1a !important;
   color: #1a1a1a !important;
@@ -671,17 +671,6 @@
   stroke: #6b7280 !important;
 }
 
-.mermaid svg .edgePath path {
-  stroke: #374151 !important;
-  stroke-width: 1.5px !important;
-}
-
-.mermaid svg path,
-.mermaid svg line {
-  stroke: #374151 !important;
-}
-
-/* Target common Mermaid diagram classes */
 .mermaid svg .actor {
   fill: #fff !important;
   stroke: #6b7280 !important;
@@ -689,6 +678,12 @@
 
 .mermaid svg .messageText {
   fill: #1a1a1a !important;
+}
+
+/* Least specific selectors last */
+.mermaid svg path,
+.mermaid svg line {
+  stroke: #374151 !important;
 }
 
 .mermaid svg .noteText {

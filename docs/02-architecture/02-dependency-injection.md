@@ -1,0 +1,270 @@
+---
+title: Dependency Injection
+description: How the service container wraps browser APIs for testability and flexibility
+sidebar_label: Dependency Injection
+sidebar_position: 2
+tags: [architecture, DI, services]
+---
+
+# Dependency Injection
+
+rspack-react-docs uses a lightweight dependency injection pattern to wrap browser APIs. This makes the codebase testable, mockable, and flexible.
+
+## Why DI in a Frontend App?
+
+Direct use of browser APIs creates tight coupling:
+
+```typescript:desc=Tightly coupled - hard to test because it directly calls window.localStorage
+function saveTheme(theme: string) {
+  localStorage.setItem("theme", theme);
+}
+```
+
+With DI, the dependency is injected:
+
+```typescript:desc=Loosely coupled - storage can be swapped for testing.
+function saveTheme(storage: IStorageService, theme: string) {
+  storage.setItem("theme", theme);
+}
+```
+
+## Service Interfaces
+
+Five services cover all browser API needs:
+
+```mermaid:desc=Class diagram showing the five service interfaces and their methods.
+classDiagram
+    class IStorageService {
+        <<interface>>
+        +getItem(key: string): string | null
+        +setItem(key: string, value: string): void
+        +removeItem(key: string): void
+        +clear(): void
+    }
+
+    class IRouterService {
+        <<interface>>
+        +getCurrentPath(): string
+        +pushState(state, title, url): void
+        +replaceState(state, title, url): void
+        +onPopState(callback): () => void
+        +buildUrl(prefix, slug): string
+    }
+
+    class IDomService {
+        <<interface>>
+        +getScrollY(): number
+        +scrollTo(x, y): void
+        +setAttribute(el, name, value): void
+        +querySelectorAll(selectors): NodeList
+        +getViewportWidth(): number
+        +onResize(callback): () => void
+        +onKeydown(callback): () => void
+        +setBodyOverflow(value): void
+    }
+
+    class IThemeService {
+        <<interface>>
+        +getInitialTheme(): boolean
+        +applyTheme(isDark: boolean): void
+        +toggleTheme(current: boolean): boolean
+        +getMermaidLoading(): boolean
+        +setMermaidLoading(loading: boolean): void
+        +onMermaidLoadingChange(callback): () => void
+    }
+
+    class IAppConfig {
+        <<interface>>
+        +siteTitle: string
+        +repoEditUrl: string
+        +mobileBreakpoint: number
+        +tocBreakpoint: number
+        +routes: { docs: string }
+    }
+
+    class ServiceContainer {
+        +storage: IStorageService
+        +router: IRouterService
+        +dom: IDomService
+        +theme: IThemeService
+        +config: IAppConfig
+    }
+
+    ServiceContainer --> IStorageService
+    ServiceContainer --> IRouterService
+    ServiceContainer --> IDomService
+    ServiceContainer --> IThemeService
+    ServiceContainer --> IAppConfig
+```
+
+### IStorageService
+
+Wraps `localStorage` with safety checks for SSR and private browsing:
+
+```typescript:desc=Default storage service implementation.
+export const createStorageService = (): IStorageService => ({
+  getItem: (key) => {
+    if (typeof window === "undefined") return null;
+    try { return localStorage.getItem(key); } catch { return null; }
+  },
+  setItem: (key, value) => {
+    if (typeof window === "undefined") return;
+    try { localStorage.setItem(key, value); } catch {}
+  },
+  // ...
+});
+```
+
+### IRouterService
+
+Wraps the History API for SPA routing:
+
+```typescript:desc=Default router service using window.history.
+export const createRouterService = (): IRouterService => ({
+  getCurrentPath: () => window.location.pathname,
+  pushState: (state, title, url) => window.history.pushState(state, title, url),
+  onPopState: (callback) => {
+    window.addEventListener("popstate", callback);
+    return () => window.removeEventListener("popstate", callback);
+  },
+  buildUrl: (prefix, slug) => `/${prefix}/${slug}`,
+});
+```
+
+### IDomService
+
+Wraps DOM APIs for viewport, scroll, keyboard, and resize events:
+
+```typescript:desc=Default DOM service wrapping window/document APIs.
+export const createDomService = (): IDomService => ({
+  getScrollY: () => window.scrollY,
+  getViewportWidth: () => window.innerWidth,
+  onResize: (callback) => {
+    window.addEventListener("resize", callback);
+    return () => window.removeEventListener("resize", callback);
+  },
+  onKeydown: (callback) => {
+    window.addEventListener("keydown", callback);
+    return () => window.removeEventListener("keydown", callback);
+  },
+  setBodyOverflow: (value) => { document.body.style.overflow = value; },
+  // ...
+});
+```
+
+### IThemeService
+
+Manages theme state with mermaid loading state tracking:
+
+```typescript:desc=Theme service with localStorage persistence and mermaid loading state.
+export const createThemeService = (storage: IStorageService): IThemeService => {
+  let mermaidLoading = false;
+  const callbacks = new Set<(loading: boolean) => void>();
+
+  return {
+    getInitialTheme: () => {
+      const stored = storage.getItem("theme");
+      if (stored) return stored === "dark";
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    },
+    applyTheme: (isDark) => {
+      document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+    },
+    toggleTheme: (current) => {
+      const next = !current;
+      storage.setItem("theme", next ? "dark" : "light");
+      return next;
+    },
+    getMermaidLoading: () => mermaidLoading,
+    setMermaidLoading: (loading) => {
+      mermaidLoading = loading;
+      callbacks.forEach(cb => cb(loading));
+    },
+    onMermaidLoadingChange: (callback) => {
+      callbacks.add(callback);
+      return () => callbacks.delete(callback);
+    },
+  };
+};
+```
+
+### IAppConfig
+
+Simple configuration object with sensible defaults:
+
+```typescript:desc=Default app configuration.
+export const createAppConfig = (overrides?): IAppConfig => ({
+  siteTitle: "Docs",
+  repoEditUrl: "https://github.com/your-org/your-repo/edit/main",
+  mobileBreakpoint: 800,
+  tocBreakpoint: 1100,
+  routes: { docs: "docs" },
+  ...overrides,
+});
+```
+
+## Container Builder
+
+The `createContainer()` factory builds a `ServiceContainer` with all default services:
+
+```typescript:desc=Container builder with dependency wiring.
+export function createContainer(options = {}): ServiceContainer {
+  const storage = options.storage ?? createStorageService();
+  const router = options.router ?? createRouterService();
+  const dom = options.dom ?? createDomService();
+  const theme = options.theme ?? createThemeService(storage);
+  const config = createAppConfig(options.config);
+  return { storage, router, dom, theme, config };
+}
+
+export const defaultContainer = createContainer();
+```
+
+## React Integration
+
+### ServicesProvider
+
+A React context provider wraps the app tree:
+
+```tsx:desc=ServicesProvider wraps the app in a React context.
+<ServicesProvider container={defaultContainer}>
+  <App />
+</ServicesProvider>
+```
+
+### useServices Hook
+
+Components access services via hook:
+
+```tsx:desc=Hook for accessing services in React components.
+function App() {
+  const services = useServices();
+  const currentSlug = services.router.getCurrentPath();
+  // ...
+}
+```
+
+## Testing with Mock Services
+
+Swap real services for mocks in tests:
+
+```typescript:desc=Creating a container with mock services for testing.
+const mockStorage = {
+  getItem: vi.fn(() => null),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+};
+
+const testContainer = createContainer({
+  storage: mockStorage,
+  router: mockRouter,
+  dom: mockDom,
+});
+```
+
+This pattern is used throughout the test suite in `tests/`.
+
+---
+
+Next: [Frontend Components](/docs/architecture/frontend-components)

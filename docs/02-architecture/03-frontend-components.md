@@ -1,0 +1,612 @@
+---
+title: Frontend Components
+description: React component hierarchy, key components, and how they work together
+sidebar_label: Frontend Components
+sidebar_position: 3
+---
+
+# Frontend Components
+
+This document covers the React component architecture of the rspack-react-docs SSG. Every component is a file under `/src/`, wired together through a dependency injection container ([`/src/services/container.ts`](/docs/02-architecture/dependency-injection)) and consumed via a custom `useServices()` hook.
+
+## Component Hierarchy
+
+```mermaid
+graph TD
+    A["frontend.tsx\n(Entry Point)"] --> B["ErrorBoundary"]
+    B --> C["ServicesProvider\n(DI Container)"]
+    C --> D["App.tsx\n(Root Component)"]
+
+    D --> E["Sidebar.tsx"]
+    D --> F["DocViewer.tsx"]
+    D --> G["TableOfContents.tsx"]
+    D --> H["Breadcrumbs.tsx"]
+    D --> I["MetadataPanel.tsx"]
+    D --> J["ArticleRefsPanel.tsx"]
+    D --> K["DocFooter.tsx"]
+    D --> L["DocStatsFooter.tsx"]
+    D --> M["ASTViewer.tsx"]
+
+    F --> F1["Mermaid SVG Renderer"]
+    F --> F2["MathJax Renderer"]
+    F --> F3["Zoom/Download Handlers"]
+
+    E --> E1["CategoryItem"]
+    E --> E2["DocLink"]
+
+    style A fill:#1a1a2e,color:#fff
+    style D fill:#16213e,color:#fff
+    style F fill:#0f3460,color:#fff
+```
+
+## Entry Point: `frontend.tsx`
+
+The application bootstraps in `/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/frontend.tsx`:
+
+1. Sets up **goober** (CSS-in-JS) with React's `createElement`
+2. Applies the initial theme from `localStorage` (defaults to `paperlike-dark-gray`)
+3. Mounts the React tree inside `<StrictMode>` with `ErrorBoundary` and `ServicesProvider`
+4. Configures React Refresh (HMR) for development
+
+```tsx
+root.render(
+  <StrictMode>
+    <ErrorBoundary>
+      <ServicesProvider container={defaultContainer}>
+        <App />
+      </ServicesProvider>
+    </ErrorBoundary>
+  </StrictMode>
+);
+```
+
+## App.tsx -- Root Component
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/App.tsx` is the orchestrator. It manages all top-level state and wires every UI panel together.
+
+### State Management
+
+The component holds these key pieces of state:
+
+```tsx
+const [sidebarVisible, setSidebarVisible] = useState(true);
+const [tocVisible, setTocVisible] = useState(false);
+const [mermaidLoading, setMermaidLoading] = useState(false);
+const [isMobile, setIsMobile] = useState(/* viewport check */);
+const [isTocMobileBreakpoint, setIsTocMobileBreakpoint] = useState(/* viewport check */);
+const [settingsOpen, setSettingsOpen] = useState(false);
+const [astOpen, setAstOpen] = useState(false);
+```
+
+### Navigation
+
+The `navigate()` function updates the slug, pushes history state, and toggles sidebar/TOC visibility:
+
+```tsx
+const navigate = (slug: string) => {
+  setCurrentSlug(slug);
+  services.router.pushState({}, "", services.router.buildUrl(services.config.routes.docs, slug));
+  setSidebarVisible(!isMobile);
+  setTocVisible(false);
+};
+```
+
+After every navigation commit, a `useEffect` scrolls to the top:
+
+```tsx
+useEffect(() => {
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+}, [currentSlug]);
+```
+
+### Keyboard Shortcuts
+
+Global shortcuts are registered via the `useKeyboardShortcut` hook (see [Keyboard Shortcut Hook](#keyboard-shortcut-hook) below):
+
+| Shortcut | Action |
+|---|---|
+| `Cmd+B` / `Ctrl+B` | Toggle sidebar |
+| `Cmd+T` / `Ctrl+T` | Toggle table of contents |
+| `Escape` | Close TOC, then sidebar |
+
+```tsx
+useKeyboardShortcut(() => setSidebarVisible((v) => !v), { key: "b", meta: true });
+useKeyboardShortcut(
+  () => { if (currentDoc?.toc.length) setTocVisible((v) => !v); },
+  { key: "t", meta: true }
+);
+```
+
+The Escape key handler is wired through `services.dom.onKeydown`:
+
+```tsx
+useEffect(() => {
+  const unsubscribe = services.dom.onKeydown((e) => {
+    if (e.key === "Escape") {
+      if (tocVisible) setTocVisible(false);
+      else if (sidebarVisible) setSidebarVisible(false);
+    }
+  });
+  return unsubscribe;
+}, [services, tocVisible, sidebarVisible]);
+```
+
+### Mermaid Loading Indicator
+
+A `requestAnimationFrame` poll checks `window.__mermaidLoading__` and shows a spinner in the top bar:
+
+```tsx
+useEffect(() => {
+  let rafId: number;
+  const checkLoading = () => {
+    setMermaidLoading(window.__mermaidLoading__ || false);
+    rafId = requestAnimationFrame(checkLoading);
+  };
+  rafId = requestAnimationFrame(checkLoading);
+  return () => cancelAnimationFrame(rafId);
+}, []);
+```
+
+The indicator renders conditionally in the top bar:
+
+```tsx
+{mermaidLoading && (
+  <span className="mermaid-loading-indicator" title="Loading diagrams...">
+    <span className="mermaid-spinner" />
+  </span>
+)}
+```
+
+### Settings Panel and Font Controls
+
+The top bar includes buttons for print, settings (font size, line height, font family, code theme), and theme toggle. The settings panel renders theme swatches from the `THEMES` constant and font options from `FONTS`:
+
+```tsx
+const THEMES = [
+  { id: "paperlike-white", label: "Paper White", bg: "#ffffff", accent: "#2563eb" },
+  { id: "paperlike-gray", label: "Paper Gray", bg: "#e8e8e8", accent: "#5b8db8" },
+  { id: "paperlike-sepia", label: "Paper Sepia", bg: "#f4ecd8", accent: "#8b6914" },
+  { id: "paperlike-dark-gray", label: "Paper Dark", bg: "#2a2a2a", accent: "#7ba3cc" },
+  { id: "navy", label: "Navy", bg: "#f0f4f8", accent: "#3b82f6" },
+  { id: "dark-navy", label: "Dark Navy", bg: "#0f172a", accent: "#60a5fa" },
+] as const;
+```
+
+### Print Functionality
+
+The `printAllDocs` async function renders all Mermaid diagrams in the current view, clones the `.doc-content` DOM, strips interactive elements (copy buttons, zoom buttons, code headers), and opens a new window with a print-optimized HTML document using a serif font and paper-like styling.
+
+### Mobile Sidebar Toggle
+
+On mobile (viewport <= `config.mobileBreakpoint`, default 800px), the sidebar renders as an overlay and body scroll is locked:
+
+```tsx
+useEffect(() => {
+  const isOverlayOpen = isMobile && sidebarVisible;
+  services.dom.setBodyOverflow(isOverlayOpen ? "hidden" : "");
+  return () => { services.dom.setBodyOverflow(""); };
+}, [isMobile, sidebarVisible, services]);
+```
+
+### Theme Management
+
+Uses the `useDocsTheme()` hook which unifies UI theme, code (Shiki) theme, font family, font size, and line height into a single hook. See [Theme Hook](#theme-hook) below.
+
+### Sidebar Data and Prev/Next Navigation
+
+The sidebar is loaded from generated data:
+
+```tsx
+const sidebar: SidebarItem[] = sidebarData;
+```
+
+Previous/next docs are computed by sorting all docs in sidebar order and finding the current index:
+
+```tsx
+const sorted = getDocsInSidebarOrder();
+const idx = sorted.findIndex((d) => d.slug === currentSlug || d.id === currentSlug);
+const prevDoc = idx > 0 ? sorted[idx - 1] : null;
+const nextDoc = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+```
+
+## DocViewer.tsx -- Document Renderer
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/DocViewer.tsx` renders the HTML content produced by the [Markdown Engine](/docs/02-architecture/markdown-engine) and then asynchronously enhances it with Mermaid diagrams and MathJax math.
+
+### Rendering Pipeline
+
+```mermaid
+sequenceDiagram
+    participant React as React (useEffect)
+    participant DOM as DOM (dangerouslySetInnerHTML)
+    participant Mermaid as renderMermaid()
+    participant MathJax as renderMath()
+    participant Zoom as setupZoomHandlers()
+    participant Download as setupDownloadHandlers()
+
+    React->>DOM: Set innerHTML
+    React->>Mermaid: await renderMermaid(ref)
+    Mermaid->>Mermaid: Dynamically import("mermaid")
+    Mermaid->>Mermaid: mermaid.render() for each diagram
+    Mermaid-->>React: Diagrams rendered as SVG
+    React->>MathJax: renderMath(ref)
+    MathJax->>MathJax: typesetPromise([container])
+    React->>Zoom: setupZoomHandlers()
+    React->>Download: setupDownloadHandlers()
+```
+
+### Mermaid Rendering
+
+The `renderMermaid()` function:
+
+1. Sets `window.__mermaidLoading__ = true`
+2. Dynamically imports the `mermaid` module (lazy-loaded)
+3. Initializes with `theme: "neutral"`, `securityLevel: "loose"`
+4. Iterates over all `.mermaid-diagram` elements
+5. Calls `mermaid.render(uniqueId, diagramSource)` for each
+6. On success: injects SVG, styles text/shapes for readability
+7. On failure: shows error container with raw diagram source
+8. Sets `window.__mermaidLoading__ = false` when done
+
+### Mermaid Zoom and Fullscreen Overlay
+
+Each diagram gets zoom and download buttons attached via event listeners:
+
+- **Zoom button**: Opens a fullscreen overlay with the SVG
+- **Zoom controls**: Zoom in/out/reset buttons, mouse wheel zoom, drag to pan, touch pinch-to-zoom
+- **Close**: Escape key, close button, or click on overlay background
+
+```tsx
+overlay.innerHTML = `
+  <div class="mermaid-fullscreen-header">
+    <span class="mermaid-fullscreen-title">Diagram</span>
+    <div class="mermaid-fullscreen-controls">
+      <button data-action="zoom-in">...</button>
+      <button data-action="zoom-out">...</button>
+      <button data-action="zoom-reset">...</button>
+      <span class="mermaid-zoom-level">100%</span>
+    </div>
+    <button class="mermaid-fullscreen-close">Close</button>
+  </div>
+  <div class="mermaid-fullscreen-content">
+    <div class="mermaid-fullscreen-viewport">
+      <div class="mermaid-diagram-container">${svgEl.outerHTML}</div>
+    </div>
+  </div>
+`;
+```
+
+Pan state tracks `scale`, `pointX`, `pointY` and applies a CSS transform:
+
+```tsx
+container.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+```
+
+### Mermaid SVG Download
+
+The download handler clones the SVG, serializes it with `XMLSerializer`, adds XML declaration, and triggers a download with a filename derived from the diagram description:
+
+```tsx
+const svgClone = svgEl.cloneNode(true) as SVGElement;
+svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+const serializer = new XMLSerializer();
+let svgString = serializer.serializeToString(svgClone);
+svgString = `<?xml version="1.0" encoding="UTF-8"?>\n${svgString}`;
+const blob = new Blob([svgString], { type: "image/svg+xml" });
+```
+
+### MathJax Rendering
+
+The `renderMath()` function:
+
+1. Finds all `.math-inline` and `.math-display` elements
+2. If MathJax is already loaded, calls `typesetPromise()` immediately
+3. If not loaded, marks elements as `loading`, polls for up to 10 seconds
+4. On MathJax load, calls `typesetPromise()` and marks elements as `rendered` or `error`
+
+### TOC Tracking via IntersectionObserver
+
+A second `useEffect` sets up an `IntersectionObserver` on all `h2` and `h3` headings. As headings enter the viewport (with `rootMargin: "0px 0px -80% 0px"`), it updates the URL hash:
+
+```tsx
+const observer = new IntersectionObserver(
+  (entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute("id");
+        if (id) {
+          const hash = `#${id}`;
+          history.replaceState(null, "", hash);
+        }
+      }
+    }
+  },
+  { rootMargin: "0px 0px -80% 0px" }
+);
+```
+
+The component renders content via `dangerouslySetInnerHTML`:
+
+```tsx
+return <div ref={ref} className="doc-content" dangerouslySetInnerHTML={{ __html: html }} />;
+```
+
+## Sidebar.tsx -- Navigation Sidebar
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/Sidebar.tsx` renders the left navigation panel from `sidebarData` (generated at build time).
+
+### Structure
+
+Two sub-components handle the two sidebar item types:
+
+- **`CategoryItem`**: Renders a collapsible category header and a sublist of doc links. Highlights the category header when any child is the active page.
+- **`DocLink`**: Renders a single doc link (for uncategorized pages).
+
+```tsx
+function CategoryItem({ item, currentSlug, onNavigate }) {
+  const hasActive = item.items.some(
+    (child) => child.slug === currentSlug || child.id === currentSlug
+  );
+  return (
+    <div className="sidebar-category">
+      <button className={`sidebar-category-header ${hasActive ? "active" : ""}`} ...>
+        <span className="sidebar-category-label">{item.label}</span>
+      </button>
+      <ul className="sidebar-sublist">
+        {item.items.map((child) => (
+          <li key={child.id} className="sidebar-item">
+            <a href={`/docs/${child.slug}`} className={`sidebar-link ${...}`}>
+              <span className="sidebar-link-label">{child.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+## TableOfContents.tsx -- Right-Side TOC
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/TableOfContents.tsx` renders the "On this page" panel from the document's `toc` array (generated from headings during the build).
+
+### Active Heading Tracking
+
+Uses its own `IntersectionObserver` to detect which heading is currently in view and highlights the matching TOC item:
+
+```tsx
+useEffect(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) setActiveHash(`#${entry.target.id}`);
+      }
+    },
+    { rootMargin: "0px 0px -80% 0px" }
+  );
+  for (const item of items) {
+    const el = document.getElementById(item.id);
+    if (el) observer.observe(el);
+  }
+  return () => observer.disconnect();
+}, [items]);
+```
+
+### Text Cleaning
+
+The `cleanTOCText()` function strips Markdown formatting from TOC labels:
+
+```tsx
+function cleanTOCText(raw: string): string {
+  return raw
+    .replace(/`([^`]+)`/g, "$1")       // inline code
+    .replace(/\*\*([^*]+)\*\*/g, "$1") // bold
+    .replace(/__([^_]+)__/g, "$1")     // bold
+    .replace(/~~([^~]+)~~/g, "$1")     // strikethrough
+    .replace(/<[^>]+>/g, "");          // HTML tags
+}
+```
+
+## Breadcrumbs.tsx
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/Breadcrumbs.tsx` renders a breadcrumb trail. Each item can be a link or plain text (the current page):
+
+```tsx
+export function Breadcrumbs({ items }: BreadcrumbsProps) {
+  return (
+    <nav className="breadcrumbs" aria-label="Breadcrumb">
+      <ul>
+        <li className="breadcrumb-item"><a href="/">Docs</a></li>
+        {items.map((item) => (
+          <li key={item.label} className="breadcrumb-item">
+            {item.href ? <a href={item.href}>{item.label}</a>
+                       : <span className="breadcrumb-current">{item.label}</span>}
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+```
+
+## MetadataPanel.tsx
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/MetadataPanel.tsx` renders arbitrary frontmatter metadata as a collapsible `<details>` panel. Array values (like tags) render as styled badges:
+
+```tsx
+function MetadataValue({ value }: { value: string | string[] }) {
+  if (Array.isArray(value)) {
+    return (
+      <span className="metadata-tags">
+        {value.map((v) => <span key={v} className="metadata-tag">{v}</span>)}
+      </span>
+    );
+  }
+  return <span className="metadata-value-text">{value}</span>;
+}
+```
+
+## DocStatsFooter.tsx
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/DocStatsFooter.tsx` parses the rendered HTML content and displays document statistics:
+
+- Word count, heading count, code blocks, Mermaid diagrams
+- Admonition count broken down by type
+- Links, images, tables, lists
+
+Stats are computed via `useMemo` by creating a temporary `<div>`, setting `innerHTML`, and querying with `querySelectorAll`:
+
+```tsx
+const stats = useMemo<DocStats | null>(() => {
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = contentHtml;
+  const codeBlocks = tempDiv.querySelectorAll(".code-block, pre code").length;
+  const mermaidDiagrams = tempDiv.querySelectorAll(".mermaid-diagram").length;
+  // ... etc.
+}, [contentHtml]);
+```
+
+## ArticleRefsPanel.tsx
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/ArticleRefsPanel.tsx` extracts footnote references (`[^identifier]`) and their definitions from the raw AST tokens. It walks the token tree recursively:
+
+```tsx
+function walkTokens(tokens: any[]) {
+  for (const token of tokens) {
+    if (token.text && typeof token.text === "string") {
+      const refRegex = /\[\^([^\]]+)\]/g;
+      // ... extract references
+    }
+    if (token.type === "paragraph" || token.type === "text") {
+      const defRegex = /^\[\^([^\]]+)\]:\s*(.+)$/;
+      // ... extract definitions
+    }
+    if (token.tokens) walkTokens(token.tokens);
+    if (token.items) walkTokens(token.items);
+  }
+}
+```
+
+## ASTViewer.tsx
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/ASTViewer.tsx` displays the `marked` parser token tree as a collapsible tree structure for debugging. Uses utilities from `/src/ast-parser.ts`:
+
+- `tokensToAST()` -- converts `Token[]` to `ASTTokenNode[]` tree
+- `countNodes()` -- total node count
+- `getUniqueTypes()` -- all distinct token types
+- `getASTDepth()` -- maximum tree depth
+
+The tree supports expand/collapse all, search by type, and shows metadata (heading depth, language, list order) on each node.
+
+## ErrorBoundary.tsx
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/ErrorBoundary.tsx` is a class component using `getDerivedStateFromError` and `componentDidCatch`:
+
+```tsx
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error, info: null };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo): void {
+    this.setState({ error, info });
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[ErrorBoundary] Caught error:", error);
+    }
+  }
+
+  reset(): void {
+    this.setState({ hasError: false, error: null, info: null });
+  }
+}
+```
+
+It wraps the entire app tree in `frontend.tsx`. Supports an optional `fallback` prop for custom error rendering.
+
+## DocFooter.tsx
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/DocFooter.tsx` renders previous/next page navigation links:
+
+```tsx
+export function DocFooter({ prevDoc, nextDoc, onNavigate }: DocFooterProps) {
+  return (
+    <footer className="doc-footer">
+      <div className="pagination-nav">
+        {prevDoc && <a className="pagination-link pagination-prev">...</a>}
+        {nextDoc && <a className="pagination-link pagination-next">...</a>}
+      </div>
+    </footer>
+  );
+}
+```
+
+## Key Hooks
+
+### useKeyboardShortcut
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/hooks/useKeyboardShortcut.ts` registers keyboard shortcuts with modifier key support:
+
+```tsx
+export function useKeyboardShortcut(
+  handler: () => void,
+  { key, meta = false, alt = false, shift = false, preventDefault = true }: ShortcutOptions
+) {
+  const handlerRef = useRef(handler);
+  handlerRef.current = handler;
+
+  useEffect(() => {
+    const listener = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() !== key.toLowerCase()) return;
+      if (meta && !(e.metaKey || e.ctrlKey)) return;
+      // ... other modifiers
+      handlerRef.current();
+    };
+    window.addEventListener("keydown", listener);
+    return () => window.removeEventListener("keydown", listener);
+  }, [key, meta, alt, shift, preventDefault]);
+}
+```
+
+### Theme Hook
+
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/hooks/useDocsTheme.ts` unifies all theme and reading preferences:
+
+```tsx
+export interface DocsTheme {
+  isDark: boolean;
+  toggleTheme: () => void;
+  codeTheme: ShikiCodeTheme;
+  setCodeTheme: (theme: ShikiCodeTheme) => void;
+  font: string;
+  setFont: (font: string) => void;
+  fontSize: number;
+  setFontSize: (size: number) => void;
+  lineHeight: number;
+  setLineHeight: (height: number) => void;
+  resetReadingPrefs: () => void;
+}
+```
+
+Preferences are persisted to `localStorage` and applied as CSS custom properties on `document.documentElement`.
+
+## Component Summary Table
+
+| Component | File | Responsibility |
+|---|---|---|
+| `App` | `src/App.tsx` | Root orchestration: state, navigation, shortcuts, settings, print |
+| `DocViewer` | `src/DocViewer.tsx` | HTML rendering, Mermaid, MathJax, TOC tracking |
+| `Sidebar` | `src/Sidebar.tsx` | Left navigation from generated sidebar data |
+| `TableOfContents` | `src/TableOfContents.tsx` | Right-side TOC with active heading tracking |
+| `Breadcrumbs` | `src/Breadcrumbs.tsx` | Breadcrumb navigation trail |
+| `MetadataPanel` | `src/MetadataPanel.tsx` | Collapsible frontmatter metadata display |
+| `DocStatsFooter` | `src/DocStatsFooter.tsx` | Document statistics (words, code, diagrams, etc.) |
+| `ArticleRefsPanel` | `src/ArticleRefsPanel.tsx` | Footnote references and definitions from AST |
+| `ASTViewer` | `src/ASTViewer.tsx` | Debug viewer for marked parser tokens |
+| `ErrorBoundary` | `src/ErrorBoundary.tsx` | React error boundary for entire app tree |
+| `DocFooter` | `src/DocFooter.tsx` | Previous/next page pagination links |
+
+## Cross-References
+
+- [Build Pipeline](/docs/02-architecture/build-pipeline) -- how markdown becomes the `allDocs` array consumed by `App.tsx`
+- [Dependency Injection](/docs/02-architecture/dependency-injection) -- the 5 services (`IStorageService`, `IRouterService`, `IDomService`, `IThemeService`, `IAppConfig`) injected into every component
+- [Markdown Engine](/docs/02-architecture/markdown-engine) -- how `marked`, Shiki, and plugins produce the HTML that `DocViewer` renders

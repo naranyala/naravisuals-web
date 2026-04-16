@@ -207,7 +207,9 @@ export const createThemeService = (storage: IStorageService): IThemeService => {
     getMermaidLoading: () => mermaidLoading,
     setMermaidLoading: (loading: boolean) => {
       mermaidLoading = loading;
-      mermaidLoadingCallbacks.forEach((cb) => cb(loading));
+      mermaidLoadingCallbacks.forEach((cb) => {
+        cb(loading);
+      });
     },
     onMermaidLoadingChange: (callback: (loading: boolean) => void) => {
       mermaidLoadingCallbacks.add(callback);

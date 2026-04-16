@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 declare global {
   interface Window {
@@ -20,7 +20,7 @@ async function renderMermaid(container: HTMLElement | null) {
   const diagrams = container.querySelectorAll<HTMLElement>(".mermaid-diagram");
   if (diagrams.length === 0) return;
 
-  // Set loading state globally
+  // Pre-load mermaid module before starting render
   window.__mermaidLoading__ = true;
 
   let mermaid: import("mermaid").default;
@@ -28,9 +28,6 @@ async function renderMermaid(container: HTMLElement | null) {
     const mermaidModule = await import("mermaid");
     mermaid = mermaidModule.default;
 
-    // Use a single neutral theme. Colors are overridden via CSS after rendering.
-    // We don't pass themeVariables here because Mermaid doesn't support "currentColor"
-    // in that config - instead we style the SVG via CSS classes after render.
     mermaid.initialize({
       startOnLoad: false,
       theme: "neutral",
@@ -39,11 +36,13 @@ async function renderMermaid(container: HTMLElement | null) {
     });
   } catch (err) {
     console.error("Failed to load Mermaid:", err);
+    window.__mermaidLoading__ = false;
     return;
   }
 
+  const renderPromises: Promise<void>[] = [];
+
   for (const wrapper of diagrams) {
-    // Skip if already processed
     if (wrapper.dataset.processed === "true") continue;
 
     const mermaidEl = wrapper.querySelector<HTMLElement>(".mermaid");
@@ -55,79 +54,80 @@ async function renderMermaid(container: HTMLElement | null) {
     const diagramSource = mermaidEl.textContent?.trim();
     if (!diagramSource) continue;
 
-    try {
-      const uniqueId = `mermaid-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-      await mermaid.parse(diagramSource);
-      const { svg } = await mermaid.render(uniqueId, diagramSource);
+    const renderPromise = (async () => {
+      try {
+        // Use renderAsync which is more reliable than parse + render
+        const uniqueId = `mermaid-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+        const { svg } = await mermaid.render(uniqueId, diagramSource);
 
-      // Mark processed BEFORE updating DOM
-      wrapper.dataset.processed = "true";
+        wrapper.dataset.processed = "true";
 
-      if (loadingEl) loadingEl.style.display = "none";
-      mermaidEl.innerHTML = svg;
-      mermaidEl.style.display = "block";
-      mermaidEl.style.opacity = "1";
+        if (loadingEl) loadingEl.style.display = "none";
+        mermaidEl.innerHTML = svg;
+        mermaidEl.style.display = "block";
+        mermaidEl.style.opacity = "1";
 
-      const svgEl = mermaidEl.querySelector("svg");
-      if (svgEl) {
-        svgEl.style.maxWidth = "100%";
-        svgEl.style.height = "auto";
-        svgEl.style.display = "block";
-        svgEl.style.margin = "0 auto";
+        const svgEl = mermaidEl.querySelector("svg");
+        if (svgEl) {
+          svgEl.style.maxWidth = "100%";
+          svgEl.style.height = "auto";
+          svgEl.style.display = "block";
+          svgEl.style.margin = "0 auto";
 
-        // Force dark text and shapes for readability on light backgrounds
-        // Mermaid's neutral theme generates inline styles that may have light text
-        svgEl.querySelectorAll("text").forEach((textEl) => {
-          textEl.style.fill = "#1a1a1a";
-          textEl.style.color = "#1a1a1a";
-        });
-        svgEl.querySelectorAll("path, line").forEach((shapeEl) => {
-          const stroke = shapeEl.getAttribute("stroke");
-          // Only override very light or missing strokes
-          if (
-            !stroke ||
-            stroke === "none" ||
-            stroke === "transparent" ||
-            stroke === "#e5e7eb" ||
-            stroke === "#d1d5db"
-          ) {
-            shapeEl.style.stroke = "#374151";
-          }
-        });
-        svgEl.querySelectorAll("rect, circle, ellipse, polygon").forEach((shapeEl) => {
-          const fill = shapeEl.getAttribute("fill");
-          // Only override very light fills (keep white backgrounds)
-          if (
-            fill &&
-            fill !== "#fff" &&
-            fill !== "#ffffff" &&
-            fill !== "white" &&
-            fill !== "none"
-          ) {
-            shapeEl.style.fill = "#ffffff";
-          }
-          shapeEl.style.stroke = "#6b7280";
-        });
+          svgEl.querySelectorAll("text").forEach((textEl) => {
+            textEl.style.fill = "#1a1a1a";
+            textEl.style.color = "#1a1a1a";
+          });
+          svgEl.querySelectorAll("path, line").forEach((shapeEl) => {
+            const stroke = shapeEl.getAttribute("stroke");
+            if (
+              !stroke ||
+              stroke === "none" ||
+              stroke === "transparent" ||
+              stroke === "#e5e7eb" ||
+              stroke === "#d1d5db"
+            ) {
+              shapeEl.style.stroke = "#374151";
+            }
+          });
+          svgEl.querySelectorAll("rect, circle, ellipse, polygon").forEach((shapeEl) => {
+            const fill = shapeEl.getAttribute("fill");
+            if (
+              fill &&
+              fill !== "#fff" &&
+              fill !== "#ffffff" &&
+              fill !== "white" &&
+              fill !== "none"
+            ) {
+              shapeEl.style.fill = "#ffffff";
+            }
+            shapeEl.style.stroke = "#6b7280";
+          });
+        }
+
+        if (errorEl) errorEl.style.display = "none";
+      } catch (err) {
+        if (loadingEl) loadingEl.style.display = "none";
+        if (errorEl) {
+          const msg = err instanceof Error ? err.message : String(err);
+          errorEl.style.display = "block";
+          errorEl.innerHTML = `<div class="mermaid-error-title">⚠ Failed to render</div><pre>${msg}</pre><pre>${diagramSource}</pre>`;
+        }
+        mermaidEl.style.display = "block";
+        mermaidEl.style.whiteSpace = "pre-wrap";
+        mermaidEl.style.padding = "1rem";
+        mermaidEl.style.background = "var(--bg-code)";
+        mermaidEl.style.color = "var(--text)";
+        mermaidEl.style.opacity = "1";
       }
+    })();
 
-      if (errorEl) errorEl.style.display = "none";
-    } catch (err) {
-      if (loadingEl) loadingEl.style.display = "none";
-      if (errorEl) {
-        const msg = err instanceof Error ? err.message : String(err);
-        errorEl.style.display = "block";
-        errorEl.innerHTML = `<div class="mermaid-error-title">⚠ Failed to render</div><pre>${msg}</pre><pre>${diagramSource}</pre>`;
-      }
-      mermaidEl.style.display = "block";
-      mermaidEl.style.whiteSpace = "pre-wrap";
-      mermaidEl.style.padding = "1rem";
-      mermaidEl.style.background = "var(--bg-code)";
-      mermaidEl.style.color = "var(--text)";
-      mermaidEl.style.opacity = "1";
-    }
+    renderPromises.push(renderPromise);
   }
 
-  // Reset loading state when done
+  // Wait for all diagrams to render in parallel
+  await Promise.all(renderPromises);
+
   window.__mermaidLoading__ = false;
 }
 

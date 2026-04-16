@@ -1,15 +1,16 @@
 ---
-title: Welcome to docts
-description: Your static documentation site generator built with rspack, React, and ShikiJS
+title: Welcome to rspack-react-docs
+description: A fast, modern static site generator for documentation built with rspack, React, Shiki, and Mermaid
 sidebar_label: Welcome
 sidebar_position: 0
+tags: [welcome, getting-started]
 ---
 
-# Welcome to docts
+# Welcome to rspack-react-docs
 
-A **Docusaurus-identical** documentation site generator built with rspack, React, and ShikiJS.
+A **fast, modern static site generator (SSG)** for building beautiful documentation websites. Powered by rspack for blazing builds, React for the UI, Shiki for VS-quality syntax highlighting, and Mermaid for live diagrams.
 
-> **Zero runtime APIs. Pure static output. Deploy anywhere.**
+> **Zero runtime APIs. Everything is generated at build time.**
 
 ---
 
@@ -20,84 +21,19 @@ bun install
 bun run dev
 ```
 
-Your docs site is live at `http://localhost:3000`.
+Your dev server is now running at `http://localhost:3000`.
 
 ---
 
-## Documentation Categories
+## Documentation Structure
 
-Explore the documentation organized by topic:
-
-### 📖 Getting Started
-
-Learn the basics of docts and set up your project.
-
-| Article | Description |
+| Section | Description |
 |---------|-------------|
-| [Project Overview](/docs/getting-started/project-overview) | Architecture principles and key dependencies |
-| [Directory Structure](/docs/getting-started/directory-structure) | Complete file organization guide |
-
----
-
-### 🛠️ Guides
-
-In-depth guides covering all aspects of the build system, components, and deployment.
-
-| Article | Description |
-|---------|-------------|
-| [Build System](/docs/guides/build-system) | How the markdown-to-TypeScript build pipeline works |
-| [Dependency Injection](/docs/guides/dependency-injection) | Service architecture and React integration |
-| [Component Reference](/docs/guides/component-reference) | React component hierarchy and props |
-| [CSS & Theme Architecture](/docs/guides/css-theme-architecture) | Styling and theming system |
-| [React Hooks](/docs/guides/react-hooks) | All 14 custom hooks with examples |
-| [Markdown Plugins](/docs/guides/markdown-plugins) | Plugin system architecture |
-| [Testing Strategy](/docs/guides/testing-strategy) | Test infrastructure and best practices |
-| [Deployment](/docs/guides/deployment) | Production build and deployment options |
-| [Generated Output](/docs/guides/generated-output) | TypeScript data format and structure |
-| [CLI Reference](/docs/guides/cli-reference) | Complete command guide |
-| [Application Bootstrap](/docs/guides/application-bootstrap) | How the React app starts |
-| [AST Parser](/docs/guides/ast-parser) | Markdown token parsing and AST viewer |
-| [SEO & LLM Optimization](/docs/guides/seo-llm-optimization) | Search engine and AI crawler optimization |
-| [Build Statistics](/docs/guides/build-statistics) | Codeblock and admonition tracking |
-| [Validation Plugins](/docs/guides/validation-plugins) | Unified plugin-based validation system |
-| [Validation Formatting](/docs/guides/validation-formatting) | Improved validation output formatting |
-| [LLM Validator Output](/docs/guides/llm-validator-output) | LLM-friendly validator output |
-| [Frontmatter Validator](/docs/guides/frontmatter-validator) | YAML frontmatter validation |
-| [Strict Footnote Validator](/docs/guides/strict-footnote-validator) | Strict footnote syntax validation |
-
----
-
-## Project Statistics
-
-### Content Overview
-
-| Metric | Count |
-|--------|-------|
-| Total Articles | 21 |
-| Total Codeblocks | 231 |
-| Total Admonitions | 23 |
-| Total Mermaid Diagrams | 24 |
-| Total Footnotes | 29 |
-
-### Codeblock Types
-
-| Type | Count | Percentage |
-|------|-------|------------|
-| 💻 Programming Languages | 66 | 28.6% |
-| 📄 Plain Text | 56 | 24.2% |
-| ⚡ Shell/Scripts | 44 | 19.0% |
-| 📝 Markup Languages | 32 | 13.9% |
-| 📊 Mermaid Diagrams | 24 | 10.4% |
-| 📋 Data Formats | 9 | 3.9% |
-
-### Admonition Types
-
-| Type | Count | Percentage |
-|------|-------|------------|
-| ℹ️ Note | 14 | 60.9% |
-| 💡 Tip | 6 | 26.1% |
-| 🚫 Danger | 2 | 8.7% |
-| ⚠️ Warning | 1 | 4.3% |
+| [Getting Started](/docs/getting-started/project-overview) | Overview, installation, and core concepts |
+| [Architecture](/docs/architecture/build-pipeline) | Build pipeline, DI container, components, markdown engine |
+| [Guides](/docs/guides/cli-reference) | CLI, themes, hooks, SEO, validation, plugins, testing |
+| [Reference](/docs/reference/generated-output) | Generated output, AST parser, configuration, plugins, file structure |
+| [Contributing](/docs/contributing/development-workflow) | Development workflow and documentation guide |
 
 ---
 
@@ -105,53 +41,89 @@ In-depth guides covering all aspects of the build system, components, and deploy
 
 | Feature | Details |
 |---------|---------|
-| **Markdown docs** | YAML frontmatter, nested folders |
-| **Syntax highlighting** | Shiki with 6 paperlike themes |
-| **Sidebar** | Collapsible categories, auto-ordered |
-| **Table of Contents** | Right sidebar with active tracking |
-| **Navigation** | Prev/Next, breadcrumbs, edit link |
-| **Themes** | 6 paperlike themes with CSS filter-based switching |
-| **MathJax** | Inline `$E=mc^2$` and display `$$...$$` |
-| **Mermaid diagrams** | Auto-rendered with loading states |
-| **Admonitions** | `:::note`, `:::tip`, `:::warning`, `:::danger` |
-| **Responsive** | Mobile sidebar, collapsible TOC |
-| **Accessibility** | Semantic HTML, keyboard navigation |
-| **Validation** | Strict codeblock and footnote validation |
-| **Zero runtime APIs** | All content in the JS bundle |
+| **Markdown → HTML** | `marked` parser with custom plugins for math, admonitions, mermaid |
+| **Syntax Highlighting** | Shiki (VS Code-quality themes, 150+ languages) |
+| **Diagrams** | Mermaid live rendering with zoom, pan, and SVG download |
+| **Math** | LaTeX math via MathJax (`$inline$` and `$$display$$`) |
+| **Admonitions** | Docusaurus-style `:::note`, `:::tip`, `:::warning` blocks |
+| **Themes** | 6 paper-like themes with CSS filter-based code theme switching |
+| **SEO** | JSON-LD, Open Graph, Twitter Cards, canonical URLs, sitemap.xml |
+| **CLI** | Unified `docts` CLI with dev, build, preview, lint, test commands |
+| **Validation** | Multi-validator system with strict/stats/llm output modes |
+| **DI Architecture** | Swappable services (storage, router, DOM, theme) for testing |
+| **Print Export** | Full-page HTML print with rendered Mermaid SVGs |
 
 ---
 
-## Tech Stack
+## Technology Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Bundler** | rspack (fast webpack alternative) |
-| **UI** | React 19 |
-| **Styling** | CSS modules + goober (minimal CSS-in-JS) |
-| **Markdown** | marked (build-time conversion) |
-| **Highlighting** | Shiki (VS Code quality) |
-| **Diagrams** | Mermaid (runtime lazy-loaded) |
-| **Math** | MathJax (CDN) |
-| **Linter** | Biome (ESLint + Prettier replacement) |
-| **Testing** | Bun test + React Testing Library |
+| Category | Technology |
+|----------|------------|
+| **Build Tool** | rspack + SWC |
+| **Frontend** | React 19, TypeScript |
+| **CSS** | goober (CSS-in-JS), CSS custom properties |
+| **Markdown** | marked (custom renderer + plugins) |
+| **Syntax Highlighting** | Shiki |
+| **Diagrams** | Mermaid |
+| **Math** | MathJax |
+| **State** | Valtio (proxy-based) |
+| **DI** | Custom service container |
+| **Package Manager** | Bun |
+| **Linter** | Biome |
+| **Testing** | Jest + Testing Library |
+| **Dev Server** | rspack serve + HMR |
+
+---
+
+## Project at a Glance
+
+```mermaid:desc=High-level architecture showing the build pipeline from markdown source to final SPA.
+flowchart TB
+    subgraph Source["Source"]
+        MD["docs/**/*.md"]
+    end
+
+    subgraph Build["Build Pipeline (bun run scripts/build-docs.mts)"]
+        Scan["Scan & Parse\nfrontmatter + marked"]
+        Plugins["Markdown Plugins\nmath → admonitions → mermaid"]
+        Shiki["Shiki Highlighting\ncode blocks"]
+        Generate["Generate TS Files\nsrc/generated/"]
+    end
+
+    subgraph Bundle["rspack Bundle"]
+        React["React App\nDocViewer, Sidebar, TOC"]
+        SPA["Single Page App"]
+    end
+
+    subgraph Output["dist/"]
+        HTML["index.html + JS bundle"]
+        Assets["MathJax + Mermaid libs"]
+    end
+
+    Source --> Scan
+    Scan --> Plugins
+    Plugins --> Shiki
+    Shiki --> Generate
+    Generate --> React
+    React --> Bundle
+    Bundle --> SPA
+    SPA --> Output
+
+    style Source fill:#e8f5e9
+    style Build fill:#fff3e0
+    style Bundle fill:#e3f2fd
+    style Output fill:#f3e5f5
+```
 
 ---
 
 ## Next Steps
 
-- Read the [Project Overview](/docs/getting-started/project-overview) for architecture details
-- Explore the [Build System](/docs/guides/build-system) guide to understand the pipeline
-- Check the [CLI Reference](/docs/guides/cli-reference) for all available commands
-- Review the [Deployment](/docs/guides/deployment) guide for production builds
+- Read the [Project Overview](/docs/getting-started/project-overview) to understand what this is
+- Follow the [Installation Guide](/docs/getting-started/installation) to get set up
+- Explore the [Core Concepts](/docs/getting-started/core-concepts) to understand the build pipeline
+- Dive into the [Architecture docs](/docs/architecture/build-pipeline) for deeper technical detail
 
 ---
 
-## Community
-
-- **GitHub**: [Source code and issues](https://github.com/your-org/docts)
-- **Contributing**: See [Contributing Guide](https://github.com/your-org/docts/blob/main/CONTRIBUTING.md)
-- **License**: [MIT License](https://github.com/your-org/docts/blob/main/LICENSE)
-
----
-
-Happy documenting! 📝✨
+Happy building! 📚

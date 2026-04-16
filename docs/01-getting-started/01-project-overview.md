@@ -1,144 +1,157 @@
 ---
 title: Project Overview
-description: Comprehensive overview of the rspack React ShikiJS documentation site generator architecture
+description: What rspack-react-docs is, its key features, and how it works
 sidebar_label: Overview
 sidebar_position: 1
+tags: [overview, architecture]
 ---
 
 # Project Overview
 
-A **Docusaurus-identical** documentation site generator built with rspack, React, and ShikiJS. Core philosophy: **minimal dependencies at build time, zero APIs at runtime, pure static output**.
+rspack-react-docs is a **Static Site Generator (SSG)** designed specifically for building documentation websites. It takes Markdown files, processes them through a customizable plugin pipeline, and produces a fully interactive Single Page Application (SPA).
 
 :::note Zero Runtime APIs
-All content is pre-built into TypeScript constants. The browser never makes network requests for content — everything is embedded at build time.
+Everything is generated at build time. The frontend is a pure React SPA with no backend, no API calls, and no server-side rendering. All documentation content is baked into TypeScript files during the build.
 :::
 
-## Architecture Principles
+## What Problem Does This Solve?
 
-:::tip Recommended Reading
-The six principles below form the foundation of this project. Understanding them will help you customize and extend the documentation site effectively.
-:::
+Building a documentation website from scratch involves:
 
-```mermaid:desc=Mindmap showing the six core architectural principles of the project centered around minimal dependencies and zero runtime APIs.
+1. **Parsing Markdown** — converting `.md` files to HTML
+2. **Syntax highlighting** — coloring code blocks with Shiki or Prism
+3. **Building navigation** — sidebars, breadcrumbs, table of contents
+4. **Adding interactivity** — search, theme switching, copy buttons, diagram rendering
+5. **SEO optimization** — meta tags, structured data, sitemaps
+
+This project provides all of that out of the box, with a clean architecture that's easy to customize.
+
+## Key Architecture Decisions
+
+```mermaid:desc=Mindmap showing the five core design decisions behind the project.
 mindmap
-  classDef darkStyle fill:#000,stroke:#fff,color:#fff;
-  root(("docts Architecture"))
-    Zero Runtime APIs
-      All content in TS constants
-      No network requests
-      Pure static output
-    Static Generation
-      Markdown to HTML at build
-      TypeScript data files
-      Pre-built bundles
-      class StaticGeneration darkStyle
-    Client-Side Routing
-      SPA with history.pushState
-      No SSR needed
-      URL-based slug lookup
+  root((Design Decisions))
+    Build-Time Generation
+      Markdown scanned at build
+      Content in TS files
+      Zero runtime fetch
+      Instant page loads
+    rspack Over Webpack
+      10x faster builds
+      SWC compilation
+      Compatible plugins
+      Native HMR
+    Custom Markdown Pipeline
+      marked base parser
+      Plugin system
+      Math, admonitions, mermaid
+      Extensible
     Dependency Injection
-      Abstracted service interfaces
-      Testable components
-      Mock services
-    CSS-in-JS plus Modular CSS
-      goober for dynamic styles
-      CSS modules for components
-      Theme system
-    Theme System
-      6 paperlike themes
-      CSS filter code switching
-      LocalStorage persistence
+      Swappable services
+      Easy testing
+      Browser API wrappers
+      Mock-friendly
+    Progressive Enhancement
+      Works without JS for basic content
+      Mermaid/Math loaded async
+      Graceful degradation
+      Print-friendly
 ```
 
-- **Zero runtime APIs**: All content is pre-built into TypeScript constants. The browser never makes network requests for content.
-- **Static generation**: Markdown is converted to HTML at build time, embedded as TypeScript data files
-- **Client-side routing**: SPA with `history.pushState`, no server-side rendering required
-- **Dependency injection**: All browser APIs abstracted behind service interfaces for testability
-- **CSS-in-JS + modular CSS**: goober for dynamic styles, CSS modules for component styles
-- **Theme system**: 6 paperlike themes with CSS filter-based code theme switching
+## How It Works
 
-## Key Dependencies
-
-```mermaid:desc=Flowchart showing the separation between build-time dependencies (marked, shiki, rspack, biome) and runtime dependencies (react, goober, mermaid, serve).
+```mermaid:desc=Data flow from authoring markdown to viewing in browser.
 flowchart LR
-    subgraph BuildTime["Build Time"]
-        B1["marked v18\nMarkdown to HTML"]
-        B2["shiki v4\nSyntax highlighting"]
-        B3["rspack core\nBundler"]
-        B4["biomejs biome\nLinter"]
-    end
+    A["Author\nwrites .md"] --> B["build-docs.mts\nscans + parses"]
+    B --> C["Plugins transform\nmath, admonitions, mermaid"]
+    C --> D["Shiki highlights\ncode blocks"]
+    D --> E["Generate\nsrc/generated/*.ts"]
+    E --> F["rspack bundles\nReact SPA"]
+    F --> G["dist/\nserved as static files"]
+    G --> H["Browser renders\ninteractive docs site"]
 
-    subgraph Runtime["Runtime"]
-        R1["react v19\nUI framework"]
-        R2["goober v2\nCSS-in-JS"]
-        R3["mermaid v11\nDiagrams"]
-        R4["serve v14\nStatic server"]
-    end
-
-    style BuildTime fill:#e1f5ff
-    style Runtime fill:#fff4e1
+    style A fill:#e8f5e9
+    style B fill:#fff3e0
+    style C fill:#fff3e0
+    style D fill:#fff3e0
+    style E fill:#e3f2fd
+    style F fill:#e3f2fd
+    style G fill:#f3e5f5
+    style H fill:#f3e5f5
 ```
 
-| Package | Role | When Used |
-|---------|------|-----------|
-| `react` + `react-dom` (v19) | UI framework | Runtime |
-| `goober` (v2) | CSS-in-JS (minimal) | Runtime |
-| `mermaid` (v11) | Diagram rendering | Runtime (lazy loaded) |
-| `serve` (v14) | Static file server | Production |
-| `marked` (v18) | Markdown to HTML parser | Build only |
-| `shiki` (v4) | Syntax highlighting | Build only |
-| `@rspack/core` + `@rspack/cli` | Bundler | Dev |
-| `@biomejs/biome` | Linter/formatter | Dev |
+### 1. Build-Time Content Scanning
 
-## Build Flow
+The build script (`scripts/build-docs.mts`) walks the `docs/` directory, reads every `.md` file, extracts frontmatter, parses Markdown with `marked`, runs it through plugins, highlights code with Shiki, and generates TypeScript files under `src/generated/`.
 
-```txt:desc=Complete build pipeline flow: from raw markdown files through frontmatter parsing, plugin processing, HTML generation, validation, and final static output.
-Raw .md files
-    ↓
-Parse frontmatter (YAML)
-    ↓
-Plugin preProcess (math, admonitions)
-    ↓
-marked.parse() → HTML
-    ↓
-Plugin postProcess (mermaid, admonitions, math)
-    ↓
-Extract TOC from headings
-    ↓
-Validate (frontmatter, slugs, links)
-    ↓
-Generate TypeScript files in src/generated/
-    ↓
-Generate sitemap.xml + robots.txt (SEO)
-    ↓
-rspack builds React SPA
-    ↓
-dist/ folder (pure static files)
+### 2. React SPA
+
+The frontend (`src/frontend.tsx`) is a React application that reads the generated data and renders it. It handles routing, sidebar navigation, table of contents, theme switching, and renders Mermaid diagrams and MathJax math on the client.
+
+### 3. No Backend
+
+There is no server, no API routes, and no database. Everything is static. The "database" is TypeScript files generated from Markdown.
+
+## Project Structure
+
+```
+rspack-react-docs/
+├── docs/                       # Markdown documentation source
+│   ├── 00-welcome.md           # Welcome page
+│   ├── 01-getting-started/     # Getting started guides
+│   ├── 02-architecture/        # Architecture documentation
+│   ├── 03-guides/              # User guides
+│   ├── 04-reference/           # Technical reference
+│   └── 05-contributing/        # Contributing guides
+├── src/                        # React frontend source
+│   ├── generated/              # Auto-generated from docs (DO NOT EDIT)
+│   ├── hooks/                  # 16 custom React hooks
+│   ├── services/               # DI container + service providers
+│   ├── styles/                 # Modular CSS files (22 files)
+│   ├── App.tsx                 # Root application component
+│   ├── DocViewer.tsx           # Markdown content renderer
+│   ├── Sidebar.tsx             # Navigation sidebar
+│   ├── TableOfContents.tsx     # Right-side TOC
+│   ├── Breadcrumbs.tsx         # Breadcrumb navigation
+│   ├── MetadataPanel.tsx       # Document metadata display
+│   ├── DocStatsFooter.tsx     # Build statistics footer
+│   ├── ArticleRefsPanel.tsx   # Article references panel
+│   ├── ASTViewer.tsx          # Markdown AST debug viewer
+│   ├── ast-parser.ts          # Markdown AST utilities
+│   ├── frontend.tsx           # Entry point
+│   └── index.html             # HTML template (MathJax loaded here)
+├── scripts/
+│   ├── cli.mts                 # Unified CLI (docts dev/build/etc.)
+│   ├── build-docs.mts          # Content scanner + build pipeline
+│   ├── validate-all.mts        # Unified markdown validator
+│   ├── copy-libs.mts           # Copy MathJax/Mermaid to dist
+│   └── plugins/                # Markdown plugin system
+│       ├── index.ts            # Plugin registry
+│       ├── types.ts            # Plugin interfaces
+│       ├── math.ts             # LaTeX math plugin
+│       ├── admonitions.ts      # Docusaurus-style admonitions
+│       ├── mermaid.ts          # Mermaid diagram transformer
+│       └── validators/         # Validation plugins
+├── tests/                      # Jest + Testing Library tests
+├── server/                     # Production server config
+├── rspack.config.ts            # rspack bundler config
+├── biome.json                  # Biome linter config
+├── package.json                # Dependencies + scripts
+└── tsconfig.json               # TypeScript config
 ```
 
-## Theme Options
+## Technology Decisions
 
-| Theme | Type | Background | Best For |
-|-------|------|-----------|----------|
-| Paper White | Light | `#ffffff` | Bright environments |
-| Paper Gray | Light | `#e8e8e8` | Reduced eye strain |
-| Paper Sepia | Light | `#f4ecd8` | Warm, vintage feel |
-| Paper Dark | Dark | `#2a2a2a` | Low-light reading |
-| Navy | Light | `#f0f4f8` | Professional blue |
-| Dark Navy | Dark | `#0f172a` | Modern dark mode |
+| Decision | Why |
+|----------|-----|
+| **rspack over webpack** | 10x faster builds, SWC-based, webpack-compatible |
+| **marked over remark/rehype** | Simpler API, easier to customize renderer |
+| **Shiki over Prism** | VS Code-quality highlighting, uses TextMate grammars |
+| **goober over styled-components** | Tiny (1KB), no bundle size impact |
+| **Valtio over Redux/Zustand** | Proxy-based, less boilerplate |
+| **Custom DI over no DI** | Makes testing browser APIs possible |
+| **Bun over npm** | Faster installs, native TypeScript execution |
 
-## Quick Start
+---
 
-```bash:desc=Common npm scripts for development workflow: starting dev server, building production bundle, serving the built site, and running tests.
-# Development
-npm run dev
-
-# Production build
-npm run build
-
-# Serve production build
-npm start
-
-# Run tests
-npm test
-```
+Next: [Installation Guide](/docs/getting-started/installation)

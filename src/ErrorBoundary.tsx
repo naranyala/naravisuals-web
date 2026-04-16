@@ -1,4 +1,4 @@
-import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Component, type ReactNode } from "react";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -71,26 +71,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
 interface DefaultErrorFallbackProps {
   error: Error;
-  info: ErrorInfo | null;
-  onReset: () => void;
 }
 
-function DefaultErrorFallback({ error, info, onReset }: DefaultErrorFallbackProps) {
-  return (
-    <div className="error-boundary-fallback">
-      <div className="error-boundary-icon">⚠️</div>
-      <h1 className="error-boundary-title">Something went wrong</h1>
-      <p className="error-boundary-message">
-        {error.message || "An unexpected error occurred while rendering this page."}
-      </p>
-      <details className="error-boundary-details">
-        <summary>Technical details</summary>
-        <pre className="error-boundary-stack">{error.stack}</pre>
-        {info && <pre className="error-boundary-stack">{info.componentStack}</pre>}
-      </details>
-      <button className="error-boundary-reset" onClick={onReset}>
-        Try again
-      </button>
-    </div>
-  );
+function DefaultErrorFallback({ error }: DefaultErrorFallbackProps) {
+  console.error("Error caught by boundary:", error.message);
+  return null;
 }

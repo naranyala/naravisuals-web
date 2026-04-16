@@ -1329,16 +1329,26 @@ a:hover {
     animation: slideDown 0.2s ease;
   }
 
-  .scroll-panel-content .toc {
-    padding: 0;
-    border: none;
-  }
+.toc {
+  font-size: 0.75rem;
+}
 
-  .scroll-panel-content .toc-list {
-    border-left-color: var(--border);
-  }
+.toc-list {
+  list-style: none;
+  border-left: 1.5px solid var(--border);
+}
 
-  .scroll-panel-top-btn {
+/* Table of Contents - scroll panel overrides */
+.scroll-panel-content .toc {
+  padding: 0;
+  border: none;
+}
+
+.scroll-panel-content .toc-list {
+  border-left-color: var(--border);
+}
+
+.scroll-panel-top-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1441,7 +1451,8 @@ a:hover {
   border-radius: 0 0.2rem 0.2rem 0;
 }
 
-.doc-content blockquote p:last-child {
+.doc-content blockquote p:last-child,
+.admonition-content p:last-child {
   margin-bottom: 0;
 }
 
@@ -1474,14 +1485,6 @@ a:hover {
 
 .admonition-content {
   padding: 0.75rem 0.85rem;
-}
-
-.doc-content blockquote p:last-child {
-  margin-bottom: 0;
-}
-
-.admonition-content p:last-child {
-  margin-bottom: 0;
 }
 
 /* Type variants */
@@ -1593,6 +1596,7 @@ a:hover {
 .toc {
   font-size: 0.75rem;
 }
+
 .toc-title {
   font-weight: 600;
   margin-bottom: 0.4rem;
@@ -1600,10 +1604,6 @@ a:hover {
   color: var(--text);
 }
 
-.toc-list {
-  list-style: none;
-  border-left: 1.5px solid var(--border);
-}
 .toc-item {
   padding: 0.15rem 0 0.15rem 0.65rem;
   border-left: 1.5px solid transparent;
