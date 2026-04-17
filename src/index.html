@@ -24,24 +24,27 @@
     
     <title>Documentation Site</title>
     
+    <!-- Mermaid for diagram rendering -->
+    <script src="/mermaid/mermaid.min.js"></script>
+    
     <!-- MathJax for rendering math notation -->
     <script>
       window.MathJax = {
-                                      tex: {
-                                        inlineMath: [["$", "$"], ["\\(", "\\)"]],
-                                        displayMath: [["$$", "$$"], ["\\[", "\\]"]],
-                                        processEscapes: true,
-                                        processEnvironments: true,
-                                      },
-                                      options: {
-                                        skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"],
-                                      },
-                                      startup: {
-                                        ready: () => {
-                                          MathJax.startup.defaultReady();
-                                        },
-                                      },
-                                    };
+              tex: {
+                inlineMath: [["$", "$"], ["\\(", "\\)"]],
+                displayMath: [["$$", "$$"], ["\\[", "\\]"]],
+                processEscapes: true,
+                processEnvironments: true,
+              },
+              options: {
+                skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+              },
+              startup: {
+                ready: () => {
+                  MathJax.startup.defaultReady();
+                },
+              },
+            };
     </script>
     <!-- Try local MathJax first, fallback to CDN -->
     <script id="MathJax-script" async src="/mathjax/tex-svg.js"

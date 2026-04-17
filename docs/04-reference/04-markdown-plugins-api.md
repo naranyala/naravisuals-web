@@ -55,7 +55,7 @@ Both `preProcess` and `postProcess` are optional. A plugin can implement one, bo
 
 The plugin registry (`scripts/plugins/index.ts`) exports the active plugins array:
 
-```ts:desc=MarkdownPlugin interface definition
+```ts:desc=Plugin registry showing the active plugins array
 import { mathPlugin } from "./math.ts";
 import { admonitionsPlugin } from "./admonitions.ts";
 import { mermaidPlugin } from "./mermaid.ts";
@@ -75,9 +75,9 @@ export const plugins: MarkdownPlugin[] = [mathPlugin, admonitionsPlugin, mermaid
 
 Validators analyze markdown content for quality checks. They run independently of the build pipeline and can be invoked via `bun run validate` commands.
 
-```ts:desc=MarkdownPlugin interface definition
+```ts:desc=MarkdownValidator interface definition
 export interface MarkdownValidator {
-  /** Unique validator name */
+  /** Validator name */
   name: string;
 
   /** Human-readable label */
@@ -93,7 +93,7 @@ export interface MarkdownValidator {
 
 ### ValidationIssue
 
-```ts:desc=MarkdownPlugin interface definition
+```ts:desc=ValidationIssue type definition
 export type ValidationSeverity = "error" | "warning" | "info";
 
 export interface ValidationIssue {
@@ -115,7 +115,7 @@ export interface ValidationIssue {
 
 ### ValidationResult
 
-```ts:desc=MarkdownPlugin interface definition
+```ts:desc=ValidationResult interface definition
 export interface ValidationResult {
   /** Number of items checked */
   checked: number;
@@ -130,7 +130,7 @@ export interface ValidationResult {
 
 The validator registry (`scripts/plugins/validators/index.ts`) exports:
 
-```ts:desc=MarkdownPlugin interface definition
+```ts:desc=Registered validators list
 export const validators: MarkdownValidator[] = [
   codeblockValidator,     // STRICT - fails build if missing descriptions
   mermaidValidator,       // STRICT - fails build if invalid mermaid content
@@ -148,7 +148,7 @@ Strict validators (`isStrict: true`) cause the build to fail when errors are fou
 
 A plugin that transforms a custom `!!important!!` syntax into an admonition:
 
-```ts:desc=MarkdownPlugin interface definition
+```ts:desc=Custom syntax plugin example
 import type { MarkdownPlugin } from "./types.ts";
 
 export const importantPlugin: MarkdownPlugin = {
@@ -162,7 +162,7 @@ export const importantPlugin: MarkdownPlugin = {
 
 Add it to the registry:
 
-```ts:desc=MarkdownPlugin interface definition
+```ts:desc=Adding plugin to registry example
 // scripts/plugins/index.ts
 import { importantPlugin } from "./important.ts";
 
@@ -178,7 +178,7 @@ export const plugins: MarkdownPlugin[] = [
 
 A plugin that injects a script after all HTML is generated:
 
-```ts:desc=MarkdownPlugin interface definition
+```ts:desc=Post-process plugin example
 import type { MarkdownPlugin } from "./types.ts";
 
 export const injectAnalyticsPlugin: MarkdownPlugin = {
@@ -196,7 +196,7 @@ export const injectAnalyticsPlugin: MarkdownPlugin = {
 
 The build script wraps plugin execution in try/catch blocks. If a plugin throws an error, it is logged as a diagnostic but does not crash the entire build:
 
-```ts:desc=MarkdownPlugin interface definition
+```ts:desc=Plugin error handling example
 for (const plugin of plugins) {
   if (plugin.preProcess) {
     try {
@@ -217,7 +217,7 @@ PostProcess hooks run in **reverse order** with the same error handling.
 
 Checks that all fenced code blocks have a language specified and a meaningful description via the `desc` metadata:
 
-`````markdown:desc=Codeblock syntax example
+`````text:desc=Codeblock syntax example
 ```typescript:desc=Example usage of the DI container
 const container = createContainer();
 ```````
@@ -257,16 +257,13 @@ Validates footnote references. Checks that:
 
 ## Validation CLI Commands
 
-```bash
+```bash:desc=Validation CLI commands
 # Run all validators
 bun run validate
-
 # Strict mode (fail on warnings too)
 bun run validate:strict
-
 # Show statistics only
 bun run validate:stats
-
 # Output in LLM-readable format
 bun run validate:llm
 ```

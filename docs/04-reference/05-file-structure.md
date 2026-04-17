@@ -174,7 +174,7 @@ flowchart tb
     A["docs/*.md"] --> B["scripts/build-docs.mts"]
     B --> C["Parse frontmatter"]
     C --> D["Run preProcess plugins"]
-    D --> E["marked.parse() -> HTML"]
+    D --> E["marked.parse() → HTML"]
     E --> F["Run postProcess plugins reverse"]
     F --> G["Shiki syntax highlight"]
     G --> H["src/generated/ output"]

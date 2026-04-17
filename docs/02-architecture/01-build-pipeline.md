@@ -16,25 +16,25 @@ The build pipeline is the heart of rspack-react-docs. It transforms raw Markdown
 flowchart tb
     subgraph Scan["Content Scanner"]
         Walk["Walk docs/ directory"]
-        Parse["Parse frontmatter\nYAML between ---"]
+        Parse["Parse frontmatter<br/>YAML between ---"]
         Lex["Tokenize with marked.Lexer"]
     end
 
     subgraph Process["Plugin Processing"]
-        Pre["preProcess\nmath → admonitions"]
-        Marked["marked.parse()\nmarkdown → HTML"]
-        Post["postProcess (reverse)\nmermaid → admonitions → math"]
+        Pre["preProcess<br/>math → admonitions"]
+        Marked["marked.parse()<br/>markdown → HTML"]
+        Post["postProcess (reverse)<br/>mermaid → admonitions → math"]
     end
 
     subgraph Highlight["Syntax Highlighting"]
-        Shiki["createHighlighter\ngithub-dark theme"]
-        CodeRenderer["Custom renderer.code\nShiki + code-block wrapper"]
+        Shiki["createHighlighter<br/>github-dark theme"]
+        CodeRenderer["Custom renderer.code<br/>Shiki + code-block wrapper"]
     end
 
     subgraph Generate["Code Generation"]
-        DocEntries["Per-file .ts\none per markdown"]
-        SidebarTS["sidebar.ts\nnavigation tree"]
-        IndexTS["index.ts + types.ts\nbarrel export + interfaces"]
+        DocEntries["Per-file .ts<br/>one per markdown"]
+        SidebarTS["sidebar.ts<br/>navigation tree"]
+        IndexTS["index.ts + types.ts<br/>barrel export + interfaces"]
     end
 
     Walk --> Parse
@@ -136,15 +136,15 @@ sequenceDiagram
     participant Marked as marked.parse()
     participant Mermaid as mermaid Plugin
 
-    MD->>Math: preProcess (extract $...$)
-    Math->>Admon: preProcess (extract ::: blocks)
-    Admon->>Marked: Clean markdown
-    Marked->>Mermaid: HTML output
-    Mermaid->>Mermaid: postProcess (transform mermaid)
-    Mermaid->>Admon: HTML with mermaid done
-    Admon->>Admon: postProcess (render admonitions)
-    Admon->>Math: HTML with admonitions done
-    Math->>Math: postProcess (restore math)
+    MD-->>Math: preProcess (extract $...$)
+    Math-->>Admon: preProcess (extract ::: blocks)
+    Admon-->>Marked: Clean markdown
+    Marked-->>Mermaid: HTML output
+    Mermaid-->>Mermaid: postProcess (transform mermaid)
+    Mermaid-->>Admon: HTML with mermaid done
+    Admon-->>Admon: postProcess (render admonitions)
+    Admon-->>Math: HTML with admonitions done
+    Math-->>Math: postProcess (restore math)
     Math-->>Output: Final HTML
 ```
 

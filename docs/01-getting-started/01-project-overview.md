@@ -62,13 +62,13 @@ mindmap
 
 ```mermaid:desc=Data flow from authoring markdown to viewing in browser.
 flowchart lr
-    A["Author\nwrites .md"] --> B["build-docs.mts\nscans + parses"]
-    B --> C["Plugins transform\nmath, admonitions, mermaid"]
-    C --> D["Shiki highlights\ncode blocks"]
-    D --> E["Generate\nsrc/generated/*.ts"]
-    E --> F["rspack bundles\nReact SPA"]
-    F --> G["dist/\nserved as static files"]
-    G --> H["Browser renders\ninteractive docs site"]
+    A["Author<br/>writes .md"] --> B["scripts-rs<br/>scans + parses"]
+    B --> C["Plugins transform<br/>math, admonitions, mermaid"]
+    C --> D["Shiki highlights<br/>code blocks"]
+    D --> E["Generate<br/>src/generated/*.ts"]
+    E --> F["rspack bundles<br/>React SPA"]
+    F --> G["dist/<br/>served as static files"]
+    G --> H["Browser renders<br/>interactive docs site"]
 
     style A fill:#e8f5e9
     style B fill:#fff3e0
@@ -82,7 +82,7 @@ flowchart lr
 
 ### 1. Build-Time Content Scanning
 
-The build script (`scripts/build-docs.mts`) walks the `docs/` directory, reads every `.md` file, extracts frontmatter, parses Markdown with `marked`, runs it through plugins, highlights code with Shiki, and generates TypeScript files under `src/generated/`.
+The build tool (`scripts-rs`) walks the `docs/` directory, reads every `.md` file, extracts frontmatter, parses Markdown with `marked`, runs it through plugins, highlights code with Shiki, and generates TypeScript files under `src/generated/`.
 
 ### 2. React SPA
 

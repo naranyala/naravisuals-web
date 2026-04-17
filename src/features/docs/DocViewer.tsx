@@ -23,10 +23,14 @@ async function renderMermaid(container: HTMLElement | null, slug: string) {
 
   window.__mermaidLoading__ = true;
 
-  let mermaid: import("mermaid").default;
+  let mermaid: any;
   try {
-    const mermaidModule = await import("mermaid");
-    mermaid = mermaidModule.default;
+    mermaid = (window as any).mermaid;
+
+    if (!mermaid || typeof mermaid.render !== "function") {
+      const mermaidModule = await import("mermaid");
+      mermaid = mermaidModule.default || mermaidModule;
+    }
 
     mermaid.initialize({
       startOnLoad: false,
@@ -65,7 +69,7 @@ async function renderMermaid(container: HTMLElement | null, slug: string) {
           const index = wrapper.dataset.index || "0";
 
           observer.unobserve(wrapper);
-          await renderSingleDiagram(wrapper, mermaid, slug, parseInt(index));
+          await renderSingleDiagram(wrapper, mermaid, slug, parseInt(index, 10));
         }
       }
     },
@@ -99,14 +103,16 @@ async function renderSingleDiagram(
 
   try {
     const uniqueId = `mermaid-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-    const { svg } = await mermaid.render(uniqueId, diagramSource);
+    const result = await mermaid.render(uniqueId, diagramSource);
 
     wrapper.dataset.processed = "true";
 
     if (loadingEl) loadingEl.style.display = "none";
-    mermaidEl.innerHTML = svg;
-    mermaidEl.style.display = "block";
-    mermaidEl.style.opacity = "1";
+    if (result?.svg) {
+      mermaidEl.innerHTML = result.svg;
+      mermaidEl.style.display = "block";
+      mermaidEl.style.opacity = "1";
+    }
 
     if (errorEl) errorEl.style.display = "none";
 
@@ -114,7 +120,7 @@ async function renderSingleDiagram(
       slug,
       index,
       id: uniqueId,
-      source: diagramSource.slice(0, 50) + "...",
+      source: `${diagramSource.slice(0, 50)}...`,
     });
   } catch (err) {
     console.error(`❌ [Mermaid Frontend] Render failed:`, {
@@ -553,6 +559,9 @@ export function DocViewer({ html, slug }: DocViewerProps) {
 
     // Start rendering
     renderContent();
+    return () => {
+      mounted = false;
+    };
   }, [html, slug]);
 
   useEffect(() => {

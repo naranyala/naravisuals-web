@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { AVAILABLE_FONTS, AVAILABLE_THEMES } from "../core/constants";
 import { ASTViewer } from "../features/ast-viewer";
 import { DocFooter, DocViewer } from "../features/docs";
-import { ArticleRefsPanel, MetadataPanel } from "../features/metadata";
+import { MetadataPanel } from "../features/metadata";
 import { Sidebar, TableOfContents } from "../features/navigation";
 import { useSeo } from "../features/seo";
 import { useDocsTheme } from "../features/theme";
@@ -712,7 +712,7 @@ export function MainLayout() {
   const sidebar: SidebarItem[] = sidebarData;
 
   const navigate = (target: string) => {
-    const [slug, hash] = target.split("#");
+    const [slug, _hash] = target.split("#");
     setCurrentSlug(slug);
     services.router.pushState(
       {},
@@ -868,14 +868,14 @@ export function MainLayout() {
           >
             🖨️
           </button>
-          {/* AST viewer toggle */}
-          <button
+          {/* AST viewer toggle - disabled for now */}
+          {/* <button
             className={`top-bar-icon-btn ${astOpen ? "active" : ""}`}
             onClick={() => setAstOpen(!astOpen)}
             aria-label="Toggle AST viewer"
           >
             🌳
-          </button>
+          </button> */}
           {/* Settings toggle */}
           <button
             className={`top-bar-icon-btn ${settingsOpen ? "active" : ""}`}

@@ -27,6 +27,7 @@
     "validate:llm": "bun run scripts/validate-all.mts --llm"
   },
   "dependencies": {
+    "fuse.js": "^7.3.0",
     "goober": "^2.1.18",
     "mathjax-full": "^3.2.2",
     "mermaid": "^11.14.0",

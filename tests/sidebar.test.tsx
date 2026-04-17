@@ -68,7 +68,7 @@ describe("Sidebar", () => {
 
   test("empty sidebar renders without error", () => {
     renderWithServices(<Sidebar sidebar={[]} currentSlug="" onNavigate={mock()} />);
-    const content = document.querySelector(".sidebar-content");
+    const content = document.querySelector(".sidebar-tree-view");
     expect(content?.children.length).toBe(0);
   });
 });

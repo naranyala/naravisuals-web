@@ -103,11 +103,11 @@ sequenceDiagram
     participant CSS as CSS Filters
     participant LS as localStorage
 
-    User->>Hook: setCodeTheme("paperlike-sepia")
-    Hook->>DOM: setAttribute("data-theme", "paperlike-sepia")
-    Hook->>LS: setItem("shiki-code-theme", "paperlike-sepia")
-    DOM->>CSS: [data-theme="paperlike-sepia"] rules activate
-    CSS->>CSS: --bg, --text, --border variables update
+    User-->>Hook: setCodeTheme("paperlike-sepia")
+    Hook-->>DOM: setAttribute("data-theme", "paperlike-sepia")
+    Hook-->>LS: setItem("shiki-code-theme", "paperlike-sepia")
+    DOM-->>CSS: [data-theme="paperlike-sepia"] rules activate
+    CSS-->>CSS: --bg, --text, --border variables update
     Note over CSS,Shiki: Code blocks transform via\ndata-code-theme filter chain
 ```
 

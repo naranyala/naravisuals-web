@@ -78,13 +78,17 @@ export function validateMermaidContent(
 
   const lines = contentWithoutDirectives.split("\n");
 
-  // Find the first line that isn't a custom metadata line (starts with ':')
-  const firstActualLineIndex = lines.findIndex((line) => !line.trim().startsWith(":"));
+  // Find the first line that isn't a comment/metadata line
+  const firstActualLineIndex = lines.findIndex((line) => {
+    const trimmedLine = line.trim();
+    // Skip empty lines, comments (%%), and metadata lines starting with :
+    return trimmedLine !== "" && !trimmedLine.startsWith("%%") && !trimmedLine.startsWith(":");
+  });
 
   if (firstActualLineIndex === -1) {
     errors.push({
       message: "Invalid diagram content",
-      detail: "Diagram contains only metadata. No valid Mermaid type found.",
+      detail: "Diagram contains only comments/metadata. No valid Mermaid type found.",
     });
     return errors;
   }
@@ -105,9 +109,9 @@ export function validateMermaidContent(
   // 3. Global Pattern-based checks (Critical rendering issues)
   const globalPatterns = [
     {
-      regex: /<br\s*\/?>/gi,
-      message: "Invalid <br/> tag",
-      detail: "Replace <br/> with '\\n' for newlines in labels.",
+      regex: /\\n/g,
+      message: "Invalid newline character",
+      detail: "Replace '\\n' with '<br/>' for newlines in labels.",
     },
     {
       regex: /&#\w+;/,
@@ -219,7 +223,7 @@ function validateFlowchartLine(line: string, lineNum: number, errors: Validation
   // 2. Node ID validation
   const parts = line.split(/-->|---/);
 
-  parts.forEach((part, i) => {
+  parts.forEach((part, _i) => {
     const trimmedPart = part.trim();
     if (!trimmedPart) return;
 
@@ -237,7 +241,7 @@ function validateFlowchartLine(line: string, lineNum: number, errors: Validation
     }
 
     // Extract the ID part (before any label [ ( {)
-    const idMatch = trimmedPart.match(/^([^\[\(\{\s]+)/);
+    const idMatch = trimmedPart.match(/^([^[({\s;]+)/);
     if (idMatch) {
       const id = idMatch[1];
 

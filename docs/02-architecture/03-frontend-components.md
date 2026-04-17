@@ -224,15 +224,15 @@ sequenceDiagram
     participant Zoom as setupZoomHandlers()
     participant Download as setupDownloadHandlers()
 
-    React->>DOM: Set innerHTML
-    React->>Mermaid: await renderMermaid(ref)
-    Mermaid->>Mermaid: Dynamically import("mermaid")
-    Mermaid->>Mermaid: mermaid.render() for each diagram
+    React-->>DOM: Set innerHTML
+    React-->>Mermaid: await renderMermaid(ref)
+    Mermaid-->>Mermaid: Dynamically import("mermaid")
+    Mermaid-->>Mermaid: mermaid.render() for each diagram
     Mermaid-->>React: Diagrams rendered as SVG
-    React->>MathJax: renderMath(ref)
-    MathJax->>MathJax: typesetPromise([container])
-    React->>Zoom: setupZoomHandlers()
-    React->>Download: setupDownloadHandlers()
+    React-->>MathJax: renderMath(ref)
+    MathJax-->>MathJax: typesetPromise([container])
+    React-->>Zoom: setupZoomHandlers()
+    React-->>Download: setupDownloadHandlers()
 ```
 
 ### Mermaid Rendering

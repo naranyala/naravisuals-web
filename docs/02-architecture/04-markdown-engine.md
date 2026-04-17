@@ -13,15 +13,15 @@ This document explains how the rspack-react-docs SSG converts raw Markdown files
 
 ```mermaid:desc=Markdown processing pipeline overview
 flowchart lr
-    A["Raw .md\nfiles"] --> B["parseFrontmatter"]
-    B --> C["Extract content\nstring"]
-    C --> D["preProcess plugins\nmath → admonitions"]
-    D --> E["marked.Lexer.lex\n(tokens for AST)"]
-    D --> F["marked.parse\n(HTML output)"]
-    E --> G["Store ast in\ndoc entry"]
-    F --> H["postProcess plugins\nREVERSE order:\nmermaid → admonitions → math"]
-    H --> I["Final HTML\nin doc entry"]
-    I --> J["src/generated/\ndocs/*.ts"]
+    A["Raw .md<br/>files"] --> B["parseFrontmatter"]
+    B --> C["Extract content<br/>string"]
+    C --> D["preProcess plugins<br/>math → admonitions"]
+    D --> E["marked.Lexer.lex<br/>(tokens for AST)"]
+    D --> F["marked.parse<br/>(HTML output)"]
+    E --> G["Store ast in<br/>doc entry"]
+    F --> H["postProcess plugins<br/>REVERSE order:<br/>mermaid → admonitions → math"]
+    H --> I["Final HTML<br/>in doc entry"]
+    I --> J["src/generated/<br/>docs/*.ts"]
 
     style A fill:#1a1a2e,color:#fff
     style F fill:#0f3460,color:#fff
@@ -247,7 +247,7 @@ Walks the Markdown line-by-line, tracking fenced code block state. Only processe
 Handles three math formats:
 
 1. **Multi-line display math** (`$$` on its own line):
-   ```
+   ```text:desc=Multi-line display math example
    $$
    \int_0^\infty e^{-x} dx = 1
    $$
@@ -255,13 +255,13 @@ Handles three math formats:
    Collects lines between opening and closing `$$`, replaces with a sentinel like `MATHDISPLAY0END`.
 
 2. **Single-line display math** (`$$...$$`):
-   ```
+   ```text:desc=Single-line display math example
    $$E = mc^2$$
    ```
    Replaces with `MATHDISPLAY1END`.
 
 3. **Inline math** (`$...$`):
-   ```
+   ```text:desc=Inline math example
    The equation $E = mc^2$ is famous.
    ```
    Replaces with `MATHINLINE2END`.
@@ -470,31 +470,31 @@ sequenceDiagram
     participant Mer as mermaid plugin
     participant Marked as marked
 
-    Build->>Build: Read raw .md file
-    Build->>Build: parseFrontmatter()
-    Build->>Build: Extract content
+    Build-->>Build: Read raw .md file
+    Build-->>Build: parseFrontmatter()
+    Build-->>Build: Extract content
 
-    Build->>Math: preProcess(md)
+    Build-->>Math: preProcess(md)
     Math-->>Build: md with $...$ → MATHINLINE0END
 
-    Build->>Adm: preProcess(md)
+    Build-->>Adm: preProcess(md)
     Adm-->>Build: md with ::: → ADMONITION0END
 
-    Build->>Marked: Lexer.lex(processed)
-    Build->>Marked: marked.parse(processed)
+    Build-->>Marked: Lexer.lex(processed)
+    Build-->>Marked: marked.parse(processed)
     Marked-->>Build: HTML (Shiki code blocks, headings with IDs)
 
-    Build->>Mer: postProcess(HTML)
+    Build-->>Mer: postProcess(HTML)
     Mer-->>Build: HTML with mermaid → MERMAIDBLOCK0END
 
-    Build->>Adm: postProcess(HTML)
+    Build-->>Adm: postProcess(HTML)
     Adm-->>Build: HTML with ADMONITION0END → admonition divs
     Note over Adm: (math sentinels inside admonitions preserved)
 
-    Build->>Math: postProcess(HTML)
+    Build-->>Math: postProcess(HTML)
     Math-->>Build: HTML with MATH sentinels → math spans/divs
 
-    Build->>Build: Write doc entry to src/generated/
+    Build-->>Build: Write doc entry to src/generated/
 ```
 
 ## TOC Extraction

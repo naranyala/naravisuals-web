@@ -41,6 +41,10 @@ export const codeblockValidator: MarkdownValidator = {
     let withDescription = 0;
     let withoutDescription = 0;
 
+    let currentBlockLanguage = "";
+    let currentBlockHasDesc = false;
+    let currentBlockContent: string[] = [];
+
     const categoryStats: Record<string, { total: number; withDesc: number; withoutDesc: number }> =
       {};
 
@@ -64,23 +68,53 @@ export const codeblockValidator: MarkdownValidator = {
         categoryStats[category].total++;
         codeBlocksCount++;
 
-        if (hasDesc) {
-          categoryStats[category].withDesc++;
-          withDescription++;
-        } else {
-          categoryStats[category].withoutDesc++;
-          withoutDescription++;
+        currentBlockLanguage = language;
+        currentBlockHasDesc = hasDesc;
+        currentBlockContent = [];
+      } else if (inCodeBlock && /^(```|~~~)\s*$/.test(line.trim())) {
+        const blockContent = currentBlockContent.join("\n").trim();
+        const isEmpty = blockContent.length === 0;
+        const category = categorizeLanguage(currentBlockLanguage);
 
+        if (isEmpty && currentBlockHasDesc) {
+          withoutDescription++;
+          if (categoryStats[category]) categoryStats[category].withoutDesc++;
+          issues.push({
+            severity: "error",
+            file: filePath,
+            line: startLine,
+            message: `Empty code block with description`,
+            detail: `Empty code blocks should not have a description. Please either add content or remove the :desc= attribute.`,
+          });
+        } else if (!isEmpty && !currentBlockHasDesc) {
+          withoutDescription++;
+          if (categoryStats[category]) categoryStats[category].withoutDesc++;
           issues.push({
             severity: "error",
             file: filePath,
             line: startLine,
             message: `Codeblock missing description`,
-            detail: `Provide a description for the codeblock using the :desc= attribute. For example: \`\`\`${language}:desc=A brief explanation of the code's purpose.`,
+            detail: `Provide a description for the codeblock using the :desc= attribute. For example: \`\`\`${currentBlockLanguage}:desc=A brief explanation of the code's purpose.`,
+          });
+        } else if (!isEmpty && currentBlockHasDesc) {
+          withDescription++;
+          if (categoryStats[category]) categoryStats[category].withDesc++;
+        } else {
+          // Empty and no description - consider this an error too as empty blocks are usually mistakes
+          withoutDescription++;
+          if (categoryStats[category]) categoryStats[category].withoutDesc++;
+          issues.push({
+            severity: "error",
+            file: filePath,
+            line: startLine,
+            message: `Empty code block`,
+            detail: `This code block is empty. Please add content or remove the block entirely.`,
           });
         }
-      } else if (inCodeBlock && line.match(/^(```|~~~)\s*$/)) {
+
         inCodeBlock = false;
+      } else if (inCodeBlock) {
+        currentBlockContent.push(line);
       }
     }
 

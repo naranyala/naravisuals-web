@@ -78,24 +78,24 @@ Your dev server is now running at `http://localhost:3000`.
 ## Project at a Glance
 
 ```mermaid:desc=High-level architecture showing the build pipeline from markdown source to final SPA.
-flowchart tb
-    subgraph Source["Source"]
+flowchart TB
+    subgraph Source
         MD["docs/**/*.md"]
     end
 
-    subgraph Build["Build Pipeline (bun run scripts/build-docs.mts)"]
-        Scan["Scan & Parse\nfrontmatter + marked"]
-        Plugins["Markdown Plugins\nmath → admonitions → mermaid"]
-        Shiki["Shiki Highlighting\ncode blocks"]
-        Generate["Generate TS Files\nsrc/generated/"]
+    subgraph Build["Build Pipeline"]
+        Scan["Scan & Parse"]
+        Plugins["Markdown Plugins"]
+        Shiki["Shiki Highlighting"]
+        Generate["Generate TS Files"]
     end
 
     subgraph Bundle["rspack Bundle"]
-        React["React App\nDocViewer, Sidebar, TOC"]
+        React["React App"]
         SPA["Single Page App"]
     end
 
-    subgraph Output["dist/"]
+    subgraph Output
         HTML["index.html + JS bundle"]
         Assets["MathJax + Mermaid libs"]
     end

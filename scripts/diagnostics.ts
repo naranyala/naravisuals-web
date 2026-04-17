@@ -1,10 +1,61 @@
+import { colors } from "./core/index.ts";
+
 /**
- * Build-Time Diagnostics
- *
- * Structured error/warning collection for the markdown build pipeline.
- * Catches: broken frontmatter, invalid YAML, duplicate slugs, broken
- * internal links, plugin failures, missing required fields, and admonition analysis.
+ * Validate that all code blocks have a description in their info string.
+ * Pattern: ```lang:desc=Description text
  */
+export function validateCodeBlockDescriptions(
+  markdownContent: string,
+  file: string,
+  diags: Diagnostics
+): void {
+  const lines = markdownContent.split("\n");
+  let inCodeBlock = false;
+  let fenceChar = "";
+  let fenceLength = 0;
+  let startLine = 0;
+
+  lines.forEach((line, index) => {
+    const match = line.match(/^(\s*)(`{3,}|~{3,})(\w+)?(.*)$/);
+
+    if (inCodeBlock) {
+      if (match) {
+        const [_full, _indent, fence, lang] = match;
+        // Closing fence must be at least as long as the opening fence and use the same character
+        if (fence.startsWith(fenceChar) && fence.length >= fenceLength && !lang) {
+          inCodeBlock = false;
+          return;
+        }
+      }
+      return;
+    }
+
+    if (match) {
+      const [_full, _indent, fence, language, infoString] = match;
+      inCodeBlock = true;
+      fenceChar = fence[0];
+      fenceLength = fence.length;
+      startLine = index + 1;
+
+      // Check for description in both colon syntax and brace syntax
+      // 1. Colon syntax: :desc=...
+      // 2. Brace syntax: {description="..."} or {desc="..."}
+      const hasDesc =
+        infoString.includes(":desc=") ||
+        infoString.includes(":description=") ||
+        /desc(?:ription)?\s*=\s*["']?([^"']+)["']?/.test(infoString);
+
+      if (!hasDesc) {
+        diags.warn(
+          "content",
+          file,
+          `Missing description for ${language || "code"} block`,
+          `Line ${startLine}: Code blocks should include a description for better documentation. Example: \`\`\`${language || "ts"}:desc=Description text\`\`\``
+        );
+      }
+    }
+  });
+}
 
 export type DiagnosticSeverity = "error" | "warning" | "info";
 export type DiagnosticSource =
@@ -95,27 +146,29 @@ export class Diagnostics {
 
   /** Format as a human-readable string */
   format(): string {
-    if (this.items.length === 0) return "✓ No diagnostics";
+    if (this.items.length === 0) return `${colors.green}✓ No diagnostics${colors.reset}`;
 
     const lines: string[] = [];
     const severityIcon: Record<DiagnosticSeverity, string> = {
-      error: "✗",
-      warning: "⚠",
-      info: "ℹ",
+      error: `${colors.red}✗${colors.reset}`,
+      warning: `${colors.yellow}⚠${colors.reset}`,
+      info: `${colors.blue}ℹ${colors.reset}`,
     };
 
     for (const d of this.items) {
       const icon = severityIcon[d.severity];
       const pos = d.line ? `:${d.line}` : "";
-      const header = `${icon} [${d.severity.toUpperCase()}] ${d.file}${pos} (${d.source})`;
+      const header = `${icon} ${colors.bright}[${d.severity.toUpperCase()}]${colors.reset} ${colors.cyan}${d.file}${colors.reset}${pos} (${colors.dim}${d.source}${colors.reset})`;
       lines.push(header);
       lines.push(`   ${d.message}`);
-      if (d.detail) lines.push(`   → ${d.detail}`);
+      if (d.detail) lines.push(`   ${colors.dim}→ ${d.detail}${colors.reset}`);
     }
 
     const { errors, warnings, info } = this.summary();
     lines.push("");
-    lines.push(`Summary: ${errors} error(s), ${warnings} warning(s), ${info} info`);
+    lines.push(
+      `${colors.bright}Summary:${colors.reset} ${colors.red}${errors} error(s)${colors.reset}, ${colors.yellow}${warnings} warning(s)${colors.reset}, ${colors.blue}${info} info${colors.reset}`
+    );
     return lines.join("\n");
   }
 
@@ -136,7 +189,6 @@ export function validateInternalLinks(
   file: string,
   diags: Diagnostics
 ): number {
-  // Match markdown links: [text](/path)
   const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
   let match: RegExpExecArray | null;
   let brokenCount = 0;
@@ -144,11 +196,8 @@ export function validateInternalLinks(
   while ((match = linkRegex.exec(content)) !== null) {
     const href = match[2];
     const text = match[1];
-    // Only validate internal doc links
     if (!href.startsWith("/docs/")) continue;
 
-    // Strip query params, anchor fragments, and leading slash to get the slug
-    // e.g. /docs/guides/configuration?ref=test#section → docs/guides/configuration
     const cleanHref = href.split("?")[0].split("#")[0].replace(/^\//, "");
 
     if (!knownSlugs.has(cleanHref)) {
@@ -216,17 +265,11 @@ export interface AdmonitionAnalysis {
   recommendations: string[];
 }
 
-/**
- * Analyze admonitions in markdown content.
- * Returns stats and recommendations for content enrichment.
- * Works on raw markdown (before HTML conversion).
- */
 export function analyzeAdmonitions(
   markdownContent: string,
   file: string,
   diags: Diagnostics
 ): AdmonitionAnalysis {
-  // Use simpler pattern that matches :::type anywhere in a line (more reliable)
   const admonitionRegex = /:::(\w+)/g;
   const types: Record<string, number> = {};
   let match: RegExpExecArray | null;
@@ -260,7 +303,6 @@ export function analyzeAdmonitions(
     );
   }
 
-  // Check for missing common types
   const commonTypes = ["tip", "warning", "note"];
   for (const t of commonTypes) {
     if (!types[t]) {
@@ -306,18 +348,15 @@ export function analyzeContent(
   };
   const recommendations: string[] = [];
 
-  // Count code blocks (```language)
   const codeBlockRegex = /^```(\w+)?/gm;
   let match: RegExpExecArray | null;
   while ((match = codeBlockRegex.exec(markdownContent)) !== null) {
     stats.codeBlocks++;
-    // Check if it's a mermaid block
     if (match[1]?.toLowerCase() === "mermaid") {
       stats.mermaidBlocks++;
     }
   }
 
-  // Count admonitions (:::type)
   const admonitionRegex = /:::(\w+)/g;
   while ((match = admonitionRegex.exec(markdownContent)) !== null) {
     const type = match[1].toLowerCase();
@@ -325,22 +364,18 @@ export function analyzeContent(
     stats.admonitionTypes[type] = (stats.admonitionTypes[type] || 0) + 1;
   }
 
-  // Count references [text][url] or [text](url)
   const refRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   while ((match = refRegex.exec(markdownContent)) !== null) {
-    // Only count if it looks like a reference (not internal link)
     if (!match[2].startsWith("/") && !match[2].startsWith("#")) {
       stats.references++;
     }
   }
 
-  // Count footnotes [^1] or [^note]:
   const footnoteRegex = /\[\^(\w+)\]/g;
   while ((match = footnoteRegex.exec(markdownContent)) !== null) {
     stats.footnotes++;
   }
 
-  // Add recommendations based on stats
   if (stats.codeBlocks === 0) {
     recommendations.push("No code blocks found - consider adding examples with ``` code blocks");
   }

@@ -63,12 +63,9 @@ export const mermaidPlugin: MarkdownPlugin = {
 
         // Replace newlines inside labels ([], (), {}) with <br/>
         // This fixes Lexical errors when labels span multiple lines
-        decoded = decoded.replace(
-          /([\[\(\{])([\s\S]*?)([\]\)\}])/g,
-          (match, open, content, close) => {
-            return `${open}${content.replace(/\n/g, "<br/>")}${close}`;
-          }
-        );
+        decoded = decoded.replace(/([[({])([\s\S]*?)([\])}])/g, (_match, open, content, close) => {
+          return `${open}${content.replace(/\n/g, "\\n")}${close}`;
+        });
 
         // Validate diagram content
         const validationErrors = validateMermaidContent(decoded);

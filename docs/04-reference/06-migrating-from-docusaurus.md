@@ -85,7 +85,7 @@ module.exports = {
 
 In rspack-react-docs, the sidebar is determined by folder structure and filename prefixes:
 
-```:desc=Sidebar folder structure example
+```text:desc=Sidebar folder structure example
 docs/
 ├── 00-welcome.md                          # Position 0
 ├── 01-getting-started/
@@ -134,9 +134,9 @@ The `:::caution` type maps to `:::note` in rspack-react-docs.
 
 Code block syntax is compatible. rspack-react-docs supports additional metadata in the info string:
 
-`````markdown:desc=Codeblock syntax comparison example
+`````text:desc=Codeblock syntax comparison example
 <!-- Docusaurus (compatible) -->
-```typescript
+```typescript:desc=Docusaurus compatible code block
 const x = 1;
 ```
 
@@ -146,9 +146,9 @@ const x = 1;
 ```
 
 ```mermaid:desc=User flow:zoom=true
-flowchart td
+flowchart TD
   A --> B
-```````
+```
 
 ### What You Lose
 
@@ -201,7 +201,6 @@ flowchart td
 <!-- MkDocs (before) -->
 !!! note "Title"
     Content here
-
 <!-- rspack-react-docs (after) -->
 :::note
 **Title**
@@ -220,10 +219,8 @@ Content here
 ```bash:desc=Audit documentation commands
 # Count files by type
 find docs/ -name "*.md" | wc -l
-
 # Check for MDX files (need rewriting)
 find docs/ -name "*.mdx" -o -name "*.md" -exec grep -l "<[A-Z]" {} \;
-
 # Check for custom admonition types
 grep -r ":::" docs/ | grep -oP ':[a-z]+' | sort | uniq -c
 ```
@@ -243,10 +240,8 @@ mkdir -p docs/{01-getting-started,02-architecture,03-guides,04-reference,05-cont
 ```bash:desc=Rebuild documentation commands
 # Generate TypeScript data from markdown
 bun run build:docs
-
 # Verify no build errors
 bun run validate
-
 # Start development server
 bun run dev
 ```

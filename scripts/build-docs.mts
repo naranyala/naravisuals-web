@@ -29,9 +29,11 @@ import {
   analyzeAdmonitions,
   analyzeContent,
   Diagnostics,
+  validateCodeBlockDescriptions,
   validateFrontmatter,
   validateUniqueSlugs,
 } from "./diagnostics.ts";
+
 import { plugins } from "./plugins/index.ts";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -151,31 +153,57 @@ interface CodeBlockMeta {
 function parseCodeInfo(info: string | undefined): CodeBlockMeta {
   if (!info) return { lang: "", copy: true, zoom: true };
 
-  // Extract language (everything before the first colon, or the whole string)
-  const colonIndex = info.indexOf(":");
-  const lang = colonIndex > 0 ? info.slice(0, colonIndex).trim() : info.trim();
+  let lang = "";
+  let rest = "";
 
-  // If no colons, return just the language with defaults
+  // 1. Try to parse the new syntax: lang { key="value" }
+  const braceMatch = info.match(/^([^\s{]+)\s*\{([\s\S]*)\}\s*$/);
+  if (braceMatch) {
+    lang = braceMatch[1].trim();
+    rest = braceMatch[2].trim();
+
+    const titleMatch = rest.match(
+      /title\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/
+    );
+    const descMatch = rest.match(
+      /desc(?:ription)?\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/
+    );
+    const labelMatch = rest.match(
+      /label\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/
+    );
+    const copyMatch = rest.match(/copy\s*=\s*["']?(true|false)["']?/i);
+    const zoomMatch = rest.match(/zoom\s*=\s*["']?(true|false)["']?/i);
+
+    return {
+      lang,
+      title: titleMatch?.[1].trim(),
+      desc: descMatch?.[1].trim(),
+      label: labelMatch?.[1].trim(),
+      copy: copyMatch ? copyMatch[1].toLowerCase() === "true" : true,
+      zoom: zoomMatch ? zoomMatch[1].toLowerCase() === "true" : true,
+    };
+  }
+
+  // 2. Fall back to existing colon syntax: lang:key=value
+  const colonIndex = info.indexOf(":");
+  lang = colonIndex > 0 ? info.slice(0, colonIndex).trim() : info.trim();
+
   if (colonIndex === -1) return { lang, copy: true, zoom: true };
 
-  // Parse key=value pairs after the language
-  const rest = info.slice(colonIndex + 1);
+  rest = info.slice(colonIndex + 1);
   const titleMatch = rest.match(/(?:^|:)title\s*=\s*([^:]+?)(?=:|$)/);
   const descMatch = rest.match(/(?:^|:)desc(?:ription)?\s*=\s*([^:]+?)(?=:|$)/);
   const labelMatch = rest.match(/(?:^|:)label\s*=\s*([^:]+?)(?=:|$)/);
   const copyMatch = rest.match(/(?:^|:)copy\s*=\s*(true|false)(?=:|$)/i);
   const zoomMatch = rest.match(/(?:^|:)zoom\s*=\s*(true|false)(?=:|$)/i);
 
-  const copyValue = copyMatch ? copyMatch[1].toLowerCase() === "true" : true;
-  const zoomValue = zoomMatch ? zoomMatch[1].toLowerCase() === "true" : true;
-
   return {
     lang,
     title: titleMatch ? titleMatch[1].trim().replace(/["'\s]+$/, "") : undefined,
     desc: descMatch ? descMatch[1].trim().replace(/["'\s]+$/, "") : undefined,
     label: labelMatch ? labelMatch[1].trim().replace(/["'\s]+$/, "") : undefined,
-    copy: copyValue,
-    zoom: zoomValue,
+    copy: copyMatch ? copyMatch[1].toLowerCase() === "true" : true,
+    zoom: zoomMatch ? zoomMatch[1].toLowerCase() === "true" : true,
   };
 }
 
@@ -370,6 +398,9 @@ function scanMdFiles(baseDir: string, section: "docs" | "blog", diags: Diagnosti
             }
           }
         }
+
+        // Validate mandatory code block descriptions
+        validateCodeBlockDescriptions(content, relPath, diags);
 
         let html = "";
         let tokens: any[] = [];
@@ -610,6 +641,8 @@ for (const doc of all) {
 const summary = diags.summary();
 if (summary.errors > 0 || summary.warnings > 0) {
   logger.raw("");
+  logger.raw(`${colors.cyan}${colors.bright}🔍 Codeblocks Report${colors.reset}`);
+  logger.raw("═".repeat(60));
   logger.raw(diags.format());
   logger.raw("");
 }

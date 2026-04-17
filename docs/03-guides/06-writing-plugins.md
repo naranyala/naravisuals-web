@@ -91,13 +91,13 @@ sequenceDiagram
     participant Mermaid as mermaidPlugin
     participant HTML as Final HTML
 
-    MD->>Math: preProcess (extract $...$)
-    Math->>Adm: preProcess (extract :::blocks)
-    Adm->>Marked: clean markdown
-    Marked->>Mermaid: raw HTML
-    Mermaid->>Adm: postProcess (mermaid diagrams rendered)
-    Adm->>Math: postProcess (admonitions rendered)
-    Math->>HTML: postProcess (math rendered)
+    MD-->>Math: preProcess (extract $...$)
+    Math-->>Adm: preProcess (extract :::blocks)
+    Adm-->>Marked: clean markdown
+    Marked-->>Mermaid: raw HTML
+    Mermaid-->>Adm: postProcess (mermaid diagrams rendered)
+    Adm-->>Math: postProcess (admonitions rendered)
+    Math-->>HTML: postProcess (math rendered)
 ```
 
 ## The Sentinel Pattern

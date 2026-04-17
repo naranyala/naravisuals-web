@@ -139,10 +139,10 @@ flowchart td
         MT[createMockTheme]
     end
 
-    Storage -.-> MS
-    Router -.-> MR
-    Dom -.-> MD
-    Theme -.-> MT
+    Storage -.--> MS
+    Router -.--> MR
+    Dom -.--> MD
+    Theme -.--> MT
 ```
 
 | Interface | Mock | Purpose |

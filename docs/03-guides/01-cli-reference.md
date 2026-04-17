@@ -267,15 +267,15 @@ sequenceDiagram
     participant Rspack as rspack
     participant Serve as serve
 
-    User->>CLI: docts build
-    CLI->>CLI: Parse arguments
-    CLI->>CLI: Run clean
-    CLI->>Build: build documentation
+    User-->>CLI: docts build
+    CLI-->>CLI: Parse arguments
+    CLI-->>CLI: Run clean
+    CLI-->>Build: build documentation
     Build-->>CLI: src/generated/
-    CLI->>CLI: Run lint (unless --no-lint)
-    CLI->>Rspack: bunx rspack build
+    CLI-->>CLI: Run lint (unless --no-lint)
+    CLI-->>Rspack: bunx rspack build
     Rspack-->>CLI: dist/
-    CLI->>CLI: Copy libraries
+    CLI-->>CLI: Copy libraries
     CLI-->>User: Build complete
 ```
 

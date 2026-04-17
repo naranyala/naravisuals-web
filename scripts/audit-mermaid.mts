@@ -1,5 +1,5 @@
-import { readFileSync, readdirSync, statSync } from "fs";
-import { join } from "path";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { validateMermaidContent } from "./plugins/validators/mermaid-content";
 
 function getFiles(dir: string): string[] {
@@ -41,7 +41,9 @@ for (const file of files) {
       console.log(`\n❌ File: ${file} (Block ${index + 1})`);
       console.log(`Source:\n${source}`);
       console.log(`Errors:`);
-      result.forEach((err) => console.log(` - ${err.message}: ${err.detail}`));
+      for (const err of result) {
+        console.log(` - ${err.message}: ${err.detail}`);
+      }
     }
   });
 }

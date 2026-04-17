@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
 import Fuse from "fuse.js";
+import { useEffect, useMemo, useState } from "react";
 import { allDocs } from "@/generated";
 
 interface SidebarDocItem {
@@ -149,7 +149,7 @@ export function Sidebar({ sidebar, currentSlug, onNavigate }: SidebarProps) {
 
       // Extract a snippet from the plainText if a match was found there
       const contentMatch = matches?.find((m) => m.key === "plainText");
-      if (contentMatch && contentMatch.indices) {
+      if (contentMatch?.indices) {
         const index = contentMatch.indices[0][0];
         const start = Math.max(0, index - 40);
         const end = Math.min(item.plainText.length, index + 40);
@@ -230,9 +230,9 @@ export function Sidebar({ sidebar, currentSlug, onNavigate }: SidebarProps) {
           <div className="sidebar-search-results">
             {debouncedQuery ? (
               searchResults.length > 0 ? (
-                searchResults.map((doc, idx) => (
+                searchResults.map((doc) => (
                   <div
-                    key={`${doc.id}-${idx}`}
+                    key={doc.id}
                     className={`sidebar-search-item ${currentSlug === doc.slug ? "active" : ""}`}
                     onClick={() => onNavigate(doc.navTarget)}
                   >

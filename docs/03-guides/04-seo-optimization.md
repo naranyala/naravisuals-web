@@ -237,12 +237,12 @@ sequenceDiagram
     participant DOM as document.head
     participant Script as structured-data
 
-    Router->>Component: Navigate to new doc
-    Component->>useSeo: call with new doc metadata
-    useSeo->>DOM: Update meta tags
-    useSeo->>DOM: Update canonical link
-    useSeo->>Script: Update JSON-LD schema
-    useSeo->>DOM: Update data-* attributes
+    Router-->>Component: Navigate to new doc
+    Component-->>useSeo: call with new doc metadata
+    useSeo-->>DOM: Update meta tags
+    useSeo-->>DOM: Update canonical link
+    useSeo-->>Script: Update JSON-LD schema
+    useSeo-->>DOM: Update data-* attributes
 ```
 
 All updates happen via `useEffect`, which runs synchronously after render. Existing meta elements are updated in-place rather than recreated.

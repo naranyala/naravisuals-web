@@ -19,25 +19,25 @@ flowchart tb
     end
 
     subgraph Parse["Parse Phase"]
-        FM["Extract Frontmatter\ntitle, description, tags"]
-        Lex["Tokenize Markdown\nmarked.Lexer"]
-        Slug["Generate Slugs\nfrom filenames"]
+        FM["Extract Frontmatter<br/>title, description, tags"]
+        Lex["Tokenize Markdown<br/>marked.Lexer"]
+        Slug["Generate Slugs<br/>from filenames"]
     end
 
     subgraph Transform["Transform Phase"]
-        Math["math Plugin\n$...$ → sentinels"]
-        Admon["admonitions Plugin\n::: → sentinels"]
-        Mermaid["mermaid Plugin\npostProcess transformer"]
+        Math["math Plugin<br/>$...$ → sentinels"]
+        Admon["admonitions Plugin<br/>::: → sentinels"]
+        Mermaid["mermaid Plugin<br/>postProcess transformer"]
     end
 
     subgraph Highlight["Highlight Phase"]
-        Shiki["Shiki Highlighter\ncode → colored HTML"]
+        Shiki["Shiki Highlighter<br/>code → colored HTML"]
     end
 
     subgraph Generate["Generate Phase"]
-        DocEntry["DocEntry objects\nper markdown file"]
-        Sidebar["Sidebar data\nnavigation structure"]
-        TypesTS["types.ts\ninterface definitions"]
+        DocEntry["DocEntry objects<br/>per markdown file"]
+        Sidebar["Sidebar data<br/>navigation structure"]
+        TypesTS["types.ts<br/>interface definitions"]
     end
 
     MD --> FM
@@ -112,21 +112,21 @@ These objects are written to `src/generated/` as TypeScript files and imported b
 
 ```mermaid:desc=React component hierarchy showing how the app renders.
 flowchart tb
-    A["frontend.tsx\nEntry Point"] --> B["ErrorBoundary"]
-    B --> C["ServicesProvider\nDI Context"]
-    C --> D["App.tsx\nRoot Component"]
+    A["frontend.tsx<br/>Entry Point"] --> B["ErrorBoundary"]
+    B --> C["ServicesProvider<br/>DI Context"]
+    C --> D["App.tsx<br/>Root Component"]
 
-    D --> E["TopBar\nTitle + theme toggle"]
-    D --> F["Sidebar\nNavigation tree"]
-    D --> G["DocViewer\nRendered content"]
-    D --> H["TableOfContents\nHeading links"]
-    D --> I["DocFooter\nPrev/Next links"]
-    D --> J["DocStatsFooter\nBuild stats"]
+    D --> E["TopBar<br/>Title + theme toggle"]
+    D --> F["Sidebar<br/>Navigation tree"]
+    D --> G["DocViewer<br/>Rendered content"]
+    D --> H["TableOfContents<br/>Heading links"]
+    D --> I["DocFooter<br/>Prev/Next links"]
+    D --> J["DocStatsFooter<br/>Build stats"]
 
-    G --> K["Shiki Code\nSyntax highlighted"]
-    G --> L["Mermaid Diagrams\nClient-side render"]
-    G --> M["MathJax Math\nClient-side typeset"]
-    G --> N["Admonitions\nStyled callouts"]
+    G --> K["Shiki Code<br/>Syntax highlighted"]
+    G --> L["Mermaid Diagrams<br/>Client-side render"]
+    G --> M["MathJax Math<br/>Client-side typeset"]
+    G --> N["Admonitions<br/>Styled callouts"]
 
     style A fill:#e8f5e9
     style D fill:#fff3e0
