@@ -179,7 +179,7 @@ describe("validateUniqueSlugs", () => {
 describe("validateInternalLinks", () => {
   test("no warnings for valid links", () => {
     const diags = new Diagnostics();
-    const knownSlugs = new Set(["docs/a", "docs/b"]);
+    const knownSlugs = new Set(["a", "b"]);
     const content = "See [page A](/docs/a) and [page B](/docs/b#section)";
     validateInternalLinks(content, knownSlugs, "test.md", diags);
     expect(diags.warnings()).toHaveLength(0);
@@ -187,7 +187,7 @@ describe("validateInternalLinks", () => {
 
   test("warning for broken link", () => {
     const diags = new Diagnostics();
-    const knownSlugs = new Set(["docs/a"]);
+    const knownSlugs = new Set(["a"]);
     const content = "See [missing](/docs/missing-page)";
     validateInternalLinks(content, knownSlugs, "test.md", diags);
     expect(diags.warnings()).toHaveLength(1);

@@ -151,6 +151,16 @@ describe("Mermaid Content Validation", () => {
   });
 
   describe("Edge cases", () => {
+    test("allows single arrow inside quotes in flowchart", () => {
+      const errors = validateMermaidContent('flowchart TD;\nA["Click -> Here"]-->B;');
+      expect(errors).toHaveLength(0);
+    });
+
+    test("handles escaped quotes in labels", () => {
+      const errors = validateMermaidContent('flowchart TD;\nA["He said \\"Hello\\""]-->B;');
+      expect(errors).toHaveLength(0);
+    });
+
     test("handles HTML entities in labels", () => {
       const errors = validateMermaidContent('flowchart TD;\nA["&amp;"]-->B;');
       // After decoding, this becomes &, which should be caught

@@ -37,7 +37,7 @@
     "valtio": "^2.3.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.11",
+    "@biomejs/biome": "^2.4.12",
     "@rspack/cli": "^1.7.11",
     "@rspack/core": "^1.7.11",
     "@rspack/plugin-react-refresh": "^2.0.0",
@@ -49,7 +49,7 @@
     "css-loader": "^7.1.4",
     "html-rspack-plugin": "^6.1.8",
     "jsdom": "^29.0.2",
-    "marked": "^18.0.0",
+    "marked": "^18.0.2",
     "react-refresh": "^0.18.0",
     "shiki": "^4.0.2",
     "style-loader": "^4.0.0"

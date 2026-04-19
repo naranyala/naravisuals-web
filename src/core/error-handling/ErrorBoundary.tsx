@@ -73,13 +73,32 @@ interface DefaultErrorFallbackProps {
   error: Error;
 }
 
-function DefaultErrorFallback({ error }: DefaultErrorFallbackProps) {
+function DefaultErrorFallback({
+  error,
+  onReset,
+}: DefaultErrorFallbackProps & { onReset: () => void }) {
   console.error("Error caught by boundary:", error.message);
   return (
     <div className="error-fallback">
-      <h2>Something went wrong.</h2>
-      <p>{error.message}</p>
-      <button onClick={() => window.location.reload()}>Reload Page</button>
+      <div className="error-fallback-content">
+        <div className="error-icon">⚠️</div>
+        <h2>Application Error</h2>
+        <p className="error-message">{error.message}</p>
+        {error.stack && (
+          <details className="error-details">
+            <summary>Stack Trace</summary>
+            <pre>{error.stack}</pre>
+          </details>
+        )}
+        <div className="error-actions">
+          <button className="btn-primary" onClick={() => window.location.reload()}>
+            Reload Page
+          </button>
+          <button className="btn-secondary" onClick={onReset}>
+            Try to recover
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

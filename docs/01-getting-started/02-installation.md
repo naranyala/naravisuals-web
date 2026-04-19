@@ -154,4 +154,4 @@ bun run validate:strict
 
 ---
 
-Next: [Core Concepts](/docs/getting-started/core-concepts)
+Next: [Core Concepts](/docs/getting-started/introduction)

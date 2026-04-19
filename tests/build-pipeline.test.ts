@@ -104,16 +104,65 @@ function slugifyHeading(text: string): string {
 function parseCodeInfo(info: string | undefined): {
   lang: string;
   title?: string;
+  desc?: string;
+  label?: string;
+  copy?: boolean;
+  zoom?: boolean;
 } {
-  if (!info) return { lang: "" };
-  const titleMatch = info.match(/^([^\s:]+)\s*:\s*title\s*=\s*(.+)$/);
-  if (titleMatch) {
+  if (!info) return { lang: "", copy: true, zoom: true };
+
+  let lang = "";
+  let rest = "";
+
+  // 1. Try to parse the new syntax: lang { key="value" }
+  const braceMatch = info.match(/^([^\s{]+)\s*\{([\s\S]*)\}\s*$/);
+  if (braceMatch) {
+    lang = braceMatch[1].trim();
+    rest = braceMatch[2].trim();
+
+    const titleMatch = rest.match(
+      /title\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/
+    );
+    const descMatch = rest.match(
+      /desc(?:ription)?\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/
+    );
+    const labelMatch = rest.match(
+      /label\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/
+    );
+    const copyMatch = rest.match(/copy\s*=\s*["']?(true|false)["']?/i);
+    const zoomMatch = rest.match(/zoom\s*=\s*["']?(true|false)["']?/i);
+
     return {
-      lang: titleMatch[1],
-      title: titleMatch[2].trim().replace(/["'\s]+$/, ""),
+      lang,
+      title: titleMatch?.[1]?.trim() || titleMatch?.[2]?.trim() || titleMatch?.[3]?.trim(),
+      desc: descMatch?.[1]?.trim() || descMatch?.[2]?.trim() || descMatch?.[3]?.trim(),
+      label: labelMatch?.[1]?.trim() || labelMatch?.[2]?.trim() || labelMatch?.[3]?.trim(),
+      copy: copyMatch ? copyMatch[1].toLowerCase() === "true" : true,
+      zoom: zoomMatch ? zoomMatch[1].toLowerCase() === "true" : true,
     };
   }
-  return { lang: info };
+
+  // 2. Fall back to existing colon syntax: lang:key=value
+  const colonIndex = info.indexOf(":");
+  lang = colonIndex > 0 ? info.slice(0, colonIndex).trim() : info.trim();
+
+  if (colonIndex === -1) return { lang, copy: true, zoom: true };
+
+  rest = info.slice(colonIndex + 1);
+  const titleMatch = rest.match(/(?:^|:)\s*title\s*=\s*([^:]+?)\s*(?=:|$)/);
+  const descMatch = rest.match(/(?:^|:)\s*desc(?:ription)?\s*=\s*([^:]+?)\s*(?=:|$)/);
+  const labelMatch = rest.match(/(?:^|:)\s*label\s*=\s*([^:]+?)\s*(?=:|$)/);
+  const copyMatch = rest.match(/(?:^|:)\s*copy\s*=\s*(true|false)\s*(?=:|$)/i);
+  const zoomMatch = rest.match(/(?:^|:)\s*zoom\s*=\s*(true|false)\s*(?=:|$)/i);
+
+  return {
+    lang,
+    title: titleMatch ? titleMatch[1].trim().replace(/["'\s]+$/, "") : undefined,
+    desc: descMatch ? descMatch[1].trim().replace(/["'\s]+$/, "") : undefined,
+    label: labelMatch ? labelMatch[1].trim().replace(/["'\s]+$/, "") : undefined,
+    copy: copyMatch ? copyMatch[1].toLowerCase() === "true" : true,
+    zoom: zoomMatch ? zoomMatch[1].toLowerCase() === "true" : true,
+  };
 }
 
 // ─── Frontmatter ─────────────────────────────────────────────────────────
@@ -345,40 +394,55 @@ describe("slugifyHeading", () => {
 
 describe("parseCodeInfo", () => {
   test("plain language", () => {
-    expect(parseCodeInfo("typescript")).toEqual({ lang: "typescript" });
+    expect(parseCodeInfo("typescript").lang).toBe("typescript");
   });
 
   test("language with title", () => {
-    expect(parseCodeInfo("typescript:title=src/store.ts")).toEqual({
-      lang: "typescript",
-      title: "src/store.ts",
-    });
+    const info = parseCodeInfo("typescript:title=src/store.ts");
+    expect(info.lang).toBe("typescript");
+    expect(info.title).toBe("src/store.ts");
   });
 
   test("language with title and spaces", () => {
-    expect(parseCodeInfo("python : title = examples/hello.py")).toEqual({
-      lang: "python",
-      title: "examples/hello.py",
-    });
+    const info = parseCodeInfo("python : title = examples/hello.py");
+    expect(info.lang).toBe("python");
+    expect(info.title).toBe("examples/hello.py");
   });
 
   test("undefined info", () => {
-    expect(parseCodeInfo(undefined)).toEqual({ lang: "" });
+    expect(parseCodeInfo(undefined).lang).toBe("");
   });
 
   test("empty string", () => {
-    expect(parseCodeInfo("")).toEqual({ lang: "" });
+    expect(parseCodeInfo("").lang).toBe("");
   });
 
   test("no title syntax", () => {
-    expect(parseCodeInfo("javascript")).toEqual({ lang: "javascript" });
+    expect(parseCodeInfo("javascript").lang).toBe("javascript");
   });
 
   test("trailing quotes stripped from title", () => {
-    expect(parseCodeInfo('ts:title=src/app.ts"')).toEqual({
-      lang: "ts",
-      title: "src/app.ts",
-    });
+    expect(parseCodeInfo('ts:title=src/app.ts"').title).toBe("src/app.ts");
+  });
+
+  test("brace syntax: simple", () => {
+    const info = parseCodeInfo('typescript { title="src/store.ts" }');
+    expect(info.lang).toBe("typescript");
+    expect(info.title).toBe("src/store.ts");
+  });
+
+  test("brace syntax: multiple fields", () => {
+    const info = parseCodeInfo('rust { title="main.rs" desc="Entry point" copy=false }');
+    expect(info.lang).toBe("rust");
+    expect(info.title).toBe("main.rs");
+    expect(info.desc).toBe("Entry point");
+    expect(info.copy).toBe(false);
+  });
+
+  test("brace syntax: unquoted values", () => {
+    const info = parseCodeInfo("json { copy=true zoom=false }");
+    expect(info.copy).toBe(true);
+    expect(info.zoom).toBe(false);
   });
 });
 

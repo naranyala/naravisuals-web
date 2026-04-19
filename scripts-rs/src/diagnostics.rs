@@ -1,7 +1,7 @@
 use colored::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -284,6 +284,219 @@ pub fn validate_unique_slugs(entries: &[(String, String)], diags: &mut Diagnosti
         } else {
             seen.insert(slug.clone(), id.clone());
         }
+    }
+}
+
+pub fn validate_internal_links(
+    content: &str,
+    known_slugs: &HashSet<String>,
+    file: &str,
+    diags: &mut Diagnostics,
+) {
+    let link_re = regex::Regex::new(r"\[([^\]]*)\]\(([^)]+)\)").unwrap();
+    for cap in link_re.captures_iter(content) {
+        let href = &cap[2];
+        if !href.starts_with("/docs/") && !href.starts_with("/blog/") {
+            continue;
+        }
+        let clean_href = href.split('#').next().unwrap().trim_start_matches('/');
+        if !known_slugs.contains(clean_href) {
+            diags.warn(
+                DiagnosticSource::Links,
+                file,
+                &format!("Broken link: \"{}\" → \"{}\"", &cap[1], href),
+                Some(&format!("Slug \"{}\" not found", clean_href)),
+            );
+        }
+    }
+}
+
+pub struct AdmonitionStats {
+    pub total: usize,
+    pub by_type: HashMap<String, usize>,
+}
+
+pub struct AdmonitionAnalysis {
+    pub file: String,
+    pub stats: AdmonitionStats,
+    pub has_admonitions: bool,
+    pub recommendations: Vec<String>,
+}
+
+pub fn analyze_admonitions(
+    markdown_content: &str,
+    file: &str,
+    _diags: &mut Diagnostics,
+) -> AdmonitionAnalysis {
+    let admonition_regex = regex::Regex::new(r":::(\w+)").unwrap();
+    let mut types = HashMap::new();
+    let mut total = 0;
+
+    for cap in admonition_regex.captures_iter(markdown_content) {
+        let t = cap[1].to_lowercase();
+        *types.entry(t).or_insert(0) += 1;
+        total += 1;
+    }
+
+    AdmonitionAnalysis {
+        file: file.to_string(),
+        stats: AdmonitionStats { total, by_type: types },
+        has_admonitions: total > 0,
+        recommendations: Vec::new(),
+    }
+}
+
+#[derive(Clone)]
+pub struct ContentStats {
+    pub code_blocks: usize,
+    pub mermaid_blocks: usize,
+    pub admonitions: usize,
+    pub references: usize,
+    pub footnotes: usize,
+}
+
+pub struct ContentAnalysis {
+    pub file: String,
+    pub stats: ContentStats,
+    pub recommendations: Vec<String>,
+}
+
+pub fn analyze_content(
+    markdown_content: &str,
+    file: &str,
+    _diags: &mut Diagnostics,
+) -> ContentAnalysis {
+    let mut stats = ContentStats {
+        code_blocks: 0,
+        mermaid_blocks: 0,
+        admonitions: 0,
+        references: 0,
+        footnotes: 0,
+    };
+
+    let code_re = regex::Regex::new(r"(?m)^```(\w+)?").unwrap();
+    for cap in code_re.captures_iter(markdown_content) {
+        stats.code_blocks += 1;
+        if let Some(lang) = cap.get(1) {
+            if lang.as_str().to_lowercase() == "mermaid" {
+                stats.mermaid_blocks += 1;
+            }
+        }
+    }
+
+    let adm_re = regex::Regex::new(r":::(\w+)").unwrap();
+    stats.admonitions = adm_re.find_iter(markdown_content).count();
+
+    let ref_re = regex::Regex::new(r"\[([^\]]+)\]\(([^)]+)\)").unwrap();
+    for cap in ref_re.captures_iter(markdown_content) {
+        let href = &cap[2];
+        if !href.starts_with('/') && !href.starts_with('#') {
+            stats.references += 1;
+        }
+    }
+
+    let foot_re = regex::Regex::new(r"\[\^(\w+)\]").unwrap();
+    stats.footnotes = foot_re.find_iter(markdown_content).count();
+
+    ContentAnalysis {
+        file: file.to_string(),
+        stats,
+        recommendations: Vec::new(),
+    }
+}
+
+pub struct ReportGenerator {
+    sections: Vec<ReportSection>,
+    diagnostics: Diagnostics,
+}
+
+struct ReportSection {
+    title: String,
+    subtitle: Option<String>,
+    content: Vec<String>,
+}
+
+impl ReportGenerator {
+    pub fn new() -> Self {
+        Self {
+            sections: Vec::new(),
+            diagnostics: Diagnostics::new(),
+        }
+    }
+
+    pub fn add_diagnostic(&mut self, diag: Diagnostic) {
+        self.diagnostics.report(diag);
+    }
+
+    pub fn add_section(&mut self, title: &str, subtitle: Option<&str>) -> usize {
+        let section = ReportSection {
+            title: title.to_string(),
+            subtitle: subtitle.map(|s| s.to_string()),
+            content: Vec::new(),
+        };
+        self.sections.push(section);
+        self.sections.len() - 1
+    }
+
+    pub fn add_line(&mut self, section_idx: usize, line: &str) {
+        if let Some(section) = self.sections.get_mut(section_idx) {
+            section.content.push(line.to_string());
+        }
+    }
+
+    pub fn print(&self) {
+        // 1. Print formal validation issues
+        for d in &self.diagnostics.items {
+            let icon = match d.severity {
+                DiagnosticSeverity::Error => "✗".red(),
+                DiagnosticSeverity::Warning => "⚠".yellow(),
+                DiagnosticSeverity::Info => "ℹ".blue(),
+            };
+            let sev_text = match d.severity {
+                DiagnosticSeverity::Error => "[ERROR]".red().bold(),
+                DiagnosticSeverity::Warning => "[WARN]".yellow().bold(),
+                DiagnosticSeverity::Info => "[INFO]".cyan().bold(),
+            };
+
+            println!("{}  {} ({})", icon, d.file.dimmed(), d.source.to_string().dimmed());
+            println!("       {}", d.message);
+            if let Some(detail) = &d.detail {
+                println!("       {} {}", "→".dimmed(), detail.dimmed());
+            }
+            println!();
+        }
+
+        // 2. Print analysis sections
+        for section in &self.sections {
+            println!("\n{}", section.title.cyan().bold());
+            if let Some(sub) = &section.subtitle {
+                println!("{}", sub.dimmed());
+            }
+            println!("{}", "═".repeat(60).dimmed());
+
+            for l in &section.content {
+                println!("{}", l);
+            }
+        }
+
+        // 3. Print global summary
+        let (errors, warnings, info) = self.diagnostics.summary();
+        if errors > 0 || warnings > 0 || info > 0 || !self.sections.is_empty() {
+            self.print_summary();
+        }
+    }
+
+    fn print_summary(&self) {
+        println!();
+        println!("{}", "─".repeat(80).dimmed());
+
+        let (errors, warnings, info) = self.diagnostics.summary();
+        let total = errors + warnings + info;
+        print!("{}  ", format!("Total Issues: {}", total).bold());
+        print!("| {} errors ", errors.to_string().red());
+        print!("| {} warnings ", warnings.to_string().yellow());
+        println!("| {} info", info.to_string().cyan());
+        println!();
     }
 }
 

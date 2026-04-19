@@ -21,7 +21,7 @@ export const mermaidValidator: MarkdownValidator = {
   label: "Mermaid Content Validator",
   isStrict: true,
 
-  validate(content: string, filePath: string): ValidationResult {
+  async validate(content: string, filePath: string): Promise<ValidationResult> {
     const issues: ValidationIssue[] = [];
     const lines = content.split("\n");
     let inMermaidBlock = false;
@@ -50,7 +50,7 @@ export const mermaidValidator: MarkdownValidator = {
         // End of mermaid block - validate the content
         const diagramContent = diagramLines.join("\n").trim();
 
-        const validationErrors = validateMermaidContent(diagramContent, filePath);
+        const validationErrors = await validateMermaidContent(diagramContent, filePath);
 
         for (const error of validationErrors) {
           // Extract line number from error detail if available

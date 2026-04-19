@@ -1,14 +1,14 @@
 ---
-title: Welcome to rspack-react-docs
+title: Welcome
 description: A fast, modern static site generator for documentation built with rspack, React, Shiki, and Mermaid
 sidebar_label: Welcome
 sidebar_position: 0
 tags: [welcome, getting-started]
 ---
 
-# Welcome to rspack-react-docs
+# Welcome to SSG Documentation
 
-A **fast, modern static site generator (SSG)** for building beautiful documentation websites. Powered by rspack for blazing builds, React for the UI, Shiki for VS-quality syntax highlighting, and Mermaid for live diagrams.
+The **SSG Documentation Site Generator** (docts) is a fast, modern tool for building beautiful documentation websites. Powered by **rspack** for blazing builds, **React** for the UI, **Shiki** for VS Code-quality syntax highlighting, and **Mermaid** for live diagrams.
 
 > **Zero runtime APIs. Everything is generated at build time.**
 
@@ -25,57 +25,27 @@ Your dev server is now running at `http://localhost:3000`.
 
 ---
 
-## Documentation Structure
+## Documentation Sections
 
-| Section | Description |
+| Section | What's inside? |
 |---------|-------------|
-| [Getting Started](/docs/getting-started/project-overview) | Overview, installation, and core concepts |
-| [Architecture](/docs/architecture/build-pipeline) | Build pipeline, DI container, components, markdown engine |
-| [Guides](/docs/guides/cli-reference) | CLI, themes, hooks, SEO, validation, plugins, testing |
-| [Reference](/docs/reference/generated-output) | Generated output, AST parser, configuration, plugins, file structure |
-| [Contributing](/docs/contributing/development-workflow) | Development workflow and documentation guide |
+| **[Getting Started](./01-getting-started/01-introduction)** | Overview, installation, and core concepts |
+| **[Architecture](./02-architecture/01-build-pipeline)** | Build pipeline, DI container, components, and hybrid toolchain |
+| **[Guides](./03-guides/01-cli-reference)** | CLI, themes, hooks, SEO, and validation |
+| **[Reference](./04-reference/01-project-structure)** | Project structure, API details, and glossary |
 
 ---
 
 ## Key Features
 
-| Feature | Details |
-|---------|---------|
-| **Markdown → HTML** | `marked` parser with custom plugins for math, admonitions, mermaid |
-| **Syntax Highlighting** | Shiki (VS Code-quality themes, 150+ languages) |
-| **Diagrams** | Mermaid live rendering with zoom, pan, and SVG download |
-| **Math** | LaTeX math via MathJax (`$inline$` and `$$display$$`) |
-| **Admonitions** | Docusaurus-style `:::note`, `:::tip`, `:::warning` blocks |
-| **Themes** | 6 paper-like themes with CSS filter-based code theme switching |
-| **SEO** | JSON-LD, Open Graph, Twitter Cards, canonical URLs, sitemap.xml |
-| **CLI** | Unified `docts` CLI with dev, build, preview, lint, test commands |
-| **Validation** | Multi-validator system with strict/stats/llm output modes |
-| **DI Architecture** | Swappable services (storage, router, DOM, theme) for testing |
-| **Print Export** | Full-page HTML print with rendered Mermaid SVGs |
+- **⚡ Performance**: Rust-powered build engine and rspack bundling.
+- **🎨 Rich Content**: Native Mermaid.js, MathJax, and Admonition support.
+- **🔍 SEO Optimized**: Automatic sitemap, JSON-LD, and meta tags.
+- **🛠 Developer First**: Strict build-time validation and HMR.
 
 ---
 
-## Technology Stack
-
-| Category | Technology |
-|----------|------------|
-| **Build Tool** | rspack + SWC |
-| **Frontend** | React 19, TypeScript |
-| **CSS** | goober (CSS-in-JS), CSS custom properties |
-| **Markdown** | marked (custom renderer + plugins) |
-| **Syntax Highlighting** | Shiki |
-| **Diagrams** | Mermaid |
-| **Math** | MathJax |
-| **State** | Valtio (proxy-based) |
-| **DI** | Custom service container |
-| **Package Manager** | Bun |
-| **Linter** | Biome |
-| **Testing** | Jest + Testing Library |
-| **Dev Server** | rspack serve + HMR |
-
----
-
-## Project at a Glance
+## High-Level Architecture
 
 ```mermaid:desc=High-level architecture showing the build pipeline from markdown source to final SPA.
 flowchart TB
@@ -83,7 +53,7 @@ flowchart TB
         MD["docs/**/*.md"]
     end
 
-    subgraph Build["Build Pipeline"]
+    subgraph Build["Build Engine (Hybrid Bun/Rust)"]
         Scan["Scan & Parse"]
         Plugins["Markdown Plugins"]
         Shiki["Shiki Highlighting"]
@@ -96,8 +66,7 @@ flowchart TB
     end
 
     subgraph Output
-        HTML["index.html + JS bundle"]
-        Assets["MathJax + Mermaid libs"]
+        Final["dist/ (index.html + JS)"]
     end
 
     Source --> Scan
@@ -107,7 +76,7 @@ flowchart TB
     Generate --> React
     React --> Bundle
     Bundle --> SPA
-    SPA --> Output
+    SPA --> Final
 
     style Source fill:#e8f5e9
     style Build fill:#fff3e0
@@ -119,11 +88,8 @@ flowchart TB
 
 ## Next Steps
 
-- Read the [Project Overview](/docs/getting-started/project-overview) to understand what this is
-- Follow the [Installation Guide](/docs/getting-started/installation) to get set up
-- Explore the [Core Concepts](/docs/getting-started/core-concepts) to understand the build pipeline
-- Dive into the [Architecture docs](/docs/architecture/build-pipeline) for deeper technical detail
-
----
+1. Read the **[Introduction](./01-getting-started/01-introduction)** to understand the project.
+2. Follow the **[Installation Guide](./01-getting-started/02-installation)** to get set up.
+3. Explore the **[Hybrid Toolchain](./02-architecture/05-hybrid-toolchain)** to see how we use Bun and Rust.
 
 Happy building! 📚

@@ -8,6 +8,7 @@ use regex::Regex;
 use serde::{Serialize};
 use serde_json::Value;
 use walkdir::WalkDir;
+use colored::*;
 
 use crate::core::{Logger, Paths};
 use crate::diagnostics::*;
@@ -53,6 +54,7 @@ pub struct SidebarItem {
 }
 
 pub fn build_docs(paths: &Paths, logger: &Logger) -> anyhow::Result<()> {
+    let mut reporter = ReportGenerator::new();
     let mut diags = Diagnostics::new();
     let docs_dir = paths.root.join("docs");
     let blog_dir = paths.root.join("blog");
@@ -74,18 +76,55 @@ pub fn build_docs(paths: &Paths, logger: &Logger) -> anyhow::Result<()> {
     // Broken links validation
     let known_slugs: HashSet<String> = all.iter().map(|d| d.slug.clone()).collect();
     for doc in &all {
-        validate_internal_links(&doc.content, &known_slugs, &doc.id, &mut diags);
+        validate_internal_links(&doc.raw_content, &known_slugs, &doc.id, &mut diags);
     }
 
-    // Report diagnostics
-    let (errors, warnings, _info) = diags.summary();
-    if errors > 0 || warnings > 0 {
-        logger.raw("");
-        logger.raw("🔍 Codeblocks Report");
-        logger.raw(&"═".repeat(60));
-        logger.raw(&diags.format());
-        logger.raw("");
+    // Add diagnostics to reporter
+    for d in diags.all() {
+        reporter.add_diagnostic(d.clone());
     }
+
+    // Admonitions Analysis Section
+    let adm_idx = reporter.add_section("Admonitions Analysis", None);
+    let mut adm_stats = Vec::new();
+    for doc in &all {
+        let analysis = analyze_admonitions(&doc.raw_content, &doc.id, &mut Diagnostics::new());
+        if analysis.has_admonitions {
+            adm_stats.push((doc.id.clone(), analysis.stats));
+        }
+    }
+    adm_stats.sort_by(|a, b| b.1.total.cmp(&a.1.total));
+    for (id, stats) in adm_stats {
+        let types = stats.by_type.iter()
+            .map(|(t, c)| format!("{}:{}", t, c))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let line = format!("{} {} ({} | {})", "✓".green(), id.dimmed(), stats.total, types);
+        reporter.add_line(adm_idx, &line);
+    }
+
+    // Content Enrichment Section
+    let enr_idx = reporter.add_section("Content Enrichment", None);
+    let mut enr_stats = Vec::new();
+    let mut totals = (0, 0, 0, 0); // code, mermaid, adm, ref
+    for doc in &all {
+        let analysis = analyze_content(&doc.raw_content, &doc.id, &mut Diagnostics::new());
+        enr_stats.push((doc.id.clone(), analysis.stats.clone()));
+        totals.0 += analysis.stats.code_blocks;
+        totals.1 += analysis.stats.mermaid_blocks;
+        totals.2 += analysis.stats.admonitions;
+        totals.3 += analysis.stats.references;
+    }
+    enr_stats.sort_by_key(|s| s.1.code_blocks + s.1.mermaid_blocks + s.1.admonitions);
+    for (id, stats) in enr_stats.iter().take(5) {
+        let line = format!("{:<30} code:{} mermaid:{} adm:{}", id.dimmed(), stats.code_blocks, stats.mermaid_blocks, stats.admonitions);
+        reporter.add_line(enr_idx, &line);
+    }
+    reporter.add_line(enr_idx, &"─".repeat(40).dimmed());
+    reporter.add_line(enr_idx, &format!("{}: Code:{} ({} mermaid) | Adm:{} | Ref:{}", "Totals".bold(), totals.0, totals.1, totals.2, totals.3));
+
+    // Print the unified report
+    reporter.print();
 
     // Build sidebar
     let sidebar = build_sidebar(&all);
@@ -105,7 +144,7 @@ pub fn build_docs(paths: &Paths, logger: &Logger) -> anyhow::Result<()> {
     for d in &all {
         let filename = d.id.replace('/', "-");
         let content = format!(
-            "// AUTO-GENERATED — DO NOT EDIT.\n\nexport const {}: any = {},\n",
+            "// AUTO-GENERATED — DO NOT EDIT.\nimport type {{ DocEntry }} from \"../types.ts\";\n\nexport const {}: DocEntry = {};\n",
             slug_to_var_name(&d.id),
             serde_json::to_string_pretty(&d)?
         );
@@ -261,8 +300,14 @@ fn scan_md_files(
                 .unwrap_or("Untitled")
                 .to_string();
 
+            // Run plugins preProcess
+            let mut processed_content = content.clone();
+            for plugin in get_plugins() {
+                plugin.pre_process(&mut processed_content);
+            }
+
             // Validate mandatory code block descriptions
-            validate_code_block_descriptions(&content, &rel_path, diags);
+            validate_code_block_descriptions(&processed_content, &rel_path, diags);
 
             // Render markdown to HTML
             let mut options = Options::empty();
@@ -270,12 +315,17 @@ fn scan_md_files(
             options.insert(Options::ENABLE_FOOTNOTES);
             options.insert(Options::ENABLE_STRIKETHROUGH);
 
-            let parser = Parser::new_ext(&content, options);
+            let parser = Parser::new_ext(&processed_content, options);
             let mut html_output = String::new();
             html::push_html(&mut html_output, parser);
 
+            // Run plugins postProcess
+            for plugin in get_plugins() {
+                plugin.post_process(&mut html_output);
+            }
+
             // TOC extraction
-            let toc = extract_toc(&content);
+            let toc = extract_toc(&processed_content);
 
             // Sidebar position
             let pos = fm
@@ -378,6 +428,10 @@ fn parse_frontmatter(md: &str) -> (HashMap<String, Value>, String) {
                     } else {
                         fm.insert(key, Value::String(val.to_string()));
                     }
+                } else if let Ok(n) = val.parse::<u64>() {
+                    fm.insert(key, Value::Number(serde_json::Number::from(n)));
+                } else if val.to_lowercase() == "true" || val.to_lowercase() == "false" {
+                    fm.insert(key, Value::Bool(val.to_lowercase() == "true"));
                 } else {
                     fm.insert(
                         key,

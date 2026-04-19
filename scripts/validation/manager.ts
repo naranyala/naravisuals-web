@@ -69,7 +69,7 @@ export class ValidationManager {
       }> = [];
 
       for (const file of files) {
-        const result = validator.validate(file.content, file.relPath);
+        const result = await validator.validate(file.content, file.relPath);
         filesChecked++;
 
         for (const issue of result.issues) {

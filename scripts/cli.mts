@@ -22,7 +22,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import net from "node:net";
 import { join } from "node:path";
-import { colors, Logger } from "./core/index.ts";
+import { c, colors, Logger } from "./core/index.ts";
 import { paths } from "./core/paths.ts";
 
 const logger = new Logger();
@@ -176,6 +176,7 @@ async function cmdBuild(options) {
     logger.step("Running rspack production build...");
     await runCommand("bunx", ["rspack", "build"], {
       env: { NODE_ENV: "production" },
+      silent: true,
     });
     logger.success("Production bundle created");
 
@@ -495,6 +496,7 @@ function showHelp() {
   logger.raw("  --coverage           Generate coverage report");
   logger.raw("  --help, -h           Show this help message");
   logger.raw("  --version, -v        Show version");
+  logger.raw("  --rust, -r           Use Rust implementation (requires build)");
   logger.blank();
   logger.raw(`Examples:${colors.reset}`);
   logger.blank();
@@ -530,12 +532,15 @@ function parseArgs(argv) {
     skipClean: false,
     skipValidation: false,
     strict: false,
+    useRust: false,
   };
 
   for (let i = 3; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--port" || arg === "-p") {
       args.port = argv[++i];
+    } else if (arg === "--rust" || arg === "-r") {
+      args.useRust = true;
     } else if (arg === "--no-lint") {
       args.skipLint = true;
     } else if (arg === "--skip-validation") {
@@ -566,6 +571,33 @@ function parseArgs(argv) {
 
 async function main() {
   const args = parseArgs(process.argv);
+
+  if (args.useRust) {
+    const rustBinary = join(projectRoot, "scripts-rs/target/release/scripts-rs");
+    const debugBinary = join(projectRoot, "scripts-rs/target/debug/scripts-rs");
+    const binary = existsSync(rustBinary)
+      ? rustBinary
+      : existsSync(debugBinary)
+        ? debugBinary
+        : null;
+
+    if (!binary) {
+      logger.error("Rust binary not found. Please build it first:");
+      logger.info("cd scripts-rs && cargo build --release");
+      process.exit(1);
+    }
+
+    logger.info(`Using Rust implementation: ${c(binary, "dim")}`);
+
+    // Forward command and arguments to Rust binary
+    const rustArgs = process.argv.slice(2).filter((arg) => arg !== "--rust" && arg !== "-r");
+    try {
+      await runCommand(binary, rustArgs);
+      process.exit(0);
+    } catch (_error) {
+      process.exit(1);
+    }
+  }
 
   // Map command aliases
   const commandMap = {

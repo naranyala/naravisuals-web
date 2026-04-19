@@ -16,14 +16,14 @@ The build pipeline is the heart of rspack-react-docs. It transforms raw Markdown
 flowchart tb
     subgraph Scan["Content Scanner"]
         Walk["Walk docs/ directory"]
-        Parse["Parse frontmatter<br/>YAML between ---"]
+        Parse["Parse frontmatter<br/>YAML headers"]
         Lex["Tokenize with marked.Lexer"]
     end
 
     subgraph Process["Plugin Processing"]
-        Pre["preProcess<br/>math → admonitions"]
-        Marked["marked.parse()<br/>markdown → HTML"]
-        Post["postProcess (reverse)<br/>mermaid → admonitions → math"]
+        Pre["preProcess<br/>math - admonitions"]
+        Marked["marked.parse()<br/>markdown - HTML"]
+        Post["postProcess (reverse)<br/>mermaid - admonitions - math"]
     end
 
     subgraph Highlight["Syntax Highlighting"]

@@ -18,7 +18,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { colors, Logger } from "./core/index.ts";
+import { c, colors, Logger, line } from "./core/index.ts";
 import { paths } from "./core/paths.ts";
 
 const logger = new Logger();
@@ -31,10 +31,14 @@ import {
   Diagnostics,
   validateCodeBlockDescriptions,
   validateFrontmatter,
+  validateInternalLinks,
   validateUniqueSlugs,
 } from "./diagnostics.ts";
-
 import { plugins } from "./plugins/index.ts";
+import { mermaidValidator } from "./plugins/validators/mermaid-validator.ts";
+import { ReportGenerator } from "./report/generator.ts";
+
+const reporter = new ReportGenerator();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -191,11 +195,11 @@ function parseCodeInfo(info: string | undefined): CodeBlockMeta {
   if (colonIndex === -1) return { lang, copy: true, zoom: true };
 
   rest = info.slice(colonIndex + 1);
-  const titleMatch = rest.match(/(?:^|:)title\s*=\s*([^:]+?)(?=:|$)/);
-  const descMatch = rest.match(/(?:^|:)desc(?:ription)?\s*=\s*([^:]+?)(?=:|$)/);
-  const labelMatch = rest.match(/(?:^|:)label\s*=\s*([^:]+?)(?=:|$)/);
-  const copyMatch = rest.match(/(?:^|:)copy\s*=\s*(true|false)(?=:|$)/i);
-  const zoomMatch = rest.match(/(?:^|:)zoom\s*=\s*(true|false)(?=:|$)/i);
+  const titleMatch = rest.match(/(?:^|:)\s*title\s*=\s*([^:]+?)\s*(?=:|$)/);
+  const descMatch = rest.match(/(?:^|:)\s*desc(?:ription)?\s*=\s*([^:]+?)\s*(?=:|$)/);
+  const labelMatch = rest.match(/(?:^|:)\s*label\s*=\s*([^:]+?)\s*(?=:|$)/);
+  const copyMatch = rest.match(/(?:^|:)\s*copy\s*=\s*(true|false)\s*(?=:|$)/i);
+  const zoomMatch = rest.match(/(?:^|:)\s*zoom\s*=\s*(true|false)\s*(?=:|$)/i);
 
   return {
     lang,
@@ -210,7 +214,12 @@ function parseCodeInfo(info: string | undefined): CodeBlockMeta {
 renderer.code = ({ text, lang: rawLang }) => {
   const meta = parseCodeInfo(rawLang);
 
-  if (meta.lang && highlighter.getLoadedLanguages().includes(meta.lang as Language)) {
+  // Skip Shiki for mermaid - the mermaid plugin needs raw text with newlines
+  if (
+    meta.lang &&
+    meta.lang.toLowerCase() !== "mermaid" &&
+    highlighter.getLoadedLanguages().includes(meta.lang as Language)
+  ) {
     const highlighted = highlighter.codeToHtml(text, { lang: meta.lang, theme: "github-dark" });
     return codeBlockWrapper(highlighted, meta);
   }
@@ -348,13 +357,13 @@ const KNOWN_FM_FIELDS = new Set([
   "slug",
 ]);
 
-function scanMdFiles(baseDir: string, section: "docs" | "blog", diags: Diagnostics): DocEntry[] {
+async function scanMdFiles(baseDir: string, section: "docs" | "blog", diags: Diagnostics): Promise<DocEntry[]> {
   if (!fs.existsSync(baseDir)) return [];
   const entries: DocEntry[] = [];
-  function walk(dir: string) {
+  async function walk(dir: string) {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(full);
+      if (entry.isDirectory()) await walk(full);
       else if (entry.isFile() && entry.name.endsWith(".md")) {
         const raw = fs.readFileSync(full, "utf-8");
         const relPath = path.relative(baseDir, full).replace(/\.md$/, "");
@@ -402,6 +411,19 @@ function scanMdFiles(baseDir: string, section: "docs" | "blog", diags: Diagnosti
         // Validate mandatory code block descriptions
         validateCodeBlockDescriptions(content, relPath, diags);
 
+        // Validate Mermaid diagrams at build-time
+        const mermaidResult = await mermaidValidator.validate(content, relPath);
+        for (const issue of mermaidResult.issues) {
+          diags.report({
+            severity: issue.severity as any,
+            source: "mermaid",
+            file: relPath,
+            message: issue.message,
+            detail: issue.detail,
+            line: issue.line,
+          });
+        }
+
         let html = "";
         let tokens: any[] = [];
         try {
@@ -418,7 +440,7 @@ function scanMdFiles(baseDir: string, section: "docs" | "blog", diags: Diagnosti
           const plugin = plugins[i];
           if (plugin.postProcess) {
             try {
-              html = plugin.postProcess(html);
+              html = await plugin.postProcess(html);
             } catch (err: unknown) {
               const msg = err instanceof Error ? err.message : String(err);
               diags.error("plugin", relPath, `Plugin "${plugin.name}" postProcess failed`, msg);
@@ -463,7 +485,7 @@ function scanMdFiles(baseDir: string, section: "docs" | "blog", diags: Diagnosti
       }
     }
   }
-  walk(baseDir);
+  await walk(baseDir);
   return entries;
 }
 
@@ -571,8 +593,8 @@ function escapeSingleLineJson(s: string): string {
 const diags = new Diagnostics();
 
 logger.raw("📚 Scanning docs…");
-const docs = scanMdFiles(DOCS_DIR, "docs", diags);
-const blogs = scanMdFiles(BLOG_DIR, "blog", diags);
+const docs = await scanMdFiles(DOCS_DIR, "docs", diags);
+const blogs = await scanMdFiles(BLOG_DIR, "blog", diags);
 const all = [...docs, ...blogs];
 const sidebar = buildSidebar(all);
 
@@ -598,221 +620,56 @@ validateUniqueSlugs(
 
 // Validate internal links now that we know all slugs
 const knownSlugs = new Set(all.map((d) => d.slug));
-const brokenLinksByFile: Record<string, { text: string; href: string; slug: string }[]> = {};
 
 for (const doc of all) {
-  // Validate links and collect broken ones
-  const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
-  let match: RegExpExecArray | null;
-  const fileBrokenLinks: { text: string; href: string; slug: string }[] = [];
-
-  while ((match = linkRegex.exec(doc.content)) !== null) {
-    const href = match[2];
-    const text = match[1];
-
-    // Only validate internal doc links
-    if (!href.startsWith("/docs/") && !href.startsWith("/blog/")) continue;
-
-    // Strip anchor fragments and leading slash to get the slug
-    const cleanHref = href.split("#")[0].replace(/^\//, "");
-
-    if (!knownSlugs.has(cleanHref)) {
-      fileBrokenLinks.push({
-        text: text || "(empty)",
-        href,
-        slug: cleanHref,
-      });
-      // Also add to diagnostics for the standard warning output
-      diags.warn(
-        "links",
-        doc.id,
-        `Broken link: "${text || "(empty)"}" → "${href}"`,
-        `Slug "${cleanHref}" not found. Available slugs: ${Array.from(knownSlugs).sort().join(", ")}`
-      );
-    }
-  }
-
-  if (fileBrokenLinks.length > 0) {
-    brokenLinksByFile[doc.id] = fileBrokenLinks;
-  }
+  validateInternalLinks(doc.content, knownSlugs, doc.id, diags);
 }
 
-// ─── Report diagnostics ──────────────────────────────────────────
-const summary = diags.summary();
-if (summary.errors > 0 || summary.warnings > 0) {
-  logger.raw("");
-  logger.raw(`${colors.cyan}${colors.bright}🔍 Codeblocks Report${colors.reset}`);
-  logger.raw("═".repeat(60));
-  logger.raw(diags.format());
-  logger.raw("");
-}
+// ─── Unified Reporting ──────────────────────────────────────────
 
-// ─── Admonitions Analysis ──────────────────────────────────────────
-logger.raw("");
-logger.raw(`${colors.cyan}${colors.bright}📋 Admonitions Analysis${colors.reset}`);
-logger.raw("═".repeat(60));
+// 1. Formal Diagnostics (errors/warnings)
+const report = {
+  validator: "build-diagnostics",
+  label: "Build Diagnostics",
+  filesChecked: all.length,
+  issues: diags.all().map((d) => ({
+    severity: d.severity as any,
+    file: d.file,
+    line: d.line,
+    message: d.message,
+    detail: d.detail,
+  })),
+  pass: !diags.hasErrors(),
+};
+reporter.addReport(report);
 
+// 2. Admonitions Analysis Section
+const addAdmonitionLine = reporter.addSection("Admonitions Analysis");
 const allAdmonitions: Record<string, { total: number; byType: Record<string, number> }> = {};
-let filesWithAdmonitions = 0;
-let filesWithoutAdmonitions = 0;
-
-// Analyze raw markdown content (before processing)
 for (const doc of docs) {
-  // doc.id is like "getting-started/blender-roadmap-overview"
-  // Need to look in DOCS_DIR/01-getting-started/01-blender-roadmap-overview.md
-  const docDir = DOCS_DIR;
-  let rawContent = "";
-
-  // Try to find the markdown file by searching
-  const slugParts = doc.id.split("/");
-  if (slugParts.length >= 2) {
-    const categoryFolder = slugParts[0];
-    const docFile = slugParts[1];
-
-    // Find folder that starts with the category number prefix
-    const docsFolders = fs
-      .readdirSync(docDir, { withFileTypes: true })
-      .filter((e) => e.isDirectory())
-      .map((e) => e.name);
-
-    const matchingFolder = docsFolders.find((f) => f.endsWith(categoryFolder));
-    if (matchingFolder) {
-      // Find the file in that folder (may have numeric prefix)
-      const folderPath = path.join(docDir, matchingFolder);
-      const mdFiles = fs
-        .readdirSync(folderPath)
-        .filter((f) => f.endsWith(".md"))
-        .filter((f) => f.replace(/^\d+-/, "").replace(".md", "") === docFile);
-
-      if (mdFiles.length > 0) {
-        const fullPath = path.join(folderPath, mdFiles[0]);
-        rawContent = fs.readFileSync(fullPath, "utf-8");
-      }
-    }
-  }
-
-  const analysis = analyzeAdmonitions(rawContent, doc.id, diags);
+  const analysis = analyzeAdmonitions(doc.rawContent, doc.id, diags);
   if (analysis.hasAdmonitions) {
-    filesWithAdmonitions++;
     allAdmonitions[doc.id] = analysis.stats;
-  } else {
-    filesWithoutAdmonitions++;
   }
 }
 
-// Sort by total admonitions descending
 const sortedFiles = Object.entries(allAdmonitions).sort((a, b) => b[1].total - a[1].total);
-
 for (const [file, stats] of sortedFiles) {
   const types = Object.entries(stats.byType)
-    .map(([type, count]) => `${type}: ${count}`)
+    .map(([type, count]) => `${type}:${count}`)
     .join(", ");
-  logger.raw(`\n${colors.green}✓${colors.reset} ${file}`);
-  logger.raw(`   Total: ${stats.total} | ${types}`);
-}
-
-if (filesWithoutAdmonitions > 0) {
-  logger.raw(
-    `\n${colors.yellow}⚠ Files without admonitions (${filesWithoutAdmonitions}):${colors.reset}`
-  );
-  let count = 0;
-  for (const doc of docs) {
-    const slugParts = doc.id.split("/");
-    let rawContent = "";
-    if (slugParts.length >= 2) {
-      const categoryFolder = slugParts[0];
-      const docFile = slugParts[1];
-      const docsFolders = fs
-        .readdirSync(DOCS_DIR, { withFileTypes: true })
-        .filter((e) => e.isDirectory())
-        .map((e) => e.name);
-      const matchingFolder = docsFolders.find((f) => f.endsWith(categoryFolder));
-      if (matchingFolder) {
-        const folderPath = path.join(DOCS_DIR, matchingFolder);
-        const mdFiles = fs
-          .readdirSync(folderPath)
-          .filter((f) => f.endsWith(".md"))
-          .filter((f) => f.replace(/^\d+-/, "").replace(".md", "") === docFile);
-        if (mdFiles.length > 0) {
-          rawContent = fs.readFileSync(path.join(folderPath, mdFiles[0]), "utf-8");
-        }
-      }
-    }
-    const analysis = analyzeAdmonitions(rawContent, doc.id, diags);
-    if (!analysis.hasAdmonitions && count < 15) {
-      logger.raw(`   - ${doc.id}`);
-      count++;
-    }
-  }
-  if (filesWithoutAdmonitions > 15) {
-    logger.raw(`   ... and ${filesWithoutAdmonitions - 15} more`);
-  }
-  logger.raw(
-    `\n${colors.dim}💡 Tip: Add :::tip, :::warning, :::note for better context and clarity${colors.reset}`
+  addAdmonitionLine(
+    `${colors.green}✓${colors.reset} ${c(file, "dim")} (${stats.total} | ${types})`
   );
 }
 
-// Calculate totals
-const totalAdmonitions = Object.values(allAdmonitions).reduce((sum, s) => sum + s.total, 0);
-const typeTotals: Record<string, number> = {};
-for (const stats of Object.values(allAdmonitions)) {
-  for (const [type, count] of Object.entries(stats.byType)) {
-    typeTotals[type] = (typeTotals[type] || 0) + count;
-  }
-}
-logger.raw(
-  `\n${colors.bright}Summary:${colors.reset} ${totalAdmonitions} total admonitions across ${filesWithAdmonitions} files`
-);
-logger.raw(
-  `By type: ${Object.entries(typeTotals)
-    .map(([t, c]) => `${t}=${c}`)
-    .join(", ")}`
-);
-
-// ─── Content Enrichment Analysis ───────────────────────────────────
-logger.raw("");
-logger.raw(`${colors.cyan}${colors.bright}📊 Content Enrichment Analysis${colors.reset}`);
-logger.raw("═".repeat(60));
-
-interface FileContentStats {
-  codeBlocks: number;
-  mermaidBlocks: number;
-  admonitions: number;
-  references: number;
-  footnotes: number;
-}
-
+// 3. Content Enrichment Section
+const addEnrichmentLine = reporter.addSection("Content Enrichment");
 const allContentStats: Record<string, FileContentStats> = {};
-let totalCodeBlocks = 0;
-let totalMermaidBlocks = 0;
-let totalAdmonitionsCount = 0;
-let totalReferences = 0;
-let totalFootnotes = 0;
+const totals = { code: 0, mermaid: 0, adm: 0, ref: 0 };
 
 for (const doc of docs) {
-  const slugParts = doc.id.split("/");
-  let rawContent = "";
-  if (slugParts.length >= 2) {
-    const categoryFolder = slugParts[0];
-    const docFile = slugParts[1];
-    const docsFolders = fs
-      .readdirSync(DOCS_DIR, { withFileTypes: true })
-      .filter((e) => e.isDirectory())
-      .map((e) => e.name);
-    const matchingFolder = docsFolders.find((f) => f.endsWith(categoryFolder));
-    if (matchingFolder) {
-      const folderPath = path.join(DOCS_DIR, matchingFolder);
-      const mdFiles = fs
-        .readdirSync(folderPath)
-        .filter((f) => f.endsWith(".md"))
-        .filter((f) => f.replace(/^\d+-/, "").replace(".md", "") === docFile);
-      if (mdFiles.length > 0) {
-        rawContent = fs.readFileSync(path.join(folderPath, mdFiles[0]), "utf-8");
-      }
-    }
-  }
-
-  const analysis = analyzeContent(rawContent, doc.id, diags);
+  const analysis = analyzeContent(doc.rawContent, doc.id, diags);
   allContentStats[doc.id] = {
     codeBlocks: analysis.stats.codeBlocks,
     mermaidBlocks: analysis.stats.mermaidBlocks,
@@ -820,73 +677,37 @@ for (const doc of docs) {
     references: analysis.stats.references,
     footnotes: analysis.stats.footnotes,
   };
-  totalCodeBlocks += analysis.stats.codeBlocks;
-  totalMermaidBlocks += analysis.stats.mermaidBlocks;
-  totalAdmonitionsCount += analysis.stats.admonitions;
-  totalReferences += analysis.stats.references;
-  totalFootnotes += analysis.stats.footnotes;
+  totals.code += analysis.stats.codeBlocks;
+  totals.mermaid += analysis.stats.mermaidBlocks;
+  totals.adm += analysis.stats.admonitions;
+  totals.ref += analysis.stats.references;
 }
 
-// Sort by enrichment score (lower = more enrichment potential)
 const sortedByEnrichment = Object.entries(allContentStats).sort((a, b) => {
-  const scoreA =
-    a[1].codeBlocks + a[1].mermaidBlocks + a[1].admonitions + a[1].references + a[1].footnotes;
-  const scoreB =
-    b[1].codeBlocks + b[1].mermaidBlocks + b[1].admonitions + b[1].references + b[1].footnotes;
-  return scoreA - scoreB;
+  return (
+    a[1].codeBlocks +
+    a[1].mermaidBlocks +
+    a[1].admonitions -
+    (b[1].codeBlocks + b[1].mermaidBlocks + b[1].admonitions)
+  );
 });
 
-// Show files with least enrichment (most potential)
-logger.raw(`\n${colors.yellow}Files needing enrichment (sorted by priority):${colors.reset}`);
-let shown = 0;
-for (const [file, stats] of sortedByEnrichment) {
-  if (shown >= 20) break;
-  const score =
-    stats.codeBlocks + stats.mermaidBlocks + stats.admonitions + stats.references + stats.footnotes;
-  if (score < 5) {
-    logger.raw(`\n${colors.dim}${file}${colors.reset}`);
-    logger.raw(
-      `   code: ${stats.codeBlocks} | mermaid: ${stats.mermaidBlocks} | admonitions: ${stats.admonitions} | refs: ${stats.references} | footnotes: ${stats.footnotes}`
-    );
-    shown++;
-  }
+for (const [file, stats] of sortedByEnrichment.slice(0, 5)) {
+  addEnrichmentLine(
+    `${c(file.padEnd(30), "dim")} code:${stats.codeBlocks} mermaid:${stats.mermaidBlocks} adm:${stats.admonitions}`
+  );
 }
-
-logger.raw(`\n${colors.bright}Overall Summary:${colors.reset}`);
-logger.raw(`   Code blocks: ${totalCodeBlocks} (${totalMermaidBlocks} mermaid)`);
-logger.raw(`   Admonitions: ${totalAdmonitionsCount}`);
-logger.raw(`   References: ${totalReferences}`);
-logger.raw(`   Footnotes: ${totalFootnotes}`);
-logger.raw(
-  `\n${colors.dim}💡 Higher counts = more enriched content. Files with low counts need attention.${colors.reset}`
+addEnrichmentLine(line("─", 40, "dim"));
+addEnrichmentLine(
+  `${colors.bright}Totals:${colors.reset} Code:${totals.code} (${totals.mermaid} mermaid) | Adm:${totals.adm} | Ref:${totals.ref}`
 );
 
-// ─── Broken Links Summary ────────────────────────────────────────
-const brokenFiles = Object.keys(brokenLinksByFile);
-if (brokenFiles.length > 0) {
-  logger.raw("");
-  logger.raw(
-    `${colors.yellow}${colors.bright}🔗 Broken Links Summary (${brokenFiles.length} file(s))${colors.reset}`
-  );
-  logger.raw("═".repeat(60));
+// Print the unified report
+reporter.print();
 
-  for (const file of brokenFiles.sort()) {
-    const links = brokenLinksByFile[file];
-    logger.raw(`\n${colors.cyan}📄 ${file}${colors.reset}`);
-    for (const link of links) {
-      logger.raw(
-        `   ${colors.red}✗${colors.reset} "${link.text}" → ${colors.yellow}${link.href}${colors.reset}`
-      );
-      logger.raw(`     ↪ ${colors.dim}Slug not found: ${link.slug}${colors.reset}`);
-    }
-  }
-
-  const totalLinks = brokenFiles.reduce((sum, f) => sum + brokenLinksByFile[f].length, 0);
-  logger.raw(
-    `\n${colors.bright}Total: ${totalLinks} broken link${totalLinks !== 1 ? "s" : ""} across ${brokenFiles.length} file(s)${colors.reset}`
-  );
-  logger.raw(`${colors.dim}💡 Fix these links to point to valid document slugs${colors.reset}`);
-  logger.raw("");
+if (diags.hasErrors()) {
+  logger.error("Build failed due to validation errors.");
+  process.exit(1);
 }
 
 // Check for --json flag to output diagnostics as JSON

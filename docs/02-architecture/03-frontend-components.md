@@ -7,15 +7,15 @@ sidebar_position: 3
 
 # Frontend Components
 
-This document covers the React component architecture of the rspack-react-docs SSG. Every component is a file under `/src/`, wired together through a dependency injection container ([`/src/services/container.ts`](/docs/02-architecture/dependency-injection)) and consumed via a custom `useServices()` hook.
+This document covers the React component architecture of the rspack-react-docs SSG. Every component is a file under `/src/`, wired together through a dependency injection container ([`/src/services/container.ts`](/docs/architecture/dependency-injection)) and consumed via a custom `useServices()` hook.
 
 ## Component Hierarchy
 
 ```mermaid:desc=React component hierarchy showing the main components and their relationships
 flowchart td
-    A["frontend.tsx\n(Entry Point)"] --> B["ErrorBoundary"]
-    B --> C["ServicesProvider\n(DI Container)"]
-    C --> D["App.tsx\n(Root Component)"]
+    A["frontend.tsx<br/>(Entry Point)"] --> B["ErrorBoundary"]
+    B --> C["ServicesProvider<br/>(DI Container)"]
+    C --> D["App.tsx<br/>(Root Component)"]
 
     D --> E["Sidebar.tsx"]
     D --> F["DocViewer.tsx"]
@@ -211,7 +211,7 @@ const nextDoc = idx < sorted.length - 1 ? sorted[idx + 1] : null;
 
 ## DocViewer.tsx -- Document Renderer
 
-`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/DocViewer.tsx` renders the HTML content produced by the [Markdown Engine](/docs/02-architecture/markdown-engine) and then asynchronously enhances it with Mermaid diagrams and MathJax math.
+`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/DocViewer.tsx` renders the HTML content produced by the [Markdown Engine](/docs/architecture/markdown-engine) and then asynchronously enhances it with Mermaid diagrams and MathJax math.
 
 ### Rendering Pipeline
 
@@ -607,6 +607,6 @@ Preferences are persisted to `localStorage` and applied as CSS custom properties
 
 ## Cross-References
 
-- [Build Pipeline](/docs/02-architecture/build-pipeline) -- how markdown becomes the `allDocs` array consumed by `App.tsx`
-- [Dependency Injection](/docs/02-architecture/dependency-injection) -- the 5 services (`IStorageService`, `IRouterService`, `IDomService`, `IThemeService`, `IAppConfig`) injected into every component
-- [Markdown Engine](/docs/02-architecture/markdown-engine) -- how `marked`, Shiki, and plugins produce the HTML that `DocViewer` renders
+- [Build Pipeline](/docs/architecture/build-pipeline) -- how markdown becomes the `allDocs` array consumed by `App.tsx`
+- [Dependency Injection](/docs/architecture/dependency-injection) -- the 5 services (`IStorageService`, `IRouterService`, `IDomService`, `IThemeService`, `IAppConfig`) injected into every component
+- [Markdown Engine](/docs/architecture/markdown-engine) -- how `marked`, Shiki, and plugins produce the HTML that `DocViewer` renders

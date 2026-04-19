@@ -26,91 +26,89 @@ export const mermaidPlugin: MarkdownPlugin = {
     return md;
   },
 
-  postProcess(html: string): string {
+  async postProcess(html: string): Promise<string> {
     blocks.length = 0;
     let index = 0;
 
     // Match mermaid code blocks by finding the "Mermaid" label in the header.
-    // Case-insensitive to handle "Mermaid", "MERMAID", etc.
-    // Works with both build-script output (with data-zoom, code-desc) and
-    // simple test output (just code-block + header + pre/code).
     const mermaidRegex =
       /<div class="code-block"[^>]*>([\s\S]*?)<div class="code-header">([\s\S]*?)<span class="code-lang">Mermaid<\/span>([\s\S]*?)<\/div>([\s\S]*?)<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>([\s\S]*?)(?:<div class="code-desc">([\s\S]*?)<\/div>)?([\s\S]*?)<\/div>/gi;
 
-    let result = html.replace(
-      mermaidRegex,
-      (match, _pre, _hdrPre, _hdrPost, _prePre, diagram, _postPre, desc, _postPost) => {
-        const id = `MERMAIDBLOCK${index++}END`;
+    let result = html;
+    const matches = Array.from(html.matchAll(mermaidRegex));
 
-        // Extract data-zoom if present on the outer div
-        const zoomMatch = match.match(/data-zoom="([^"]*)"/i);
-        const zoomEnabled = zoomMatch ? zoomMatch[1] === "true" : true;
+    for (const match of matches) {
+      const [fullMatch, _pre, _hdrPre, _hdrPost, _prePre, diagram, _postPre, desc, _postPost] =
+        match;
+      const id = `MERMAIDBLOCK${index++}END`;
 
-        // Decode HTML entities back to original diagram text
-        // Also strip Shiki-generated <span> tags
-        let decoded = diagram
-          .replace(/&amp;/g, "&")
-          .replace(/&#x26;/g, "&")
-          .replace(/&lt;/g, "<")
-          .replace(/&#x3c;/gi, "<")
-          .replace(/&gt;/g, ">")
-          .replace(/&#x3e;/gi, ">")
-          .replace(/&quot;/g, '"')
-          .replace(/&#39;/g, "'")
-          .replace(/&amp;#39;/g, "'")
-          .replace(/<\/?span[^>]*>/g, "")
-          .trim();
+      // Extract data-zoom if present on the outer div
+      const zoomMatch = fullMatch.match(/data-zoom="([^"]*)"/i);
+      const zoomEnabled = zoomMatch ? zoomMatch[1] === "true" : true;
 
-        // Replace newlines inside labels ([], (), {}) with <br/>
-        // This fixes Lexical errors when labels span multiple lines
-        decoded = decoded.replace(/([[({])([\s\S]*?)([\])}])/g, (_match, open, content, close) => {
-          return `${open}${content.replace(/\n/g, "\\n")}${close}`;
-        });
+      // Decode HTML entities back to original diagram text
+      let decoded = diagram
+        .replace(/&amp;/g, "&")
+        .replace(/&#x26;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&#x3c;/gi, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&#x3e;/gi, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&amp;#39;/g, "'")
+        .replace(/<\/?span[^>]*>/g, "")
+        .trim();
 
-        // Validate diagram content
-        const validationErrors = validateMermaidContent(decoded);
-        if (validationErrors.length > 0) {
-          const errorDetails = validationErrors
-            .map((err) => `  - ${err.message}: ${err.detail}`)
-            .join("\n");
-          console.error(`\n⚠️ Mermaid validation warning in diagram ${id}:`, `\n${errorDetails}`);
-          // Render the diagram anyway, but keep the error details available in the UI
-          const errorContainer = [
-            `<div class="mermaid-diagram" data-processed="false" data-zoom="${zoomEnabled}" data-validation-error="true">`,
-            `  <div class="mermaid-diagram-header">`,
-            `    <span class="mermaid-diagram-label">Diagram</span>`,
-            `    <div class="mermaid-diagram-actions">`,
-            `      <span class="mermaid-loading"><span class="mermaid-spinner"></span></span>`,
-            `    </div>`,
-            `  </div>`,
-            `  <div class="mermaid">${escapeHtml(decoded)}</div>`,
-            `  <div class="mermaid-error" style="display:block;">`,
-            `    <div class="mermaid-error-title">⚠ Validation Warning</div>`,
-            `    <details>`,
-            `      <summary>${validationErrors[0].message}</summary>`,
-            `      <pre>${escapeHtml(errorDetails)}</pre>`,
-            `    </details>`,
-            `  </div>`,
-            `</div>`,
-          ].join("\n");
-          return errorContainer;
-        }
+      // Replace newlines inside labels
+      decoded = decoded.replace(/([[({])([\s\S]*?)([\])}])/g, (_match, open, content, close) => {
+        return `${open}${content.replace(/\n/g, "<br/>")}${close}`;
+      });
 
-        // Decode description HTML entities
-        const decodedDesc = desc
-          ? desc
-              .replace(/&amp;/g, "&")
-              .replace(/&lt;/g, "<")
-              .replace(/&gt;/g, ">")
-              .replace(/&quot;/g, '"')
-              .replace(/&#39;/g, "'")
-              .trim()
-          : undefined;
+      // Validate diagram content (STRICT validation using real Mermaid parser)
+      const validationErrors = await validateMermaidContent(decoded);
+      if (validationErrors.length > 0) {
+        const errorDetails = validationErrors
+          .map((err) => `  - ${err.message}: ${err.detail}`)
+          .join("\n");
 
-        blocks.push({ id, diagram: decoded, desc: decodedDesc, zoom: zoomEnabled });
-        return id;
+        // Render the diagram anyway, but keep the error details available in the UI
+        const errorContainer = [
+          `<div class="mermaid-diagram" data-processed="false" data-zoom="${zoomEnabled}" data-validation-error="true">`,
+          `  <div class="mermaid-diagram-header">`,
+          `    <span class="mermaid-diagram-label">Diagram</span>`,
+          `    <div class="mermaid-diagram-actions">`,
+          `      <span class="mermaid-loading"><span class="mermaid-spinner"></span></span>`,
+          `    </div>`,
+          `  </div>`,
+          `  <div class="mermaid">${escapeHtml(decoded)}</div>`,
+          `  <div class="mermaid-error" style="display:block;">`,
+          `    <div class="mermaid-error-title">⚠ Validation Warning</div>`,
+          `    <details>`,
+          `      <summary>${validationErrors[0].message}</summary>`,
+          `      <pre>${escapeHtml(errorDetails)}</pre>`,
+          `    </details>`,
+          `  </div>`,
+          `</div>`,
+        ].join("\n");
+        result = result.replace(fullMatch, errorContainer);
+        continue;
       }
-    );
+
+      // Decode description HTML entities
+      const decodedDesc = desc
+        ? desc
+            .replace(/&amp;/g, "&")
+            .replace(/&lt;/g, "<")
+            .replace(/&gt;/g, ">")
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .trim()
+        : undefined;
+
+      blocks.push({ id, diagram: decoded, desc: decodedDesc, zoom: zoomEnabled });
+      result = result.replace(fullMatch, id);
+    }
 
     // Replace sentinels with mermaid containers
     for (const block of blocks) {

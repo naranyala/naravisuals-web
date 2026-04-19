@@ -544,6 +544,6 @@ Unknown frontmatter fields (not in the known set: `title`, `description`, `sideb
 
 ## Cross-References
 
-- [Build Pipeline](/docs/02-architecture/build-pipeline) -- the full build-docs.mts orchestration including file scanning, sidebar generation, and diagnostics
-- [Dependency Injection](/docs/02-architecture/dependency-injection) -- service container used by the frontend
-- [Frontend Components](/docs/02-architecture/frontend-components) -- how DocViewer renders the HTML produced by this engine, including Mermaid and MathJax
+- [Build Pipeline](/docs/architecture/build-pipeline) -- the full build-docs.mts orchestration including file scanning, sidebar generation, and diagnostics
+- [Dependency Injection](/docs/architecture/dependency-injection) -- service container used by the frontend
+- [Frontend Components](/docs/architecture/frontend-components) -- how DocViewer renders the HTML produced by this engine, including Mermaid and MathJax

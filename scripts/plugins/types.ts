@@ -24,7 +24,7 @@ export interface MarkdownPlugin {
    * Use this to transform HTML output, replace code blocks,
    * or inject scripts/styles.
    */
-  postProcess?(html: string): string;
+  postProcess?(html: string): string | Promise<string>;
 }
 
 /**
@@ -67,7 +67,7 @@ export interface MarkdownValidator {
    * Validate a single markdown file.
    * Returns validation result with issues and stats.
    */
-  validate(content: string, filePath: string): ValidationResult;
+  validate(content: string, filePath: string): ValidationResult | Promise<ValidationResult>;
 
   /**
    * Whether validation should fail the build.

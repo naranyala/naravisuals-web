@@ -199,14 +199,15 @@ export function validateInternalLinks(
     if (!href.startsWith("/docs/")) continue;
 
     const cleanHref = href.split("?")[0].split("#")[0].replace(/^\//, "");
+    const slug = cleanHref.startsWith("docs/") ? cleanHref.slice(5) : cleanHref;
 
-    if (!knownSlugs.has(cleanHref)) {
+    if (!knownSlugs.has(slug)) {
       brokenCount++;
       diags.warn(
         "links",
         file,
         `Broken link: "${text}" → "${href}"`,
-        `Slug "${cleanHref}" not found. Available slugs: ${Array.from(knownSlugs).sort().join(", ")}`
+        `Slug "${slug}" not found. Available slugs: ${Array.from(knownSlugs).sort().join(", ")}`
       );
     }
   }
