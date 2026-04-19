@@ -11,102 +11,90 @@
 }
 
 :root {
-  --ifm-color-primary: #2563eb;
-  --ifm-color-primary-dark: #1d4ed8;
-  --ifm-color-primary-light: #3b82f6;
+  --ifm-color-primary: #8aadf4;
+  --ifm-color-primary-dark: #7aa2f7;
+  --ifm-color-primary-light: #b7bdf8;
   --sidebar-width: 260px;
   --toc-width: 200px;
   --topbar-height: 44px;
-  --bg: #ffffff;
-  --bg-surface: #f5f5f5;
-  --bg-code: #f0f0f0;
-  --border: #e0e0e0;
-  --text: #2c2c2c;
-  --text-secondary: #666666;
+  --bg: #24273a;
+  --bg-surface: #363a4f;
+  --bg-code: #1e2030;
+  --border: #494d64;
+  --text: #cad3f5;
+  --text-secondary: #a5adcb;
 }
 
-[data-theme="paperlike-white"] {
-  --ifm-color-primary: #2563eb;
-  --ifm-color-primary-dark: #1d4ed8;
-  --ifm-color-primary-light: #3b82f6;
-  --bg: #ffffff;
-  --bg-surface: #f5f5f5;
-  --bg-code: #f0f0f0;
-  --border: #e0e0e0;
-  --text: #2c2c2c;
-  --text-secondary: #666666;
+[data-theme="catppuccin"] {
+  --ifm-color-primary: #8aadf4;
+  --ifm-color-primary-dark: #7aa2f7;
+  --ifm-color-primary-light: #b7bdf8;
+  --bg: #24273a;
+  --bg-surface: #363a4f;
+  --bg-code: #1e2030;
+  --border: #494d64;
+  --text: #cad3f5;
+  --text-secondary: #a5adcb;
 }
 
-[data-theme="paperlike-gray"] {
-  --ifm-color-primary: #5b8db8;
-  --ifm-color-primary-dark: #4a7a9e;
-  --ifm-color-primary-light: #7ba3cc;
-  --bg: #e8e8e8;
-  --bg-surface: #dddddd;
-  --bg-code: #d5d5d5;
-  --border: #c0c0c0;
-  --text: #333333;
-  --text-secondary: #555555;
+[data-theme="tokyonight"] {
+  --ifm-color-primary: #7aa2f7;
+  --ifm-color-primary-dark: #3d59a1;
+  --ifm-color-primary-light: #bb9af7;
+  --bg: #1a1b26;
+  --bg-surface: #24283b;
+  --bg-code: #16161e;
+  --border: #414868;
+  --text: #a9b1d6;
+  --text-secondary: #787c99;
 }
 
-[data-theme="paperlike-sepia"] {
-  --ifm-color-primary: #8b6914;
-  --ifm-color-primary-dark: #6b4f10;
-  --ifm-color-primary-light: #a67c1a;
-  --bg: #f4ecd8;
-  --bg-surface: #ebe3cf;
-  --bg-code: #e5dcc5;
-  --border: #d5c9b0;
-  --text: #433422;
-  --text-secondary: #6b5d4f;
+[data-theme="gruvbox"] {
+  --ifm-color-primary: #d79921;
+  --ifm-color-primary-dark: #af3a03;
+  --ifm-color-primary-light: #fabd2f;
+  --bg: #282828;
+  --bg-surface: #32302f;
+  --bg-code: #1d2021;
+  --border: #504945;
+  --text: #d4be98;
+  --text-secondary: #a89984;
 }
 
-[data-theme="paperlike-dark-gray"] {
-  --ifm-color-primary: #7ba3cc;
-  --ifm-color-primary-dark: #5b8db8;
-  --ifm-color-primary-light: #9bb5d8;
-  --bg: #2a2a2a;
-  --bg-surface: #333333;
-  --bg-code: #383838;
-  --border: #444444;
-  --text: #d0d0d0;
-  --text-secondary: #999999;
+[data-theme="nord"] {
+  --ifm-color-primary: #88c0d0;
+  --ifm-color-primary-dark: #5e81ac;
+  --ifm-color-primary-light: #8fbcbb;
+  --bg: #2e3440;
+  --bg-surface: #3b4252;
+  --bg-code: #242933;
+  --border: #4c566a;
+  --text: #eceff4;
+  --text-secondary: #d8dee9;
 }
 
-[data-theme="paperlike-dark-sepia"] {
-  --ifm-color-primary: #c9a84c;
-  --ifm-color-primary-dark: #b8953f;
-  --ifm-color-primary-light: #d4b85e;
-  --bg: #2c241b;
-  --bg-surface: #362d23;
-  --bg-code: #3f352a;
-  --border: #4a3d30;
-  --text: #d5c4a1;
-  --text-secondary: #a89575;
+[data-theme="everforest"] {
+  --ifm-color-primary: #a7c080;
+  --ifm-color-primary-dark: #83c092;
+  --ifm-color-primary-light: #d3c6aa;
+  --bg: #2d353b;
+  --bg-surface: #343f44;
+  --bg-code: #232a2e;
+  --border: #475258;
+  --text: #d3c6aa;
+  --text-secondary: #9da9a0;
 }
 
-[data-theme="navy"] {
-  --ifm-color-primary: #3b82f6;
-  --ifm-color-primary-dark: #2563eb;
-  --ifm-color-primary-light: #60a5fa;
-  --bg: #f0f4f8;
-  --bg-surface: #e2e8f0;
-  --bg-code: #dae1e9;
-  --border: #cbd5e1;
-  --text: #1e293b;
-  --text-secondary: #475569;
-}
-
-[data-theme="dark-navy"] {
-  --ifm-color-primary: #60a5fa;
-  --ifm-color-primary-dark: #3b82f6;
-  --ifm-color-primary-light: #93c5fd;
-  --bg: #0f172a;
-  --bg-surface: #1e293b;
-  --bg-code: #253349;
-  --border: #334155;
-  --text: #e2e8f0;
-  --text-secondary: #94a3b8;
+[data-theme="solarized-light"] {
+  --ifm-color-primary: #268bd2;
+  --ifm-color-primary-dark: #073642;
+  --ifm-color-primary-light: #2aa198;
+  --bg: #fdf6e3;
+  --bg-surface: #eee8d5;
+  --bg-code: #fdf6e3;
+  --border: #93a1a1;
+  --text: #586e75;
+  --text-secondary: #93a1a1;
 }
 
 html {
@@ -116,8 +104,7 @@ html {
 
 body {
   font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
-    "Helvetica Neue", sans-serif;
+    "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: var(--text);
   background: var(--bg);
   line-height: var(--docs-line-height, 1.6);

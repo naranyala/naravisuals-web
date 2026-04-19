@@ -20,37 +20,35 @@
 import { useCallback, useEffect, useState } from "react";
 
 export type ShikiCodeTheme =
-  | "paperlike-white"
-  | "paperlike-gray"
-  | "paperlike-sepia"
-  | "paperlike-dark-gray"
-  | "paperlike-dark-sepia"
-  | "navy"
-  | "dark-navy";
+  | "catppuccin"
+  | "tokyonight"
+  | "gruvbox"
+  | "nord"
+  | "everforest"
+  | "solarized-light";
 
-const THEME_STORAGE_KEY = "shiki-code-theme";
+const THEME_STORAGE_KEY = "theme";
 
 /**
- * Get the initial code theme from localStorage, falling back to paperlike-dark-gray.
+ * Get the initial code theme from localStorage, falling back to catppuccin.
  */
 function getInitialCodeTheme(): ShikiCodeTheme {
-  if (typeof window === "undefined") return "paperlike-dark-gray";
+  if (typeof window === "undefined") return "catppuccin";
   try {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
     if (stored && isValidTheme(stored)) return stored;
   } catch {}
-  return "paperlike-dark-gray";
+  return "catppuccin";
 }
 
 function isValidTheme(name: string): name is ShikiCodeTheme {
   return [
-    "paperlike-white",
-    "paperlike-gray",
-    "paperlike-sepia",
-    "paperlike-dark-gray",
-    "paperlike-dark-sepia",
-    "navy",
-    "dark-navy",
+    "catppuccin",
+    "tokyonight",
+    "gruvbox",
+    "nord",
+    "everforest",
+    "solarized-light",
   ].includes(name);
 }
 

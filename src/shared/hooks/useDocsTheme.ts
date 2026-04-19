@@ -65,21 +65,22 @@ export function useDocsTheme(): DocsTheme {
 
   // ── Code Theme (now the main document theme) ──────────────────────
   const [codeTheme, setCodeThemeState] = useState<ShikiCodeTheme>(() => {
-    if (typeof window === "undefined") return "paperlike-dark-gray";
+    if (typeof window === "undefined") return "catppuccin";
     try {
-      const stored = localStorage.getItem("shiki-code-theme");
+      const stored = localStorage.getItem("theme");
       if (stored && isValidTheme(stored)) return stored;
     } catch {}
-    return "paperlike-dark-gray";
+    return "catppuccin";
   });
 
   const setCodeTheme = useCallback((theme: ShikiCodeTheme) => {
     setCodeThemeState(theme);
     if (typeof document !== "undefined") {
-      // Apply as main theme
+      // Apply as main theme and code theme
       document.documentElement.setAttribute("data-theme", theme);
+      document.documentElement.setAttribute("data-code-theme", theme);
     }
-    localStorage.setItem("shiki-code-theme", theme);
+    localStorage.setItem("theme", theme);
   }, []);
 
   // ── Font Size ─────────────────────────────────────────────────
@@ -153,12 +154,11 @@ export function useDocsTheme(): DocsTheme {
 
 function isValidTheme(name: string): name is ShikiCodeTheme {
   return [
-    "paperlike-white",
-    "paperlike-gray",
-    "paperlike-sepia",
-    "paperlike-dark-gray",
-    "paperlike-dark-sepia",
-    "navy",
-    "dark-navy",
+    "catppuccin",
+    "tokyonight",
+    "gruvbox",
+    "nord",
+    "everforest",
+    "solarized-light",
   ].includes(name);
 }

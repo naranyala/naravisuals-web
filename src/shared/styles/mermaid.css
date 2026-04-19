@@ -238,10 +238,14 @@
 
 .mermaid,
 .mermaid-src {
-  padding: 1rem;
+  padding: 1.5rem;
   overflow-x: auto;
   text-align: center;
   background: #ffffff;
+  min-height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .mermaid svg,
@@ -249,6 +253,8 @@
 .mermaid-fullscreen-content svg {
   max-width: 100%;
   height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 /* ---- Text & labels: dark for readability on white ---- */
@@ -260,20 +266,18 @@
   font-family: inherit !important;
 }
 
-/* ---- Node fills: distinct pastel colors for variety ---- */
-
-/* Use more specific selectors for nodes to avoid catching everything */
+/* ---- Node fills: light with primary border ---- */
 .mermaid svg .node rect,
 .mermaid svg .node circle,
 .mermaid svg .node ellipse,
 .mermaid svg .node polygon,
 .mermaid svg .node path {
-  fill: #f9fafb;
-  stroke: #d1d5db;
-  stroke-width: 1.5px;
+  fill: #f9fafb !important;
+  stroke: #8aadf4 !important; /* Fixed primary color */
+  stroke-width: 1.5px !important;
 }
 
-/* ---- Lines, paths, arrows: dark ---- */
+/* ---- Lines, paths, arrows: dark gray ---- */
 .mermaid svg .edgePath path,
 .mermaid-fullscreen-content svg .edgePath path,
 .mermaid svg line {
@@ -281,16 +285,7 @@
   stroke-width: 1.5px !important;
 }
 
-/* ---- Diagram Defaults: Let Mermaid handle specifics, provide only safety overrides ---- */
-.mermaid svg .node rect,
-.mermaid svg .node circle,
-.mermaid svg .node ellipse,
-.mermaid svg .node polygon,
-.mermaid svg .node path,
-.mermaid svg .cluster rect {
-  stroke-width: 1.5px !important;
-}
-
+/* ---- Edge label backgrounds: white ---- */
 .mermaid svg .edgeLabel,
 .mermaid svg .edgeLabel rect {
   background-color: #ffffff !important;
@@ -571,30 +566,4 @@
   .mermaid svg .edgePath path {
     stroke-width: 1.5px !important;
   }
-}
-
-/* ============================================
-   NORMAL VIEW STYLES
-   Minimal safety overrides for legacy diagram support.
-   ============================================ */
-
-.mermaid svg .nodeRect,
-.mermaid svg .actor,
-.mermaid svg .stateGroup rect,
-.mermaid svg .task {
-  fill: #fff !important;
-  stroke: #6b7280 !important;
-}
-
-.mermaid svg .section {
-  fill: #f9fafb !important;
-}
-
-.mermaid svg .grid .tick line {
-  stroke: #e5e7eb !important;
-}
-
-.mermaid svg .edgePath path {
-  stroke: #374151 !important;
-  stroke-width: 1.5px !important;
 }

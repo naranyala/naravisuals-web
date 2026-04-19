@@ -195,23 +195,22 @@ flowchart TD
 
 | Key | Values | Purpose |
 |---|---|---|
-| `theme` | `"dark"` or `"light"` | UI theme preference |
-| `shiki-code-theme` | `"paperlike-white"`, `"paperlike-gray"`, `"paperlike-sepia"`, `"paperlike-dark-gray"`, `"paperlike-dark-sepia"`, `"navy"`, `"dark-navy"` | Shiki syntax highlighting theme |
+| `theme` | `"catppuccin"`, `"tokyonight"`, `"gruvbox"`, `"nord"`, `"everforest"`, `"solarized-light"` | UI theme and syntax highlighting preference |
 
 ### Available Themes
 
 ```ts:desc=IAppConfig interface definition
 const THEMES = [
-  { id: "paperlike-white", label: "Paper White", bg: "#ffffff", accent: "#2563eb" },
-  { id: "paperlike-gray", label: "Paper Gray", bg: "#e8e8e8", accent: "#5b8db8" },
-  { id: "paperlike-sepia", label: "Paper Sepia", bg: "#f4ecd8", accent: "#8b6914" },
-  { id: "paperlike-dark-gray", label: "Paper Dark", bg: "#2a2a2a", accent: "#7ba3cc" },
-  { id: "navy", label: "Navy", bg: "#f0f4f8", accent: "#3b82f6" },
-  { id: "dark-navy", label: "Dark Navy", bg: "#0f172a", accent: "#60a5fa" },
+  { id: "catppuccin", label: "Catppuccin", bg: "#24273a", accent: "#8aadf4" },
+  { id: "tokyonight", label: "Tokyo Night", bg: "#1a1b26", accent: "#7aa2f7" },
+  { id: "gruvbox", label: "Gruvbox", bg: "#282828", accent: "#d79921" },
+  { id: "nord", label: "Nord", bg: "#2e3440", accent: "#88c0d0" },
+  { id: "everforest", label: "Everforest", bg: "#2d353b", accent: "#a7c080" },
+  { id: "solarized-light", label: "Solarized Light", bg: "#fdf6e3", accent: "#268bd2" },
 ];
 ```
 
-The default theme (when no preference is stored) is `paperlike-dark-gray`.
+The default theme (when no preference is stored) is `catppuccin`.
 
 ## Responsive Breakpoints
 

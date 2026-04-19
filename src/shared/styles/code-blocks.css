@@ -195,9 +195,11 @@
 }
 
 /* Dark theme overrides */
-[data-theme="paperlike-dark-gray"] .doc-content :not(pre) > code,
-[data-theme="paperlike-dark-sepia"] .doc-content :not(pre) > code,
-[data-theme="dark-navy"] .doc-content :not(pre) > code {
+[data-theme="catppuccin"] .doc-content :not(pre) > code,
+[data-theme="tokyonight"] .doc-content :not(pre) > code,
+[data-theme="gruvbox"] .doc-content :not(pre) > code,
+[data-theme="nord"] .doc-content :not(pre) > code,
+[data-theme="everforest"] .doc-content :not(pre) > code {
   background: var(--bg-code);
   color: #e5e7eb;
   border-color: rgba(255, 255, 255, 0.1);

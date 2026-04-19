@@ -9,12 +9,12 @@
 .view-mode-switcher {
   position: relative;
   display: flex;
-  background: #1a1a1a; /* Dark theme background */
-  border: 1px solid #333;
+  background: var(--bg-code); /* Theme-aware background */
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 4px;
   width: 100%;
-  max-width: 1200px; /* Limit to prevent extreme stretching on ultrawide */
+  max-width: 1200px;
   user-select: none;
 }
 
@@ -24,9 +24,10 @@
   left: 4px;
   bottom: 4px;
   width: calc(50% - 4px);
-  background: #333; /* Dark theme slider */
+  background: var(--bg-surface); /* Theme-aware slider */
+  border: 1px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 0;
 }
@@ -45,7 +46,7 @@
   padding: 0.5rem;
   border: none;
   background: transparent;
-  color: #888; /* Dimmed text for inactive */
+  color: var(--text-secondary); /* Theme-aware dimmed text */
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -55,7 +56,7 @@
 
 .view-mode-switcher.view .view-mode-btn:first-child,
 .view-mode-switcher.raw .view-mode-btn:last-child {
-  color: #fff; /* Bright text for active */
+  color: var(--ifm-color-primary); /* Theme-aware active text */
 }
 
 .raw-content-viewer {

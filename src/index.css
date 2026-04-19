@@ -32,8 +32,7 @@ html {
 
 body {
   font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
-    "Helvetica Neue", sans-serif;
+    "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: var(--text);
   background: var(--bg);
   line-height: var(--docs-line-height, 1.6);
@@ -838,8 +837,12 @@ a:hover {
   border-left-color: var(--ifm-color-primary);
 }
 
-[data-theme="dark"] .sidebar-link.active {
-  background: rgba(96, 165, 250, 0.12);
+[data-theme="catppuccin"] .sidebar-link.active,
+[data-theme="tokyonight"] .sidebar-link.active,
+[data-theme="gruvbox"] .sidebar-link.active,
+[data-theme="nord"] .sidebar-link.active,
+[data-theme="everforest"] .sidebar-link.active {
+  background: rgba(138, 173, 244, 0.12);
 }
 
 .sidebar-link-label {
@@ -1143,7 +1146,7 @@ a:hover {
 }
 
 .code-lang {
-  color: #a6adc8;
+  color: var(--text-secondary);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1151,7 +1154,7 @@ a:hover {
 }
 
 .code-title {
-  color: #89b4fa;
+  color: var(--ifm-color-primary);
   font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 0.72rem;
   margin-left: 0.5rem;
@@ -1160,8 +1163,8 @@ a:hover {
 
 .code-copy-btn {
   background: none;
-  border: 1px solid #45475a;
-  color: #a6adc8;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 0.2rem 0.55rem;
   border-radius: 0.25rem;
@@ -1171,14 +1174,14 @@ a:hover {
 }
 
 .code-copy-btn:hover {
-  background: #313244;
-  color: #cdd6f4;
-  border-color: #585b70;
+  background: var(--bg-surface);
+  color: var(--text);
+  border-color: var(--border);
 }
 
 .code-copy-btn.copied {
-  color: #a6e3a1;
-  border-color: #a6e3a1;
+  color: #10b981;
+  border-color: #10b981;
 }
 
 /* Line numbers via CSS counters */
@@ -1224,38 +1227,6 @@ a:hover {
   line-height: inherit;
 }
 */
-
-/* Print-friendly code blocks */
-@media print {
-  .code-block {
-    break-inside: avoid;
-    border: 1px solid #ccc;
-    page-break-inside: avoid;
-  }
-
-  .code-header {
-    background: #f5f5f5 !important;
-    border-bottom: 1px solid #ccc;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .code-copy-btn {
-    display: none !important;
-  }
-
-  .doc-content .code-block pre {
-    background: #fafafa !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .doc-content .code-block pre .line::before {
-    color: #888 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-}
 
 /* ─── Math (MathJax) ────────────────────────────────────────── */
 
@@ -1407,31 +1378,29 @@ a:hover {
 
 /* ─── Font Families ─────────────────────────────────────────── */
 
-[data-font="system"] body,
-[data-font="system"] .doc-content {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
-    "Helvetica Neue", sans-serif;
+[data-font="inter"] body,
+[data-font="inter"] .doc-content {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
 }
 
 [data-font="serif"] body,
 [data-font="serif"] .doc-content {
-  font-family: "Georgia", "Times New Roman", "Noto Serif", serif;
+  font-family: "Source Serif 4", "Georgia", "Times New Roman", serif;
+}
+
+[data-font="plex"] body,
+[data-font="plex"] .doc-content {
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
 }
 
 [data-font="mono"] body,
 [data-font="mono"] .doc-content {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, "Fira Code", monospace;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
 }
 
-[data-font="inter"] body,
-[data-font="inter"] .doc-content {
-  font-family: "Inter", system-ui, sans-serif;
-}
-
-[data-font="source-sans"] body,
-[data-font="source-sans"] .doc-content {
-  font-family: "Source Sans 3", system-ui, sans-serif;
+[data-font="system"] body,
+[data-font="system"] .doc-content {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .doc-content ul,
@@ -1489,40 +1458,40 @@ a:hover {
 
 /* Type variants */
 .admonition-note {
-  border-left-color: #3b82f6;
+  border-left-color: var(--ifm-color-primary);
 }
 .admonition-note .admonition-heading {
-  background: rgba(59, 130, 246, 0.08);
+  background: rgba(var(--ifm-color-primary-rgb, 138, 173, 244), 0.12);
 }
 
 .admonition-tip {
-  border-left-color: #22c55e;
+  border-left-color: #a6e3a1; /* Catppuccin Green */
 }
 .admonition-tip .admonition-heading {
-  background: rgba(34, 197, 94, 0.08);
+  background: rgba(166, 227, 161, 0.12);
 }
 
 .admonition-info {
-  border-left-color: #8b5cf6;
+  border-left-color: #89b4fa; /* Catppuccin Blue */
 }
 .admonition-info .admonition-heading {
-  background: rgba(139, 92, 246, 0.08);
+  background: rgba(137, 180, 250, 0.12);
 }
 
 .admonition-warning {
-  border-left-color: #f59e0b;
+  border-left-color: #f9e2af; /* Catppuccin Yellow */
 }
 .admonition-warning .admonition-heading {
-  background: rgba(245, 158, 11, 0.08);
+  background: rgba(249, 226, 175, 0.12);
 }
 
 .admonition-danger,
 .admonition-caution {
-  border-left-color: #ef4444;
+  border-left-color: #f38ba8; /* Catppuccin Red */
 }
 .admonition-danger .admonition-heading,
 .admonition-caution .admonition-heading {
-  background: rgba(239, 68, 68, 0.08);
+  background: rgba(243, 139, 168, 0.12);
 }
 
 .doc-content hr {
@@ -2008,89 +1977,19 @@ a:hover {
   color: inherit !important;
 }
 
-[data-theme="dark"] .code-block-timeline {
-  border-color: #45475a;
+[data-theme="catppuccin"] .code-block-timeline,
+[data-theme="tokyonight"] .code-block-timeline,
+[data-theme="gruvbox"] .code-block-timeline,
+[data-theme="nord"] .code-block-timeline,
+[data-theme="everforest"] .code-block-timeline {
+  border-color: var(--border);
 }
 
-[data-theme="dark"] .code-block-timeline .code-header {
-  background: #181825;
-  border-bottom-color: #313244;
-}
-
-/* ============================================
-   BROWSER PRINT STYLES
-   ============================================ */
-
-@media print {
-  /* Hide all UI elements */
-  .top-bar,
-  .sidebar,
-  .toc-container,
-  .scroll-panel,
-  .breadcrumbs,
-  .doc-footer,
-  .scroll-to-top-btn,
-  .print-btn,
-  .font-switcher,
-  .theme-toggle,
-  .menu-btn,
-  .toc-mobile-collapsible {
-    display: none !important;
-  }
-
-  /* Reset layout for print */
-  .site-wrapper {
-    min-height: auto;
-  }
-
-  .doc-page-layout {
-    display: block;
-  }
-
-  .main-content {
-    max-width: 100%;
-    padding: 0;
-  }
-
-  /* Code blocks print-friendly */
-  .code-block {
-    break-inside: avoid;
-    border: 1px solid #ccc;
-    page-break-inside: avoid;
-  }
-
-  .code-header {
-    background: #f5f5f5 !important;
-    border-bottom: 1px solid #ccc;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .code-copy-btn {
-    display: none !important;
-  }
-
-  .doc-content .code-block pre {
-    background: #fafafa !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .doc-content .code-block pre .line::before {
-    color: #888 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  /* Links show URL */
-  .doc-content a[href^="http"]::after {
-    content: " (" attr(href) ")";
-    font-size: 0.75em;
-    color: #666;
-  }
-
-  /* Mermaid diagrams */
-  .mermaid-diagram {
-    break-inside: avoid;
-  }
+[data-theme="catppuccin"] .code-block-timeline .code-header,
+[data-theme="tokyonight"] .code-block-timeline .code-header,
+[data-theme="gruvbox"] .code-block-timeline .code-header,
+[data-theme="nord"] .code-block-timeline .code-header,
+[data-theme="everforest"] .code-block-timeline .code-header {
+  background: var(--bg-surface);
+  border-bottom-color: var(--border);
 }

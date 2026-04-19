@@ -9,24 +9,24 @@ import type { FontOption, ThemeOption } from "../types";
 // ─── Theme Configuration ──────────────────────────────────────────────────
 
 export const AVAILABLE_THEMES: ThemeOption[] = [
-  { id: "paperlike-white", label: "Paper White", bg: "#ffffff", accent: "#2563eb" },
-  { id: "paperlike-gray", label: "Paper Gray", bg: "#e8e8e8", accent: "#5b8db8" },
-  { id: "paperlike-sepia", label: "Paper Sepia", bg: "#f4ecd8", accent: "#8b6914" },
-  { id: "paperlike-dark-gray", label: "Paper Dark", bg: "#2a2a2a", accent: "#7ba3cc" },
-  { id: "navy", label: "Navy", bg: "#f0f4f8", accent: "#3b82f6" },
-  { id: "dark-navy", label: "Dark Navy", bg: "#0f172a", accent: "#60a5fa" },
+  { id: "catppuccin", label: "Catppuccin", bg: "#24273a", accent: "#8aadf4" },
+  { id: "tokyonight", label: "Tokyo Night", bg: "#1a1b26", accent: "#7aa2f7" },
+  { id: "gruvbox", label: "Gruvbox", bg: "#282828", accent: "#d79921" },
+  { id: "nord", label: "Nord", bg: "#2e3440", accent: "#88c0d0" },
+  { id: "everforest", label: "Everforest", bg: "#2d353b", accent: "#a7c080" },
+  { id: "solarized-light", label: "Solarized Light", bg: "#fdf6e3", accent: "#268bd2" },
 ];
 
 export const AVAILABLE_FONTS: FontOption[] = [
-  { id: "system", label: "System", css: "system-ui, -apple-system, sans-serif" },
-  { id: "serif", label: "Serif", css: 'Georgia, "Times New Roman", serif' },
-  { id: "mono", label: "Mono", css: '"SFMono-Regular", Consolas, monospace' },
-  { id: "inter", label: "Inter", css: '"Inter", system-ui, sans-serif' },
-  { id: "source-sans", label: "Source Sans", css: '"Source Sans 3", system-ui, sans-serif' },
+  { id: "inter", label: "Modern Sans", css: '"Inter", system-ui, -apple-system, sans-serif' },
+  { id: "serif", label: "Classic Serif", css: '"Source Serif 4", "Georgia", "Times New Roman", serif' },
+  { id: "plex", label: "Professional", css: '"IBM Plex Sans", system-ui, sans-serif' },
+  { id: "mono", label: "Technical", css: '"JetBrains Mono", "SFMono-Regular", Consolas, monospace' },
+  { id: "system", label: "System UI", css: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
 ];
 
-export const DEFAULT_THEME = "paperlike-dark-gray";
-export const DEFAULT_FONT = "system";
+export const DEFAULT_THEME = "catppuccin";
+export const DEFAULT_FONT = "inter";
 
 // ─── Storage Keys ─────────────────────────────────────────────────────────
 
@@ -46,22 +46,22 @@ export const MERMAID_CONFIG = {
   startOnLoad: false,
   theme: "base",
   themeVariables: {
-    primaryColor: "#e8f5e9",
-    primaryTextColor: "#1a1a2e",
-    primaryBorderColor: "#2e7d32",
-    lineColor: "#374151",
-    secondaryColor: "#e3f2fd",
-    tertiaryColor: "#fff3e0",
-    background: "#ffffff",
-    mainBkg: "#ffffff",
-    nodeBorder: "#6b7280",
-    clusterBkg: "#f3f4f6",
-    clusterBorder: "#d1d5db",
-    titleColor: "#1a1a2e",
-    edgeLabelBackground: "#ffffff",
+    primaryColor: "#363a4f",
+    primaryTextColor: "#cad3f5",
+    primaryBorderColor: "#8aadf4",
+    lineColor: "#b8c0e0",
+    secondaryColor: "#363a4f",
+    tertiaryColor: "#363a4f",
+    background: "#24273a",
+    mainBkg: "#24273a",
+    nodeBorder: "#494d64",
+    clusterBkg: "#1e2030",
+    clusterBorder: "#494d64",
+    titleColor: "#cad3f5",
+    edgeLabelBackground: "#24273a",
   },
   securityLevel: "loose",
-  fontFamily: "system-ui, -apple-system, sans-serif",
+  fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
 };
 
 // ─── Keyboard Shortcuts ───────────────────────────────────────────────────

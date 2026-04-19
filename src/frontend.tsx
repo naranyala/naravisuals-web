@@ -24,20 +24,20 @@ const createElement = (
 setup({ createElement });
 
 // Apply initial theme using injected service
-// Default to paperlike-dark-gray if no preference is stored
+// Default to catppuccin if no preference is stored
 if (typeof window !== "undefined") {
-  const stored = localStorage.getItem("shiki-code-theme");
+  const stored = localStorage.getItem("theme");
   const validThemes = [
-    "paperlike-white",
-    "paperlike-gray",
-    "paperlike-sepia",
-    "paperlike-dark-gray",
-    "paperlike-dark-sepia",
-    "navy",
-    "dark-navy",
+    "catppuccin",
+    "tokyonight",
+    "gruvbox",
+    "nord",
+    "everforest",
+    "solarized-light",
   ];
-  const initialTheme = stored && validThemes.includes(stored) ? stored : "paperlike-dark-gray";
+  const initialTheme = stored && validThemes.includes(stored) ? stored : "catppuccin";
   document.documentElement.setAttribute("data-theme", initialTheme);
+  document.documentElement.setAttribute("data-code-theme", initialTheme);
 }
 
 const elem = defaultContainer.dom.getElementById("root");

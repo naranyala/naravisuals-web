@@ -35,40 +35,40 @@
 
 /* Type variants */
 .admonition-note {
-  border-left-color: #3b82f6;
+  border-left-color: var(--ifm-color-primary);
 }
 .admonition-note .admonition-heading {
-  background: rgba(59, 130, 246, 0.08);
+  background: rgba(var(--ifm-color-primary-rgb, 138, 173, 244), 0.12);
 }
 
 .admonition-tip {
-  border-left-color: #22c55e;
+  border-left-color: #a6e3a1; /* Catppuccin Green */
 }
 .admonition-tip .admonition-heading {
-  background: rgba(34, 197, 94, 0.08);
+  background: rgba(166, 227, 161, 0.12);
 }
 
 .admonition-info {
-  border-left-color: #8b5cf6;
+  border-left-color: #89b4fa; /* Catppuccin Blue */
 }
 .admonition-info .admonition-heading {
-  background: rgba(139, 92, 246, 0.08);
+  background: rgba(137, 180, 250, 0.12);
 }
 
 .admonition-warning {
-  border-left-color: #f59e0b;
+  border-left-color: #f9e2af; /* Catppuccin Yellow */
 }
 .admonition-warning .admonition-heading {
-  background: rgba(245, 158, 11, 0.08);
+  background: rgba(249, 226, 175, 0.12);
 }
 
 .admonition-danger,
 .admonition-caution {
-  border-left-color: #ef4444;
+  border-left-color: #f38ba8; /* Catppuccin Red */
 }
 .admonition-danger .admonition-heading,
 .admonition-caution .admonition-heading {
-  background: rgba(239, 68, 68, 0.08);
+  background: rgba(243, 139, 168, 0.12);
 }
 
 .doc-content hr {
