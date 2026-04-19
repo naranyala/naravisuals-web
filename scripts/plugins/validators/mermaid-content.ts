@@ -100,6 +100,32 @@ export async function validateMermaidContent(
     return errors;
   }
 
+  // Rule: Flowchart direction should ideally be on the same line as 'flowchart'
+  if ((validType === "flowchart" || validType === "graph") && firstLineParts.length === 1) {
+    const nextLine = lines[firstActualLineIndex + 1]?.trim();
+    const directions = ["LR", "RL", "TD", "TB", "BT"];
+    if (nextLine && directions.includes(nextLine.toUpperCase())) {
+      errors.push({
+        severity: "warning",
+        message: "Disconnected direction",
+        detail: `Put diagram direction (e.g., '${nextLine.toUpperCase()}') on the same line as the diagram type: '${validType} ${nextLine.toUpperCase()}'.`,
+        line: firstActualLineIndex + 1,
+      });
+    }
+  }
+
+  // Rule: Mindmap must have a root node
+  if (validType === "mindmap") {
+    const hasRoot = lines.some((l, i) => i > firstActualLineIndex && l.trim() !== "" && !l.trim().startsWith("%%"));
+    if (!hasRoot) {
+      errors.push({
+        message: "Missing root node",
+        detail: "Mindmap requires at least one root node.",
+        line: firstActualLineIndex + 1,
+      });
+    }
+  }
+
   // Rule: Prefer 'flowchart' over 'graph' (modern standard)
   if (type.toLowerCase() === "graph") {
     errors.push({
@@ -218,12 +244,13 @@ export async function validateMermaidContent(
         });
       }
 
-      // Enforce double quotes for labels in brackets: [Label] -> ["Label"]
+      // Suggest double quotes for labels in brackets: [Label] -> ["Label"]
       if (/[[({][^"'`\s][^\])}]*[\])}]/.test(unquotedLine)) {
         errors.push({
+          severity: "warning",
           message: "Unquoted label",
           detail:
-            'Labels inside brackets, parentheses, or braces must be wrapped in double quotes (e.g., ["Text"]).',
+            'Consider wrapping labels inside brackets, parentheses, or braces in double quotes (e.g., ["Text"]) for better compatibility with special characters.',
           line: lineNum,
         });
       }
@@ -260,14 +287,25 @@ export async function validateMermaidContent(
       }
     }
 
-    // Sequence Diagram specific checks
-    if (validType === "sequenceDiagram") {
-      if (stripped.startsWith("participant") && stripped.split(/\s+/).length < 2) {
-        errors.push({
-          message: "Malformed participant",
-          detail: "Participant declaration requires a name.",
-          line: lineNum,
-        });
+    // Mindmap specific checks
+    if (validType === "mindmap") {
+      // Mindmaps use indentation, but we can still check for node IDs
+      const stripped = unquotedLine.trim();
+      if (stripped && !stripped.startsWith("%%")) {
+        // Simple check for illegal node characters in mindmap if not using shapes () [] etc.
+        const firstWord = stripped.split(/\s+/)[0];
+        if (firstWord && !firstWord.includes("(") && !firstWord.includes("[") && !firstWord.includes("{")) {
+          if (/[^a-zA-Z0-9_-]/.test(firstWord)) {
+             // Mindmaps are more flexible but certain chars at start can confuse parser
+             // Just a warning
+             errors.push({
+               severity: "info",
+               message: "Complex node ID",
+               detail: `Node '${firstWord}' contains special characters. Wrap in double quotes if rendering fails.`,
+               line: lineNum
+             });
+          }
+        }
       }
     }
   });

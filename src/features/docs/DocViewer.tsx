@@ -209,11 +209,20 @@ export function DocViewer({ html, slug }: DocViewerProps) {
         btn.parentNode?.replaceChild(newBtn, btn);
         newBtn.addEventListener("click", (e) => {
           e.preventDefault();
-          const container = (newBtn as HTMLElement).closest(".mermaid-diagram")?.querySelector<HTMLElement>(".mermaid-source-container");
+          const diagramWrapper = (newBtn as HTMLElement).closest(".mermaid-diagram");
+          const container = diagramWrapper?.querySelector<HTMLElement>(".mermaid-source-container");
           if (!container) return;
-          const isHidden = container.style.display === "none";
-          container.style.display = isHidden ? "block" : "none";
-          (newBtn as HTMLElement).classList.toggle("active", isHidden);
+          
+          const isOpening = container.style.display === "none";
+          container.style.display = isOpening ? "block" : "none";
+          (newBtn as HTMLElement).classList.toggle("active", isOpening);
+
+          // Scroll to the source container if it's being opened
+          if (isOpening) {
+            setTimeout(() => {
+              container.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }, 50);
+          }
         });
       });
 
@@ -251,27 +260,52 @@ export function DocViewer({ html, slug }: DocViewerProps) {
       wrapper.dataset.processed = "true";
 
       try {
-        const uniqueId = `mermaid-chart-${slug.replace(/\//g, "-")}-${index}-${Math.random().toString(36).slice(2, 7)}`;
+        const uniqueId = `mermaid-chart-${Math.random().toString(36).slice(2, 11)}`;
         
-        // Ensure the element is clean and briefly visible for measurement (hidden via opacity)
+        // Ensure the element is clean and visible for measurement
         mermaidEl.innerHTML = "";
         mermaidEl.style.display = "block";
         mermaidEl.style.opacity = "0";
+        mermaidEl.style.minHeight = "100px"; // Provide some minimum height for measurement
         
         // Pass mermaidEl as the container to improve measurement accuracy in Mermaid v11
         const result = await mermaid.render(uniqueId, diagramSource, mermaidEl);
         const svgContent = typeof result === "string" ? result : result?.svg;
 
         if (mounted && svgContent) {
+          // Check for Mermaid-internal error reporting within the SVG
+          // but still show the result so the user can see what's wrong
+          const hasInternalError = svgContent.includes('id="error-div"') || 
+                                  svgContent.includes('class="error-icon"') ||
+                                  svgContent.includes('Syntax error') ||
+                                  svgContent.includes('Unknown diagram type');
+
           mermaidEl.innerHTML = svgContent;
           mermaidEl.style.opacity = "1";
-          if (errorEl) errorEl.style.display = "none";
+          mermaidEl.style.minHeight = ""; // Reset min-height
+
+          if (hasInternalError) {
+            console.warn(`Mermaid rendered with errors for ${slug} [${index}]`);
+            if (errorEl) {
+              errorEl.style.display = "block";
+              errorEl.innerHTML = `
+                <div class="mermaid-error-title">⚠ Diagram Rendering Warning</div>
+                <p>The diagram rendered but Mermaid reported internal errors. Check the syntax below.</p>
+                <div class="mermaid-error-actions">
+                  <button onclick="this.closest('.mermaid-diagram').querySelector('.mermaid-code-btn').click()">View Source</button>
+                </div>
+              `;
+            }
+          } else {
+            if (errorEl) errorEl.style.display = "none";
+          }
         }
       } catch (err) {
         console.error(`Mermaid render failed for ${slug} [${index}]:`, err);
         if (mounted) {
           mermaidEl.style.display = "block";
           mermaidEl.style.opacity = "1";
+          mermaidEl.style.minHeight = "";
           
           if (errorEl) {
             const msg = err instanceof Error ? err.message : String(err);
@@ -279,7 +313,7 @@ export function DocViewer({ html, slug }: DocViewerProps) {
             errorEl.innerHTML = `
               <div class="mermaid-error-title">⚠ Rendering Failed</div>
               <p style=\"font-size: 0.85em; margin: 0.5rem 0; opacity: 0.8;\">
-                Mermaid failed to render this diagram in the browser.
+                Mermaid failed to render this diagram.
               </p>
               <pre class="mermaid-error-msg">${msg}</pre>
               <details>
@@ -311,9 +345,11 @@ export function DocViewer({ html, slug }: DocViewerProps) {
         if (!(window as any).__mermaidInitialized__) {
           mermaid.initialize({
             startOnLoad: false,
-            theme: "neutral", // Switch to neutral for better compatibility in v11
+            theme: "default", // Use default theme for maximum compatibility
             securityLevel: "loose",
             fontFamily: "system-ui, -apple-system, sans-serif",
+            flowchart: { htmlLabels: true, useMaxWidth: true },
+            sequence: { useMaxWidth: true, showSequenceNumbers: true },
           });
           (window as any).__mermaidInitialized__ = true;
         }

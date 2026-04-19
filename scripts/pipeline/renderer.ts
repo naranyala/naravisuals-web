@@ -105,12 +105,23 @@ export function createCustomRenderer(highlighter: Highlighter) {
   renderer.code = ({ text, lang: rawLang }) => {
     const meta = parseCodeInfo(rawLang);
 
-    // Skip Shiki for mermaid - the mermaid plugin needs raw text with newlines
-    if (
-      meta.lang &&
-      meta.lang.toLowerCase() !== "mermaid" &&
-      highlighter.getLoadedLanguages().includes(meta.lang as Language)
-    ) {
+    // Skip Shiki for all mermaid types and technical diagrams
+    const mermaidTypes = [
+      "mermaid", "graph", "flowchart", "sequenceDiagram", "classDiagram", "stateDiagram", 
+      "erDiagram", "gantt", "pie", "quadrantChart", "xyChart", "mindmap", 
+      "timeline", "journey", "requirementDiagram", "gitGraph", "sankey"
+    ];
+    
+    const lowerLang = meta.lang.toLowerCase();
+    if (mermaidTypes.includes(lowerLang) || ["timeline", "text (timeline)"].includes(lowerLang)) {
+      const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return codeBlockWrapper(
+        `<pre><code class="language-${meta.lang || ""}">${escaped}</code></pre>`,
+        meta
+      );
+    }
+
+    if (meta.lang && highlighter.getLoadedLanguages().includes(meta.lang as Language)) {
       const highlighted = highlighter.codeToHtml(text, { lang: meta.lang, theme: "github-dark" });
       return codeBlockWrapper(highlighted, meta);
     }

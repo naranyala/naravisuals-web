@@ -15,21 +15,58 @@ export const mermaidPlugin: MarkdownPlugin = {
     const codeBlocks = Array.from(document.querySelectorAll(".code-block"));
 
     const mermaidTypes = [
-      "mermaid", "flowchart", "sequenceDiagram", "classDiagram", "stateDiagram", 
+      "mermaid", "graph", "flowchart", "sequenceDiagram", "classDiagram", "stateDiagram", 
       "erDiagram", "gantt", "pie", "quadrantChart", "xyChart", "mindmap", 
       "timeline", "journey", "requirementDiagram", "gitGraph", "sankey"
     ];
 
     for (const block of codeBlocks) {
-      const langSpan = block.querySelector(".code-lang");
-      const lang = langSpan?.textContent?.toLowerCase() || "";
+      const lang = block.getAttribute("data-lang")?.toLowerCase() || "";
       
       if (!mermaidTypes.includes(lang)) continue;
 
       const codeElement = block.querySelector("pre code");
       if (!codeElement) continue;
 
-      const diagram = codeElement.textContent || "";
+      let diagram = codeElement.textContent || "";
+      const trimmedDiagram = diagram.trim();
+      const firstLine = trimmedDiagram.split("\n")[0].trim().toLowerCase();
+
+      // Determine the target diagram type
+      let targetType = lang;
+      if (lang === "mermaid") {
+        // Auto-detect from content if lang is just "mermaid"
+        const firstWord = trimmedDiagram.split(/\s+/)[0].toLowerCase();
+        if (mermaidTypes.includes(firstWord) && firstWord !== "mermaid") {
+          targetType = firstWord;
+        } else if (firstWord === "graph") {
+          targetType = "flowchart"; // Normalize graph to flowchart
+        }
+      }
+
+      // Ensure diagram has the correct prefix and direction
+      if (targetType !== "mermaid") {
+        const isPrefixed = firstLine.startsWith(targetType.toLowerCase()) || 
+                          (targetType === "graph" && firstLine.startsWith("flowchart")) ||
+                          (targetType === "flowchart" && firstLine.startsWith("graph"));
+        
+        if (!isPrefixed) {
+          const directions = ["LR", "RL", "TD", "TB", "BT"];
+          const firstWord = firstLine.split(/\s+/)[0].toUpperCase();
+          
+          if (directions.includes(firstWord)) {
+            // Already has a direction, just prefix with type
+            const restOfDiagram = trimmedDiagram.split("\n").slice(1).join("\n");
+            diagram = `${targetType} ${firstWord}\n${restOfDiagram}`;
+          } else if (targetType === "flowchart" || targetType === "graph") {
+            // Flowcharts need a direction
+            diagram = `${targetType} TD\n${trimmedDiagram}`;
+          } else {
+            // Others just need the type prefix
+            diagram = `${targetType}\n${trimmedDiagram}`;
+          }
+        }
+      }
       const descElement = block.querySelector(".code-desc");
       const desc = descElement?.textContent || undefined;
       const zoomEnabled = block.getAttribute("data-zoom") === "true";
@@ -89,9 +126,9 @@ export const mermaidPlugin: MarkdownPlugin = {
         <div class="mermaid-diagram-header">
           <span class="mermaid-diagram-label">Diagram</span>
           <div class="mermaid-diagram-actions">
-            ${codeBtnHtml}
             ${zoomBtnHtml}
             ${downloadBtnHtml}
+            ${codeBtnHtml}
             <span class="mermaid-loading"><span class="mermaid-spinner"></span></span>
           </div>
         </div>

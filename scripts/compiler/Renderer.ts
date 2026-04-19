@@ -42,7 +42,7 @@ export class MarkdownRenderer {
 
       // Skip Shiki for all mermaid types and technical diagrams
       const mermaidTypes = [
-        "mermaid", "flowchart", "sequenceDiagram", "classDiagram", "stateDiagram", 
+        "mermaid", "graph", "flowchart", "sequenceDiagram", "classDiagram", "stateDiagram", 
         "erDiagram", "gantt", "pie", "quadrantChart", "xyChart", "mindmap", 
         "timeline", "journey", "requirementDiagram", "gitGraph", "sankey"
       ];

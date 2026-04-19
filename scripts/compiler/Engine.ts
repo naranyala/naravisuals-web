@@ -143,6 +143,12 @@ export class DocumentationCompiler {
     this.renderer.reset();
     const renderer = this.renderer.getRenderer();
     unit.tokens = marked.Lexer.lex(unit.content);
+
+    // Middleware: Transform
+    for (const mw of this.middlewares) {
+      if (mw.onTransform) await mw.onTransform(unit, this.ctx);
+    }
+
     unit.html = marked.parse(unit.content, { renderer }) as string;
     unit.toc = extractTOC(unit.tokens);
 
