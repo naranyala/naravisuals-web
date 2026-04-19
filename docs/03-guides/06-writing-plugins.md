@@ -37,11 +37,11 @@ export interface MarkdownPlugin {
 ## Build Pipeline
 
 ```mermaid:desc=Build pipeline plugin flow diagram
-flowchart lr
-    Raw[raw .md file] -->|preProcess| Plugins[All plugins in order]
-    Plugins -->|combined md| Marked[marked parser]
-    Marked -->|HTML| PostPlugins[All plugins in REVERSE order]
-    PostPlugins -->|final HTML| Output[src/generated/]
+flowchart LR
+    A["raw markdown"] -->|preProcess| B["All plugins"]
+    B -->|combined| C["marked parser"]
+    C -->|HTML| D["All plugins (reverse)"]
+    D -->|final HTML| E["src/generated"]
 ```
 
 The full pipeline:

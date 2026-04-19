@@ -22,24 +22,18 @@ This tool was designed to solve the limitations of traditional documentation gen
 
 The system operates on three primary abstractions:
 
-### 1. The Build Pipeline
-The pipeline transforms raw `.md` files into optimized React components. It uses a **plugin system** that processes content in three phases:
-- `preProcess`: Transforms raw markdown (e.g., extracting math).
-- `marked`: Converts markdown to HTML via a custom renderer.
-- `postProcess`: Enhances the HTML (e.g., wrapping code blocks, rendering Mermaid).
+### 1. The Compiler Engine (v2)
+The engine treats your documentation as a collection of **Compilation Units**. It uses a stateful pipeline that handles parsing, syntax highlighting, and HTML generation with guaranteed isolation between files.
 
-### 2. Dependency Injection (DI)
+### 2. Middleware Architecture
+Unlike traditional generators, every feature (from Mermaid diagrams to link checking) is a decoupled **Middleware**. This makes the system extremely extensible and allows for deep structural validation during the build.
+
+### 3. Dependency Injection (DI)
 The frontend uses a DI container to manage services like SEO, navigation, and theme state. This makes the components highly testable and allows for easy swapping of service implementations.
-
-### 3. Unified Validation
-Instead of catching errors in the browser, the system validates content during the build. This includes:
-- **Codeblock Descriptions**: Ensures every snippet has an explanation.
-- **Mermaid Syntax**: Catches diagram errors before they reach the user.
-- **Reference Integrity**: Validates footnotes and internal links.
 
 ## Design Decisions
 
-```mermaid:desc=Mindmap showing the five core design decisions behind the project.
+```mermaid:desc=Design Decisions Mindmap
 mindmap
   root((Design Decisions))
     Performance

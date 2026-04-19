@@ -30,18 +30,18 @@ bun run scripts/validate-all.mts --llm     # LLM action items format
 ## Validator Architecture
 
 ```mermaid:desc=Validator architecture diagram
-flowchart td
-    Entry[validate-all.mts] --> Scan[Scan markdown files]
-    Scan --> Mode{Output Mode}
-    Mode -->|--llm| LLM[LLM Output Mode]
-    Mode -->|default| Human[Human Output Mode]
+flowchart TD
+    Entry["validate-all.mts"] --> Scan["Scan markdown files"]
+    Scan --> Mode{"Output Mode"}
+    Mode -->|--llm| LLM["LLM Output Mode"]
+    Mode -->|default| Human["Human Output Mode"]
 
     subgraph Validators
-        CB[codeblockValidator]
-        MV[mermaidValidator]
-        FM[frontmatterValidator]
-        AD[admonitionValidator]
-        RF[referenceValidator]
+        CB["codeblockValidator"]
+        MV["mermaidValidator"]
+        FM["frontmatterValidator"]
+        AD["admonitionValidator"]
+        RF["referenceValidator"]
     end
 
     Scan --> CB
@@ -227,6 +227,18 @@ bun run scripts/validate-all.mts --strict
 
 Strict validators are those with `isStrict: true` in their definition. These are typically structural checks that would affect the build output.
 
+## Mermaid.js Validation Constraints (Advisory)
+
+It is important to note that **Mermaid.js build-time validation is advisory**.
+
+The project uses a pure-TypeScript heuristic parser at build-time to catch common syntax errors without requiring a heavy browser environment. However:
+
+1. **Heuristics vs. Real Parser:** The build-time rules may be incomplete or outdated compared to the official Mermaid.js engine running in the browser.
+2. **False Positives/Negatives:** A diagram may pass build-time validation but still fail to render in the React frontend, or vice-versa.
+3. **Always Verify:** Successful build-time validation **does not guarantee** a correctly rendered diagram. Authors must always verify the final output in the browser.
+
+When a diagram fails build-time validation, an advisory warning is displayed in the build report and the document UI.
+
 ## Colored Terminal Output
 
 The validation script uses a comprehensive color system for terminal output:
@@ -254,13 +266,13 @@ Validation is integrated into the CLI's build process:
 - **CI/CD**: Use `bun run validate:strict` to enforce content quality gates
 
 ```mermaid:desc=Build pipeline integration diagram
-flowchart lr
-    A[docts docs] --> B{skip-validation?}
-    B -->|no| C[validate:strict]
-    B -->|yes| D[build-docs.mts]
+flowchart LR
+    A["docts docs"] --> B{"skip-validation?"}
+    B -->|no| C["validate:strict"]
+    B -->|yes| D["build-docs.mts"]
     C -->|pass| D
-    C -->|fail| E[exit 1]
-    D --> F[src/generated/]
+    C -->|fail| E["exit 1"]
+    D --> F["src/generated/"]
 ```
 
 ## Adding Custom Validators

@@ -44,28 +44,28 @@ Each theme defines a complete set of CSS custom properties:
 The styles are organized into **22 CSS files** in `src/styles/`:
 
 ```mermaid:desc=CSS file organization diagram
-flowchart td
-    Root[index.css] --> Vars[variables.css]
-    Root --> Layout[layout.css]
-    Root --> States[states.css]
-    Root --> Panels[panels.css]
-    Root --> Responsive[responsive.css]
-    Root --> Code[code-blocks.css]
-    Root --> Shiki[shiki-themes.css]
-    Root --> Adm[admonitions.css]
-    Root --> Breadcrumbs[breadcrumbs.css]
-    Root --> Meta[metadata.css]
-    Root --> TOC[toc.css]
-    Root --> Article[article-links-panel.css]
-    Root --> DocContent[doc-content.css]
-    Root --> Footer[doc-footer.css]
-    Root --> StatsFooter[doc-stats-footer.css]
-    Root --> Error[error-boundary.css]
-    Root --> Math[math.css]
-    Root --> Mermaid[mermaid.css]
-    Root --> Blog[blog.css]
-    Root --> PrintMedia[print-media.css]
-    Root --> PrintView[print-view.css]
+flowchart TD
+    Root["index.css"] --> Vars["variables.css"]
+    Root --> Layout["layout.css"]
+    Root --> States["states.css"]
+    Root --> Panels["panels.css"]
+    Root --> Responsive["responsive.css"]
+    Root --> Code["code-blocks.css"]
+    Root --> Shiki["shiki-themes.css"]
+    Root --> Adm["admonitions.css"]
+    Root --> Breadcrumbs["breadcrumbs.css"]
+    Root --> Meta["metadata.css"]
+    Root --> TOC["toc.css"]
+    Root --> Article["article-links-panel.css"]
+    Root --> DocContent["doc-content.css"]
+    Root --> Footer["doc-footer.css"]
+    Root --> StatsFooter["doc-stats-footer.css"]
+    Root --> Error["error-boundary.css"]
+    Root --> Math["math.css"]
+    Root --> Mermaid["mermaid.css"]
+    Root --> Blog["blog.css"]
+    Root --> PrintMedia["print-media.css"]
+    Root --> PrintView["print-view.css"]
 ```
 
 | File | Purpose |
@@ -108,7 +108,7 @@ sequenceDiagram
     Hook-->>LS: setItem("shiki-code-theme", "paperlike-sepia")
     DOM-->>CSS: [data-theme="paperlike-sepia"] rules activate
     CSS-->>CSS: --bg, --text, --border variables update
-    Note over CSS,Shiki: Code blocks transform via<br/>data-code-theme filter chain
+    Note over CSS,Shiki: Code blocks transform via data-code-theme filter chain
 ```
 
 ### UI Theme vs Code Theme

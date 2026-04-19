@@ -176,7 +176,7 @@ Services are created in dependency order:
 5. `config` -- built from defaults merged with overrides
 
 ```mermaid:desc=Service container creation diagram
-flowchart td
+flowchart TD
     A["ContainerOptions"] --> B["createStorageService"]
     A --> C["createRouterService"]
     A --> D["createDomService"]
@@ -216,7 +216,7 @@ The default theme (when no preference is stored) is `paperlike-dark-gray`.
 ## Responsive Breakpoints
 
 ```mermaid:desc=Responsive breakpoints flow diagram
-flowchart lr
+flowchart LR
     A["Viewport Width"] --> B{"< 800px?"}
     B -->|yes| C["Mobile: sidebar overlay, hamburger menu"]
     B -->|no| D{"< 1100px?"}

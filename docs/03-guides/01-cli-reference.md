@@ -18,17 +18,17 @@ The CLI is defined in [scripts/cli.mts](/docs/guides/cli-reference) and is regis
 ## Command Overview
 
 ```mermaid:desc=CLI command overview diagram
-flowchart lr
-    CLI[docts CLI] --> dev[dev]
-    CLI --> build[build]
-    CLI --> start[start]
-    CLI --> preview[preview]
-    CLI --> docs[docs]
-    CLI --> lint[lint]
-    CLI --> lintfix[lint:fix]
-    CLI --> test[test]
-    CLI --> clean[clean]
-    CLI --> info[info]
+flowchart LR
+    CLI["docts CLI"] --> dev["dev"]
+    CLI --> build["build"]
+    CLI --> start["start"]
+    CLI --> preview["preview"]
+    CLI --> docs["docs"]
+    CLI --> lint["lint"]
+    CLI --> lintfix["lint:fix"]
+    CLI --> test["test"]
+    CLI --> clean["clean"]
+    CLI --> info["info"]
 ```
 
 ## Commands
@@ -67,18 +67,18 @@ docts bundle                   # Alias for build
 **Build pipeline:**
 
 ```mermaid:desc=Build pipeline flow diagram
-flowchart td
-    A[build start] --> B[clean dist/]
-    B --> C[build docs]
-    C --> D{lint?}
-    D -->|--no-lint| E[rspack build]
-    D -->|yes| F[biome check]
+flowchart TD
+    A["build start"] --> B["clean dist/"]
+    B --> C["build docs"]
+    C --> D{"lint?"}
+    D -->|--no-lint| E["rspack build"]
+    D -->|yes| F["biome check"]
     F -->|pass| E
-    F -->|fail| G{--strict?}
-    G -->|yes| H[exit 1]
+    F -->|fail| G{"--strict?"}
+    G -->|yes| H["exit 1"]
     G -->|no| E
-    E --> I[copy libraries]
-    I --> J[build complete]
+    E --> I["copy libraries"]
+    I --> J["build complete"]
 ```
 
 **Steps:**

@@ -35,38 +35,38 @@ Five services cover all browser API needs:
 ```mermaid:desc=Class diagram showing the five service interfaces and their methods.
 classDiagram
     class IStorageService {
-        +getItem(key: string): string | null
-        +setItem(key: string, value: string): void
-        +removeItem(key: string): void
-        +clear(): void
+        +getItem(key: string) string
+        +setItem(key: string, value: string) void
+        +removeItem(key: string) void
+        +clear() void
     }
 
     class IRouterService {
-        +getCurrentPath(): string
-        +pushState(state, title, url): void
-        +replaceState(state, title, url): void
-        +onPopState(callback): () => void
-        +buildUrl(prefix, slug): string
+        +getCurrentPath() string
+        +pushState(state, title, url) void
+        +replaceState(state, title, url) void
+        +onPopState(callback) void
+        +buildUrl(prefix, slug) string
     }
 
     class IDomService {
-        +getScrollY(): number
-        +scrollTo(x, y): void
-        +setAttribute(el, name, value): void
-        +querySelectorAll(selectors): NodeList
-        +getViewportWidth(): number
-        +onResize(callback): () => void
-        +onKeydown(callback): () => void
-        +setBodyOverflow(value): void
+        +getScrollY() number
+        +scrollTo(x, y) void
+        +setAttribute(el, name, value) void
+        +querySelectorAll(selectors) NodeList
+        +getViewportWidth() number
+        +onResize(callback) void
+        +onKeydown(callback) void
+        +setBodyOverflow(value) void
     }
 
     class IThemeService {
-        +getInitialTheme(): boolean
-        +applyTheme(isDark: boolean): void
-        +toggleTheme(current: boolean): boolean
-        +getMermaidLoading(): boolean
-        +setMermaidLoading(loading: boolean): void
-        +onMermaidLoadingChange(callback): () => void
+        +getInitialTheme() boolean
+        +applyTheme(isDark: boolean) void
+        +toggleTheme(current: boolean) boolean
+        +getMermaidLoading() boolean
+        +setMermaidLoading(loading: boolean) void
+        +onMermaidLoadingChange(callback) void
     }
 
     class IAppConfig {
@@ -74,7 +74,7 @@ classDiagram
         +repoEditUrl: string
         +mobileBreakpoint: number
         +tocBreakpoint: number
-        +routes: { docs: string }
+        +routes: string
     }
 
     class ServiceContainer {

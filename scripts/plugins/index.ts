@@ -11,6 +11,7 @@
 import { admonitionsPlugin } from "./admonitions.ts";
 import { mathPlugin } from "./math.ts";
 import { mermaidPlugin } from "./mermaid.ts";
+import { timelinePlugin } from "./timeline.ts";
 import type { MarkdownPlugin } from "./types.ts";
 
 /**
@@ -21,10 +22,17 @@ import type { MarkdownPlugin } from "./types.ts";
  *   1. math — extract $...$ outside code blocks FIRST
  *   2. admonitions — extract ::: blocks (math already removed from content)
  *   3. mermaid — transform mermaid code blocks in postProcess
+ *   4. timeline — transform timeline code blocks in postProcess
  */
-export const plugins: MarkdownPlugin[] = [mathPlugin, admonitionsPlugin, mermaidPlugin];
+export const plugins: MarkdownPlugin[] = [
+  mathPlugin,
+  admonitionsPlugin,
+  mermaidPlugin,
+  timelinePlugin,
+];
 
 export { admonitionsPlugin } from "./admonitions.ts";
 export { mathPlugin } from "./math.ts";
 export { mermaidPlugin } from "./mermaid.ts";
+export { timelinePlugin } from "./timeline.ts";
 export type { MarkdownPlugin } from "./types.ts";

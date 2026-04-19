@@ -26,6 +26,11 @@
     
     <!-- Mermaid for diagram rendering -->
     <script src="/mermaid/mermaid.min.js"></script>
+    <script>
+      if (window.mermaid) {
+        window.mermaid.initialize({ startOnLoad: false });
+      }
+    </script>
     
     <!-- MathJax for rendering math notation -->
     <script>

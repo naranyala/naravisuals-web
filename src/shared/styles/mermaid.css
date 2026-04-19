@@ -129,12 +129,98 @@
   display: none;
 }
 
+.mermaid-code-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: all 0.15s;
+  line-height: 0;
+}
+
+.mermaid-code-btn:hover {
+  background: rgba(128, 128, 128, 0.15);
+  color: var(--text);
+}
+
+.mermaid-code-btn.active {
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.1);
+}
+
+/* ============================================
+   MERMAID SOURCE VIEW
+   ============================================ */
+
+.mermaid-source-container {
+  background: var(--bg-code);
+  border-top: 1px solid var(--border);
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+.mermaid-source-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.75rem;
+  background: rgba(0, 0, 0, 0.05);
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.mermaid-source-copy-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.2rem;
+  font-size: 0.6rem;
+  transition: all 0.15s;
+}
+
+.mermaid-source-copy-btn:hover {
+  background: var(--bg-code);
+  color: var(--text);
+}
+
+.mermaid-source-copy-btn.copied {
+  color: #10b981;
+  border-color: #10b981;
+}
+
+.mermaid-source-code {
+  margin: 0 !important;
+  padding: 0.75rem 1rem !important;
+  overflow-x: auto;
+  font-size: 0.8rem !important;
+  line-height: 1.4 !important;
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+.mermaid-source-code code {
+  background: none !important;
+  padding: 0 !important;
+  border: none !important;
+  color: inherit !important;
+}
+
 /* ============================================
    MERMAID SVG — INLINE + FULLSCREEN
    Same theme everywhere: white background, colorful nodes.
    ============================================ */
 
-.mermaid {
+.mermaid,
+.mermaid-src {
   padding: 1rem;
   overflow-x: auto;
   text-align: center;
@@ -142,6 +228,7 @@
 }
 
 .mermaid svg,
+.mermaid-src svg,
 .mermaid-fullscreen-content svg {
   max-width: 100%;
   height: auto;
@@ -149,44 +236,64 @@
 
 /* ---- Text & labels: dark for readability on white ---- */
 .mermaid svg text,
+.mermaid-src svg text,
 .mermaid-fullscreen-content svg text,
 .mermaid svg .titleText,
+.mermaid-src svg .titleText,
 .mermaid-fullscreen-content svg .titleText,
 .mermaid svg .edgeLabel,
+.mermaid-src svg .edgeLabel,
 .mermaid-fullscreen-content svg .edgeLabel,
 .mermaid svg .label,
+.mermaid-src svg .label,
 .mermaid-fullscreen-content svg .label,
 .mermaid svg .taskText,
+.mermaid-src svg .taskText,
 .mermaid-fullscreen-content svg .taskText,
 .mermaid svg .actor-text,
+.mermaid-src svg .actor-text,
 .mermaid-fullscreen-content svg .actor-text,
 .mermaid svg .activation-text,
+.mermaid-src svg .activation-text,
 .mermaid-fullscreen-content svg .activation-text,
 .mermaid svg .messageText,
+.mermaid-src svg .messageText,
 .mermaid-fullscreen-content svg .messageText,
 .mermaid svg .noteText,
+.mermaid-src svg .noteText,
 .mermaid-fullscreen-content svg .noteText,
 .mermaid svg .loopText,
+.mermaid-src svg .loopText,
 .mermaid-fullscreen-content svg .loopText,
 .mermaid svg .labelText,
+.mermaid-src svg .labelText,
 .mermaid-fullscreen-content svg .labelText,
 .mermaid svg .legend-text,
+.mermaid-src svg .legend-text,
 .mermaid-fullscreen-content svg .legend-text,
 .mermaid svg .sectionTitle,
+.mermaid-src svg .sectionTitle,
 .mermaid-fullscreen-content svg .sectionTitle,
 .mermaid svg .grid-title,
+.mermaid-src svg .grid-title,
 .mermaid-fullscreen-content svg .grid-title,
 .mermaid svg .classTitle text,
+.mermaid-src svg .classTitle text,
 .mermaid-fullscreen-content svg .classTitle text,
 .mermaid svg .entity-label text,
+.mermaid-src svg .entity-label text,
 .mermaid-fullscreen-content svg .entity-label text,
 .mermaid svg .relationship-label text,
+.mermaid-src svg .relationship-label text,
 .mermaid-fullscreen-content svg .relationship-label text,
 .mermaid svg .branch-label text,
+.mermaid-src svg .branch-label text,
 .mermaid-fullscreen-content svg .branch-label text,
 .mermaid svg .blockLabel text,
+.mermaid-src svg .blockLabel text,
 .mermaid-fullscreen-content svg .blockLabel text,
 .mermaid svg .packet text,
+.mermaid-src svg .packet text,
 .mermaid-fullscreen-content svg .packet text {
   fill: #1a1a2e !important;
   color: #1a1a2e !important;
@@ -195,41 +302,63 @@
 
 /* Least specific selectors first */
 .mermaid svg line,
-.mermaid svg path {
+.mermaid-src svg line,
+.mermaid svg path,
+.mermaid-src svg path {
   stroke: #374151 !important;
 }
 
 .mermaid svg .noteText,
+.mermaid-src svg .noteText,
 .mermaid svg .loopText,
+.mermaid-src svg .loopText,
 .mermaid svg .classLabel text,
+.mermaid-src svg .classLabel text,
 .mermaid svg .stateGroup text,
+.mermaid-src svg .stateGroup text,
 .mermaid svg .taskText,
+.mermaid-src svg .taskText,
 .mermaid svg .sectionTitle,
+.mermaid-src svg .sectionTitle,
 .mermaid svg .grid .tick text,
+.mermaid-src svg .grid .tick text,
 .mermaid svg .pieTitleText,
+.mermaid-src svg .pieTitleText,
 .mermaid svg .pieSliceText,
+.mermaid-src svg .pieSliceText,
 .mermaid svg .mindmap-node text,
-.mermaid svg .journey-task text {
+.mermaid-src svg .mindmap-node text,
+.mermaid svg .journey-task text,
+.mermaid-src svg .journey-task text {
   fill: #1a1a1a !important;
 }
 
 .mermaid svg rect.node,
+.mermaid-src svg rect.node,
 .mermaid-fullscreen-content svg rect.node,
 .mermaid svg .node rect,
+.mermaid-src svg .node rect,
 .mermaid-fullscreen-content svg .node rect,
 .mermaid svg circle.node,
+.mermaid-src svg circle.node,
 .mermaid-fullscreen-content svg circle.node,
 .mermaid svg .node circle,
+.mermaid-src svg .node circle,
 .mermaid-fullscreen-content svg .node circle,
 .mermaid svg ellipse.node,
+.mermaid-src svg ellipse.node,
 .mermaid-fullscreen-content svg ellipse.node,
 .mermaid svg .node ellipse,
+.mermaid-src svg .node ellipse,
 .mermaid-fullscreen-content svg .node ellipse,
 .mermaid svg polygon.node,
+.mermaid-src svg polygon.node,
 .mermaid-fullscreen-content svg polygon.node,
 .mermaid svg .node polygon,
+.mermaid-src svg .node polygon,
 .mermaid-fullscreen-content svg .node polygon,
 .mermaid svg .node path,
+.mermaid-src svg .node path,
 .mermaid-fullscreen-content svg .node path {
   fill: #e8f5e9 !important;
   stroke: #2e7d32 !important;
@@ -478,16 +607,18 @@
 }
 
 .mermaid-error-source {
-  background: var(--bg-code);
+  background: #181825;
+  color: #cdd6f4;
   padding: 0.5rem 0.75rem;
   border-radius: 0.25rem;
   margin: 0.5rem 0;
   overflow-x: auto;
   font-size: 0.72rem;
   line-height: 1.4;
-  white-space: pre-wrap;
-  word-break: break-word;
-  border: 1px solid var(--border);
+  white-space: pre;
+  word-break: normal;
+  border: 1px solid #313244;
+  font-family: "JetBrains Mono", monospace;
 }
 
 /* ============================================

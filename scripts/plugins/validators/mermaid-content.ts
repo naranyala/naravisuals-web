@@ -1,21 +1,59 @@
-import mermaid from "mermaid";
-
 /**
- * Mermaid Content Validation Helper
+ * Mermaid Content Validation Helper (STRICT & Pure TS)
  *
- * Used by mermaid.ts plugin to validate diagram content at build-time.
+ * NOTE: These validation rules are heuristics and may be incomplete or outdated
+ * compared to the official Mermaid.js parser. Successful validation DOES NOT
+ * guarantee successful rendering in the browser. Always verify diagrams visually.
+ *
  * This validator implements a strict set of rules to catch common Mermaid.js
- * syntax errors before they reach the renderer.
+ * syntax errors without relying on the browser-based Mermaid engine.
+ * This ensures it runs reliably in any build environment (Bun, Rust, Node).
  */
 
-interface ValidationError {
+export interface ValidationError {
   message: string;
   detail: string;
   line?: number;
+  severity?: "error" | "warning" | "info";
 }
 
-// Initialize mermaid for build-time parsing
-mermaid.initialize({ startOnLoad: false });
+const VALID_DIAGRAM_TYPES = [
+  "flowchart",
+  "sequenceDiagram",
+  "classDiagram",
+  "stateDiagram",
+  "erDiagram",
+  "gantt",
+  "pie",
+  "quadrantChart",
+  "xyChart",
+  "mindmap",
+  "timeline",
+  "journey",
+  "requirementDiagram",
+  "gitGraph",
+  "sankey",
+  "block",
+  "packet",
+  "c4Context",
+  "c4Container",
+  "c4Component",
+  "c4Dynamic",
+  "c4Deployment",
+  "graph", // Alias for flowchart
+];
+
+const _RESERVED_KEYWORDS = new Set([
+  "subgraph",
+  "end",
+  "style",
+  "class",
+  "classDef",
+  "direction",
+  "click",
+  "callback",
+  "linkStyle",
+]);
 
 export async function validateMermaidContent(
   content: string,
@@ -29,35 +67,240 @@ export async function validateMermaidContent(
     return errors;
   }
 
-  // Use the actual Mermaid parser for the strictest possible validation
-  try {
-    // Note: mermaid.parse is async in newer versions
-    await mermaid.parse(trimmed, { suppressErrors: true });
-  } catch (err: any) {
-    // Extract message and line number if available
-    const message = err.message || "Syntax Error";
-    const detail = err.str || String(err);
-    const lineMatch = detail.match(/line (\d+)/i) || message.match(/line (\d+)/i);
-    const line = lineMatch ? parseInt(lineMatch[1], 10) : undefined;
+  const lines = trimmed.split("\n");
 
+  // 1. Find the first line that isn't a comment/metadata line
+  const firstActualLineIndex = lines.findIndex((line) => {
+    const l = line.trim();
+    return l !== "" && !l.startsWith("%%") && !l.startsWith(":");
+  });
+
+  if (firstActualLineIndex === -1) {
     errors.push({
-      message: "Mermaid Syntax Error",
-      detail: message,
-      line,
+      message: "Invalid diagram content",
+      detail: "No valid Mermaid diagram type found (only comments or metadata).",
     });
-
-    // If we have a syntax error from the real parser, we can stop here
     return errors;
   }
 
-  // Additional project-specific global patterns (optional)
+  const firstLine = lines[firstActualLineIndex].trim();
+  const firstLineLower = firstLine.toLowerCase();
+
+  // 2. Diagram Type Validation
+  const firstLineParts = firstLine.split(/\s+/);
+  const type = firstLineParts[0];
+  const direction = firstLineParts[1];
+
+  const validType = VALID_DIAGRAM_TYPES.find((t) => firstLineLower.startsWith(t.toLowerCase()));
+  if (!validType) {
+    errors.push({
+      message: "Invalid diagram type",
+      detail: `Must start with a valid type (e.g., flowchart, sequenceDiagram, etc.). Found: "${type}"`,
+    });
+    return errors;
+  }
+
+  // Rule: Prefer 'flowchart' over 'graph' (modern standard)
+  if (type.toLowerCase() === "graph") {
+    errors.push({
+      severity: "warning",
+      message: "Legacy diagram type",
+      detail:
+        "Use 'flowchart' instead of 'graph' for more features and better rendering consistency.",
+      line: firstActualLineIndex + 1,
+    });
+  }
+
+  // Rule: Diagram type and direction must be correctly cased (flowchart LR, graph TD)
+  if (type !== validType && type.toLowerCase() === validType.toLowerCase()) {
+    errors.push({
+      severity: "warning",
+      message: "Lowercase diagram type",
+      detail: `Standard practice is to use PascalCase/Lowercase as defined by Mermaid: use '${validType}' instead of '${type}'.`,
+      line: firstActualLineIndex + 1,
+    });
+  }
+
+  if (direction && direction === direction.toLowerCase() && direction !== direction.toUpperCase()) {
+    errors.push({
+      severity: "warning",
+      message: "Lowercase direction",
+      detail: `Standard practice is to use uppercase for directions: use '${direction.toUpperCase()}' instead of '${direction}'.`,
+      line: firstActualLineIndex + 1,
+    });
+  }
+
+  // 3. State-based scanning for syntax errors
+  let inQuote = false;
+  let currentQuoteChar = "";
+  const bracketStack: { char: string; line: number }[] = [];
+  const pairs: Record<string, string> = { "(": ")", "[": "]", "{": "}" };
+  let subgraphCount = 0;
+  let endCount = 0;
+
+  lines.forEach((line, index) => {
+    const lineNum = index + 1;
+    const trimmedLine = line.trim();
+    if (!trimmedLine || trimmedLine.startsWith("%%")) return;
+
+    let unquotedLine = "";
+
+    // Track quotes and brackets char-by-char
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      const prevChar = i > 0 ? line[i - 1] : "";
+      const isEscaped = prevChar === "\\" && (i < 2 || line[i - 2] !== "\\");
+
+      if ((char === '"' || char === "'" || char === "`") && !isEscaped) {
+        if (!inQuote) {
+          inQuote = true;
+          currentQuoteChar = char;
+          unquotedLine += char;
+        } else if (char === currentQuoteChar) {
+          inQuote = false;
+          currentQuoteChar = "";
+          unquotedLine += char;
+        } else {
+          // Rule: No double-quote inside double-quote
+          if (char === '"' && currentQuoteChar === '"') {
+            errors.push({
+              message: "Nested double quotes",
+              detail:
+                "Do not use double quotes inside a double-quoted label. Use single quotes instead.",
+              line: lineNum,
+            });
+          }
+          unquotedLine += " "; // inside different quote type
+        }
+      } else if (!inQuote) {
+        unquotedLine += char;
+        if (pairs[char]) {
+          bracketStack.push({ char, line: lineNum });
+        } else if (Object.values(pairs).includes(char)) {
+          const last = bracketStack.pop();
+          if (!last || pairs[last.char] !== char) {
+            errors.push({
+              message: "Unbalanced brackets",
+              detail: `Mismatched closing bracket '${char}' at line ${lineNum}.`,
+              line: lineNum,
+            });
+          }
+        }
+      } else {
+        unquotedLine += " "; // inside quotes
+      }
+    }
+
+    // 4. Content Checks (only on unquoted parts of the line)
+    const stripped = unquotedLine.trim();
+
+    // Track subgraphs
+    if (stripped.match(/^subgraph\b/)) subgraphCount++;
+    if (stripped === "end") endCount++;
+
+    // Flowchart specific checks
+    if (validType === "flowchart" || validType === "graph") {
+      // Reject single arrows ->
+      if (/\s->\s/.test(stripped) || /^->\s/.test(stripped) || /\s->$/.test(stripped)) {
+        errors.push({
+          message: "Invalid arrow syntax",
+          detail: "Flowcharts must use '-->' or '---'. Single '->' is invalid.",
+          line: lineNum,
+        });
+      }
+
+      // Reject malformed dotted arrows (must be -.->)
+      if (/-+\.-*->/.test(stripped) && !stripped.includes("-.->")) {
+        errors.push({
+          message: "Invalid arrow syntax",
+          detail: "Dotted arrows must use '-.->'. Found a malformed dotted arrow.",
+          line: lineNum,
+        });
+      }
+
+      // Enforce double quotes for labels in brackets: [Label] -> ["Label"]
+      if (/[[({][^"'`\s][^\])}]*[\])}]/.test(unquotedLine)) {
+        errors.push({
+          message: "Unquoted label",
+          detail:
+            'Labels inside brackets, parentheses, or braces must be wrapped in double quotes (e.g., ["Text"]).',
+          line: lineNum,
+        });
+      }
+
+      // Check for illegal characters in node IDs (must be alphanumeric/underscore unless quoted)
+      // 1. Strip edge labels: |label|
+      let idOnlyLine = stripped.replace(/\|[^|]+\|/g, " ");
+      // 2. Replace all valid arrows with a common delimiter
+      idOnlyLine = idOnlyLine.replace(/--+>|---+|-+\.->|==+>/g, " § ");
+      // 3. Split by delimiter and validate IDs
+      const parts = idOnlyLine.split(" § ");
+
+      for (const part of parts) {
+        const p = part.trim();
+        if (!p) continue;
+
+        // Skip keywords
+        if (p === "subgraph" || p === "end" || p === "direction") continue;
+
+        const idMatch = p.match(/^([^[({ \t\n\r\f\v]+)/);
+        if (idMatch) {
+          const id = idMatch[1];
+          // If it is already quoted, it is fine
+          if (id.startsWith('"') || id.startsWith("'") || id.startsWith("`")) continue;
+
+          if (/[^a-zA-Z0-9_-]/.test(id)) {
+            errors.push({
+              message: "Invalid node ID",
+              detail: `Node ID '${id}' contains illegal characters. Wrap in double quotes or use only alphanumeric/underscores.`,
+              line: lineNum,
+            });
+          }
+        }
+      }
+    }
+
+    // Sequence Diagram specific checks
+    if (validType === "sequenceDiagram") {
+      if (stripped.startsWith("participant") && stripped.split(/\s+/).length < 2) {
+        errors.push({
+          message: "Malformed participant",
+          detail: "Participant declaration requires a name.",
+          line: lineNum,
+        });
+      }
+    }
+  });
+
+  if (subgraphCount !== endCount) {
+    errors.push({
+      message: "Unbalanced subgraphs",
+      detail: `Diagram has ${subgraphCount} 'subgraph' declarations but ${endCount} 'end' keywords.`,
+    });
+  }
+
+  // 6. Global Quality Checks
   const globalPatterns = [
     {
       regex: /&#\w+;/,
-      message: "HTML entity",
+      message: "HTML entity detected",
       detail: "Use literal characters instead of HTML entities (e.g., '&' instead of '&#x26;')",
     },
-    { regex: /&amp;amp;/, message: "Double-encoded ampersand", detail: "Use literal '&'" },
+    {
+      regex: /\\n/g,
+      message: "Literal newline character",
+      detail: "Replace '\\n' with '<br/>' for newlines in labels.",
+    },
+    {
+      regex: /<(?!\/?br\s*\/?)(\/?[a-z][a-z0-9]*)\b[^>]*>/gi,
+      message: "Unsupported HTML tag",
+      detail: "HTML tags are not allowed in Mermaid diagrams.",
+    },
+    {
+      regex: /<br\s*\/?>/gi,
+      message: "HTML break tag",
+      detail: "Do not use '<br/>'. Use spaces or multiple nodes instead.",
+    },
   ];
 
   globalPatterns.forEach(({ regex, message, detail }) => {
@@ -66,7 +309,17 @@ export async function validateMermaidContent(
     }
   });
 
+  // Special check for nested double quotes in flowcharts
+  if (validType === "flowchart" || validType === "graph") {
+    const nestedQuoteRegex = /[[({][^\])}]*"[^"\])}]*"[^"\])}]*"[^\])}]*[\])}]/;
+    if (nestedQuoteRegex.test(content)) {
+      errors.push({
+        message: "Nested double quotes",
+        detail:
+          "Double quotes should not be used inside other double quotes. Use single quotes ('...') for internal emphasis within a [\"...\"] label.",
+      });
+    }
+  }
+
   return errors;
 }
-
-// Remove legacy regex-based validation functions

@@ -35,6 +35,24 @@ This document tracks the feature parity between the legacy **TypeScript (Bun)** 
 - [ ] **Default to Rust**: Change the default `bun run build` to use the Rust engine.
 - [ ] **Retire Bun Scripts**: Archive `.mts` scripts once Rust engine is 100% compatible.
 
+## Compiler Abstraction & Refinement (Modernization)
+
+These tasks focus on evolving the current modular script into a professional-grade **Compiler Engine** to ensure long-term maintainability and performance.
+
+### 🏗️ Core Architecture
+- [ ] **Stateful Compiler Engine**: Refactor the pipeline into a `MarkdownCompiler` class that maintains a unified `CompilationContext`.
+- [ ] **Middleware Lifecycle**: Implement a formalized middleware pattern with specific hooks (`onParse`, `onRender`, `onGenerate`) to replace simple pre/post-processing.
+- [ ] **Virtual File System (VFS)**: Transition to an in-memory representation of docs (`CompilationUnit`) to facilitate easier cross-document analysis.
+
+### ⚡ Performance & Scalability
+- [ ] **Incremental Build Engine**: Implement hash-based change detection to skip processing for unchanged markdown files.
+- [ ] **Async Parallelization**: Fully utilize worker threads or async pools for concurrent file processing in the TS pipeline.
+
+### 🛡️ Quality & Robustness
+- [ ] **Stateful Renderer**: Encapsulate the `marked` renderer instance within a per-file scope to prevent ID leakage (e.g., duplicated anchor suffixes).
+- [ ] **Unified Schema Validation**: Move from heuristics to a strict schema-based validation for frontmatter and code block metadata.
+- [ ] **Source Protection (Expanded)**: Extend the `data-source` protection mechanism to other complex blocks beyond Mermaid (e.g., MathJax, custom Timeline visuals).
+
 ## Known Discrepancies
 - **HTML Output**: `marked` and `pulldown-cmark` generate slightly different HTML structures for complex elements like tables.
 - **Diagnostics**: The Rust engine doesn't currently report line numbers for all error types as accurately as the TS validators.

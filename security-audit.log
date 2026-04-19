@@ -1,0 +1,1 @@
+{"ruleId":"cmd-blacklist","action":"confirm_allow","toolName":"bash","input":{"command":"rm -rf src/generated/docs/*\nbun run build"},"reason":"Allowed by user after confirmation","timestamp":"2026-04-19T03:50:44.721Z"}

@@ -7,6 +7,7 @@ A fast, modern static site generator for documentation built with **rspack**, **
 - **Blazing Fast Build**: Uses **rspack** and **Rust** for near-instant builds.
 - **Rich Markdown**: Built-in support for diagrams (Mermaid), math (MathJax), and admonitions.
 - **Developer-Centric**: Strong focus on DX with HMR, a strict validation system, and hybrid Bun/Rust toolchain.
+  *Note: Mermaid.js validation rules are advisory. Always verify rendering in the browser.*
 - **Production Ready**: Optimized SPA output with SEO features, print support, and modular theming.
 
 ## Quick Start

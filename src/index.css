@@ -1943,6 +1943,80 @@ a:hover {
   filter: saturate(1.15) hue-rotate(200deg) brightness(1.02) contrast(1.08);
 }
 
+/* ─── Timelines ─────────────────────────────────────────── */
+
+.code-block-timeline {
+  border-color: var(--ifm-color-primary-light);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.code-block-timeline .code-header {
+  background: #181825;
+  border-bottom: 1px solid #313244;
+}
+
+.code-block-timeline .code-lang {
+  color: #89b4fa;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+}
+
+.code-block-timeline .code-lang::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #89b4fa;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(137, 180, 250, 0.5);
+}
+
+.code-block-timeline .timeline-content {
+  padding: 1.25rem;
+  overflow-x: auto;
+  background: #1e1e2e;
+  border-left: 4px solid var(--ifm-color-primary);
+  position: relative;
+}
+
+.code-block-timeline .timeline-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.03) 0%, transparent 10%);
+  pointer-events: none;
+}
+
+.code-block-timeline .timeline-content pre {
+  margin: 0;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #cdd6f4;
+}
+
+.code-block-timeline .timeline-content pre code {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  color: inherit !important;
+}
+
+[data-theme="dark"] .code-block-timeline {
+  border-color: #45475a;
+}
+
+[data-theme="dark"] .code-block-timeline .code-header {
+  background: #181825;
+  border-bottom-color: #313244;
+}
+
 /* ============================================
    BROWSER PRINT STYLES
    ============================================ */

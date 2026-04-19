@@ -18,7 +18,7 @@ import type { MarkdownValidator, ValidationIssue, ValidationResult } from "./typ
 
 export const mermaidValidator: MarkdownValidator = {
   name: "mermaid-content",
-  label: "Mermaid Content Validator",
+  label: "Mermaid Content Validator (Advisory Rules)",
   isStrict: true,
 
   async validate(content: string, filePath: string): Promise<ValidationResult> {
@@ -60,7 +60,7 @@ export const mermaidValidator: MarkdownValidator = {
             errorLineNum > 0 ? blockStartLine + errorLineNum : blockStartLine;
 
           issues.push({
-            severity: "error",
+            severity: (error.severity as any) || "error",
             file: filePath,
             line: actualLineNumber,
             message: `[${filePath}:${actualLineNumber}] ${error.message}`,

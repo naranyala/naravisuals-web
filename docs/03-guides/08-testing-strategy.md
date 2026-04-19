@@ -125,24 +125,24 @@ export const mockSidebarData = [
 The DI system (`src/services/container.ts`) defines 5 service interfaces that can be swapped for testing:
 
 ```mermaid:desc=Service container diagram
-flowchart td
-    Container[ServiceContainer] --> Storage[IStorageService]
-    Container --> Router[IRouterService]
-    Container --> Dom[IDomService]
-    Container --> Theme[IThemeService]
-    Container --> Config[IAppConfig]
+flowchart TD
+    Container["ServiceContainer"] --> Storage["IStorageService"]
+    Container --> Router["IRouterService"]
+    Container --> Dom["IDomService"]
+    Container --> Theme["IThemeService"]
+    Container --> Config["IAppConfig"]
 
     subgraph Mocks
-        MS[createMockStorage]
-        MR[createMockRouter]
-        MD[createMockDom]
-        MT[createMockTheme]
+        MS["createMockStorage"]
+        MR["createMockRouter"]
+        MD["createMockDom"]
+        MT["createMockTheme"]
     end
 
-    Storage -.--> MS
-    Router -.--> MR
-    Dom -.--> MD
-    Theme -.--> MT
+    Storage -.-> MS
+    Router -.-> MR
+    Dom -.-> MD
+    Theme -.-> MT
 ```
 
 | Interface | Mock | Purpose |

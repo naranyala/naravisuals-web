@@ -10,35 +10,35 @@ sidebar_position: 3
 The project includes **16 custom React hooks** in `src/hooks/`. Each hook solves a specific problem in the documentation site -- from theme management to SEO to keyboard shortcuts.
 
 ```mermaid:desc=Diagram showing the 16 React hooks organized by category
-flowchart td
+flowchart TD
     subgraph Theme Hooks
-        UT[useTheme]
-        UDT[useDocsTheme]
-        UST[useShikiTheme]
+        UT["useTheme"]
+        UDT["useDocsTheme"]
+        UST["useShikiTheme"]
     end
 
     subgraph Scroll Hooks
-        USP[useScrollProgress]
-        USTT[useScrollToTop]
+        USP["useScrollProgress"]
+        USTT["useScrollToTop"]
     end
 
     subgraph Navigation Hooks
-        UAS[useActiveSection]
-        UKS[useKeyboardShortcut]
+        UAS["useActiveSection"]
+        UKS["useKeyboardShortcut"]
     end
 
     subgraph Utility Hooks
-        UCL[useClipboard]
-        UCC[useCopyCode]
-        UDB[useDebounce]
-        ULS[useLocalStorage]
-        UMQ[useMediaQuery]
+        UCL["useClipboard"]
+        UCC["useCopyCode"]
+        UDB["useDebounce"]
+        ULS["useLocalStorage"]
+        UMQ["useMediaQuery"]
     end
 
     subgraph Content Hooks
-        URT[useReadingTime]
-        USE[useSeo]
-        UTI[useTitle]
+        URT["useReadingTime"]
+        USE["useSeo"]
+        UTI["useTitle"]
     end
 ```
 

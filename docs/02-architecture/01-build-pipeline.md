@@ -8,51 +8,79 @@ tags: [architecture, build, pipeline]
 
 # Build Pipeline
 
-The build pipeline is the heart of rspack-react-docs. It transforms raw Markdown files into TypeScript data that the React app consumes.
+The build pipeline is the engine of rspack-react-docs. It transforms raw Markdown files into specialized TypeScript compilation units that the React app consumes.
 
-## Pipeline Overview
+## The Compiler Engine (v2)
 
-```mermaid:desc=Complete build pipeline from markdown source to generated TypeScript files.
-flowchart tb
-    subgraph Scan["Content Scanner"]
-        Walk["Walk docs/ directory"]
-        Parse["Parse frontmatter<br/>YAML headers"]
-        Lex["Tokenize with marked.Lexer"]
+The system uses a stateful `DocumentationCompiler` to manage the transformation lifecycle. Unlike simple scripts, this engine treats each document as a `CompilationUnit` within a shared `CompilationContext`.
+
+### Pipeline Overview
+
+```mermaid:desc=Modern build pipeline architecture showing the compiler engine and middleware system.
+flowchart TB
+    subgraph Engine["Documentation Compiler"]
+        Scan["File Discovery & Ingest"]
+        Context["Compilation Context (State & Diags)"]
+        Renderer["Stateful Markdown Renderer"]
     end
 
-    subgraph Process["Plugin Processing"]
-        Pre["preProcess<br/>math - admonitions"]
-        Marked["marked.parse()<br/>markdown - HTML"]
-        Post["postProcess (reverse)<br/>mermaid - admonitions - math"]
+    subgraph Pipeline["Middleware Pipeline"]
+        PreParse["onPreParse (Plugins/Math)"]
+        Transform["onTransform (AST Validation)"]
+        PostProcess["onPostProcess (Mermaid/Timeline)"]
+        Assemble["onAssemble (Global Logic)"]
     end
 
-    subgraph Highlight["Syntax Highlighting"]
-        Shiki["createHighlighter<br/>github-dark theme"]
-        CodeRenderer["Custom renderer.code<br/>Shiki + code-block wrapper"]
+    subgraph Generate["Artifact Generation"]
+        TS["TypeScript Data (.ts)"]
+        SEO["Sitemap & Robots (.xml/.txt)"]
+        Sidebar["Sidebar Tree (sidebar.ts)"]
     end
 
-    subgraph Generate["Code Generation"]
-        DocEntries["Per-file .ts<br/>one per markdown"]
-        SidebarTS["sidebar.ts<br/>navigation tree"]
-        IndexTS["index.ts + types.ts<br/>barrel export + interfaces"]
-    end
+    Scan --> Context
+    Context --> PreParse
+    PreParse --> Transform
+    Transform --> Renderer
+    Renderer --> PostProcess
+    PostProcess --> Assemble
+    Assemble --> TS
+    Assemble --> SEO
+    Assemble --> Sidebar
 
-    Walk --> Parse
-    Parse --> Lex
-    Lex --> Pre
-    Pre --> Marked
-    Marked --> Post
-    Marked --> Shiki
-    Shiki --> CodeRenderer
-    Post --> DocEntries
-    DocEntries --> SidebarTS
-    SidebarTS --> IndexTS
-
-    style Scan fill:#e8f5e9
-    style Process fill:#fff3e0
-    style Highlight fill:#e3f2fd
+    style Engine fill:#e8f5e9
+    style Pipeline fill:#fff3e0
     style Generate fill:#f3e5f5
 ```
+
+## Core Abstractions
+
+### 1. `CompilationUnit`
+Each markdown file is loaded into memory as a unit. It tracks:
+*   **Raw Content**: The original markdown string.
+*   **Metadata**: Derived from frontmatter or content fallbacks.
+*   **AST Tokens**: The parsed `marked` token stream.
+*   **HTML**: The final transformed markup.
+
+### 2. `CompilationContext`
+A unified object that lives for the duration of the build. It prevents "prop-drilling" by providing a single source for:
+*   **Diagnostics**: Accumulated errors and warnings.
+*   **Configuration**: Global build settings.
+*   **State Tracking**: Information shared across multiple files (like slug uniqueness).
+
+### 3. Middleware Lifecycle
+The transformation logic is decoupled into reusable middlewares:
+*   **`onIngest`**: Initial path validation and unit creation.
+*   **`onPreParse`**: Text-level transformations (e.g., math sentinel extraction).
+*   **`onTransform`**: AST-level analysis and deep syntax validation.
+*   **`onPostProcess`**: Final HTML enhancements and feature injection.
+*   **`onAssemble`**: Cross-document logic (e.g., link checking across all units).
+
+## Output Strategy
+
+The compiler generates a zero-runtime data set:
+1. **Per-Document Files**: One `.ts` file per doc, exported as a constant.
+2. **Barrel Exports**: `index.ts` files for clean imports in React.
+3. **SEO Artifacts**: Dynamically generated `sitemap.xml` and `robots.txt`.
 
 ## Entry Point: `scripts/build-docs.mts`
 

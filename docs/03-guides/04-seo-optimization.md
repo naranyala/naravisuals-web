@@ -12,26 +12,26 @@ The documentation site includes a comprehensive SEO system that dynamically upda
 ## Overview
 
 ```mermaid:desc=SEO system overview diagram
-flowchart td
+flowchart TD
     subgraph Document Level
-        Title[Page Title]
-        Desc[Meta Description]
-        Canonical[Canonical URL]
+        Title["Page Title"]
+        Desc["Meta Description"]
+        Canonical["Canonical URL"]
     end
 
     subgraph Social Sharing
-        OG[Open Graph Tags]
-        TC[Twitter Cards]
+        OG["Open Graph Tags"]
+        TC["Twitter Cards"]
     end
 
     subgraph Structured Data
-        JSONLD[JSON-LD Article Schema]
-        Breadcrumb[BreadcrumbList Schema]
+        JSONLD["JSON-LD Article Schema"]
+        Breadcrumb["BreadcrumbList Schema"]
     end
 
     subgraph Static Files
-        Sitemap[sitemap.xml]
-        Robots[robots.txt]
+        Sitemap["sitemap.xml"]
+        Robots["robots.txt"]
     end
 
     Title --> useSeo

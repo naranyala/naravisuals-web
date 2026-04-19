@@ -47,41 +47,36 @@ Your dev server is now running at `http://localhost:3000`.
 
 ## High-Level Architecture
 
-```mermaid:desc=High-level architecture showing the build pipeline from markdown source to final SPA.
+```mermaid:desc=High-level architecture showing the modern compiler engine and its artifacts.
 flowchart TB
-    subgraph Source
+    subgraph Source["Markdown Docs"]
         MD["docs/**/*.md"]
     end
 
-    subgraph Build["Build Engine (Hybrid Bun/Rust)"]
-        Scan["Scan & Parse"]
-        Plugins["Markdown Plugins"]
-        Shiki["Shiki Highlighting"]
-        Generate["Generate TS Files"]
+    subgraph Build["Compiler Engine (v2)"]
+        Ingest["Ingest & VFS"]
+        Middlewares["Middleware Pipeline"]
+        Renderer["Stateful Renderer"]
+        Generate["TS Generation"]
     end
 
-    subgraph Bundle["rspack Bundle"]
-        React["React App"]
-        SPA["Single Page App"]
+    subgraph Frontend["React SPA"]
+        Context["DI Container"]
+        Components["React Components"]
+        Viewer["Interactive Viewer"]
     end
 
-    subgraph Output
-        Final["dist/ (index.html + JS)"]
-    end
-
-    Source --> Scan
-    Scan --> Plugins
-    Plugins --> Shiki
-    Shiki --> Generate
-    Generate --> React
-    React --> Bundle
-    Bundle --> SPA
-    SPA --> Final
+    Source --> Ingest
+    Ingest --> Middlewares
+    Middlewares --> Renderer
+    Renderer --> Generate
+    Generate --> Context
+    Context --> Components
+    Components --> Viewer
 
     style Source fill:#e8f5e9
     style Build fill:#fff3e0
-    style Bundle fill:#e3f2fd
-    style Output fill:#f3e5f5
+    style Frontend fill:#e3f2fd
 ```
 
 ---

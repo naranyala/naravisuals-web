@@ -12,14 +12,14 @@ The documentation site supports two print modes: **browser print** (via `window.
 ## Print Architecture
 
 ```mermaid:desc=Print architecture flow diagram
-flowchart td
-    User[User clicks Print] --> PrintAll[printAllDocs in App.tsx]
-    PrintAll --> Mermaid[Render Mermaid SVGs]
-    Mermaid --> Clone[Clone doc-content DOM]
-    Clone --> Clean[Remove interactive elements]
-    Clean --> Template[Build HTML print template]
-    Template --> Open[window.open + document.write]
-    Open --> Browser[Browser print dialog]
+flowchart TD
+    User["User clicks Print"] --> PrintAll["printAllDocs in App.tsx"]
+    PrintAll --> Mermaid["Render Mermaid SVGs"]
+    Mermaid --> Clone["Clone doc-content DOM"]
+    Clone --> Clean["Remove interactive elements"]
+    Clean --> Template["Build HTML print template"]
+    Template --> Open["window.open + document.write"]
+    Open --> Browser["Browser print dialog"]
 ```
 
 ## printAllDocs Function
@@ -67,14 +67,14 @@ mermaid.initialize({
    - All shapes: `stroke: "#6b7280"` (visible border)
 
 ```mermaid:desc=Mermaid print rendering flow
-flowchart lr
-    A[Raw mermaid text] --> B[mermaid.parse]
-    B --> C[mermaid.render]
-    C --> D[SVG output]
-    D --> E[Force dark text]
-    D --> F[White backgrounds]
-    D --> G[Visible strokes]
-    E --> H[Print-ready SVG]
+flowchart LR
+    A["Raw mermaid text"] --> B["mermaid.parse"]
+    B --> C["mermaid.render"]
+    C --> D["SVG output"]
+    D --> E["Force dark text"]
+    D --> F["White backgrounds"]
+    D --> G["Visible strokes"]
+    E --> H["Print-ready SVG"]
     F --> H
     G --> H
 ```

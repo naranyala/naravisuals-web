@@ -12,10 +12,10 @@ This document covers the React component architecture of the rspack-react-docs S
 ## Component Hierarchy
 
 ```mermaid:desc=React component hierarchy showing the main components and their relationships
-flowchart td
-    A["frontend.tsx<br/>(Entry Point)"] --> B["ErrorBoundary"]
-    B --> C["ServicesProvider<br/>(DI Container)"]
-    C --> D["App.tsx<br/>(Root Component)"]
+flowchart TD
+    A["frontend.tsx ('Entry Point')"] --> B["ErrorBoundary"]
+    B --> C["ServicesProvider ('DI Container')"]
+    C --> D["App.tsx ('Root Component')"]
 
     D --> E["Sidebar.tsx"]
     D --> F["DocViewer.tsx"]

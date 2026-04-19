@@ -27,6 +27,7 @@
     "validate:llm": "bun run scripts/validate-all.mts --llm"
   },
   "dependencies": {
+    "dompurify": "^3.4.0",
     "fuse.js": "^7.3.0",
     "goober": "^2.1.18",
     "mathjax-full": "^3.2.2",
@@ -44,6 +45,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/dompurify": "^3.2.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "css-loader": "^7.1.4",

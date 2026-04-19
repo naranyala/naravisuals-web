@@ -56,7 +56,7 @@ Every documentation page is represented by a `DocEntry`:
 ## Consumption Flow
 
 ```mermaid:desc=Generated output consumption flow diagram
-flowchart lr
+flowchart LR
     A["docs/*.md files"] --> B["Build Engine"]
     B --> C["src/generated/docs/*.ts"]
     B --> D["src/generated/sidebar.ts"]

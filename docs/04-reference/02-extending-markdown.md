@@ -1,71 +1,78 @@
 ---
 title: Extending Markdown
-description: Plugin system, validators, and AST parser utilities
+description: Middleware architecture, lifecycle hooks, and AST analysis tools
 sidebar_label: Extending Markdown
 sidebar_position: 2
 ---
 
 # Extending Markdown
 
-The project provides a comprehensive system for extending and validating Markdown content. This is achieved through a multi-phase plugin pipeline, a dedicated validation suite, and AST (Abstract Syntax Tree) analysis tools.
+The project provides a comprehensive system for extending and validating Markdown content via a **Compiler Middleware** architecture. This allows you to hook into the compilation lifecycle to inject custom features, perform deep validation, or transform output.
 
-## Plugin Pipeline
+## Middleware Lifecycle
 
-The transformation of Markdown to HTML occurs in three distinct phases:
+The transformation of Markdown to TypeScript occurs in five distinct lifecycle stages:
 
-1. **`preProcess`**: All plugins run in registration order on the raw Markdown string. Use this for syntax extensions (e.g., math extraction).
-2. **`marked`**: The core parser converts Markdown to HTML via a custom renderer.
-3. **`postProcess`**: Plugins run in **reverse order** on the HTML output. Use this for HTML enhancements (e.g., Mermaid containers).
-
-```mermaid:desc=Plugin pipeline diagram
-flowchart lr
-    A["Raw .md"] --> B["preProcess plugins"]
-    B --> C["marked.parse()"]
-    C --> D["HTML output"]
-    D --> E["postProcess plugins (reverse order)"]
-    E --> F["Final HTML in DocEntry.content"]
+```mermaid:desc=Detailed middleware lifecycle diagram
+flowchart TD
+    A["onIngest"] -->|File Discovered| B["onPreParse"]
+    B -->|Content Ready| C["onTransform"]
+    C -->|AST Analyzed| D["onPostProcess"]
+    D -->|HTML Generated| E["onAssemble"]
+    E -->|Compilation Done| F["Artifacts Generated"]
 ```
 
-### The `MarkdownPlugin` Interface
+### The `CompilerMiddleware` Interface
 
-```ts:desc=MarkdownPlugin interface definition
-export interface MarkdownPlugin {
+To extend the system, create an object implementing one or more lifecycle hooks:
+
+```typescript:desc=CompilerMiddleware interface
+export interface CompilerMiddleware {
   name: string;
-  preProcess?(md: string): string;
-  postProcess?(html: string): string;
+  onIngest?(unit: CompilationUnit, ctx: CompilationContext): void;
+  onPreParse?(unit: CompilationUnit, ctx: CompilationContext): void;
+  onTransform?(unit: CompilationUnit, ctx: CompilationContext): void;
+  onPostProcess?(unit: CompilationUnit, ctx: CompilationContext): void;
+  onAssemble?(units: CompilationUnit[], ctx: CompilationContext): void;
 }
 ```
 
-## Validation System
+## Active Middlewares
 
-Validators ensure document quality at build time. They can be configured as **strict** (failing the build on errors) or informational.
-
-### Active Validators
-
-| Validator | Purpose | Strict |
-|---|---|---|
-| `codeblock` | Ensures all code blocks have languages and `:desc=` attributes. | Yes |
-| `mermaid` | Validates Mermaid.js syntax before rendering. | Yes |
-| `reference` | Checks for broken internal links and orphaned footnotes. | Yes |
-| `frontmatter` | Ensures mandatory fields like `title` and `description`. | No |
+| Middleware | Phase | Purpose |
+| :--- | :--- | :--- |
+| **Plugin System** | Pre/Post | Orchestrates legacy `preProcess` and `postProcess` plugins (Math, Admonitions). |
+| **Mermaid Deep Validator** | Transform | Performs structural analysis on diagrams to prevent SVG corruption. |
+| **Validation Layer** | Ingest/Assemble | Checks for path SEO, duplicate slugs, and broken internal links. |
+| **TOC Extractor** | Transform | Uses the AST token stream to generate unique, deduplicated anchor IDs. |
 
 ## AST Analysis
 
-The system includes utilities to inspect the token tree produced by `marked.js`, located in `src/shared/utils/ast-parser.ts` (or similar).
+The system exposes the raw `marked` tokens in the `onTransform` phase. This is the preferred way to perform deep analysis without the fragility of regular expressions.
 
-### Key Functions
-- **`tokensToAST(tokens)`**: Converts a flat token array into a hierarchical tree.
-- **`countNodes(ast)`**: Recursively counts all elements in the document.
-- **`getUniqueTypes(ast)`**: Identifies all Markdown features used (e.g., `table`, `blockquote`).
+### Example: Custom Syntax Checker
+```typescript:desc=Middleware for detecting forbidden words
+export const strictLanguageMiddleware: CompilerMiddleware = {
+  name: "language-check",
+  onTransform(unit, ctx) {
+    unit.tokens?.forEach(token => {
+      if (token.type === 'text' && token.text.includes('forbidden')) {
+        ctx.error("content", unit.relPath, "Forbidden word detected", "Please use alternative terminology.");
+      }
+    });
+  }
+};
+```
 
-### AST Viewer
-A built-in debug component allows authors to visualize the document structure during development. It can be toggled from the top bar settings.
+## Built-in Components
 
-## Summary of Markdown Features
+| Feature | Syntax | Lifecycle Hook |
+| :--- | :--- | :--- |
+| **Math** | `$E=mc^2$` | `onPreParse` (Sentinel extraction) |
+| **Admonitions** | `:::note` | `onPreParse` (Block extraction) |
+| **Diagrams** | ` ```mermaid ` | `onPostProcess` (Container injection) |
+| **Timelines** | ` ```timeline ` | `onPostProcess` (Technical wrapper) |
 
-| Feature | Syntax | Transformation |
-|---|---|---|
-| **Math** | `$E=mc^2$` | `preProcess` extracts to MathJax spans. |
-| **Admonitions** | `:::note` | `preProcess` converts to custom containers. |
-| **Diagrams** | ` ```mermaid ` | `postProcess` wraps in rich UI containers. |
-| **Descriptions** | `:desc=...` | Custom renderer adds accessibility labels. |
+## Related
+- [Markdown Engine](/docs/architecture/markdown-engine) — Details on the stateful renderer.
+- [Writing Plugins](/docs/guides/writing-plugins) — Tutorial on creating custom middleware.
