@@ -39,15 +39,15 @@ This document tracks the feature parity between the legacy **TypeScript (Bun)** 
 
 ---
 
-## Build Pipeline Modernization (TS - COMPLETED)
+## Build Pipeline Modernization (TS & Rust - COMPLETED)
 
-The TypeScript pipeline has been evolved into a professional-grade **Compiler Engine** to ensure maintainability and performance.
+The build pipelines have been evolved into professional-grade **Compiler Engines** to ensure maintainability and performance.
 
 ### 🏗️ Core Architecture (DONE)
-- [x] **Stateful Compiler Engine**: Implemented `DocumentationCompiler` in `scripts/compiler/Engine.ts`.
+- [x] **Stateful Compiler Engine**: Implemented `DocumentationCompiler` in both TS (`scripts/compiler/Engine.ts`) and Rust (`scripts-rs/src/compiler/engine.rs`).
 - [x] **Middleware Lifecycle**: Formalized middleware pattern with hooks (`onIngest`, `onPreParse`, `onTransform`, `onPostProcess`, `onAssemble`).
 - [x] **Virtual File System (VFS)**: Implemented in-memory representation via `CompilationUnit` to facilitate cross-document analysis.
-- [x] **Stateful Renderer**: Encapsulated `marked` renderer in `MarkdownRenderer.ts` to prevent ID leakage (duplicated anchors).
+- [x] **Token-Aware Transformation**: Rust engine now supports `pulldown-cmark` event stream interception.
 
 ### ⚡ Mermaid v11 Integration (DONE)
 - [x] **Smart Header Correction**: Auto-prefixing of diagram types and default directions (e.g., `flowchart TD`).

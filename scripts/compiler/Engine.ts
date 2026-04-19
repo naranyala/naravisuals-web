@@ -30,9 +30,9 @@ export class DocumentationCompiler {
   private units: CompilationUnit[] = [];
   private readonly logger = new Logger();
 
-  constructor(config: CompilerConfig, highlighter: Highlighter) {
+  constructor(config: CompilerConfig) {
     this.ctx = new CompilationContext(config);
-    this.renderer = new MarkdownRenderer(highlighter);
+    this.renderer = new MarkdownRenderer();
   }
 
   public use(middleware: CompilerMiddleware) {
@@ -45,7 +45,6 @@ export class DocumentationCompiler {
 
     // 1. Ingest
     await this.scanDirectory(this.ctx.config.docsDir, "docs");
-    await this.scanDirectory(this.ctx.config.blogDir, "blog");
 
     // 2. Process Units
     for (const unit of this.units) {

@@ -1,4 +1,6 @@
 import { useEffect, useRef } from "react";
+import hljs from "highlight.js";
+import "highlight.js/styles/github-dark.css";
 
 declare global {
   interface Window {
@@ -23,7 +25,7 @@ export function DocViewer({ html, slug }: DocViewerProps) {
     const observerRef = { current: null as IntersectionObserver | null };
 
     // Setup zoom button click handlers
-    const setupZoomHandlers = () => {
+    const setupZoomHandlers = (mermaid: any) => {
       const zoomButtons = ref.current?.querySelectorAll(".mermaid-zoom-btn");
       if (!zoomButtons) return;
 
@@ -31,57 +33,48 @@ export function DocViewer({ html, slug }: DocViewerProps) {
         const newBtn = btn.cloneNode(true);
         btn.parentNode?.replaceChild(newBtn, btn);
 
-        newBtn.addEventListener("click", (e) => {
+        newBtn.addEventListener("click", async (e) => {
           e.preventDefault();
-          const diagramWrapper = (newBtn as HTMLElement).closest(".mermaid-diagram");
+          const diagramWrapper = (newBtn as HTMLElement).closest(".mermaid-diagram") as HTMLElement;
           if (!diagramWrapper) return;
 
-          const mermaidEl = diagramWrapper.querySelector<HTMLElement>(".mermaid");
-          const svgEl = mermaidEl?.querySelector("svg");
-          if (!svgEl) return;
+          const diagramSource = diagramWrapper.dataset.mermaidSource;
+          if (!diagramSource) return;
 
           const overlay = document.createElement("div");
           overlay.className = "mermaid-fullscreen-overlay";
           overlay.innerHTML = `
             <div class="mermaid-fullscreen-header">
-              <span class="mermaid-fullscreen-title">Diagram</span>
+              <span class="mermaid-fullscreen-title">Fullscreen Diagram</span>
               <div class="mermaid-fullscreen-controls">
-                <button class="mermaid-fullscreen-zoom-btn" data-action="zoom-in" title="Zoom In" aria-label="Zoom in">
+                <button class="mermaid-fullscreen-zoom-btn" data-action="zoom-in" title="Zoom In">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="m21 21-4.35-4.35"/>
-                    <path d="M11 8v6"/>
-                    <path d="M8 11h6"/>
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6"/><path d="M8 11h6"/>
                   </svg>
                 </button>
-                <button class="mermaid-fullscreen-zoom-btn" data-action="zoom-out" title="Zoom Out" aria-label="Zoom out">
+                <button class="mermaid-fullscreen-zoom-btn" data-action="zoom-out" title="Zoom Out">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="m21 21-4.35-4.35"/>
-                    <path d="M11 8v6"/>
-                    <path d="M8 11h6"/>
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6"/><path d="M8 11h6"/>
                   </svg>
                 </button>
-                <button class="mermaid-fullscreen-zoom-btn" data-action="zoom-reset" title="Reset Zoom" aria-label="Reset zoom">
+                <button class="mermaid-fullscreen-zoom-btn" data-action="zoom-reset" title="Reset Zoom">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                    <path d="M3 3v5h5"/>
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
                   </svg>
                 </button>
                 <span class="mermaid-zoom-level">100%</span>
               </div>
-              <button class="mermaid-fullscreen-close" aria-label="Close fullscreen diagram">
+              <button class="mermaid-fullscreen-close">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M18 6 6 18"/>
-                  <path d="m6 6 12 12"/>
+                  <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
                 </svg>
                 Close
               </button>
             </div>
             <div class="mermaid-fullscreen-content">
               <div class="mermaid-fullscreen-viewport">
-                <div class="mermaid-diagram-container">
-                  ${svgEl.outerHTML}
+                <div class="mermaid-diagram-container" id="mermaid-fullscreen-render-target">
+                  <div class="mermaid-loading-spinner">Rendering...</div>
                 </div>
               </div>
             </div>
@@ -89,6 +82,17 @@ export function DocViewer({ html, slug }: DocViewerProps) {
 
           document.body.appendChild(overlay);
           document.body.style.overflow = "hidden";
+
+          // Perform fresh render for fullscreen
+          try {
+            const fsTarget = document.getElementById("mermaid-fullscreen-render-target");
+            if (fsTarget) {
+              const { svg } = await mermaid.render("mermaid-fs-" + Math.random().toString(36).slice(2, 9), diagramSource);
+              fsTarget.innerHTML = svg;
+            }
+          } catch (err) {
+            console.error("Fullscreen render failed:", err);
+          }
 
           let scale = 1;
           let panning = false;
@@ -98,7 +102,7 @@ export function DocViewer({ html, slug }: DocViewerProps) {
           let startY = 0;
 
           const viewport = overlay.querySelector(".mermaid-fullscreen-viewport");
-          const container = viewport?.querySelector(".mermaid-diagram-container") as HTMLElement;
+          const container = viewport?.querySelector("#mermaid-fullscreen-render-target") as HTMLElement;
           const zoomLevelEl = overlay.querySelector(".mermaid-zoom-level");
 
           if (!viewport || !container) return;
@@ -193,7 +197,17 @@ export function DocViewer({ html, slug }: DocViewerProps) {
 
           const svgString = `<?xml version="1.0" encoding="UTF-8"?>\n${new XMLSerializer().serializeToString(svgClone)}`;
           const url = URL.createObjectURL(new Blob([svgString], { type: "image/svg+xml" }));
-          const filename = wrapper?.querySelector(".mermaid-diagram-desc")?.textContent?.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 50) || "diagram";
+          
+          // Generate a unique, slugified filename
+          const docSlugPart = slug.split("/").pop() || "doc";
+          let descPart = wrapper?.querySelector(".mermaid-diagram-desc")?.textContent?.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+          
+          if (!descPart) {
+             const index = wrapper?.dataset.index || "0";
+             descPart = `diagram-${index}`;
+          }
+
+          const filename = `${docSlugPart}-${descPart}`;
 
           const link = document.createElement("a");
           link.href = url; link.download = `${filename}.svg`;
@@ -328,36 +342,12 @@ export function DocViewer({ html, slug }: DocViewerProps) {
       }
     };
 
-    const renderMermaid = async () => {
+    const renderMermaid = async (mermaid: any) => {
       if (!ref.current || !mounted) return;
       const diagrams = ref.current.querySelectorAll<HTMLElement>(".mermaid-diagram");
       if (diagrams.length === 0) return;
 
       window.__mermaidLoading__ = true;
-      let mermaid: any;
-      try {
-        mermaid = (window as any).mermaid;
-        if (!mermaid || typeof mermaid.render !== "function") {
-          mermaid = (await import("mermaid")).default;
-        }
-        
-        // Ensure we only initialize once per session or when theme-relevant settings change
-        if (!(window as any).__mermaidInitialized__) {
-          mermaid.initialize({
-            startOnLoad: false,
-            theme: "default", // Use default theme for maximum compatibility
-            securityLevel: "loose",
-            fontFamily: "system-ui, -apple-system, sans-serif",
-            flowchart: { htmlLabels: true, useMaxWidth: true },
-            sequence: { useMaxWidth: true, showSequenceNumbers: true },
-          });
-          (window as any).__mermaidInitialized__ = true;
-        }
-      } catch (err) {
-        console.error("Failed to load Mermaid:", err);
-        window.__mermaidLoading__ = false; return;
-      }
-
       const observer = new IntersectionObserver(async (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting && mounted) {
@@ -393,6 +383,14 @@ export function DocViewer({ html, slug }: DocViewerProps) {
 
     const enhanceCodeBlocks = () => {
       if (!ref.current) return;
+      
+      // Use highlight.js for actual syntax highlighting
+      ref.current.querySelectorAll("pre code").forEach((block) => {
+        if (!block.classList.contains("hljs")) {
+          hljs.highlightElement(block as HTMLElement);
+        }
+      });
+
       ref.current.querySelectorAll("pre code[class^='language-']").forEach(code => {
         const pre = code.parentElement;
         if (!pre || pre.parentElement?.classList.contains("code-block")) return;
@@ -415,11 +413,36 @@ export function DocViewer({ html, slug }: DocViewerProps) {
       const raf = typeof requestAnimationFrame !== "undefined" ? requestAnimationFrame : (cb: any) => setTimeout(cb, 0);
       await new Promise<void>(resolve => raf(() => resolve()));
       if (!mounted) return;
-      await renderMermaid();
+
+      // Load Mermaid once
+      let mermaid: any;
+      try {
+        mermaid = (window as any).mermaid;
+        if (!mermaid || typeof mermaid.render !== "function") {
+          mermaid = (await import("mermaid")).default;
+        }
+        
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        
+        // Ensure we only initialize once per session or when theme changes
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: isDark ? "dark" : "default",
+          securityLevel: "loose",
+          fontFamily: "system-ui, -apple-system, sans-serif",
+          flowchart: { htmlLabels: true, useMaxWidth: true },
+          sequence: { useMaxWidth: true, showSequenceNumbers: true },
+        });
+      } catch (err) {
+        console.error("Failed to load Mermaid:", err);
+        return;
+      }
+
+      await renderMermaid(mermaid);
       if (!mounted) return;
       renderMath();
       enhanceCodeBlocks();
-      setupZoomHandlers();
+      setupZoomHandlers(mermaid);
       setupDownloadHandlers();
       setupSourceHandlers();
     };

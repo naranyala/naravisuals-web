@@ -138,6 +138,11 @@ impl Diagnostics {
             .any(|d| d.severity == DiagnosticSeverity::Error)
     }
 
+    #[allow(dead_code)]
+    pub fn clear(&mut self) {
+        self.items.clear();
+    }
+
     pub fn summary(&self) -> (usize, usize, usize) {
         let mut errors = 0;
         let mut warnings = 0;
@@ -200,48 +205,29 @@ pub fn validate_code_block_descriptions(
     file: &str,
     diags: &mut Diagnostics,
 ) {
-    let lines: Vec<&str> = markdown_content.lines().collect();
-    let mut in_code_block = false;
-    let mut fence_char = ' ';
-    let mut fence_length = 0;
+    use pulldown_cmark::{Parser, Event, Tag, CodeBlockKind};
 
+    let parser = Parser::new(markdown_content);
     let desc_re = regex::Regex::new(r#"desc(?:ription)?\s*=\s*["']?([^"']+)["']?"#).unwrap();
 
-    for (index, line) in lines.iter().enumerate() {
-        let trimmed = line.trim_start();
-        if trimmed.starts_with("```") || trimmed.starts_with("~~~") {
-            if in_code_block {
-                if trimmed.starts_with(fence_char) && trimmed.len() >= fence_length {
-                    let rest = &trimmed[fence_length..];
-                    if rest.is_empty() || rest.trim().is_empty() {
-                        in_code_block = false;
-                        continue;
-                    }
-                }
-            } else {
-                in_code_block = true;
-                fence_char = trimmed.chars().next().unwrap();
-                let match_fence = if trimmed.starts_with("```") {
-                    "```"
-                } else {
-                    "~~~"
-                };
-                fence_length = trimmed
-                    .chars()
-                    .take_while(|&c| c == match_fence.chars().next().unwrap())
-                    .count();
+    for event in parser {
+        if let Event::Start(Tag::CodeBlock(kind)) = event {
+            let info_string = match &kind {
+                CodeBlockKind::Fenced(s) => s.to_string(),
+                CodeBlockKind::Indented => String::new(),
+            };
 
-                let info_string = &trimmed[fence_length..];
+            if let CodeBlockKind::Fenced(_) = kind {
                 let has_desc = info_string.contains(":desc=")
                     || info_string.contains(":description=")
-                    || desc_re.is_match(info_string);
+                    || desc_re.is_match(&info_string);
 
                 if !has_desc {
                     diags.warn(
                         DiagnosticSource::Content,
                         file,
                         "Missing description for code block",
-                        Some(&format!("Line {}: Code blocks should include a description. Example: ```ts:desc=Description", index + 1)),
+                        Some(&format!("Code blocks should include a description. Example: ```ts:desc=Description (Info string: '{}')", info_string)),
                     );
                 }
             }
@@ -299,7 +285,14 @@ pub fn validate_internal_links(
         if !href.starts_with("/docs/") && !href.starts_with("/blog/") {
             continue;
         }
-        let clean_href = href.split('#').next().unwrap().trim_start_matches('/');
+        let mut clean_href = href.split('#').next().unwrap().split('?').next().unwrap();
+        
+        if clean_href.starts_with("/docs/") {
+            clean_href = &clean_href[6..];
+        } else {
+            clean_href = clean_href.trim_start_matches('/');
+        }
+
         if !known_slugs.contains(clean_href) {
             diags.warn(
                 DiagnosticSource::Links,
@@ -308,6 +301,100 @@ pub fn validate_internal_links(
                 Some(&format!("Slug \"{}\" not found", clean_href)),
             );
         }
+    }
+}
+
+pub fn validate_mermaid_content(
+    content: &str,
+    file: &str,
+    diags: &mut Diagnostics,
+) {
+    let trimmed = content.trim();
+    if trimmed.is_empty() {
+        diags.error(DiagnosticSource::Content, file, "Empty diagram", Some("Diagram contains no content."));
+        return;
+    }
+
+    let mermaid_types = [
+        "flowchart", "sequenceDiagram", "classDiagram", "stateDiagram", "erDiagram", "gantt", 
+        "pie", "quadrantChart", "xyChart", "mindmap", "timeline", "journey", 
+        "requirementDiagram", "gitGraph", "sankey", "block", "packet", "graph"
+    ];
+
+    let lines: Vec<&str> = trimmed.lines().collect();
+    let first_line_idx = lines.iter().position(|l| {
+        let t = l.trim();
+        !t.is_empty() && !t.starts_with("%%") && !t.starts_with(':')
+    });
+
+    if first_line_idx.is_none() {
+        diags.error(DiagnosticSource::Content, file, "Invalid diagram content", Some("No valid Mermaid diagram type found."));
+        return;
+    }
+
+    let first_line = lines[first_line_idx.unwrap()].trim();
+    let first_word = first_line.split_whitespace().next().unwrap_or("").to_lowercase();
+    
+    if !mermaid_types.iter().any(|t| first_word.starts_with(&t.to_lowercase())) {
+        diags.error(
+            DiagnosticSource::Content, 
+            file, 
+            "Invalid diagram type", 
+            Some(&format!("Must start with a valid type (e.g., flowchart, sequenceDiagram). Found: '{}'", first_word))
+        );
+    }
+
+    // Bracket balance and quote tracking
+    let mut in_quote = false;
+    let mut quote_char = ' ';
+    let mut bracket_stack = Vec::new();
+    let pairs = [('(', ')'), ('[', ']'), ('{', '}')];
+
+    for (idx, line) in lines.iter().enumerate() {
+        let line_num = idx + 1;
+        let t = line.trim();
+        if t.is_empty() || t.starts_with("%%") { continue; }
+
+        let mut prev_char = ' ';
+        for (i, c) in line.chars().enumerate() {
+            let is_escaped = prev_char == '\\' && (i < 2 || line.chars().nth(i-2).unwrap_or(' ') != '\\');
+            
+            if (c == '"' || c == '\'' || c == '`') && !is_escaped {
+                if !in_quote {
+                    in_quote = true;
+                    quote_char = c;
+                } else if c == quote_char {
+                    in_quote = false;
+                }
+            } else if !in_quote {
+                if let Some(&(open, _)) = pairs.iter().find(|p| p.0 == c) {
+                    bracket_stack.push((open, line_num));
+                } else if let Some(&(_, close)) = pairs.iter().find(|p| p.1 == c) {
+                    if let Some(last) = bracket_stack.pop() {
+                        let expected = pairs.iter().find(|p| p.0 == last.0).unwrap().1;
+                        if expected != close {
+                            diags.error(DiagnosticSource::Content, file, "Unbalanced brackets", Some(&format!("Mismatched closing bracket '{}' at line {}", c, line_num)));
+                        }
+                    } else {
+                        diags.error(DiagnosticSource::Content, file, "Unbalanced brackets", Some(&format!("Unexpected closing bracket '{}' at line {}", c, line_num)));
+                    }
+                }
+            }
+            prev_char = c;
+        }
+    }
+
+    if !bracket_stack.is_empty() {
+        let (c, ln) = bracket_stack.pop().unwrap();
+        diags.error(DiagnosticSource::Content, file, "Unbalanced brackets", Some(&format!("Unclosed bracket '{}' from line {}", c, ln)));
+    }
+
+    // Global patterns
+    if trimmed.contains("&#") {
+        diags.warn(DiagnosticSource::Content, file, "HTML entity detected", Some("Use literal characters instead of HTML entities (e.g., '&' instead of '&#x26;')"));
+    }
+    if trimmed.contains("\\n") {
+        diags.warn(DiagnosticSource::Content, file, "Literal newline character", Some("Replace '\\n' with '<br/>' for newlines in labels."));
     }
 }
 
@@ -569,5 +656,48 @@ mod tests {
         let (_, warnings, _) = diags.summary();
         assert_eq!(warnings, 1);
         assert_eq!(diags.warnings()[0].file, "bad.md");
+    }
+
+    #[test]
+    fn test_validate_code_block_descriptions_nested() {
+        let mut diags = Diagnostics::new();
+
+        // Use 4 backticks for outer to properly nest 3 backticks inner
+        let content = "````ts:desc=Outer\n```js\nno desc here but it is nested\n```\n````";
+        validate_code_block_descriptions(content, "nested.md", &mut diags);
+        
+        let (_, warnings, _) = diags.summary();
+        // It SHOULD only see the outer one because inner is just text inside the outer block.
+        assert_eq!(warnings, 0);
+    }
+
+    #[test]
+    fn test_validate_mermaid_content() {
+        let mut diags = Diagnostics::new();
+
+        // 1. Empty
+        validate_mermaid_content("", "empty.md", &mut diags);
+        assert!(diags.has_errors());
+        diags.clear();
+
+        // 2. Invalid type
+        validate_mermaid_content("invalidType TD;\nA-->B;", "invalid.md", &mut diags);
+        assert!(diags.has_errors());
+        diags.clear();
+
+        // 3. Unbalanced brackets
+        validate_mermaid_content("flowchart TD;\nA[Node-->B;", "unbalanced.md", &mut diags);
+        assert!(diags.has_errors());
+        diags.clear();
+
+        // 4. Problematic patterns
+        validate_mermaid_content("flowchart TD;\nA-->B&#x26;C;", "entity.md", &mut diags);
+        let (_, warnings, _) = diags.summary();
+        assert_eq!(warnings, 1);
+        diags.clear();
+
+        // 5. Valid diagram
+        validate_mermaid_content("sequenceDiagram\nAlice->>John: Hello", "valid.md", &mut diags);
+        assert!(!diags.has_errors());
     }
 }

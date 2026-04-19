@@ -1877,46 +1877,299 @@ a:hover {
  * entire .code-block wrapper (header + highlighted content).
  */
 
+/* ─── Mermaid Diagrams ─────────────────────────────────────── */
+
+.mermaid-diagram {
+  margin: 1.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: var(--bg-surface);
+  transition: box-shadow 0.15s;
+}
+
+.mermaid-diagram:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.mermaid-diagram-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.85rem;
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid var(--border);
+}
+
+.mermaid-diagram-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mermaid-diagram-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.mermaid-zoom-btn,
+.mermaid-download-btn,
+.mermaid-code-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.mermaid-zoom-btn:hover,
+.mermaid-download-btn:hover,
+.mermaid-code-btn:hover {
+  background: var(--bg);
+  color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+}
+
+.mermaid-code-btn.active {
+  background: var(--ifm-color-primary);
+  color: white;
+  border-color: var(--ifm-color-primary);
+}
+
+.mermaid {
+  padding: 1.25rem;
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+/* Internal Mermaid SVG Colors */
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Fullscreen Overlay */
+.mermaid-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(4px);
+}
+
+.mermaid-fullscreen-header {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  background: #111;
+  color: white;
+  border-bottom: 1px solid #333;
+}
+
+.mermaid-fullscreen-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.mermaid-fullscreen-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mermaid-fullscreen-zoom-btn {
+  background: #222;
+  border: 1px solid #444;
+  color: #ccc;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.25rem;
+  display: flex;
+  transition: all 0.1s;
+}
+
+.mermaid-fullscreen-zoom-btn:hover {
+  background: #333;
+  color: white;
+  border-color: #666;
+}
+
+.mermaid-zoom-level {
+  font-size: 0.75rem;
+  font-family: monospace;
+  min-width: 3rem;
+  text-align: center;
+  color: #888;
+}
+
+.mermaid-fullscreen-close {
+  background: #e11d48;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.mermaid-fullscreen-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.mermaid-fullscreen-viewport {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+.mermaid-fullscreen-viewport:active {
+  cursor: grabbing;
+}
+
+.mermaid-diagram-container {
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.mermaid-source-container {
+  padding: 1rem;
+  background: #111;
+  border-top: 1px solid #333;
+}
+
+.mermaid-source-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.mermaid-source-header span {
+  color: #888;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.mermaid-source-copy-btn {
+  background: none;
+  border: 1px solid #444;
+  color: #ccc;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.7rem;
+  border-radius: 0.2rem;
+}
+
+.mermaid-source-code {
+  margin: 0;
+  padding: 0.5rem;
+  background: #000;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  color: #a6e3a1; /* Catppuccin Green */
+  overflow-x: auto;
+}
+
+.mermaid-loading {
+  margin-left: 0.5rem;
+}
+
+.mermaid-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(37, 99, 235, 0.2);
+  border-top-color: var(--ifm-color-primary);
+  border-radius: 50%;
+  animation: mermaid-spin 0.6s linear infinite;
+}
+
+@keyframes mermaid-spin {
+  to { transform: rotate(360deg); }
+}
+
+.mermaid-error {
+  padding: 1rem;
+  background: #fff1f2;
+  border-top: 1px solid #fecdd3;
+  color: #9f1239;
+}
+
+.mermaid-error-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.mermaid-error-msg {
+  font-family: monospace;
+  font-size: 0.72rem;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+}
+
 /* github-light: invert dark to light */
-[data-code-theme="github-light"] .code-block {
+[data-code-theme="github-light"] .code-block:not(.mermaid-diagram) {
   filter: invert(1) hue-rotate(180deg);
 }
 
 /* nord: cool blue-gray tones */
-[data-code-theme="nord"] .code-block {
+[data-code-theme="nord"] .code-block:not(.mermaid-diagram) {
   filter: saturate(0.8) hue-rotate(10deg) brightness(0.95) contrast(1.05);
 }
 
 /* dracula: vibrant purple/pink */
-[data-code-theme="dracula"] .code-block {
+[data-code-theme="dracula"] .code-block:not(.mermaid-diagram) {
   filter: saturate(1.2) hue-rotate(300deg) brightness(1.05) contrast(1.1);
 }
 
 /* catppuccin-mocha: warm pastel */
-[data-code-theme="catppuccin-mocha"] .code-block {
+[data-code-theme="catppuccin-mocha"] .code-block:not(.mermaid-diagram) {
   filter: saturate(0.9) hue-rotate(15deg) brightness(1.02) contrast(0.95);
 }
 
 /* vitesse-dark: green-tinted */
-[data-code-theme="vitesse-dark"] .code-block {
+[data-code-theme="vitesse-dark"] .code-block:not(.mermaid-diagram) {
   filter: saturate(1.1) hue-rotate(80deg) brightness(0.98) contrast(1.02);
 }
 
 /* one-dark: Atom's One Dark */
-[data-code-theme="one-dark"] .code-block {
+[data-code-theme="one-dark"] .code-block:not(.mermaid-diagram) {
   filter: saturate(0.85) hue-rotate(340deg) brightness(1.05) contrast(1.05);
 }
 
 /* material-theme: Google Material colors */
-[data-code-theme="material-theme"] .code-block {
+[data-code-theme="material-theme"] .code-block:not(.mermaid-diagram) {
   filter: saturate(1.15) hue-rotate(200deg) brightness(1.02) contrast(1.08);
-}
-
-/* ─── Timelines ─────────────────────────────────────────── */
-
-.code-block-timeline {
-  border-color: var(--ifm-color-primary-light);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .code-block-timeline .code-header {

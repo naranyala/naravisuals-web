@@ -104,12 +104,7 @@ async function findAvailablePort(startPort: number, maxAttempts = 10): Promise<n
 async function cmdDev(options) {
   banner();
 
-  const startPort = Number(options.port) || 3000;
-  const port = await findAvailablePort(startPort);
-
-  if (port !== startPort) {
-    logger.warn(`Port ${startPort} is in use, using port ${port} instead`);
-  }
+  const port = options.port || 3000;
 
   logger.info("Starting development server...");
   logger.info("Hot Module Replacement (HMR) enabled");
@@ -217,12 +212,7 @@ async function cmdBuild(options) {
 async function cmdStart(options) {
   banner();
 
-  const startPort = Number(options.port) || Number(process.env.PORT) || 3000;
-  const port = await findAvailablePort(startPort);
-
-  if (port !== startPort) {
-    logger.warn(`Port ${startPort} is in use, using port ${port} instead`);
-  }
+  const port = options.port || 3000;
 
   // Check if dist exists
   if (!existsSync(join(projectRoot, "dist"))) {
@@ -398,9 +388,7 @@ async function cmdInfo() {
 
   // Count docs
   const docsDir = join(projectRoot, "docs");
-  const blogDir = join(projectRoot, "blog");
   let docCount = 0;
-  let blogCount = 0;
 
   if (existsSync(docsDir)) {
     docCount = readdirSync(docsDir, { recursive: true }).filter(
@@ -408,15 +396,8 @@ async function cmdInfo() {
     ).length;
   }
 
-  if (existsSync(blogDir)) {
-    blogCount = readdirSync(blogDir, { recursive: true }).filter(
-      (f) => typeof f === "string" && f.endsWith(".md")
-    ).length;
-  }
-
   logger.raw(`Documentation:${colors.reset}`);
   logger.raw(`  Docs:  ${docCount} files`);
-  logger.raw(`  Blog:  ${blogCount} files`);
   logger.blank();
 
   // Check build status
@@ -541,6 +522,9 @@ function parseArgs(argv) {
       args.port = argv[++i];
     } else if (arg === "--rust" || arg === "-r") {
       args.useRust = true;
+    } else if (arg === "-rust") {
+      logger.warn("The '-rust' flag is deprecated. Please use the standard '--rust' or '-r' instead.");
+      args.useRust = true;
     } else if (arg === "--no-lint") {
       args.skipLint = true;
     } else if (arg === "--skip-validation") {
@@ -572,33 +556,6 @@ function parseArgs(argv) {
 async function main() {
   const args = parseArgs(process.argv);
 
-  if (args.useRust) {
-    const rustBinary = join(projectRoot, "scripts-rs/target/release/scripts-rs");
-    const debugBinary = join(projectRoot, "scripts-rs/target/debug/scripts-rs");
-    const binary = existsSync(rustBinary)
-      ? rustBinary
-      : existsSync(debugBinary)
-        ? debugBinary
-        : null;
-
-    if (!binary) {
-      logger.error("Rust binary not found. Please build it first:");
-      logger.info("cd scripts-rs && cargo build --release");
-      process.exit(1);
-    }
-
-    logger.info(`Using Rust implementation: ${c(binary, "dim")}`);
-
-    // Forward command and arguments to Rust binary
-    const rustArgs = process.argv.slice(2).filter((arg) => arg !== "--rust" && arg !== "-r");
-    try {
-      await runCommand(binary, rustArgs);
-      process.exit(0);
-    } catch (_error) {
-      process.exit(1);
-    }
-  }
-
   // Map command aliases
   const commandMap = {
     dev: "dev",
@@ -626,6 +583,59 @@ async function main() {
   // Detect lint:fix
   if (args.command === "lint:fix" || args.fix) {
     args.fix = true;
+  }
+
+  // Handle port detection for relevant commands
+  let port = null;
+  if (["dev", "start", "preview"].includes(command)) {
+    const startPort = Number(args.port) || Number(process.env.PORT) || 3000;
+    port = await findAvailablePort(startPort);
+    if (port !== startPort) {
+      logger.warn(`Port ${startPort} is in use, using port ${port} instead`);
+    }
+    args.port = String(port);
+  }
+
+  if (args.useRust) {
+    const rustBinary = join(projectRoot, "scripts-rs/target/release/scripts-rs");
+    const debugBinary = join(projectRoot, "scripts-rs/target/debug/scripts-rs");
+    const binary = existsSync(rustBinary)
+      ? rustBinary
+      : existsSync(debugBinary)
+        ? debugBinary
+        : null;
+
+    if (!binary) {
+      logger.error("Rust binary not found. Please build it first:");
+      logger.info("cd scripts-rs && cargo build --release");
+      process.exit(1);
+    }
+
+    logger.info(`Using Rust implementation: ${c(binary, "dim")}`);
+
+    // Forward command and arguments to Rust binary
+    // We explicitly pass the detected port if we found one
+    const rustArgs = [command];
+    
+    // Add other flags
+    if (args.skipClean) rustArgs.push("--skip-clean");
+    if (args.skipLint) rustArgs.push("--skip-lint");
+    if (args.strict) rustArgs.push("--strict");
+    if (args.skipValidation) rustArgs.push("--skip-validation");
+    if (args.fix) rustArgs.push("--fix");
+    if (args.watch) rustArgs.push("--watch");
+    if (args.coverage) rustArgs.push("--coverage");
+    if (port) {
+      rustArgs.push("--port");
+      rustArgs.push(String(port));
+    }
+
+    try {
+      await runCommand(binary, rustArgs);
+      process.exit(0);
+    } catch (_error) {
+      process.exit(1);
+    }
   }
 
   try {

@@ -30,6 +30,7 @@
     "dompurify": "^3.4.0",
     "fuse.js": "^7.3.0",
     "goober": "^2.1.18",
+    "highlight.js": "^11.11.1",
     "mathjax-full": "^3.2.2",
     "mermaid": "^11.14.0",
     "react": "^19.2.5",

@@ -54,9 +54,7 @@ export function buildSidebar(docs: DocEntry[]): SidebarItem[] {
   }
 
   // Sort categories by their folder numeric prefix
-  const sortedCats = catOrder
-    .filter((c) => c !== "blog")
-    .sort((a, b) => (catPrefixes[a] || 999) - (catPrefixes[b] || 999));
+  const sortedCats = catOrder.sort((a, b) => (catPrefixes[a] || 999) - (catPrefixes[b] || 999));
 
   for (const cat of sortedCats) {
     const items = (grouped[cat] || []).sort((a, b) => a.sidebar_position - b.sidebar_position);
@@ -75,23 +73,6 @@ export function buildSidebar(docs: DocEntry[]): SidebarItem[] {
         label: d.sidebar_label,
         slug: d.slug,
         category: d.category,
-        date: d.date,
-      })),
-    });
-  }
-
-  if (catOrder.includes("blog")) {
-    const items = (grouped.blog || []).sort((a, b) => a.sidebar_position - b.sidebar_position);
-    sidebar.push({
-      type: "category",
-      label: "📝 Blog",
-      link: items[0] ? { type: "doc", id: items[0].id } : undefined,
-      items: items.map((d) => ({
-        type: "doc" as const,
-        id: d.id,
-        label: d.sidebar_label,
-        slug: d.slug,
-        category: "blog",
         date: d.date,
       })),
     });

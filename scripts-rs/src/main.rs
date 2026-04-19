@@ -175,12 +175,22 @@ fn main() -> anyhow::Result<()> {
         }
         Commands::Info => {
             logger.info("Project Information");
-            // Implementation of info command
             let pkg_path = paths.root.join("package.json");
             if let Ok(pkg_content) = fs::read_to_string(pkg_path) {
                 let v: serde_json::Value = serde_json::from_str(&pkg_content)?;
                 logger.raw(&format!("Name: {}", v["name"]));
                 logger.raw(&format!("Version: {}", v["version"]));
+            }
+
+            // Count docs
+            let docs_dir = paths.root.join("docs");
+            if docs_dir.exists() {
+                let count = walkdir::WalkDir::new(docs_dir)
+                    .into_iter()
+                    .filter_map(|e| e.ok())
+                    .filter(|e| e.file_type().is_file() && e.file_name().to_string_lossy().ends_with(".md"))
+                    .count();
+                logger.raw(&format!("Documentation: {} files", count));
             }
         }
     }

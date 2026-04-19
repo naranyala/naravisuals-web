@@ -257,47 +257,6 @@
   margin: 0 auto;
 }
 
-/* ---- Text & labels: dark for readability on white ---- */
-.mermaid svg text,
-.mermaid-src svg text,
-.mermaid-fullscreen-content svg text {
-  fill: #1a1a2e !important;
-  color: #1a1a2e !important;
-  font-family: inherit !important;
-}
-
-/* ---- Node fills: light with primary border ---- */
-.mermaid svg .node rect,
-.mermaid svg .node circle,
-.mermaid svg .node ellipse,
-.mermaid svg .node polygon,
-.mermaid svg .node path {
-  fill: #f9fafb !important;
-  stroke: #8aadf4 !important; /* Fixed primary color */
-  stroke-width: 1.5px !important;
-}
-
-/* ---- Lines, paths, arrows: dark gray ---- */
-.mermaid svg .edgePath path,
-.mermaid-fullscreen-content svg .edgePath path,
-.mermaid svg line {
-  stroke: #4b5563 !important;
-  stroke-width: 1.5px !important;
-}
-
-/* ---- Edge label backgrounds: white ---- */
-.mermaid svg .edgeLabel,
-.mermaid svg .edgeLabel rect {
-  background-color: #ffffff !important;
-  fill: #ffffff !important;
-}
-
-/* Ensure mindmap and specialized diagrams are legible */
-.mermaid svg .mindmap-node text,
-.mermaid svg .mindmap-node-text {
-  fill: #1a1a2e !important;
-}
-
 /* ============================================
    ERROR STATES
    ============================================ */

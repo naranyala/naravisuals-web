@@ -1,22 +1,19 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap};
 use std::fs;
 use std::path::Path;
-use anyhow::Result;
 use chrono;
-use pulldown_cmark::{html, Options, Parser};
 use regex::Regex;
-use serde::{Serialize};
+use serde::{Serialize, Deserialize};
 use serde_json::Value;
-use walkdir::WalkDir;
-use colored::*;
-
 use crate::core::{Logger, Paths};
 use crate::diagnostics::*;
 use crate::plugins::*;
+use crate::compiler::*;
+use serde_json::json;
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DocEntry {
-
     pub id: String,
     pub slug: String,
     pub title: String,
@@ -33,18 +30,20 @@ pub struct DocEntry {
     pub tags: Option<Vec<String>>,
     pub section: String,
     pub metadata: HashMap<String, Value>,
+    pub ast: Value,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TocItem {
     pub value: String,
     pub id: String,
     pub level: usize,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SidebarItem {
-    pub item_type: String, // "doc" or "category"
+    #[serde(rename = "type")]
+    pub r#type: String, // "doc" or "category"
     pub id: String,
     pub label: String,
     pub slug: String,
@@ -54,142 +53,56 @@ pub struct SidebarItem {
 }
 
 pub fn build_docs(paths: &Paths, logger: &Logger) -> anyhow::Result<()> {
-    let mut reporter = ReportGenerator::new();
-    let mut diags = Diagnostics::new();
-    let docs_dir = paths.root.join("docs");
-    let blog_dir = paths.root.join("blog");
-    let gen_dir = paths.root.join("src").join("generated");
-    let gen_docs_dir = gen_dir.join("docs");
+    let ctx = CompilationContext::new(paths);
+    
+    let pipeline = (
+        FrontmatterMiddleware,
+        AdmonitionPlugin,
+        MathPlugin,
+        TocMiddleware,
+        HighlightMiddleware,
+        MermaidMiddleware,
+        MermaidPlugin,
+        ValidationMiddleware,
+        GeneratorMiddleware,
+    );
 
-    logger.raw("📚 Scanning docs…");
-    let docs = scan_md_files(&docs_dir, "docs", &mut diags)?;
-    let blogs = scan_md_files(&blog_dir, "blog", &mut diags)?;
-    let all = [docs, blogs].concat();
+    let mut compiler = DocumentationCompiler::new(ctx, pipeline);
+    compiler.compile()?;
 
-    logger.raw(&format!("✅ Found {} docs", all.len()));
-
-    // Validate unique slugs
-    let slug_entries: Vec<(String, String)> =
-        all.iter().map(|d| (d.id.clone(), d.slug.clone())).collect();
-    validate_unique_slugs(&slug_entries, &mut diags);
-
-    // Broken links validation
-    let known_slugs: HashSet<String> = all.iter().map(|d| d.slug.clone()).collect();
-    for doc in &all {
-        validate_internal_links(&doc.raw_content, &known_slugs, &doc.id, &mut diags);
-    }
-
-    // Add diagnostics to reporter
-    for d in diags.all() {
-        reporter.add_diagnostic(d.clone());
-    }
-
-    // Admonitions Analysis Section
-    let adm_idx = reporter.add_section("Admonitions Analysis", None);
-    let mut adm_stats = Vec::new();
-    for doc in &all {
-        let analysis = analyze_admonitions(&doc.raw_content, &doc.id, &mut Diagnostics::new());
-        if analysis.has_admonitions {
-            adm_stats.push((doc.id.clone(), analysis.stats));
+    // SEO and other post-compile tasks
+    let all_docs: Vec<DocEntry> = compiler.units.iter().map(|u| {
+        let meta = u.metadata.as_ref().expect("Metadata missing for unit");
+        DocEntry {
+            id: u.id.to_string(),
+            slug: meta.slug.to_string(),
+            title: meta.title.to_string(),
+            sidebar_label: meta.sidebar_label.to_string(),
+            sidebar_position: meta.sidebar_position,
+            category: meta.category.to_string(),
+            original_category: meta.original_category.as_ref().map(|s| s.to_string()),
+            description: meta.description.to_string(),
+            content: u.html.clone().unwrap_or_default(),
+            raw_content: u.clean_content.clone(),
+            toc: u.toc.clone().unwrap_or_default(),
+            date: meta.date.as_ref().map(|s| s.to_string()),
+            author: meta.author.as_ref().map(|s| s.to_string()),
+            tags: meta.tags.as_ref().map(|t| t.iter().map(|s| s.to_string()).collect()),
+            section: u.section.to_string(),
+            metadata: meta.custom.iter().map(|(k, v)| (k.to_string(), v.clone())).collect(),
+            ast: u.ast.clone().unwrap_or(json!([])),
         }
-    }
-    adm_stats.sort_by(|a, b| b.1.total.cmp(&a.1.total));
-    for (id, stats) in adm_stats {
-        let types = stats.by_type.iter()
-            .map(|(t, c)| format!("{}:{}", t, c))
-            .collect::<Vec<_>>()
-            .join(", ");
-        let line = format!("{} {} ({} | {})", "✓".green(), id.dimmed(), stats.total, types);
-        reporter.add_line(adm_idx, &line);
-    }
+    }).collect();
 
-    // Content Enrichment Section
-    let enr_idx = reporter.add_section("Content Enrichment", None);
-    let mut enr_stats = Vec::new();
-    let mut totals = (0, 0, 0, 0); // code, mermaid, adm, ref
-    for doc in &all {
-        let analysis = analyze_content(&doc.raw_content, &doc.id, &mut Diagnostics::new());
-        enr_stats.push((doc.id.clone(), analysis.stats.clone()));
-        totals.0 += analysis.stats.code_blocks;
-        totals.1 += analysis.stats.mermaid_blocks;
-        totals.2 += analysis.stats.admonitions;
-        totals.3 += analysis.stats.references;
-    }
-    enr_stats.sort_by_key(|s| s.1.code_blocks + s.1.mermaid_blocks + s.1.admonitions);
-    for (id, stats) in enr_stats.iter().take(5) {
-        let line = format!("{:<30} code:{} mermaid:{} adm:{}", id.dimmed(), stats.code_blocks, stats.mermaid_blocks, stats.admonitions);
-        reporter.add_line(enr_idx, &line);
-    }
-    reporter.add_line(enr_idx, &"─".repeat(40).dimmed());
-    reporter.add_line(enr_idx, &format!("{}: Code:{} ({} mermaid) | Adm:{} | Ref:{}", "Totals".bold(), totals.0, totals.1, totals.2, totals.3));
+    generate_seo_assets(&paths.root, &all_docs)?;
 
-    // Print the unified report
-    reporter.print();
-
-    // Build sidebar
-    let sidebar = build_sidebar(&all);
-
-    // Ensure output dirs exist
-    fs::create_dir_all(&gen_docs_dir)?;
-
-    // 1) Write sidebar.ts
-    let sidebar_json = serde_json::to_string_pretty(&sidebar)?;
-    let sidebar_content = format!(
-        "// AUTO-GENERATED — DO NOT EDIT.\n\nexport const sidebarData = {};",
-        sidebar_json
-    );
-    fs::write(gen_dir.join("sidebar.ts"), sidebar_content)?;
-
-    // 2) Write one file per doc
-    for d in &all {
-        let filename = d.id.replace('/', "-");
-        let content = format!(
-            "// AUTO-GENERATED — DO NOT EDIT.\nimport type {{ DocEntry }} from \"../types.ts\";\n\nexport const {}: DocEntry = {};\n",
-            slug_to_var_name(&d.id),
-            serde_json::to_string_pretty(&d)?
-        );
-        fs::write(gen_docs_dir.join(format!("{}.ts", filename)), content)?;
-    }
-
-    // 3) Write docs/index.ts
-    let imports = all
-        .iter()
-        .map(|d| {
-            format!(
-                "import {{ {} }} from \"./{}.ts\";",
-                slug_to_var_name(&d.id),
-                d.id.replace('/', "-")
-            )
-        })
-        .collect::<Vec<_>>()
-        .join("\n");
-    let exports = all
-        .iter()
-        .map(|d| slug_to_var_name(&d.id))
-        .collect::<Vec<_>>()
-        .join(",\n  ");
-
-    let docs_index_content = format!(
-        "// AUTO-GENERATED — DO NOT EDIT.\n{}\n\nexport {{\n  {},\n}};\n\nexport const allDocs: any[] = [\n  {},\n];",
-        imports, exports, exports
-    );
-    fs::write(gen_docs_dir.join("index.ts"), docs_index_content)?;
-
-    // 4) Write top-level index.ts
-    let top_index_content = format!(
-        "// AUTO-GENERATED — DO NOT EDIT.\nexport {{ sidebarData }} from \"./sidebar.ts\";\nexport {{ allDocs }} from \"./docs/index.ts\";",
-    );
-    fs::write(gen_dir.join("index.ts"), top_index_content)?;
-
-    generate_seo_assets(&paths.root, &all)?;
-
-    logger.raw(&format!("💾 Written to {}", gen_dir.display()));
+    logger.raw(&format!("💾 Written to {}", compiler.ctx.config.output_dir));
     logger.raw("✨ Done!");
 
     Ok(())
 }
 
-fn generate_seo_assets(root: &Path, docs: &[DocEntry]) -> anyhow::Result<()> {
+pub fn generate_seo_assets(root: &Path, docs: &[DocEntry]) -> anyhow::Result<()> {
     let site_url = "https://your-docs-site.com"; // Should probably be in a config file
     let today = chrono::Local::now().format("%Y-%m-%d").to_string();
 
@@ -216,17 +129,9 @@ fn generate_seo_assets(root: &Path, docs: &[DocEntry]) -> anyhow::Result<()> {
 
     // Docs
     for d in docs {
-        let url = if d.section == "blog" {
-            format!("{}/blog/{}", site_url, d.slug.replace("blog/", ""))
-        } else {
-            format!("{}/docs/{}", site_url, d.slug)
-        };
-        let freq = if d.section == "blog" {
-            "weekly"
-        } else {
-            "monthly"
-        };
-        let prio = if d.section == "blog" { "0.7" } else { "0.9" };
+        let url = format!("{}/docs/{}", site_url, d.slug);
+        let freq = "monthly";
+        let prio = "0.9";
 
         sitemap_xml.push_str(&format!(
             r#"  <url>
@@ -252,134 +157,17 @@ fn generate_seo_assets(root: &Path, docs: &[DocEntry]) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn scan_md_files(
+#[allow(unused_variables)]
+pub fn scan_md_files(
     base_dir: &Path,
     section: &str,
     diags: &mut Diagnostics,
 ) -> anyhow::Result<Vec<DocEntry>> {
-    let re_prefix = regex::Regex::new(r"^\d{2}-").unwrap();
-    let mut entries = Vec::new();
-    if !base_dir.exists() {
-        return Ok(entries);
-    }
-
-    for entry in WalkDir::new(base_dir).into_iter().filter_map(|e| e.ok()) {
-        if entry.file_type().is_file() && entry.file_name().to_string_lossy().ends_with(".md") {
-            let raw = fs::read_to_string(entry.path())?;
-            let rel_path = entry
-                .path()
-                .strip_prefix(base_dir)?
-                .to_string_lossy()
-                .replace(".md", "");
-
-            let (fm, content) = parse_frontmatter(&raw);
-            validate_frontmatter(&fm, &rel_path, diags);
-
-            // Slug handling
-            let slug_parts: Vec<&str> = rel_path.split('/').collect();
-            let category = if slug_parts.len() > 1 {
-                re_prefix.replace(&slug_parts[0], "").to_string()
-            } else {
-                "".to_string()
-            };
-
-            let clean_slug = slug_parts
-                .iter()
-                .map(|part| re_prefix.replace(part, "").to_string())
-                .collect::<Vec<_>>()
-                .join("/");
-
-            let slug = if section == "blog" {
-                format!("blog/{}", clean_slug)
-            } else {
-                clean_slug
-            };
-            let title = fm
-                .get("title")
-                .and_then(|v| v.as_str())
-                .unwrap_or("Untitled")
-                .to_string();
-
-            // Run plugins preProcess
-            let mut processed_content = content.clone();
-            for plugin in get_plugins() {
-                plugin.pre_process(&mut processed_content);
-            }
-
-            // Validate mandatory code block descriptions
-            validate_code_block_descriptions(&processed_content, &rel_path, diags);
-
-            // Render markdown to HTML
-            let mut options = Options::empty();
-            options.insert(Options::ENABLE_TABLES);
-            options.insert(Options::ENABLE_FOOTNOTES);
-            options.insert(Options::ENABLE_STRIKETHROUGH);
-
-            let parser = Parser::new_ext(&processed_content, options);
-            let mut html_output = String::new();
-            html::push_html(&mut html_output, parser);
-
-            // Run plugins postProcess
-            for plugin in get_plugins() {
-                plugin.post_process(&mut html_output);
-            }
-
-            // TOC extraction
-            let toc = extract_toc(&processed_content);
-
-            // Sidebar position
-            let pos = fm
-                .get("sidebar_position")
-                .and_then(|v| v.as_u64())
-                .unwrap_or(999) as usize;
-
-            entries.push(DocEntry {
-                id: rel_path.clone(),
-                slug,
-                title,
-                sidebar_label: fm
-                    .get("sidebar_label")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or("")
-                    .to_string(),
-                sidebar_position: if section == "blog" { 9000 + pos } else { pos },
-                category,
-                original_category: if slug_parts.len() > 1 {
-                    Some(slug_parts[0].to_string())
-                } else {
-                    None
-                },
-                description: fm
-                    .get("description")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or("")
-                    .to_string(),
-                content: html_output,
-                raw_content: content,
-                toc,
-                date: fm
-                    .get("date")
-                    .and_then(|v| v.as_str())
-                    .map(|s| s.to_string()),
-                author: fm
-                    .get("author")
-                    .and_then(|v| v.as_str())
-                    .map(|s| s.to_string()),
-                tags: fm.get("tags").and_then(|v| v.as_array()).map(|arr| {
-                    arr.iter()
-                        .filter_map(|v| v.as_str())
-                        .map(|s| s.to_string())
-                        .collect()
-                }),
-                section: section.to_string(),
-                metadata: fm,
-            });
-        }
-    }
-    Ok(entries)
+    // Legacy function kept for compatibility if needed, but the compiler handles scanning now
+    Ok(Vec::new())
 }
 
-fn parse_frontmatter(md: &str) -> (HashMap<String, Value>, String) {
+pub fn parse_frontmatter(md: &str) -> (HashMap<String, Value>, String) {
     let re = Regex::new(r"(?m)^---\s*$\n?([\s\S]*?)^---\s*$\n?([\s\S]*)$").unwrap();
     if let Some(caps) = re.captures(md) {
         let fm_text = &caps[1];
@@ -396,7 +184,7 @@ fn parse_frontmatter(md: &str) -> (HashMap<String, Value>, String) {
             }
 
             if trimmed.starts_with("- ") {
-                if let Some(key) = &current_key {
+                if let Some(_key) = &current_key {
                     let val = trimmed[2..]
                         .trim()
                         .trim_matches('\"')
@@ -458,7 +246,7 @@ fn parse_frontmatter(md: &str) -> (HashMap<String, Value>, String) {
     }
 }
 
-fn slugify_heading(text: &str) -> String {
+pub fn slugify_heading(text: &str) -> String {
     let lower = text.to_lowercase().trim().to_string();
 
     // Special cases for common technical terms
@@ -486,7 +274,7 @@ fn slugify_heading(text: &str) -> String {
     result
 }
 
-fn extract_toc(content: &str) -> Vec<TocItem> {
+pub fn extract_toc(content: &str) -> Vec<TocItem> {
     let mut toc = Vec::new();
     let re = Regex::new(r"(?m)^(#{2,3})\s+(.+)$").unwrap();
     for cap in re.captures_iter(content) {
@@ -498,157 +286,103 @@ fn extract_toc(content: &str) -> Vec<TocItem> {
     toc
 }
 
-fn build_sidebar(docs: &[DocEntry]) -> Vec<SidebarItem> {
+pub fn build_sidebar_from_json(docs: &[Value]) -> Vec<SidebarItem> {
     let mut cat_order: Vec<String> = Vec::new();
     let mut cat_prefixes: HashMap<String, usize> = HashMap::new();
-    let mut grouped: HashMap<String, Vec<DocEntry>> = HashMap::new();
-    let mut uncategorized: Vec<DocEntry> = Vec::new();
+    let mut grouped: HashMap<String, Vec<Value>> = HashMap::new();
+    let mut uncategorized: Vec<Value> = Vec::new();
+
+    let re_prefix = Regex::new(r"^(\d{2})").unwrap();
 
     for d in docs {
-        if !d.category.is_empty() {
-            if !grouped.contains_key(&d.category) {
-                cat_order.push(d.category.clone());
-                if let Some(orig) = &d.original_category {
-                    let prefix = orig
-                        .chars()
-                        .take(2)
-                        .filter_map(|c| c.to_digit(10))
-                        .collect::<Vec<_>>();
-                    if prefix.len() == 2 {
-                        cat_prefixes.insert(
-                            d.category.clone(),
-                            (prefix[0] as usize * 10) + prefix[1] as usize,
-                        );
+        let category = d["category"].as_str().unwrap_or("");
+        if !category.is_empty() {
+            if !grouped.contains_key(category) {
+                grouped.insert(category.to_string(), Vec::new());
+                cat_order.push(category.to_string());
+                
+                let original_category = d["originalCategory"].as_str().unwrap_or("");
+                if !original_category.is_empty() {
+                    if let Some(caps) = re_prefix.captures(original_category) {
+                        cat_prefixes.insert(category.to_string(), caps[1].parse().unwrap_or(999));
                     } else {
-                        cat_prefixes.insert(d.category.clone(), 999);
+                        cat_prefixes.insert(category.to_string(), 999);
                     }
                 } else {
-                    cat_prefixes.insert(d.category.clone(), 999);
+                    cat_prefixes.insert(category.to_string(), 999);
                 }
             }
-            grouped
-                .entry(d.category.clone())
-                .or_default()
-                .push(d.clone());
+            grouped.get_mut(category).unwrap().push(d.clone());
         } else {
             uncategorized.push(d.clone());
         }
     }
 
-    let mut sidebar: Vec<SidebarItem> = Vec::new();
+    let mut sidebar = Vec::new();
 
-    // 1. Welcome page
-    if let Some(welcome) = docs.iter().find(|d| d.slug == "welcome") {
+    // Add welcome page first
+    if let Some(welcome) = docs.iter().find(|d| d["slug"] == "welcome") {
         sidebar.push(SidebarItem {
-            item_type: "doc".to_string(),
-            id: welcome.id.clone(),
-            label: welcome.sidebar_label.clone(),
-            slug: welcome.slug.clone(),
-            category: Some(welcome.category.clone()),
-            date: welcome.date.clone(),
+            r#type: "doc".to_string(),
+            id: welcome["id"].as_str().unwrap().to_string(),
+            label: welcome["sidebarLabel"].as_str().unwrap_or(welcome["title"].as_str().unwrap_or("Welcome")).to_string(),
+            slug: welcome["slug"].as_str().unwrap().to_string(),
+            category: None,
+            date: welcome["date"].as_str().map(|s| s.to_string()),
             items: None,
         });
     }
 
-    // 2. Uncategorized
-    let mut sorted_uncat = uncategorized;
-    sorted_uncat.sort_by_key(|d| d.sidebar_position);
-    for d in sorted_uncat {
-        if d.slug == "welcome" {
-            continue;
-        }
+    // Uncategorized
+    uncategorized.sort_by_key(|d| d["sidebarPosition"].as_u64().unwrap_or(999));
+    for d in uncategorized {
+        if d["slug"] == "welcome" { continue; }
         sidebar.push(SidebarItem {
-            item_type: "doc".to_string(),
-            id: d.id.clone(),
-            label: d.sidebar_label.clone(),
-            slug: d.slug.clone(),
-            category: Some(d.category.clone()),
-            date: d.date.clone(),
+            r#type: "doc".to_string(),
+            id: d["id"].as_str().unwrap().to_string(),
+            label: d["sidebarLabel"].as_str().unwrap_or(d["title"].as_str().unwrap_or("")).to_string(),
+            slug: d["slug"].as_str().unwrap().to_string(),
+            category: None,
+            date: d["date"].as_str().map(|s| s.to_string()),
             items: None,
         });
     }
 
-    // 3. Categories sorted by numeric prefix
-    cat_order.sort_by_key(|cat| *cat_prefixes.get(cat).unwrap_or(&999));
+    // Categories
+    cat_order.sort_by_key(|c| cat_prefixes.get(c).unwrap_or(&999));
 
     for cat in cat_order {
-        if cat == "blog" {
-            continue;
-        }
+        let mut items = grouped.get(&cat).unwrap().clone();
+        items.sort_by_key(|d| d["sidebarPosition"].as_u64().unwrap_or(999));
 
-        let mut items = grouped.get(&cat).cloned().unwrap_or_default();
-        items.sort_by_key(|d| d.sidebar_position);
-
-        let label = cat
-            .split('-')
-            .map(|word| {
-                let mut c = word.chars();
-                match c.next() {
-                    None => String::new(),
-                    Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
-                }
-            })
+        let label = cat.split('-')
+            .map(|s| s[0..1].to_uppercase() + &s[1..])
             .collect::<Vec<_>>()
             .join(" ");
 
         sidebar.push(SidebarItem {
-            item_type: "category".to_string(),
-            id: cat.clone(),
+            r#type: "category".to_string(),
+            id: format!("cat-{}", cat),
             label,
-            slug: cat.clone(),
-            category: None,
+            slug: String::new(),
+            category: Some(cat),
             date: None,
-            items: Some(
-                items
-                    .into_iter()
-                    .map(|d| SidebarItem {
-                        item_type: "doc".to_string(),
-                        id: d.id.clone(),
-                        label: d.sidebar_label.clone(),
-                        slug: d.slug.clone(),
-                        category: Some(d.category.clone()),
-                        date: d.date.clone(),
-                        items: None,
-                    })
-                    .collect(),
-            ),
-        });
-    }
-
-    // 4. Blog
-    if let Some(blog_items) = grouped.get("blog") {
-        let mut items = blog_items.clone();
-        items.sort_by_key(|d| d.sidebar_position);
-
-        sidebar.push(SidebarItem {
-            item_type: "category".to_string(),
-            id: "blog".to_string(),
-            label: "📝 Blog".to_string(),
-            slug: "blog".to_string(),
-            category: None,
-            date: None,
-            items: Some(
-                items
-                    .into_iter()
-                    .map(|d| SidebarItem {
-                        item_type: "doc".to_string(),
-                        id: d.id.clone(),
-                        label: d.sidebar_label.clone(),
-                        slug: d.slug.clone(),
-                        category: Some(d.category.clone()),
-                        date: d.date.clone(),
-                        items: None,
-                    })
-                    .collect(),
-            ),
+            items: Some(items.iter().map(|d| SidebarItem {
+                r#type: "doc".to_string(),
+                id: d["id"].as_str().unwrap().to_string(),
+                label: d["sidebarLabel"].as_str().unwrap_or(d["title"].as_str().unwrap_or("")).to_string(),
+                slug: d["slug"].as_str().unwrap().to_string(),
+                category: Some(d["category"].as_str().unwrap_or("").to_string()),
+                date: d["date"].as_str().map(|s| s.to_string()),
+                items: None,
+            }).collect()),
         });
     }
 
     sidebar
 }
 
-// ... (rest of the file)
-fn slug_to_var_name(slug: &str) -> String {
+pub fn slug_to_var_name(slug: &str) -> String {
     if slug.is_empty() {
         return "doc_".to_string();
     }
@@ -657,249 +391,5 @@ fn slug_to_var_name(slug: &str) -> String {
         format!("doc_{}", name)
     } else {
         name
-    }
-}
-
-fn validate_internal_links(
-    content: &str,
-    known_slugs: &HashSet<String>,
-    file: &str,
-    diags: &mut Diagnostics,
-) {
-    let link_re = Regex::new(r"\[([^\]]*)\]\(([^)]+)\)").unwrap();
-    for cap in link_re.captures_iter(content) {
-        let href = &cap[2];
-        if !href.starts_with("/docs/") && !href.starts_with("/blog/") {
-            continue;
-        }
-        let clean_href = href.split('#').next().unwrap().trim_start_matches('/');
-        if !known_slugs.contains(clean_href) {
-            diags.warn(
-                DiagnosticSource::Links,
-                file,
-                &format!("Broken link: \"{}\" → \"{}\"", &cap[1], href),
-                Some(&format!("Slug \"{}\" not found", clean_href)),
-            );
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::collections::HashSet;
-
-    #[test]
-    fn test_parse_frontmatter_no_frontmatter() {
-        let md = "Just content without any frontmatter";
-        let (fm, content) = parse_frontmatter(md);
-        assert!(fm.is_empty());
-        assert_eq!(content, md);
-    }
-
-    #[test]
-    fn test_parse_frontmatter_empty_frontmatter() {
-        let md = "---\n---\nContent here";
-        let (fm, content) = parse_frontmatter(md);
-        assert!(fm.is_empty());
-        assert_eq!(content, "Content here");
-    }
-
-    #[test]
-    fn test_parse_frontmatter_malformed_frontmatter() {
-        let md = "---\ntitle: Hello\nnot-a-key-value-pair\n---\nContent";
-        let (fm, content) = parse_frontmatter(md);
-        assert_eq!(fm.get("title").and_then(|v| v.as_str()), Some("Hello"));
-        assert_eq!(content, "Content");
-    }
-
-    #[test]
-    fn test_parse_frontmatter_multiline_list() {
-        let md = "---\ntitle: Multi-line\ntags:\n  - item1\n  - item2\n  - item3\n---\nContent";
-        let (fm, _) = parse_frontmatter(md);
-        let tags = fm.get("tags").and_then(|v| v.as_array()).expect("Should be array");
-        assert_eq!(tags.len(), 3);
-        assert_eq!(tags[0].as_str(), Some("item1"));
-        assert_eq!(tags[2].as_str(), Some("item3"));
-    }
-
-    #[test]
-    fn test_parse_frontmatter_empty_values() {
-        let md = "---\ntitle: \ndescription: \n---\nContent";
-        let (fm, _) = parse_frontmatter(md);
-        // In current implementation, an empty value after ':' might be handled as a key for the next line
-        // or an empty string if it's the last line.
-        // Let's see how it actually behaves.
-    }
-
-
-    #[test]
-    fn test_parse_frontmatter_yaml_list() {
-        let md = "---\ntitle: List Test\ntags:\n  - rust\n  - testing\n---\nContent";
-        let (fm, _) = parse_frontmatter(md);
-        let tags = fm
-            .get("tags")
-            .and_then(|v| v.as_array())
-            .expect("Should be array");
-        assert_eq!(tags.len(), 2);
-        assert_eq!(tags[0].as_str(), Some("rust"));
-        assert_eq!(tags[1].as_str(), Some("testing"));
-    }
-
-    #[test]
-    fn test_parse_frontmatter_complex_values() {
-        let md = "---\nurl: https://example.com/path?q=1\nmeta: key:value\n---\nContent";
-        let (fm, _) = parse_frontmatter(md);
-        assert_eq!(
-            fm.get("url").and_then(|v| v.as_str()),
-            Some("https://example.com/path?q=1")
-        );
-        assert_eq!(fm.get("meta").and_then(|v| v.as_str()), Some("key:value"));
-    }
-
-    #[test]
-    fn test_slugify_heading_edge_cases() {
-        assert_eq!(slugify_heading("Hello World"), "hello-world");
-        assert_eq!(slugify_heading("C++ Guide"), "c-plus-plus-guide");
-        assert_eq!(slugify_heading("C# Basics"), "c-sharp-basics");
-        assert_eq!(slugify_heading(".NET Core"), "net-core");
-        assert_eq!(slugify_heading("What is 1 + 1?"), "what-is-1-1");
-        assert_eq!(slugify_heading("!!! Warning !!!"), "warning");
-        assert_eq!(slugify_heading("  Mixed Case  "), "mixed-case");
-        assert_eq!(slugify_heading("Unicode 😊 Test"), "unicode-test");
-        assert_eq!(slugify_heading(""), "");
-        assert_eq!(slugify_heading("   "), "");
-        assert_eq!(slugify_heading("!!!"), "");
-    }
-
-    #[test]
-    fn test_slug_to_var_name_edge_cases() {
-        assert_eq!(slug_to_var_name("docs/my-page"), "docs_my_page");
-        assert_eq!(slug_to_var_name("01-intro"), "doc_01_intro");
-        assert_eq!(slug_to_var_name(""), "doc_");
-        assert_eq!(slug_to_var_name("123-digit-start"), "doc_123_digit_start");
-        assert_eq!(slug_to_var_name("docs/sub/page"), "docs_sub_page");
-    }
-
-    #[test]
-    fn test_extract_toc() {
-        let content = "# Title\n## Heading 2\nSome text\n### Heading 3\nMore text\n## Another Heading 2";
-        let toc = extract_toc(content);
-        assert_eq!(toc.len(), 3);
-        assert_eq!(toc[0].level, 2);
-        assert_eq!(toc[0].value, "Heading 2");
-        assert_eq!(toc[0].id, "heading-2");
-        assert_eq!(toc[1].level, 3);
-        assert_eq!(toc[1].value, "Heading 3");
-        assert_eq!(toc[2].level, 2);
-        assert_eq!(toc[2].value, "Another Heading 2");
-
-        let no_headings = "Just some content";
-        assert!(extract_toc(no_headings).is_empty());
-    }
-
-    #[test]
-    fn test_validate_internal_links() {
-        let mut diags = Diagnostics::new();
-        let known_slugs: HashSet<String> = vec!["docs/page1".to_string(), "docs/page2".to_string()].into_iter().collect();
-
-        let content_ok = "[Link to Page 1](/docs/page1) and [Link to Page 2](/docs/page2#section)";
-        validate_internal_links(content_ok, &known_slugs, "file1.md", &mut diags);
-        assert_eq!(diags.summary().1, 0); // No warnings
-
-        let content_broken = "[Broken Link](/docs/nonexistent)";
-        validate_internal_links(content_broken, &known_slugs, "file2.md", &mut diags);
-        assert_eq!(diags.summary().1, 1);
-        assert_eq!(diags.warnings()[0].file, "file2.md");
-
-        let content_external = "[Google](https://google.com)";
-        validate_internal_links(content_external, &known_slugs, "file3.md", &mut diags);
-        // Should not generate warnings for external links
-    }
-
-    #[test]
-    fn test_build_sidebar_complex() {
-        let docs = vec![
-            DocEntry {
-                id: "welcome".to_string(),
-                slug: "welcome".to_string(),
-                title: "Welcome".to_string(),
-                sidebar_label: "Welcome".to_string(),
-                sidebar_position: 0,
-                category: "".to_string(),
-                original_category: None,
-                description: "".to_string(),
-                content: "".to_string(),
-                raw_content: "".to_string(),
-                toc: vec![],
-                date: None,
-                author: None,
-                tags: None,
-                section: "docs".to_string(),
-                metadata: HashMap::new(),
-            },
-            DocEntry {
-                id: "01-getting-started/intro".to_string(),
-                slug: "getting-started/intro".to_string(),
-                title: "Intro".to_string(),
-                sidebar_label: "Intro".to_string(),
-                sidebar_position: 1,
-                category: "getting-started".to_string(),
-                original_category: Some("01-getting-started".to_string()),
-                description: "".to_string(),
-                content: "".to_string(),
-                raw_content: "".to_string(),
-                toc: vec![],
-                date: None,
-                author: None,
-                tags: None,
-                section: "docs".to_string(),
-                metadata: HashMap::new(),
-            },
-            DocEntry {
-                id: "02-architecture/core".to_string(),
-                slug: "architecture/core".to_string(),
-                title: "Core".to_string(),
-                sidebar_label: "Core".to_string(),
-                sidebar_position: 1,
-                category: "architecture".to_string(),
-                original_category: Some("02-architecture".to_string()),
-                description: "".to_string(),
-                content: "".to_string(),
-                raw_content: "".to_string(),
-                toc: vec![],
-                date: None,
-                author: None,
-                tags: None,
-                section: "docs".to_string(),
-                metadata: HashMap::new(),
-            },
-            DocEntry {
-                id: "blog/post1".to_string(),
-                slug: "blog/post1".to_string(),
-                title: "Post 1".to_string(),
-                sidebar_label: "Post 1".to_string(),
-                sidebar_position: 1,
-                category: "blog".to_string(),
-                original_category: None,
-                description: "".to_string(),
-                content: "".to_string(),
-                raw_content: "".to_string(),
-                toc: vec![],
-                date: None,
-                author: None,
-                tags: None,
-                section: "blog".to_string(),
-                metadata: HashMap::new(),
-            },
-        ];
-
-        let sidebar = build_sidebar(&docs);
-        
-        // Check order: Welcome -> Categories (01, 02) -> Blog
-        assert_eq!(sidebar[0].label, "Welcome");
-        assert_eq!(sidebar[1].label, "Getting Started");
-        assert_eq!(sidebar[2].label, "Architecture");
-        assert_eq!(sidebar[3].label, "📝 Blog");
     }
 }

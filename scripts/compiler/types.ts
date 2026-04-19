@@ -56,13 +56,12 @@ export interface CompilationUnit {
   metadata?: DocMetadata;
   toc?: TocItem[];
   tokens?: marked.Token[];
-  section: "docs" | "blog";
+  section: "docs";
   hash?: string;
 }
 
 export interface CompilerConfig {
   docsDir: string;
-  blogDir: string;
   outputDir: string;
   siteUrl: string;
   mobileBreakpoint: number;
