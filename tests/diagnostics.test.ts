@@ -32,7 +32,8 @@ describe("Diagnostics", () => {
     expect(diags.all()).toHaveLength(1);
     expect(diags.hasErrors()).toBe(true);
     expect(diags.errors()).toHaveLength(1);
-    expect(diags.errors()[0].severity).toBe("error");
+    const errors = diags.errors();
+    expect(errors[0]?.severity).toBe("error");
   });
 
   test("records warning", () => {
@@ -44,12 +45,15 @@ describe("Diagnostics", () => {
   test("records info", () => {
     diags.info("build", "test.md", "File processed");
     expect(diags.all()).toHaveLength(1);
-    expect(diags.all()[0].severity).toBe("info");
+    const all = diags.all();
+    expect(all[0]?.severity).toBe("info");
   });
 
   test("stores detail", () => {
     diags.error("plugin", "test.md", "Plugin failed", "Syntax error");
-    const d = diags.errors()[0];
+    const errors = diags.errors();
+    const d = errors[0];
+    if (!d) throw new Error("No error found");
     expect(d.detail).toBe("Syntax error");
   });
 
@@ -89,7 +93,7 @@ describe("Diagnostics", () => {
     const json = diags.toJSON();
     expect(Array.isArray(json)).toBe(true);
     expect(json).toHaveLength(1);
-    expect(json[0].message).toBe("Missing title");
+    expect(json[0]?.message).toBe("Missing title");
   });
 });
 
@@ -107,14 +111,16 @@ describe("validateFrontmatter", () => {
     const diags = new Diagnostics();
     validateFrontmatter({ description: "World" }, "test.md", diags);
     expect(diags.errors()).toHaveLength(1);
-    expect(diags.errors()[0].message).toContain("title");
+    const errors = diags.errors();
+    expect(errors[0]?.message).toContain("title");
   });
 
   test("warning when description is missing", () => {
     const diags = new Diagnostics();
     validateFrontmatter({ title: "Hello" }, "test.md", diags);
     expect(diags.warnings()).toHaveLength(1);
-    expect(diags.warnings()[0].message).toContain("description");
+    const warnings = diags.warnings();
+    expect(warnings[0]?.message).toContain("description");
   });
 
   test("both errors and warnings when both missing", () => {
@@ -150,7 +156,8 @@ describe("validateUniqueSlugs", () => {
       diags
     );
     expect(diags.errors()).toHaveLength(1);
-    expect(diags.errors()[0].message).toContain("docs/a");
+    const errors = diags.errors();
+    expect(errors[0]?.message).toContain("docs/a");
   });
 
   test("multiple duplicates reported", () => {
@@ -191,7 +198,8 @@ describe("validateInternalLinks", () => {
     const content = "See [missing](/docs/missing-page)";
     validateInternalLinks(content, knownSlugs, "test.md", diags);
     expect(diags.warnings()).toHaveLength(1);
-    expect(diags.warnings()[0].message).toContain("missing-page");
+    const warnings = diags.warnings();
+    expect(warnings[0]?.message).toContain("missing-page");
   });
 
   test("ignores external links", () => {

@@ -31,39 +31,110 @@
   flex-shrink: 0;
 }
 
-.menu-btn,
-.toc-btn {
-  background: none;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  padding: 0.3rem 0.5rem;
-  border-radius: 0.3rem;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  display: flex;
+/* ============================================
+   TOP BAR BUTTONS (UNIFIED)
+   ============================================ */
+
+.top-bar-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  transition: all 0.15s;
-}
-
-.menu-btn:hover,
-.toc-btn:hover {
+  justify-content: center;
   background: var(--bg-surface);
-  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
 }
 
-.toc-btn-icon {
-  font-size: 0.7rem;
+.top-bar-btn:hover {
+  background: var(--bg);
+  border-color: var(--text-secondary);
+  color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
 }
-.toc-btn-label {
-  font-weight: 600;
-  font-size: 0.7rem;
+
+.top-bar-btn:active {
+  transform: translateY(0);
+}
+
+.top-bar-btn.active {
+  border-color: var(--ifm-color-primary);
+  background: rgba(37, 99, 235, 0.06);
+  color: var(--ifm-color-primary);
+}
+
+.top-bar-action-btn {
+  padding: 0 0.5rem;
+}
+
+.top-bar-action-btn .btn-icon {
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-bar-action-btn .btn-text {
+  font-size: 0.8rem;
+  margin-left: 0.4rem;
+  font-weight: 500;
+}
+
+.top-bar-action-btn .btn-shortcut {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.3rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  margin-left: 0.5rem;
+  opacity: 0.5;
+}
+
+/* Specific adjustment for Search trigger to be wider on desktop */
+.top-bar-action-btn:first-child {
+  min-width: 200px;
+  justify-content: flex-start;
+  padding-left: 0.75rem;
+}
+
+@media (max-width: 800px) {
+  .top-bar-action-btn:first-child {
+    min-width: 32px;
+    padding: 0;
+    justify-content: center;
+  }
+  .btn-text, .btn-shortcut {
+    display: none;
+  }
+}
+
+.menu-btn {
+  margin-right: 0.5rem;
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .site-title {
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text);
+  transition: opacity 0.2s;
+}
+
+.site-title:hover {
+  opacity: 0.8;
 }
 
 .top-bar-sep {
@@ -106,7 +177,7 @@
 }
 
 /* ============================================
-   SIDEBAR (desktop + mobile overlay)
+   SIDEBAR (desktop + mobile drawer)
    ============================================ */
 
 .sidebar {
@@ -120,7 +191,26 @@
   height: calc(100vh - var(--topbar-height));
   padding: 0.6rem 0;
   scroll-padding-top: 1rem;
-  scroll-padding-bottom: 50vh;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 50;
+}
+
+@media (max-width: 800px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 2000; /* Above top bar but below search modal */
+    height: 100vh;
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.2);
+    transform: translateX(-100%);
+    display: flex !important; /* Always flex but hidden by transform */
+  }
+
+  .mobile-sidebar-open .sidebar {
+    transform: translateX(0);
+  }
 }
 
 .sidebar-content {
@@ -191,14 +281,6 @@
   border-left-color: var(--ifm-color-primary);
 }
 
-[data-theme="catppuccin"] .sidebar-link.active,
-[data-theme="tokyonight"] .sidebar-link.active,
-[data-theme="gruvbox"] .sidebar-link.active,
-[data-theme="nord"] .sidebar-link.active,
-[data-theme="everforest"] .sidebar-link.active {
-  background: rgba(138, 173, 244, 0.12);
-}
-
 .sidebar-link-label {
   flex: 1;
   min-width: 0;
@@ -207,61 +289,18 @@
   white-space: nowrap;
 }
 
-.sidebar-link-date {
-  font-size: 0.65rem;
-  color: var(--text-secondary);
-  opacity: 0.6;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* ============================================
-   OVERLAY (mobile panels)
-   ============================================ */
-
-.overlay {
+.mobile-overlay {
   position: fixed;
   inset: 0;
-  z-index: 200;
-  background: rgba(0, 0, 0, 0.4);
-  animation: overlay-fade 0.15s ease;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1500;
+  animation: fadeIn 0.2s ease-out;
 }
 
-@keyframes overlay-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.overlay-sidebar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: var(--sidebar-width);
-  max-width: 85vw;
-  height: 100%;
-  background: var(--bg);
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
-  animation: slide-in 0.2s ease;
-  overflow-y: auto;
-  scroll-padding-top: 1rem;
-  scroll-padding-bottom: 50vh;
-}
-
-.overlay-sidebar .sidebar-content {
-  padding: 0 0.4rem 50vh;
-}
-
-@keyframes slide-in {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .overlay-toc {

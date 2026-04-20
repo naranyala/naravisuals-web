@@ -42,7 +42,7 @@ describe("Sidebar", () => {
     renderWithServices(<Sidebar sidebar={mockSidebar} currentSlug="setup" onNavigate={mock()} />);
     const active = document.querySelectorAll(".sidebar-link.active");
     expect(active.length).toBe(1);
-    expect(active[0].textContent).toContain("Setup");
+    expect(active[0]?.textContent).toContain("Setup");
   });
 
   test("calls onNavigate when clicking a link", () => {
@@ -52,7 +52,7 @@ describe("Sidebar", () => {
     const setupLabel = Array.from(labels).find((l) => l.textContent === "Setup");
     if (setupLabel) {
       const link = setupLabel.closest(".sidebar-link");
-      if (link) link.click();
+      if (link) (link as HTMLElement).click();
       expect(nav).toHaveBeenCalledWith("setup");
     }
   });

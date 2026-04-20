@@ -19,7 +19,9 @@ const TYPE_CODES: Record<string, string> = {
 };
 
 function getTypeCode(type: string): string {
-  return TYPE_CODES[type.toLowerCase()] || type.toLowerCase()[0];
+  const lower = type.toLowerCase();
+  const firstChar = lower[0];
+  return TYPE_CODES[lower] || (firstChar !== undefined ? firstChar : "x");
 }
 
 export const admonitionValidator: MarkdownValidator = {
@@ -35,8 +37,9 @@ export const admonitionValidator: MarkdownValidator = {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
+      if (line === undefined) continue;
       const match = line.match(/^:::(\w+)/);
-      if (match) {
+      if (match && match[1] !== undefined) {
         const type = match[1].toLowerCase();
         totalAdmonitions++;
         typeCounts[type] = (typeCounts[type] || 0) + 1;

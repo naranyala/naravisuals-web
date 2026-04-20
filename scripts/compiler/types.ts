@@ -2,7 +2,7 @@
  * Core types for the Documentation Compiler Engine.
  */
 
-import type { marked } from "marked";
+import type { Token } from "marked";
 
 export type DiagnosticSeverity = "error" | "warning" | "info";
 export type DiagnosticSource =
@@ -55,8 +55,8 @@ export interface CompilationUnit {
   html?: string;
   metadata?: DocMetadata;
   toc?: TocItem[];
-  tokens?: marked.Token[];
-  section: "docs";
+  tokens?: Token[];
+  section: "docs" | "blog";
   hash?: string;
 }
 

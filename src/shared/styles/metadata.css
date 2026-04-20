@@ -96,3 +96,68 @@
   font-size: 0.75rem;
   font-weight: 500;
 }
+
+/* ============================================
+   REFERENCE PANEL (UNIFIED)
+   ============================================ */
+
+.reference-panel-unified {
+  margin-top: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: var(--bg-surface);
+}
+
+.reference-tabs {
+  display: flex;
+  background: var(--bg-dim);
+  border-bottom: 1px solid var(--border);
+}
+
+.ref-tab {
+  flex: 1;
+  padding: 0.6rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.ref-tab:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text);
+}
+
+.ref-tab.active {
+  background: var(--bg-surface);
+  color: var(--ifm-color-primary);
+  border-bottom: 2px solid var(--ifm-color-primary);
+}
+
+.reference-content {
+  padding: 0.5rem;
+}
+
+.ref-empty-state {
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.article-refs-panel {
+  border: none !important;
+  background: transparent !important;
+  margin-top: 0 !important;
+}
+
+.metadata-panel {
+  border: none !important;
+  background: transparent !important;
+  margin-top: 0 !important;
+}

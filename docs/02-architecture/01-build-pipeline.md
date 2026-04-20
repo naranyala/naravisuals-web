@@ -99,25 +99,24 @@ This 1000+ line TypeScript script is the entire build engine. It does:
 
 ### File Discovery
 
-The scanner walks directories recursively, finding all `.md` files:
+The scanner uses `fast-glob` to identify markdown files efficiently across the project structure. This replaces manual recursive directory walking, providing better performance and native support for ignore patterns.
 
-```typescript:desc=Recursive directory walker for markdown files.
-function scanMdFiles(baseDir: string, section: "docs" | "blog"): DocEntry[] {
-  if (!fs.existsSync(baseDir)) return [];
-  const entries: DocEntry[] = [];
-  function walk(dir: string) {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(full);
-      else if (entry.isFile() && entry.name.endsWith(".md")) {
-        // Process this file...
-      }
-    }
-  }
-  walk(baseDir);
-  return entries;
+```typescript:desc=Optimized file discovery using fast-glob.
+import glob from "fast-glob";
+
+async function scanMdFiles(baseDir: string): Promise<string[]> {
+  // Finds all .md files recursively with absolute paths
+  return await glob("**/*.md", { cwd: baseDir, absolute: true });
 }
 ```
+
+### Build-Time Quality Enforcement
+
+The build pipeline now enforces strict quality standards through mandatory steps:
+
+1.  **TypeScript Verification**: Every build runs `tsc --noEmit` across the entire codebase. The build will fail if any type errors are detected.
+2.  **Strict Linting**: Biome is integrated into the pipeline with elevated rule severities. Unused imports, variables, and unsafe patterns are treated as errors that halt the build.
+3.  **Cross-Document Validation**: The compiler checks for duplicate slugs and broken internal links between documents before generating artifacts.
 
 ### Frontmatter Parsing
 

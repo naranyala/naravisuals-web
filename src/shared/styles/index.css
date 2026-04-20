@@ -8,6 +8,7 @@
 
 /* 2. Core layout: topbar, sidebar, overlay, scroll, main */
 @import "./layout.css";
+@import "./modal.css";
 
 /* 3. Panels: settings, print button, AST viewer, fonts, scroll-to-top */
 @import "./panels.css";

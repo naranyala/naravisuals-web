@@ -60,7 +60,7 @@ describe("ServicesProvider", () => {
     render(<BrokenComponent />);
 
     expect(caughtError).not.toBeNull();
-    expect(caughtError?.message).toContain(
+    expect((caughtError as any)?.message).toContain(
       "useServices() must be used within a <ServicesProvider>"
     );
   });

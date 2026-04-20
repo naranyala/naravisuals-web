@@ -8,6 +8,7 @@
  */
 
 import { useMemo, useState } from "react";
+import { clsx } from "clsx";
 
 interface FootnoteEntry {
   identifier: string;
@@ -19,7 +20,7 @@ interface FootnoteEntry {
 
 interface ArticleRefsPanelProps {
   /** AST tokens from marked parser */
-  markdownAst?: any[];
+  markdownAst?: readonly any[];
 }
 
 export function ArticleRefsPanel({ markdownAst }: ArticleRefsPanelProps) {
@@ -32,7 +33,7 @@ export function ArticleRefsPanel({ markdownAst }: ArticleRefsPanelProps) {
     const footnotesMap = new Map<string, FootnoteEntry>();
 
     // Walk AST tokens to find footnote references and definitions
-    function walkTokens(tokens: any[]) {
+    function walkTokens(tokens: readonly any[]) {
       for (const token of tokens) {
         if (typeof token !== "object" || token === null) continue;
 
@@ -42,7 +43,7 @@ export function ArticleRefsPanel({ markdownAst }: ArticleRefsPanelProps) {
           let match: RegExpExecArray | null;
           while ((match = refRegex.exec(token.text)) !== null) {
             const identifier = match[1];
-            if (!footnotesMap.has(identifier)) {
+            if (identifier && !footnotesMap.has(identifier)) {
               footnotesMap.set(identifier, {
                 identifier,
                 referenceText: `[^${identifier}]`,
@@ -62,13 +63,13 @@ export function ArticleRefsPanel({ markdownAst }: ArticleRefsPanelProps) {
             if (defMatch) {
               const identifier = defMatch[1];
               const definitionText = defMatch[2]?.trim() || "";
-              if (footnotesMap.has(identifier)) {
+              if (identifier && footnotesMap.has(identifier)) {
                 const entry = footnotesMap.get(identifier);
                 if (entry) {
                   entry.definitionText = definitionText;
                   entry.hasDefinition = definitionText.length > 0;
                 }
-              } else {
+              } else if (identifier) {
                 footnotesMap.set(identifier, {
                   identifier,
                   referenceText: `[^${identifier}]`,
@@ -96,9 +97,6 @@ export function ArticleRefsPanel({ markdownAst }: ArticleRefsPanelProps) {
     return Array.from(footnotesMap.values());
   }, [markdownAst]);
 
-  // Don't render if no footnotes
-  if (footnotes.length === 0) return null;
-
   return (
     <div className="article-refs-panel">
       <button
@@ -109,35 +107,39 @@ export function ArticleRefsPanel({ markdownAst }: ArticleRefsPanelProps) {
         <span className="article-refs-header-text">
           📖 References & Footnotes ({footnotes.length})
         </span>
-        <span className={`article-refs-chevron ${isOpen ? "open" : ""}`}>▾</span>
+        <span className={clsx("article-refs-chevron", { open: isOpen })}>▾</span>
       </button>
 
       {isOpen && (
         <div className="article-refs-content">
-          <ol className="article-refs-list">
-            {footnotes.map((footnote, idx) => (
-              <li key={footnote.identifier} className="article-ref-item">
-                <div className="article-ref-header">
-                  <span className="article-ref-identifier">
-                    <sup>{idx + 1}</sup> [{footnote.identifier}]
-                  </span>
-                  {!footnote.hasDefinition && footnote.hasReference && (
-                    <span className="article-ref-warning" title="No definition found">
-                      ⚠️ No definition
+          {footnotes.length > 0 ? (
+            <ol className="article-refs-list">
+              {footnotes.map((footnote, idx) => (
+                <li key={footnote.identifier} className="article-ref-item">
+                  <div className="article-ref-header">
+                    <span className="article-ref-identifier">
+                      <sup>{idx + 1}</sup> [{footnote.identifier}]
                     </span>
+                    {!footnote.hasDefinition && footnote.hasReference && (
+                      <span className="article-ref-warning" title="No definition found">
+                        ⚠️ No definition
+                      </span>
+                    )}
+                  </div>
+                  {footnote.hasDefinition && (
+                    <div
+                      className="article-ref-definition"
+                      dangerouslySetInnerHTML={{
+                        __html: footnote.definitionText,
+                      }}
+                    />
                   )}
-                </div>
-                {footnote.hasDefinition && (
-                  <div
-                    className="article-ref-definition"
-                    dangerouslySetInnerHTML={{
-                      __html: footnote.definitionText,
-                    }}
-                  />
-                )}
-              </li>
-            ))}
-          </ol>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <div className="ref-empty-state">No references found in this article.</div>
+          )}
         </div>
       )}
     </div>

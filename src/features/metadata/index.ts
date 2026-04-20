@@ -10,3 +10,4 @@
 
 export { ArticleRefsPanel } from "./ArticleRefsPanel";
 export { MetadataPanel } from "./MetadataPanel";
+export { ReferencePanel } from "./ReferencePanel";

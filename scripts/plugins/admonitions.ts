@@ -70,6 +70,7 @@ export const admonitionsPlugin: MarkdownPlugin = {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
+      if (line === undefined) continue;
 
       // Toggle code block state on triple-backtick lines
       if (line.trimStart().startsWith("```")) {
@@ -100,7 +101,7 @@ export const admonitionsPlugin: MarkdownPlugin = {
 
       // Check for admonition start
       const admonitionMatch = line.match(/^:::(\w+)([^\n]*)$/);
-      if (admonitionMatch) {
+      if (admonitionMatch && admonitionMatch[1] !== undefined && admonitionMatch[2] !== undefined) {
         // If we're already in an admonition, this might be a nested one or content
         // For simplicity, treat it as content
         if (currentAdmonition) {
@@ -169,7 +170,7 @@ export const admonitionsPlugin: MarkdownPlugin = {
       const label = block.customTitle || meta.label;
 
       // Process the inner content through marked to get HTML
-      const innerHtml = marked.parse(block.content) as string;
+      const innerHtml = marked.parse(block.content) as any as string;
 
       const admonitionHtml = [
         `<div class="admonition admonition-${block.type}">`,

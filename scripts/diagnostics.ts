@@ -16,11 +16,13 @@ export function validateCodeBlockDescriptions(
   let startLine = 0;
 
   lines.forEach((line, index) => {
+    if (line === undefined) return;
     const match = line.match(/^(\s*)(`{3,}|~{3,})(\w+)?(.*)$/);
 
     if (inCodeBlock) {
-      if (match) {
-        const [_full, _indent, fence, lang] = match;
+      if (match && match[2] !== undefined) {
+        const fence = match[2];
+        const lang = match[3];
         // Closing fence must be at least as long as the opening fence and use the same character
         if (fence.startsWith(fenceChar) && fence.length >= fenceLength && !lang) {
           inCodeBlock = false;
@@ -30,16 +32,17 @@ export function validateCodeBlockDescriptions(
       return;
     }
 
-    if (match) {
-      const [_full, _indent, fence, language, infoString] = match;
+    if (match && match[2] !== undefined && match[4] !== undefined) {
+      const fence = match[2];
+      const language = match[3];
+      const infoString = match[4];
+      
       inCodeBlock = true;
-      fenceChar = fence[0];
+      fenceChar = fence[0] || "`";
       fenceLength = fence.length;
       startLine = index + 1;
 
       // Check for description in both colon syntax and brace syntax
-      // 1. Colon syntax: :desc=...
-      // 2. Brace syntax: {description="..."} or {desc="..."}
       const hasDesc =
         infoString.includes(":desc=") ||
         infoString.includes(":description=") ||
@@ -65,7 +68,8 @@ export type DiagnosticSource =
   | "plugin"
   | "content"
   | "build"
-  | "admonitions";
+  | "admonitions"
+  | "mermaid";
 
 export interface Diagnostic {
   severity: DiagnosticSeverity;
@@ -196,9 +200,10 @@ export function validateInternalLinks(
   while ((match = linkRegex.exec(content)) !== null) {
     const href = match[2];
     const text = match[1];
+    if (href === undefined || text === undefined) continue;
     if (!href.startsWith("/docs/")) continue;
 
-    const cleanHref = href.split("?")[0].split("#")[0].replace(/^\//, "");
+    const cleanHref = (href.split("?")[0] || "").split("#")[0]?.replace(/^\//, "") || "";
     const slug = cleanHref.startsWith("docs/") ? cleanHref.slice(5) : cleanHref;
 
     if (!knownSlugs.has(slug)) {
@@ -222,10 +227,10 @@ export function validateFrontmatter(
   file: string,
   diags: Diagnostics
 ): void {
-  if (!fm.title) {
+  if (!fm["title"]) {
     diags.error("frontmatter", file, "Missing required field: title");
   }
-  if (!fm.description) {
+  if (!fm["description"]) {
     diags.warn("frontmatter", file, "Missing recommended field: description");
   }
 }
@@ -277,9 +282,11 @@ export function analyzeAdmonitions(
   let total = 0;
 
   while ((match = admonitionRegex.exec(markdownContent)) !== null) {
-    const type = match[1].toLowerCase();
-    types[type] = (types[type] || 0) + 1;
-    total++;
+    const type = match[1]?.toLowerCase();
+    if (type) {
+      types[type] = (types[type] || 0) + 1;
+      total++;
+    }
   }
 
   const recommendations: string[] = [];
@@ -353,21 +360,25 @@ export function analyzeContent(
   let match: RegExpExecArray | null;
   while ((match = codeBlockRegex.exec(markdownContent)) !== null) {
     stats.codeBlocks++;
-    if (match[1]?.toLowerCase() === "mermaid") {
+    const lang = match[1]?.toLowerCase();
+    if (lang === "mermaid") {
       stats.mermaidBlocks++;
     }
   }
 
   const admonitionRegex = /:::(\w+)/g;
   while ((match = admonitionRegex.exec(markdownContent)) !== null) {
-    const type = match[1].toLowerCase();
-    stats.admonitions++;
-    stats.admonitionTypes[type] = (stats.admonitionTypes[type] || 0) + 1;
+    const type = match[1]?.toLowerCase();
+    if (type) {
+      stats.admonitions++;
+      stats.admonitionTypes[type] = (stats.admonitionTypes[type] || 0) + 1;
+    }
   }
 
   const refRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   while ((match = refRegex.exec(markdownContent)) !== null) {
-    if (!match[2].startsWith("/") && !match[2].startsWith("#")) {
+    const url = match[2];
+    if (url && !url.startsWith("/") && !url.startsWith("#")) {
       stats.references++;
     }
   }

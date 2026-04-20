@@ -11,6 +11,7 @@ import {
   type IStorageService,
   type IThemeService,
 } from "./container";
+import { type IEventBusService, createEventBusService } from "./event-bus";
 
 // ─── Mock Types ───────────────────────────────────────────────────────────
 
@@ -130,14 +131,30 @@ export const createMockDom = (): MockDom => {
 
 // ─── Mock Theme ───────────────────────────────────────────────────────────
 
-export const createMockTheme = (storage: IStorageService): IThemeService => ({
-  getInitialTheme: () => {
-    return storage.getItem("theme") === "dark";
-  },
-  applyTheme: () => {},
-  toggleTheme: (current: boolean) => {
-    const next = !current;
-    storage.setItem("theme", next ? "dark" : "light");
-    return next;
-  },
-});
+export const createMockTheme = (
+  storage: IStorageService,
+  events: IEventBusService = createEventBusService()
+): IThemeService => {
+  let mermaidLoading = false;
+  return {
+    getInitialTheme: () => {
+      return storage.getItem("theme") === "dark";
+    },
+    applyTheme: () => {},
+    toggleTheme: (current: boolean) => {
+      const next = !current;
+      storage.setItem("theme", next ? "dark" : "light");
+      events.emit("theme:change", { theme: next ? "dark" : "light", isDark: next });
+      return next;
+    },
+    getMermaidLoading: () => mermaidLoading,
+    setMermaidLoading: (loading: boolean) => {
+      mermaidLoading = loading;
+      events.emit("mermaid:loading", loading);
+    },
+    onMermaidLoadingChange: (callback: (loading: boolean) => void) => {
+      events.on("mermaid:loading", callback);
+      return () => events.off("mermaid:loading", callback);
+    },
+  };
+};

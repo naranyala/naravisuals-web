@@ -7,7 +7,7 @@
 
 import { useEffect } from "react";
 
-export function useTitle(docTitle: string, siteName = "Docs") {
+export function useTitle(docTitle: string, siteName = (process.env.PROJECT_NAME as string) || "Docs") {
   useEffect(() => {
     const prev = document.title;
     document.title = docTitle ? `${docTitle} – ${siteName}` : siteName;

@@ -1,4 +1,4 @@
-import { Component, type ReactNode } from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -36,7 +36,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     return { hasError: true, error, info: null };
   }
 
-  componentDidCatch(error: Error, info: ErrorInfo): void {
+  override componentDidCatch(error: Error, info: ErrorInfo): void {
     this.setState({ error, info });
     // Log to console in development
     if (process.env.NODE_ENV !== "production") {
@@ -50,7 +50,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     this.setState({ hasError: false, error: null, info: null });
   }
 
-  render(): ReactNode {
+  override render(): ReactNode {
     if (this.state.hasError && this.state.error) {
       if (this.props.fallback) {
         return this.props.fallback(this.state.error, this.state.info);
@@ -71,10 +71,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
 interface DefaultErrorFallbackProps {
   error: Error;
+  info?: ErrorInfo | null;
 }
 
 function DefaultErrorFallback({
   error,
+  info,
   onReset,
 }: DefaultErrorFallbackProps & { onReset: () => void }) {
   console.error("Error caught by boundary:", error.message);

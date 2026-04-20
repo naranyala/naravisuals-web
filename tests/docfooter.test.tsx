@@ -14,8 +14,8 @@ describe("DocFooter", () => {
     renderWithServices(<DocFooter prevDoc={prevDoc} nextDoc={nextDoc} onNavigate={mock()} />);
     const links = document.querySelectorAll(".pagination-link");
     expect(links.length).toBe(2);
-    expect(links[0].textContent).toContain("Previous Doc");
-    expect(links[1].textContent).toContain("Next Doc");
+    expect(links[0]?.textContent).toContain("Previous Doc");
+    expect(links[1]?.textContent).toContain("Next Doc");
   });
 
   test("calls onNavigate for previous link", () => {
@@ -40,14 +40,14 @@ describe("DocFooter", () => {
     renderWithServices(<DocFooter nextDoc={nextDoc} onNavigate={mock()} />);
     const links = document.querySelectorAll(".pagination-link");
     expect(links.length).toBe(1);
-    expect(links[0].textContent).toContain("Next Doc");
+    expect(links[0]?.textContent).toContain("Next Doc");
   });
 
   test("renders without nextDoc", () => {
     renderWithServices(<DocFooter prevDoc={prevDoc} onNavigate={mock()} />);
     const links = document.querySelectorAll(".pagination-link");
     expect(links.length).toBe(1);
-    expect(links[0].textContent).toContain("Previous Doc");
+    expect(links[0]?.textContent).toContain("Previous Doc");
   });
 
   test("renders with no prev or next", () => {
@@ -57,7 +57,7 @@ describe("DocFooter", () => {
 
   test("pagination nav and footer exist", () => {
     renderWithServices(<DocFooter prevDoc={prevDoc} nextDoc={nextDoc} onNavigate={mock()} />);
-    expect(document.querySelector(".pagination-nav")).toBeDefined();
-    expect(document.querySelector(".doc-footer")).toBeDefined();
+    expect(document.querySelector(".pagination-nav")).toBeTruthy();
+    expect(document.querySelector(".doc-footer")).toBeTruthy();
   });
 });

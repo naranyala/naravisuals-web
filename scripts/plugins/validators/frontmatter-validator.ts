@@ -112,6 +112,7 @@ function extractFrontmatter(content: string): FrontmatterData | null {
   if (!match) return null;
 
   const frontmatterStr = match[1];
+  if (frontmatterStr === undefined) return null;
   const data: FrontmatterData = {};
 
   // Parse key-value pairs
@@ -123,13 +124,13 @@ function extractFrontmatter(content: string): FrontmatterData | null {
     // Check if this is a list item under the current key
     const listMatch = line.match(/^\s+-\s+(.+)$/);
     if (listMatch && currentKey && currentList !== null) {
-      currentList.push(listMatch[1].trim().replace(/^["']|["']$/g, ""));
+      currentList.push((listMatch[1] || "").trim().replace(/^["']|["']$/g, ""));
       continue;
     }
 
     // Flush previous list if any
     if (currentKey && currentList !== null) {
-      data[currentKey] = currentList;
+      data[currentKey as string] = currentList;
       currentKey = null;
       currentList = null;
     }
@@ -138,38 +139,40 @@ function extractFrontmatter(content: string): FrontmatterData | null {
     const kvMatch = line.match(/^(\w[\w_-]*):\s*(.*)$/);
     if (kvMatch) {
       const key = kvMatch[1];
-      const value = kvMatch[2].trim().replace(/^["']|["']$/g, "");
+      const value = (kvMatch[2] || "").trim().replace(/^["']|["']$/g, "");
 
-      if (value === "") {
-        // Might be a list on following lines
-        currentKey = key;
-        currentList = [];
-      } else if (value.startsWith("[")) {
-        // Inline array
-        try {
-          data[key] = JSON.parse(value);
-        } catch {
-          data[key] = value.split(",").map((t) => t.trim().replace(/["']/g, ""));
+      if (key !== undefined) {
+        if (value === "") {
+          // Might be a list on following lines
+          currentKey = key;
+          currentList = [];
+        } else if (value.startsWith("[")) {
+          // Inline array
+          try {
+            data[key] = JSON.parse(value);
+          } catch {
+            data[key] = value.split(",").map((t) => t.trim().replace(/["']/g, ""));
+          }
+        } else if (/^\d+$/.test(value)) {
+          // Number
+          data[key] = Number.parseInt(value, 10);
+        } else if (/^\d+\.\d+$/.test(value)) {
+          // Float
+          data[key] = Number.parseFloat(value);
+        } else if (value === "true" || value === "false") {
+          // Boolean
+          data[key] = value === "true";
+        } else {
+          // String
+          data[key] = value;
         }
-      } else if (/^\d+$/.test(value)) {
-        // Number
-        data[key] = Number.parseInt(value, 10);
-      } else if (/^\d+\.\d+$/.test(value)) {
-        // Float
-        data[key] = Number.parseFloat(value);
-      } else if (value === "true" || value === "false") {
-        // Boolean
-        data[key] = value === "true";
-      } else {
-        // String
-        data[key] = value;
       }
     }
   }
 
   // Flush final list if any
   if (currentKey && currentList !== null) {
-    data[currentKey] = currentList;
+    data[currentKey as string] = currentList;
   }
 
   return data;

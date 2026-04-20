@@ -5,6 +5,8 @@
  * Services can be swapped for testing, SSR, or different implementations.
  */
 
+import { type IEventBusService, createEventBusService } from "./event-bus";
+
 // ─── Service Interfaces ───────────────────────────────────────────────────
 
 /**
@@ -77,6 +79,7 @@ export interface ServiceContainer {
   dom: IDomService;
   theme: IThemeService;
   config: IAppConfig;
+  events: IEventBusService;
 }
 
 // ─── Default Implementations ──────────────────────────────────────────────
@@ -157,7 +160,7 @@ export const createDomService = (): IDomService => ({
     return element.getAttribute(name);
   },
   querySelectorAll: (selectors: string) => {
-    if (typeof document === "undefined") return new NodeList([]);
+    if (typeof document === "undefined") return [] as unknown as NodeList;
     return document.querySelectorAll(selectors);
   },
   getElementById: (id: string) => {
@@ -184,9 +187,11 @@ export const createDomService = (): IDomService => ({
 /**
  * Default theme service
  */
-export const createThemeService = (storage: IStorageService): IThemeService => {
+export const createThemeService = (
+  storage: IStorageService,
+  events: IEventBusService
+): IThemeService => {
   let mermaidLoading = false;
-  const mermaidLoadingCallbacks: Set<(loading: boolean) => void> = new Set();
 
   return {
     getInitialTheme: () => {
@@ -202,18 +207,17 @@ export const createThemeService = (storage: IStorageService): IThemeService => {
     toggleTheme: (current: boolean) => {
       const next = !current;
       storage.setItem("theme", next ? "dark" : "light");
+      events.emit("theme:change", { theme: next ? "dark" : "light", isDark: next });
       return next;
     },
     getMermaidLoading: () => mermaidLoading,
     setMermaidLoading: (loading: boolean) => {
       mermaidLoading = loading;
-      mermaidLoadingCallbacks.forEach((cb) => {
-        cb(loading);
-      });
+      events.emit("mermaid:loading", loading);
     },
     onMermaidLoadingChange: (callback: (loading: boolean) => void) => {
-      mermaidLoadingCallbacks.add(callback);
-      return () => mermaidLoadingCallbacks.delete(callback);
+      events.on("mermaid:loading", callback);
+      return () => events.off("mermaid:loading", callback);
     },
   };
 };
@@ -222,7 +226,7 @@ export const createThemeService = (storage: IStorageService): IThemeService => {
  * Default app config
  */
 export const createAppConfig = (overrides?: Partial<IAppConfig>): IAppConfig => ({
-  siteTitle: "Docs",
+  siteTitle: (process.env.PROJECT_NAME as string) || "Docs",
   repoEditUrl: "https://github.com/your-org/your-repo/edit/main",
   mobileBreakpoint: 800,
   tocBreakpoint: 1100,
@@ -240,6 +244,7 @@ export interface ContainerOptions {
   router?: IRouterService;
   dom?: IDomService;
   theme?: IThemeService;
+  events?: IEventBusService;
 }
 
 /**
@@ -249,10 +254,11 @@ export function createContainer(options: ContainerOptions = {}): ServiceContaine
   const storage = options.storage ?? createStorageService();
   const router = options.router ?? createRouterService();
   const dom = options.dom ?? createDomService();
-  const theme = options.theme ?? createThemeService(storage);
+  const events = options.events ?? createEventBusService();
+  const theme = options.theme ?? createThemeService(storage, events);
   const config = createAppConfig(options.config);
 
-  return { storage, router, dom, theme, config };
+  return { storage, router, dom, theme, config, events };
 }
 
 /**

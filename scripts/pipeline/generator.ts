@@ -16,7 +16,8 @@ export function cleanGeneratedDir(dir: string) {
 
 export function generateSidebar(genDir: string, sidebar: SidebarItem[]) {
   const content = `// AUTO-GENERATED — DO NOT EDIT.
-export const sidebarData: any[] = ${JSON.stringify(sidebar, null, 2)};
+import type { SidebarItem } from "./types.ts";
+export const sidebarData: SidebarItem[] = ${JSON.stringify(sidebar, null, 2)};
 `;
   fs.writeFileSync(path.join(genDir, "sidebar.ts"), content, "utf-8");
 }
@@ -55,7 +56,7 @@ import "./clipboard.ts";
 
 export { sidebarData } from "./sidebar.ts";
 export { allDocs } from "./docs/index.ts";
-export type { DocEntry } from "./types.ts";
+export type { DocEntry, SidebarItem, SidebarDocItem, SidebarCategoryItem } from "./types.ts";
 `;
   fs.writeFileSync(path.join(genDir, "index.ts"), topIndexContent, "utf-8");
 }

@@ -62,6 +62,7 @@ export async function printAllDocs(allDocs: DocEntry[], config: IAppConfig, _dom
       const diagramSource = mermaidEl.getAttribute("data-source") || mermaidEl.textContent?.trim();
       if (!diagramSource) continue;
 
+      let currentId = "unknown";
       try {
         // Ensure element is briefly visible for measurement
         mermaidEl.style.display = "block";
@@ -69,6 +70,7 @@ export async function printAllDocs(allDocs: DocEntry[], config: IAppConfig, _dom
         mermaidEl.style.minHeight = "100px";
 
         const uniqueId = `mermaid-print-${Math.random().toString(36).slice(2, 11)}`;
+        currentId = uniqueId;
         const result = await mermaid.render(uniqueId, diagramSource, mermaidEl);
         const svgContent = typeof result === "string" ? result : result?.svg;
         
@@ -87,7 +89,7 @@ export async function printAllDocs(allDocs: DocEntry[], config: IAppConfig, _dom
           svgEl.querySelectorAll("text").forEach(t => { t.style.fill = "#000"; t.style.color = "#000"; });
         }
       } catch (err) {
-        console.warn(`Failed to render diagram for ${uniqueId}:`, err);
+        console.warn(`Failed to render diagram for ${currentId}:`, err);
       }
     }
   } catch (err) {

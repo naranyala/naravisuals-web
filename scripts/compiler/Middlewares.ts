@@ -20,8 +20,8 @@ export const pluginMiddleware: CompilerMiddleware = {
   async onPostProcess(unit) {
     for (let i = plugins.length - 1; i >= 0; i--) {
       const plugin = plugins[i];
-      if (plugin.postProcess) {
-        unit.html = await plugin.postProcess(unit.html!);
+      if (plugin?.postProcess) {
+        unit.html = await (plugin.postProcess as any)(unit.html!);
       }
     }
   }
@@ -64,8 +64,8 @@ export const validationMiddleware: CompilerMiddleware = {
       let match;
       while ((match = linkRegex.exec(unit.rawContent)) !== null) {
         const href = match[2];
-        if (href.startsWith("/docs/")) {
-          const slug = href.replace("/docs/", "").split("#")[0].split("?")[0];
+        if (href !== undefined && href.startsWith("/docs/")) {
+          const slug = (href.replace("/docs/", "").split("#")[0] || "").split("?")[0] || "";
           if (!knownSlugs.has(slug)) {
             ctx.warn("links", unit.relPath, `Broken link: ${href}`, `Slug "${slug}" not found.`);
           }

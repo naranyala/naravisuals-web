@@ -5,7 +5,7 @@
 import { marked } from "marked";
 import type { CodeBlockMeta } from "./types.ts";
 import { slugifyHeading } from "./utils.ts";
-import type { Highlighter, Language } from "shiki";
+import type { Highlighter } from "shiki";
 
 /**
  * Parse code fence info string → metadata
@@ -18,7 +18,7 @@ export function parseCodeInfo(info: string | undefined): CodeBlockMeta {
 
   // 1. Try to parse the new syntax: lang { key="value" }
   const braceMatch = info.match(/^([^\s{]+)\s*\{([\s\S]*)\}\s*$/);
-  if (braceMatch) {
+  if (braceMatch && braceMatch[1] !== undefined && braceMatch[2] !== undefined) {
     lang = braceMatch[1].trim();
     rest = braceMatch[2].trim();
 
@@ -30,11 +30,11 @@ export function parseCodeInfo(info: string | undefined): CodeBlockMeta {
 
     return {
       lang,
-      title: titleMatch?.[1].trim(),
-      desc: descMatch?.[1].trim(),
-      label: labelMatch?.[1].trim(),
-      copy: copyMatch ? copyMatch[1].toLowerCase() === "true" : true,
-      zoom: zoomMatch ? zoomMatch[1].toLowerCase() === "true" : true,
+      title: titleMatch ? (titleMatch[1] || titleMatch[2] || titleMatch[3] || "").trim() : "",
+      desc: descMatch ? (descMatch[1] || descMatch[2] || descMatch[3] || "").trim() : "",
+      label: labelMatch ? (labelMatch[1] || labelMatch[2] || labelMatch[3] || "").trim() : "",
+      copy: copyMatch ? copyMatch[1]?.toLowerCase() === "true" : true,
+      zoom: zoomMatch ? zoomMatch[1]?.toLowerCase() === "true" : true,
     };
   }
 
@@ -63,11 +63,11 @@ export function parseCodeInfo(info: string | undefined): CodeBlockMeta {
 
   return {
     lang,
-    title: titleMatch ? titleMatch[1].trim().replace(/["'\s]+$/, "") : undefined,
-    desc: descMatch ? descMatch[1].trim().replace(/["'\s]+$/, "") : undefined,
-    label: labelMatch ? labelMatch[1].trim().replace(/["'\s]+$/, "") : undefined,
-    copy: copyMatch ? copyMatch[1].toLowerCase() === "true" : true,
-    zoom: zoomMatch ? zoomMatch[1].toLowerCase() === "true" : true,
+    title: titleMatch ? (titleMatch[1] || "").trim().replace(/["'\s]+$/, "") : "",
+    desc: descMatch ? (descMatch[1] || "").trim().replace(/["'\s]+$/, "") : "",
+    label: labelMatch ? (labelMatch[1] || "").trim().replace(/["'\s]+$/, "") : "",
+    copy: copyMatch ? copyMatch[1]?.toLowerCase() === "true" : true,
+    zoom: zoomMatch ? zoomMatch[1]?.toLowerCase() === "true" : true,
   };
 }
 
@@ -121,7 +121,7 @@ export function createCustomRenderer(highlighter: Highlighter) {
       );
     }
 
-    if (meta.lang && highlighter.getLoadedLanguages().includes(meta.lang as Language)) {
+    if (meta.lang && highlighter.getLoadedLanguages().includes(meta.lang as any)) {
       const highlighted = highlighter.codeToHtml(text, { lang: meta.lang, theme: "github-dark" });
       return codeBlockWrapper(highlighted, meta);
     }

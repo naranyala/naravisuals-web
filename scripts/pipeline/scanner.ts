@@ -4,6 +4,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import glob from "fast-glob";
 import { marked } from "marked";
 import type { DocEntry } from "./types.ts";
 import { parseFrontmatter } from "./frontmatter.ts";
@@ -38,127 +39,123 @@ export async function scanMdFiles(
   if (!fs.existsSync(baseDir)) return [];
   const entries: DocEntry[] = [];
 
-  async function walk(dir: string) {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        await walk(full);
-      } else if (entry.isFile() && entry.name.endsWith(".md")) {
-        const raw = fs.readFileSync(full, "utf-8");
-        const relPath = path.relative(baseDir, full).replace(/\.md$/, "");
-        const { fm, content } = parseFrontmatter(raw);
+  const files = await glob("**/*.md", { cwd: baseDir, absolute: true });
 
-        // Validate frontmatter
-        validateFrontmatter(fm, relPath, diags);
+  for (const full of files) {
+    const raw = fs.readFileSync(full, "utf-8");
+    const relPath = path.relative(baseDir, full).replace(/\.md$/, "");
+    const { fm, content } = parseFrontmatter(raw);
 
-        // Extract numeric index prefix from filename
-        const filename = entry.name.replace(/\.md$/, "");
-        const indexMatch = filename.match(/^(\d{2})-/);
-        const fileIndex = indexMatch ? parseInt(indexMatch[1], 10) : null;
+    // Validate frontmatter
+    validateFrontmatter(fm, relPath, diags);
 
-        const slugParts = relPath.split("/");
-        const originalCategory = slugParts.length > 1 ? slugParts[0] : "";
-        const category = slugParts.length > 1 ? slugParts[0].replace(/^\d{2}-/, "") : "";
-        const cleanSlug = slugParts.map((part) => part.replace(/^\d{2}-/, "")).join("/");
-        const slug = section === "blog" ? `blog/${cleanSlug}` : cleanSlug;
+    // Extract numeric index prefix from filename
+    const entryName = path.basename(full);
+    const filename = entryName.replace(/\.md$/, "");
+    const indexMatch = filename.match(/^(\d{2})-/);
+    const fileIndex = indexMatch ? parseInt(indexMatch[1] || "0", 10) : null;
 
-        const title =
-          (fm.title as string) ||
-          content.match(/^# (.+)$/m)?.[1] ||
-          filename
-            .split("-")
-            .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-            .join(" ");
+    const slugParts = relPath.split("/");
+    const originalCategory = slugParts.length > 1 ? slugParts[0] : "";
+    const category = slugParts.length > 1 ? (slugParts[0] || "").replace(/^\d{2}-/, "") : "";
+    const cleanSlug = slugParts.map((part) => part.replace(/^\d{2}-/, "")).join("/");
+    const slug = section === "blog" ? `blog/${cleanSlug}` : cleanSlug;
 
-        // Run preProcess plugins
-        let processed = content;
-        for (const plugin of plugins) {
-          if (plugin.preProcess) {
-            try {
-              processed = plugin.preProcess(processed);
-            } catch (err: any) {
-              diags.error("plugin", relPath, `Plugin "${plugin.name}" preProcess failed`, err.message);
-            }
-          }
-        }
+    const titleMatch = content.match(/^# (.+)$/m);
+    const title =
+      (fm.title as string) ||
+      (titleMatch?.[1] || "") ||
+      filename
+        .split("-")
+        .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+        .join(" ");
 
-        // Diagnostics
-        validateCodeBlockDescriptions(content, relPath, diags);
-        const mermaidResult = await mermaidValidator.validate(content, relPath);
-        for (const issue of mermaidResult.issues) {
-          diags.report({
-            severity: issue.severity as any,
-            source: "mermaid",
-            file: relPath,
-            message: issue.message,
-            detail: issue.detail,
-            line: issue.line,
-          });
-        }
-
-        let html = "";
-        let tokens: any[] = [];
-        const renderer = createCustomRenderer(highlighter);
-        
+    // Run preProcess plugins
+    let processed = content;
+    for (const plugin of plugins) {
+      if (plugin.preProcess) {
         try {
-          tokens = marked.Lexer.lex(processed);
-          html = marked.parse(processed, { renderer }) as string;
+          processed = plugin.preProcess(processed);
         } catch (err: any) {
-          diags.error("content", relPath, "Markdown parsing failed", err.message);
+          diags.error("plugin", relPath, `Plugin "${plugin.name}" preProcess failed`, err.message);
         }
-
-        // Fallback description
-        let description = (fm.description as string) || "";
-        if (!description) {
-          const firstPara = html.match(/<p>(.*?)<\/p>/);
-          if (firstPara) {
-            description = firstPara[1].replace(/<[^>]*>/g, "").slice(0, 160).trim();
-          }
-        }
-
-        // Run postProcess plugins in reverse order
-        for (let i = plugins.length - 1; i >= 0; i--) {
-          const plugin = plugins[i];
-          if (plugin.postProcess) {
-            try {
-              html = await plugin.postProcess(html);
-            } catch (err: any) {
-              diags.error("plugin", relPath, `Plugin "${plugin.name}" postProcess failed`, err.message);
-            }
-          }
-        }
-
-        const pos = fileIndex !== null ? fileIndex : parseInt(fm.sidebar_position as string, 10) || 999;
-        const metadata: Record<string, string | string[]> = {};
-        for (const [key, val] of Object.entries(fm)) {
-          if (!KNOWN_FM_FIELDS.has(key) && val !== undefined) {
-            metadata[key] = Array.isArray(val) ? val.map(String) : String(val);
-          }
-        }
-
-        entries.push({
-          id: slug,
-          slug,
-          title,
-          sidebar_label: (fm.sidebar_label as string) || title,
-          sidebar_position: section === "blog" ? 9000 + pos : pos,
-          category: section === "blog" ? "blog" : category,
-          original_category: section === "blog" ? undefined : originalCategory || undefined,
-          description,
-          content: html,
-          rawContent: content,
-          toc: extractTOC(tokens),
-          date: fm.date as string | undefined,
-          author: fm.author as string | undefined,
-          tags: fm.tags as string[] | undefined,
-          section,
-          metadata,
-          ast: tokens,
-        });
       }
     }
+
+    // Diagnostics
+    validateCodeBlockDescriptions(content, relPath, diags);
+    const mermaidResult = await mermaidValidator.validate(content, relPath);
+    for (const issue of mermaidResult.issues) {
+      diags.report({
+        severity: issue.severity as any,
+        source: "mermaid",
+        file: relPath,
+        message: issue.message,
+        detail: issue.detail,
+        line: issue.line,
+      });
+    }
+
+    let html = "";
+    let tokens: any[] = [];
+    const renderer = createCustomRenderer(highlighter);
+
+    try {
+      tokens = marked.Lexer.lex(processed);
+      html = marked.parse(processed, { renderer }) as any as string;
+    } catch (err: any) {
+      diags.error("content", relPath, "Markdown parsing failed", err.message);
+    }
+
+    // Fallback description
+    let description = (fm.description as string) || "";
+    if (!description) {
+      const firstPara = html.match(/<p>(.*?)<\/p>/);
+      if (firstPara && firstPara[1] !== undefined) {
+        description = firstPara[1].replace(/<[^>]*>/g, "").slice(0, 160).trim();
+      }
+    }
+
+    // Run postProcess plugins in reverse order
+    for (let i = plugins.length - 1; i >= 0; i--) {
+      const plugin = plugins[i];
+      if (plugin?.postProcess) {
+        try {
+          html = await (plugin.postProcess as any)(html);
+        } catch (err: any) {
+          diags.error("plugin", relPath, `Plugin "${plugin.name}" postProcess failed`, err.message);
+        }
+      }
+    }
+
+    const pos = fileIndex !== null ? fileIndex : parseInt(fm.sidebar_position as string, 10) || 999;
+    const metadata: Record<string, string | string[]> = {};
+    for (const [key, val] of Object.entries(fm)) {
+      if (!KNOWN_FM_FIELDS.has(key) && val !== undefined) {
+        metadata[key] = Array.isArray(val) ? val.map(String) : String(val);
+      }
+    }
+
+    entries.push({
+      id: slug,
+      slug,
+      title,
+      sidebar_label: (fm.sidebar_label as string) || title,
+      sidebar_position: section === "blog" ? 9000 + pos : pos,
+      category: section === "blog" ? "blog" : category,
+      original_category: section === "blog" ? undefined : originalCategory || undefined,
+      description,
+      content: html,
+      rawContent: content,
+      toc: extractTOC(tokens),
+      date: fm.date as string | undefined,
+      author: fm.author as string | undefined,
+      tags: fm.tags as string[] | undefined,
+      section,
+      metadata,
+      ast: tokens,
+    });
   }
 
-  await walk(baseDir);
   return entries;
 }

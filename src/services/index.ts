@@ -11,5 +11,6 @@ export type {
   IThemeService,
   ServiceContainer,
 } from "./container";
+export type { AppEvents, IEventBusService } from "./event-bus";
 export { createContainer, defaultContainer } from "./container";
 export { ServicesProvider, useService, useServices } from "./provider";

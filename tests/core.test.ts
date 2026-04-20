@@ -67,8 +67,8 @@ describe("Core Utilities", () => {
     test("deepMerge merges objects recursively", () => {
       const target = { a: 1, b: { c: 2 } };
       const source = { b: { d: 3 }, e: 4 };
-      const result = utils.deepMerge({ ...target }, source);
-      expect(result).toEqual({ a: 1, b: { c: 2, d: 3 }, e: 4 });
+      const result = utils.deepMerge({ ...target }, source as any);
+      expect(result).toEqual({ a: 1, b: { c: 2, d: 3 }, e: 4 } as any);
     });
 
     test("isPlainObject identifies plain objects", () => {
@@ -81,8 +81,8 @@ describe("Core Utilities", () => {
 
     test("getNestedValue retrieves deep values", () => {
       const obj = { a: { b: { c: 42 } } };
-      expect(utils.getNestedValue(obj, "a.b.c")).toBe(42);
-      expect(utils.getNestedValue(obj, "a.x", "default")).toBe("default");
+      expect(utils.getNestedValue(obj, "a.b.c")).toBe(42 as any);
+      expect(utils.getNestedValue(obj, "a.x", "default")).toBe("default" as any);
       expect(utils.getNestedValue({}, "a.b.c")).toBeUndefined();
     });
   });

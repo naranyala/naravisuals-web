@@ -34,7 +34,7 @@ export interface MarkdownValidator {
    * Validate a single markdown file.
    * Returns validation result with issues and stats.
    */
-  validate(content: string, filePath: string): ValidationResult;
+  validate(content: string, filePath: string): ValidationResult | Promise<ValidationResult>;
 
   /**
    * Whether validation should fail the build.

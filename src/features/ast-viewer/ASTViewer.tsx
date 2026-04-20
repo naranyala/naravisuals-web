@@ -17,7 +17,7 @@ import {
 } from "./ast-parser";
 
 interface ASTViewerProps {
-  ast: Token[];
+  ast: any[];
 }
 
 interface TreeNodeProps {
@@ -29,7 +29,7 @@ interface TreeNodeProps {
 }
 
 function getTokenIcon(type: string): string {
-  const icons = {
+  const icons: Record<string, string> = {
     heading: "📌",
     paragraph: "📝",
     code: "💻",
@@ -90,15 +90,15 @@ function TreeNode({ node, depth, expanded, onToggle, path }: TreeNodeProps) {
           </span>
         )}
 
-        {hasChildren && <span className="ast-node-count">({node.children.length})</span>}
+        {hasChildren && <span className="ast-node-count">({(node.children as any[]).length})</span>}
       </button>
 
       {/* Expandable children */}
       {isExpanded && hasChildren && node.children && (
         <div className="ast-node-children">
-          {node.children.map((child, i) => (
+          {(node.children as any[]).map((child: any, i: number) => (
             <TreeNode
-              key={`${child.type}-${child.text?.slice(0, 20) || ""}`}
+              key={`node-${path}-${i}`}
               node={child}
               depth={depth + 1}
               expanded={expanded}

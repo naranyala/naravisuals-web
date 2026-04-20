@@ -5,6 +5,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import glob from "fast-glob";
 import { marked } from "marked";
 import type { Highlighter } from "shiki";
 import { CompilationContext } from "./Context.ts";
@@ -21,7 +22,7 @@ import {
   generateSeoFiles 
 } from "../pipeline/generator.ts";
 import { buildSidebar } from "../pipeline/sidebar.ts";
-import { Logger } from "../core/index.ts";
+import { Logger } from "../core/logger.ts";
 
 export class DocumentationCompiler {
   private readonly ctx: CompilationContext;
@@ -30,9 +31,9 @@ export class DocumentationCompiler {
   private units: CompilationUnit[] = [];
   private readonly logger = new Logger();
 
-  constructor(config: CompilerConfig) {
+  constructor(config: CompilerConfig, highlighter?: Highlighter) {
     this.ctx = new CompilationContext(config);
-    this.renderer = new MarkdownRenderer();
+    this.renderer = new MarkdownRenderer(highlighter);
   }
 
   public use(middleware: CompilerMiddleware) {
@@ -71,34 +72,26 @@ export class DocumentationCompiler {
   private async scanDirectory(baseDir: string, section: "docs" | "blog") {
     if (!fs.existsSync(baseDir)) return;
 
-    const walk = async (dir: string) => {
-      const entries = fs.readdirSync(dir, { withFileTypes: true });
-      for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
-        if (entry.isDirectory()) {
-          await walk(fullPath);
-        } else if (entry.isFile() && entry.name.endsWith(".md")) {
-          const relPath = path.relative(baseDir, fullPath).replace(/\.md$/, "");
-          const rawContent = fs.readFileSync(fullPath, "utf-8");
-          
-          const unit: CompilationUnit = {
-            id: relPath,
-            filePath: fullPath,
-            relPath,
-            rawContent,
-            section
-          };
+    const files = await glob("**/*.md", { cwd: baseDir, absolute: true });
 
-          for (const mw of this.middlewares) {
-            if (mw.onIngest) await mw.onIngest(unit, this.ctx);
-          }
+    for (const fullPath of files) {
+      const relPath = path.relative(baseDir, fullPath).replace(/\.md$/, "");
+      const rawContent = fs.readFileSync(fullPath, "utf-8");
 
-          this.units.push(unit);
-        }
+      const unit: CompilationUnit = {
+        id: relPath,
+        filePath: fullPath,
+        relPath,
+        rawContent,
+        section,
+      };
+
+      for (const mw of this.middlewares) {
+        if (mw.onIngest) await mw.onIngest(unit, this.ctx);
       }
-    };
 
-    await walk(baseDir);
+      this.units.push(unit);
+    }
   }
 
   private async processUnit(unit: CompilationUnit) {
@@ -108,7 +101,7 @@ export class DocumentationCompiler {
     // Metadata construction
     const filename = path.basename(unit.filePath).replace(/\.md$/, "");
     const slugParts = unit.relPath.split("/");
-    const category = slugParts.length > 1 ? slugParts[0].replace(/^\d{2}-/, "") : (unit.section === "blog" ? "blog" : "");
+    const category = slugParts.length > 1 ? (slugParts[0] || "").replace(/^\d{2}-/, "") : (unit.section === "blog" ? "blog" : "");
     const slug = unit.section === "blog" ? `blog/${unit.relPath.replace(/^\d{2}-/, "")}` : unit.relPath.replace(/\d{2}-/g, "");
     
     const knownFields = new Set(["title", "description", "sidebar_label", "sidebar_position", "date", "author", "tags", "slug"]);
@@ -152,9 +145,9 @@ export class DocumentationCompiler {
     unit.toc = extractTOC(unit.tokens);
 
     // Fallback description
-    if (!unit.metadata.description) {
+    if (unit.metadata && !unit.metadata.description && unit.html) {
       const firstPara = unit.html.match(/<p>(.*?)<\/p>/);
-      if (firstPara) {
+      if (firstPara && firstPara[1] !== undefined) {
         unit.metadata.description = firstPara[1].replace(/<[^>]*>/g, "").slice(0, 160).trim();
       }
     }
@@ -173,7 +166,8 @@ export class DocumentationCompiler {
 
     // Transform units back to DocEntry format for legacy generator compatibility
     const allDocs = this.units.map(u => {
-      const meta = u.metadata!;
+      if (!u.metadata) throw new Error(`Missing metadata for unit ${u.relPath}`);
+      const meta = u.metadata;
       return {
         id: u.id,
         slug: meta.slug,
@@ -183,15 +177,15 @@ export class DocumentationCompiler {
         category: meta.category,
         original_category: meta.original_category,
         description: meta.description,
-        content: u.html!,
-        rawContent: u.content!,
-        toc: u.toc!,
+        content: u.html || "",
+        rawContent: u.content || "",
+        toc: u.toc || [],
         date: meta.date,
         author: meta.author,
         tags: meta.tags,
         section: u.section,
-        metadata: meta.custom, // Flattened custom fields only
-        ast: u.tokens
+        metadata: (meta.custom || {}) as Record<string, string | string[]>, // Flattened custom fields only
+        ast: u.tokens || []
       };
     });
 

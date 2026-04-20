@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 interface MetadataPanelProps {
-  metadata: Record<string, string | string[]>;
+  metadata: Record<string, string | readonly string[]>;
 }
 
 function formatLabel(key: string): string {
@@ -11,7 +11,7 @@ function formatLabel(key: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function MetadataValue({ value }: { value: string | string[] }) {
+function MetadataValue({ value }: { value: string | readonly string[] }) {
   if (Array.isArray(value)) {
     return (
       <span className="metadata-tags">

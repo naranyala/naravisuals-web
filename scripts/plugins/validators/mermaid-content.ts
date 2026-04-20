@@ -71,11 +71,11 @@ export async function validateMermaidContent(
 
   // 1. Find the first line that isn't a comment/metadata line
   const firstActualLineIndex = lines.findIndex((line) => {
-    const l = line.trim();
+    const l = (line || "").trim();
     return l !== "" && !l.startsWith("%%") && !l.startsWith(":");
   });
 
-  if (firstActualLineIndex === -1) {
+  if (firstActualLineIndex === -1 || lines[firstActualLineIndex] === undefined) {
     errors.push({
       message: "Invalid diagram content",
       detail: "No valid Mermaid diagram type found (only comments or metadata).",
@@ -88,11 +88,11 @@ export async function validateMermaidContent(
 
   // 2. Diagram Type Validation
   const firstLineParts = firstLine.split(/\s+/);
-  const type = firstLineParts[0];
+  const type = firstLineParts[0] || "unknown";
   const direction = firstLineParts[1];
 
   const validType = VALID_DIAGRAM_TYPES.find((t) => firstLineLower.startsWith(t.toLowerCase()));
-  if (!validType) {
+  if (!validType || type === "unknown") {
     errors.push({
       message: "Invalid diagram type",
       detail: `Must start with a valid type (e.g., flowchart, sequenceDiagram, etc.). Found: "${type}"`,
@@ -174,6 +174,8 @@ export async function validateMermaidContent(
     // Track quotes and brackets char-by-char
     for (let i = 0; i < line.length; i++) {
       const char = line[i];
+      if (char === undefined) continue;
+
       const prevChar = i > 0 ? line[i - 1] : "";
       const isEscaped = prevChar === "\\" && (i < 2 || line[i - 2] !== "\\");
 
@@ -271,7 +273,7 @@ export async function validateMermaidContent(
         if (p === "subgraph" || p === "end" || p === "direction") continue;
 
         const idMatch = p.match(/^([^[({ \t\n\r\f\v]+)/);
-        if (idMatch) {
+        if (idMatch && idMatch[1] !== undefined) {
           const id = idMatch[1];
           // If it is already quoted, it is fine
           if (id.startsWith('"') || id.startsWith("'") || id.startsWith("`")) continue;

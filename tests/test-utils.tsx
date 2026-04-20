@@ -4,7 +4,7 @@
 
 if (typeof window !== "undefined" && !window.requestAnimationFrame) {
   window.requestAnimationFrame = (callback: FrameRequestCallback) => {
-    return setTimeout(() => callback(performance.now()), 16);
+    return setTimeout(() => callback(performance.now()), 16) as any;
   };
 }
 

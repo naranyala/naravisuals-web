@@ -161,6 +161,7 @@ describe("sidebar-data and allDocs consistency", () => {
 describe("DocEntry type integrity", () => {
   test("first doc is a valid DocEntry", () => {
     const doc = allDocs[0];
+    if (!doc) throw new Error("No docs found");
     expect(typeof doc.id).toBe("string");
     expect(typeof doc.slug).toBe("string");
     expect(typeof doc.title).toBe("string");

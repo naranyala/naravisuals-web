@@ -30,9 +30,9 @@ export function useActiveSection(selector = ".doc-content h2, .doc-content h3"):
       { rootMargin: "0px 0px -80% 0px" }
     );
 
-    for (const h of headings) {
+    headings.forEach((h) => {
       observerRef.current?.observe(h);
-    }
+    });
   }, []);
 
   useEffect(() => {

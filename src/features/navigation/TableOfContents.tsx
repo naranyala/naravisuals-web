@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { clsx } from "clsx";
 
 interface TOCItem {
   value: string;
@@ -7,7 +8,7 @@ interface TOCItem {
 }
 
 interface TableOfContentsProps {
-  items: TOCItem[];
+  items: readonly TOCItem[];
 }
 
 /**
@@ -79,7 +80,7 @@ export function TableOfContents({ items }: TableOfContentsProps) {
           return (
             <li
               key={item.id}
-              className={`toc-item toc-item-level-${item.level}${isActive ? " active" : ""}`}
+              className={clsx("toc-item", `toc-item-level-${item.level}`, { active: isActive })}
             >
               <a
                 href={`#${item.id}`}

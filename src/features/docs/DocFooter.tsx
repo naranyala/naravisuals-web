@@ -1,3 +1,5 @@
+import { clsx } from "clsx";
+
 interface DocFooterProps {
   prevDoc?: { title: string; slug: string };
   nextDoc?: { title: string; slug: string };
@@ -22,7 +24,7 @@ export function DocFooter({ prevDoc, nextDoc, onNavigate }: DocFooterProps) {
           {prevDoc ? (
             <a
               href={`/docs/${prevDoc.slug}`}
-              className="pagination-link pagination-prev"
+              className={clsx("pagination-link", "pagination-prev")}
               onClick={handleNavigate(prevDoc.slug)}
             >
               <span className="pagination-subtitle">Previous</span>
@@ -34,7 +36,7 @@ export function DocFooter({ prevDoc, nextDoc, onNavigate }: DocFooterProps) {
           {nextDoc ? (
             <a
               href={`/docs/${nextDoc.slug}`}
-              className="pagination-link pagination-next"
+              className={clsx("pagination-link", "pagination-next")}
               onClick={handleNavigate(nextDoc.slug)}
             >
               <span className="pagination-subtitle">Next</span>

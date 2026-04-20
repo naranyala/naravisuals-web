@@ -12,6 +12,7 @@ import { createRoot } from "react-dom/client";
 import { ErrorBoundary } from "./core/error-handling";
 import { MainLayout } from "./layout";
 import { defaultContainer, ServicesProvider } from "./services";
+import { StoreProvider } from "./core/store";
 import "./shared/styles/error-boundary.css";
 
 // Setup goober with React createElement
@@ -19,7 +20,7 @@ const createElement = (
   type: React.ElementType,
   props: Record<string, unknown> | null,
   ...children: ReactNode[]
-): ReactElement => type(props, ...children) as ReactElement;
+): ReactElement => (type as any)(props, ...children) as ReactElement;
 
 setup({ createElement });
 
@@ -50,16 +51,19 @@ root.render(
   <StrictMode>
     <ErrorBoundary>
       <ServicesProvider container={defaultContainer}>
-        <MainLayout />
+        <StoreProvider>
+          <MainLayout />
+        </StoreProvider>
       </ServicesProvider>
     </ErrorBoundary>
   </StrictMode>
 );
 
 // React Refresh (HMR) setup
-if (import.meta.webpackHot) {
-  import.meta.webpackHot.accept();
-  import.meta.webpackHot.dispose(() => {
+const hot = (import.meta as any).webpackHot;
+if (hot) {
+  hot.accept();
+  hot.dispose(() => {
     root.unmount();
   });
 }

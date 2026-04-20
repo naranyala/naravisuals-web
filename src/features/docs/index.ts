@@ -8,4 +8,5 @@
 
 export { DocFooter } from "./DocFooter";
 export { DocStatsFooter } from "./DocStatsFooter";
+export { ArticleFooter } from "./ArticleFooter";
 export { DocViewer } from "./DocViewer";

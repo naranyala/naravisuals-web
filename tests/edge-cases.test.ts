@@ -531,7 +531,7 @@ describe("Diagnostics edge cases", () => {
   test("handles very large number of diagnostics", () => {
     const diags = new Diagnostics();
     for (let i = 0; i < 1000; i++) {
-      diags.error("test", `file-${i}.md`, `Error ${i}`);
+      diags.error("content", `file-${i}.md`, `Error ${i}`);
     }
     expect(diags.all()).toHaveLength(1000);
     expect(diags.errors()).toHaveLength(1000);
@@ -539,7 +539,7 @@ describe("Diagnostics edge cases", () => {
 
   test("handles merge with empty diagnostics", () => {
     const diags = new Diagnostics();
-    diags.error("test", "a.md", "Error");
+    diags.error("content", "a.md", "Error");
     const empty = new Diagnostics();
     diags.merge(empty);
     expect(diags.all()).toHaveLength(1);
@@ -554,9 +554,9 @@ describe("Diagnostics edge cases", () => {
 
   test("handles toJSON with mixed severities", () => {
     const diags = new Diagnostics();
-    diags.error("test", "a.md", "Error");
-    diags.warn("test", "b.md", "Warning");
-    diags.info("test", "c.md", "Info");
+    diags.error("content" as any, "a.md", "Error");
+    diags.warn("content" as any, "b.md", "Warning");
+    diags.info("content" as any, "c.md", "Info");
 
     const json = diags.toJSON();
     expect(json).toHaveLength(3);
@@ -575,17 +575,18 @@ function parseFrontmatter(md: string) {
   const fm: Record<string, unknown> = {};
   let content = md;
   if (m) {
-    content = m[2];
-    const fmLines = m[1].split("\n");
+    content = m[2] || "";
+    const fmLines = (m[1] || "").split("\n");
     let currentKey: string | null = null;
     let currentList: string[] | null = null;
 
     for (let i = 0; i < fmLines.length; i++) {
       const line = fmLines[i];
+      if (line === undefined) continue;
 
       const listMatch = line.match(/^\s+-\s+(.+)$/);
       if (listMatch && currentKey && currentList !== null) {
-        currentList.push(listMatch[1].trim().replace(/^["']|["']$/g, ""));
+        currentList.push((listMatch[1] || "").trim().replace(/^["']|["']$/g, ""));
         continue;
       }
 
@@ -630,11 +631,13 @@ function extractTOC(content: string) {
   const re = /^(#{2,3})\s+(.+)$/gm;
   let m: RegExpExecArray | null;
   while ((m = re.exec(content)) !== null) {
-    const id = m[2]
+    const level = (m[1] || "").length;
+    const value = m[2] || "";
+    const id = value
       .toLowerCase()
       .replace(/[^\w\s-]/g, "")
       .replace(/\s+/g, "-");
-    toc.push({ value: m[2], id, level: m[1].length });
+    toc.push({ value, id, level });
   }
   return toc;
 }

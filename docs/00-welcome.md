@@ -8,11 +8,14 @@ tags: [welcome, getting-started]
 
 # Welcome to SSG Documentation
 
-The **SSG Documentation Site Generator** (docts) is a fast, modern tool for building beautiful documentation websites. Powered by **rspack** for blazing builds, **React** for the UI, **Shiki** for VS Code-quality syntax highlighting, and **Mermaid** for live diagrams.
+The **SSG Documentation Site Generator** (docts) is a fast, modern tool for building beautiful documentation websites. Powered by **rspack**[^1] for blazing builds, **React** for the UI, **Shiki**[^2] for VS Code-quality syntax highlighting, and **Mermaid** for live diagrams.
 
 > **Zero runtime APIs. Everything is generated at build time.**
 
 ---
+
+[^1]: Rspack is a high-performance Rust-based web bundler.
+[^2]: Shiki uses the same grammars and themes as VS Code.
 
 ## Quick Start
 

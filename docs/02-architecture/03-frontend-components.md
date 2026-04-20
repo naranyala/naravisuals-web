@@ -7,37 +7,68 @@ sidebar_position: 3
 
 # Frontend Components
 
-This document covers the React component architecture of the rspack-react-docs SSG. Every component is a file under `/src/`, wired together through a dependency injection container ([`/src/services/container.ts`](/docs/architecture/dependency-injection)) and consumed via a custom `useServices()` hook.
+The project uses a highly decoupled, state-driven architecture. Components are built as modular units that consume shared services and reactive state stores.
 
-## Component Hierarchy
+## Component Hierarchy (v3)
 
-```mermaid:desc=React component hierarchy showing the main components and their relationships
+```mermaid:desc=Modern component hierarchy with reactive stores and layout primitives.
 flowchart TD
-    A["frontend.tsx ('Entry Point')"] --> B["ErrorBoundary"]
-    B --> C["ServicesProvider ('DI Container')"]
-    C --> D["App.tsx ('Root Component')"]
-
-    D --> E["Sidebar.tsx"]
-    D --> F["DocViewer.tsx"]
-    D --> G["TableOfContents.tsx"]
-    D --> H["Breadcrumbs.tsx"]
-    D --> I["MetadataPanel.tsx"]
-    D --> J["ArticleRefsPanel.tsx"]
-    D --> K["DocFooter.tsx"]
-    D --> L["DocStatsFooter.tsx"]
-    D --> M["ASTViewer.tsx"]
-
-    F --> F1["Mermaid SVG Renderer"]
-    F --> F2["MathJax Renderer"]
-    F --> F3["Zoom/Download Handlers"]
-
-    E --> E1["CategoryItem"]
-    E --> E2["DocLink"]
-
-    style A fill:#1a1a2e,color:#fff
-    style D fill:#16213e,color:#fff
-    style F fill:#0f3460,color:#fff
+    A["frontend.tsx"] --> B["State Stores (React Context)"]
+    B --> C["AppShell"]
+    
+    C --> D["GlobalSearch (Modal)"]
+    C --> E["TopBar"]
+    
+    C --> F["ThreeColumnLayout"]
+    F --> G["Sidebar (Navigation)"]
+    F --> H["Main Content Column"]
+    F --> I["ReferencePanel (Always Visible)"]
+    
+    H --> H1["DocViewer (HTML Only)"]
+    H --> H2["ArticleFooter (Pagination + Stats)"]
+    
+    H1 --> J["useDocumentEnhancer (Mermaid/MathJax)"]
+    
+    style B fill:#e1f5fe
+    style F fill:#f3e5f5
+    style J fill:#f1f8e9
 ```
+
+## Core Abstractions
+
+### 1. AppShell
+The root structural component. It manages global overlays (Search, Settings) and top-level layout constraints. By centralizing overlays, we ensure consistent keyboard handling (Escape) and prevent z-index conflicts.
+
+### 2. ThreeColumnLayout
+A specialized layout primitive designed for documentation. It manages the responsive transition between:
+*   **Navigation Column**: Fixed/collapsible sidebar.
+*   **Content Column**: Primary reading area.
+*   **Reference Column**: Contains the Table of Contents and the unified Reference Panel.
+
+### 3. Unified Reference Panel
+Located in the right column, this panel is **always visible**. It uses a tabbed interface to provide quick access to:
+*   **Metadata**: Frontmatter fields (tags, author, date).
+*   **Footnotes**: Automated extraction of markdown references (`[^1]`).
+
+[^1]: Footnotes are automatically parsed from the AST and rendered in the Reference Panel.
+
+### 4. ArticleFooter
+Consolidates two previously separate components into one clean "end-of-article" experience:
+*   **Pagination**: Links to the next and previous documents in the sidebar order.
+*   **Statistics**: Document-wide metrics (word count, diagram counts, estimated reading time).
+
+## Reactive Integration
+
+Instead of prop-drilling state, components subscribe to centralized **React Context** stores:
+*   `useUIState()`: Controls panel visibility and responsive breakpoints.
+*   `useDocState()`: Tracks the currently active document and its metadata.
+
+## Document Enhancements
+
+All late-binding enhancements are handled by the `useDocumentEnhancer` hook. This keeps the `DocViewer` component focused purely on rendering HTML, while the hook manages:
+*   Asynchronous Mermaid rendering.
+*   MathJax typesetting.
+*   Interaction handlers (Zoom, Download).
 
 ## Entry Point: `frontend.tsx`
 
@@ -80,14 +111,13 @@ const [astOpen, setAstOpen] = useState(false);
 
 ### Navigation
 
-The `navigate()` function updates the slug, pushes history state, and toggles sidebar/TOC visibility:
+The `navigate()` function updates the `docStore` and triggers a global event. The UI reactively updates based on these store changes:
 
-```tsx:desc=Navigation function in App.tsx
+```tsx:desc=Navigation function using DocStore.
 const navigate = (slug: string) => {
-  setCurrentSlug(slug);
-  services.router.pushState({}, "", services.router.buildUrl(services.config.routes.docs, slug));
-  setSidebarVisible(!isMobile);
-  setTocVisible(false);
+  docStore.setSlug(slug);
+  services.events.emit("nav:navigate", { target: slug, isMobile });
+  // ... router logic
 };
 ```
 
@@ -133,18 +163,14 @@ useEffect(() => {
 
 ### Mermaid Loading Indicator
 
-A `requestAnimationFrame` poll checks `window.__mermaidLoading__` and shows a spinner in the top bar:
+The application listens for `mermaid:loading` events via the central event bus. This replaces inefficient polling and allows any component to trigger or observe loading states:
 
-```tsx:desc=Mermaid loading indicator using requestAnimationFrame
+```tsx:desc=Mermaid loading state managed via event bus.
 useEffect(() => {
-  let rafId: number;
-  const checkLoading = () => {
-    setMermaidLoading(window.__mermaidLoading__ || false);
-    rafId = requestAnimationFrame(checkLoading);
-  };
-  rafId = requestAnimationFrame(checkLoading);
-  return () => cancelAnimationFrame(rafId);
-}, []);
+  return services.events.on("mermaid:loading", (loading) => {
+    setMermaidLoading(loading);
+  });
+}, [services.events]);
 ```
 
 The indicator renders conditionally in the top bar:
@@ -597,7 +623,6 @@ Preferences are persisted to `localStorage` and applied as CSS custom properties
 | `DocViewer` | `src/DocViewer.tsx` | HTML rendering, Mermaid, MathJax, TOC tracking |
 | `Sidebar` | `src/Sidebar.tsx` | Left navigation from generated sidebar data |
 | `TableOfContents` | `src/TableOfContents.tsx` | Right-side TOC with active heading tracking |
-| `Breadcrumbs` | `src/Breadcrumbs.tsx` | Breadcrumb navigation trail |
 | `MetadataPanel` | `src/MetadataPanel.tsx` | Collapsible frontmatter metadata display |
 | `DocStatsFooter` | `src/DocStatsFooter.tsx` | Document statistics (words, code, diagrams, etc.) |
 | `ArticleRefsPanel` | `src/ArticleRefsPanel.tsx` | Footnote references and definitions from AST |

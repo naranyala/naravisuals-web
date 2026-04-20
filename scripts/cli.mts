@@ -22,7 +22,9 @@ import { spawn, spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import net from "node:net";
 import { join } from "node:path";
-import { c, colors, Logger } from "./core/index.ts";
+import glob from "fast-glob";
+import { c, colors } from "./core/index.ts";
+import { Logger } from "./core/logger.ts";
 import { paths } from "./core/paths.ts";
 
 const logger = new Logger();
@@ -39,7 +41,7 @@ function banner() {
   logger.raw("", colors.cyan);
 }
 
-function runCommand(command, args, options = {}) {
+function runCommand(command: string, args: string[], options: any = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       stdio: options.silent ? "pipe" : "inherit",
@@ -63,7 +65,7 @@ function runCommand(command, args, options = {}) {
   });
 }
 
-function _runCommandSync(command, args) {
+function _runCommandSync(command: string, args: string[]) {
   return spawnSync(command, args, {
     stdio: "pipe",
     cwd: projectRoot,
@@ -99,9 +101,20 @@ async function findAvailablePort(startPort: number, maxAttempts = 10): Promise<n
   return 0;
 }
 
+async function cmdTypeCheck() {
+  logger.step("Running TypeScript type checks...");
+  try {
+    await runCommand("bunx", ["tsc", "--noEmit"]);
+    logger.success("Type checks passed");
+  } catch (error) {
+    logger.error("TypeScript type checks failed");
+    throw error;
+  }
+}
+
 // ─── Commands ──────────────────────────────────────────────────────────────
 
-async function cmdDev(options) {
+async function cmdDev(options: any) {
   banner();
 
   const port = options.port || 3000;
@@ -118,6 +131,11 @@ async function cmdDev(options) {
     await runCommand("bun", ["run", "scripts/build-docs.mts"]);
     logger.success("Documentation built");
 
+    // Step 0.5: Type Check
+    if (!options.skipTypeCheck) {
+      await cmdTypeCheck();
+    }
+
     // Step 2: Start rspack dev server
     logger.step("Starting rspack dev server...");
     logger.blank();
@@ -126,13 +144,13 @@ async function cmdDev(options) {
 
     // Pass port as CLI argument, not just env var
     await runCommand("bunx", ["rspack", "serve", "--port", String(port)]);
-  } catch (error) {
+  } catch (error: any) {
     logger.error(`Development server failed: ${error.message}`);
     process.exit(1);
   }
 }
 
-async function cmdBuild(options) {
+async function cmdBuild(options: any) {
   banner();
   logger.info("Building for production...");
   logger.blank();
@@ -151,6 +169,11 @@ async function cmdBuild(options) {
     logger.step("Building documentation...");
     await runCommand("bun", ["run", "scripts/build-docs.mts"]);
     logger.success("Documentation built");
+
+    // Step 2.5: Type Check
+    if (!options.skipTypeCheck) {
+      await cmdTypeCheck();
+    }
 
     // Step 3: Lint (optional)
     if (!options.skipLint) {
@@ -203,13 +226,13 @@ async function cmdBuild(options) {
 
       logger.info(`Generated ${files.length} files (${(totalSize / 1024).toFixed(1)} KB)`);
     }
-  } catch (error) {
+  } catch (error: any) {
     logger.error(`Build failed: ${error.message}`);
     process.exit(1);
   }
 }
 
-async function cmdStart(options) {
+async function cmdStart(options: any) {
   banner();
 
   const port = options.port || 3000;
@@ -227,13 +250,13 @@ async function cmdStart(options) {
 
   try {
     await runCommand("npx", ["serve", "dist", "-p", String(port), "-s"]);
-  } catch (error) {
+  } catch (error: any) {
     logger.error(`Server failed: ${error.message}`);
     process.exit(1);
   }
 }
 
-async function cmdPreview(options) {
+async function cmdPreview(options: any) {
   banner();
   logger.info("Build + Preview mode");
   logger.blank();
@@ -260,13 +283,13 @@ async function cmdPreview(options) {
     logger.blank();
 
     await runCommand("npx", ["serve", "dist", "-p", String(port), "-s"]);
-  } catch (error) {
+  } catch (error: any) {
     logger.error(`Preview failed: ${error.message}`);
     process.exit(1);
   }
 }
 
-async function cmdDocs(options = {}) {
+async function cmdDocs(options: any = {}) {
   banner();
   logger.info("Regenerating documentation...");
   logger.blank();
@@ -294,18 +317,16 @@ async function cmdDocs(options = {}) {
     // Count docs
     const docsDir = join(projectRoot, "docs");
     if (existsSync(docsDir)) {
-      const docs = readdirSync(docsDir, { recursive: true }).filter(
-        (f) => typeof f === "string" && f.endsWith(".md")
-      );
+      const docs = glob.sync("**/*.md", { cwd: docsDir });
       logger.info(`Found ${docs.length} markdown files`);
     }
-  } catch (error) {
+  } catch (error: any) {
     logger.error(`Docs build failed: ${error.message}`);
     process.exit(1);
   }
 }
 
-async function cmdLint(options) {
+async function cmdLint(options: any) {
   banner();
   logger.info("Checking code quality...");
   logger.blank();
@@ -315,18 +336,21 @@ async function cmdLint(options) {
       await runCommand("bunx", ["biome", "check", "--write", "."]);
       logger.success("Lint issues auto-fixed");
     } else {
-      await runCommand("bunx", ["biome", "check", "."]);
+      const args = ["biome", "check", "."];
+      // Biome doesn't have a --strict flag in the same way, but we can treat warnings as errors
+      // if we want. By default 'check' fails on errors.
+      await runCommand("bunx", args);
       logger.success("All checks passed");
     }
-  } catch {
+  } catch (error) {
     if (!options.fix) {
       logger.error("Lint issues found. Run 'docts lint:fix' to auto-fix.");
     }
-    process.exit(1);
+    throw error;
   }
 }
 
-async function cmdTest(options) {
+async function cmdTest(options: any) {
   banner();
   logger.info("Running test suite...");
   logger.blank();
@@ -342,7 +366,7 @@ async function cmdTest(options) {
       logger.blank();
       logger.info("Coverage report: coverage/index.html");
     }
-  } catch (error) {
+  } catch (error: any) {
     logger.error(`Tests failed: ${error.message}`);
     process.exit(1);
   }
@@ -362,7 +386,7 @@ async function cmdClean() {
 
     logger.blank();
     logger.success("Clean complete");
-  } catch (error) {
+  } catch (error: any) {
     logger.error(`Clean failed: ${error.message}`);
     process.exit(1);
   }
@@ -391,9 +415,7 @@ async function cmdInfo() {
   let docCount = 0;
 
   if (existsSync(docsDir)) {
-    docCount = readdirSync(docsDir, { recursive: true }).filter(
-      (f) => typeof f === "string" && f.endsWith(".md")
-    ).length;
+    docCount = glob.sync("**/*.md", { cwd: docsDir }).length;
   }
 
   logger.raw(`Documentation:${colors.reset}`);
@@ -440,8 +462,10 @@ async function cmdInfo() {
       ["docts info", "Show project information"],
     ];
 
-    for (const [cmd, desc] of commands) {
-      logger.raw(`  ${cmd.padEnd(18)} ${desc}`);
+    for (const entry of commands) {
+      if (!entry) continue;
+      const [cmd, desc] = entry;
+      logger.raw(`  ${(cmd || "").padEnd(18)} ${desc}`);
     }
   }
   logger.blank();
@@ -502,8 +526,20 @@ function showVersion() {
 
 // ─── Parse Arguments ───────────────────────────────────────────────────────
 
-function parseArgs(argv) {
-  const args = {
+function parseArgs(argv: any) {
+  const args: {
+    command: string;
+    port: string | null;
+    fix: boolean;
+    watch: boolean;
+    coverage: boolean;
+    skipLint: boolean;
+    skipClean: boolean;
+    skipValidation: boolean;
+    skipTypeCheck: boolean;
+    strict: boolean;
+    useRust: boolean;
+  } = {
     command: argv[2] || "help",
     port: null,
     fix: false,
@@ -512,6 +548,7 @@ function parseArgs(argv) {
     skipLint: false,
     skipClean: false,
     skipValidation: false,
+    skipTypeCheck: false,
     strict: false,
     useRust: false,
   };
@@ -527,6 +564,8 @@ function parseArgs(argv) {
       args.useRust = true;
     } else if (arg === "--no-lint") {
       args.skipLint = true;
+    } else if (arg === "--no-type-check" || arg === "--skip-type-check") {
+      args.skipTypeCheck = true;
     } else if (arg === "--skip-validation") {
       args.skipValidation = true;
     } else if (arg === "--strict") {
@@ -569,6 +608,8 @@ async function main() {
     lint: "lint",
     "lint:fix": "lint",
     check: "lint",
+    typecheck: "typecheck",
+    "type-check": "typecheck",
     test: "test",
     tests: "test",
     clean: "clean",
@@ -578,7 +619,7 @@ async function main() {
     help: "help",
   };
 
-  const command = commandMap[args.command] || "help";
+  const command = (commandMap as any)[args.command] || "help";
 
   // Detect lint:fix
   if (args.command === "lint:fix" || args.fix) {
@@ -633,7 +674,7 @@ async function main() {
     try {
       await runCommand(binary, rustArgs);
       process.exit(0);
-    } catch (_error) {
+    } catch (_error: any) {
       process.exit(1);
     }
   }
@@ -658,6 +699,9 @@ async function main() {
       case "lint":
         await cmdLint(args);
         break;
+      case "typecheck":
+        await cmdTypeCheck();
+        break;
       case "test":
         await cmdTest(args);
         break;
@@ -670,7 +714,7 @@ async function main() {
       default:
         showHelp();
     }
-  } catch (error) {
+  } catch (error: any) {
     if (error.code === "ENOENT") {
       logger.error(`Command not found: ${args.command}`);
       logger.info("Run 'docts --help' for available commands");

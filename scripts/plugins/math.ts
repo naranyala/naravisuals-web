@@ -39,6 +39,7 @@ export const mathPlugin: MarkdownPlugin = {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
+      if (line === undefined) continue;
 
       // Toggle code block state on triple-backtick lines
       if (line.trimStart().startsWith("```")) {

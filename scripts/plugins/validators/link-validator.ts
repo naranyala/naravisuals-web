@@ -57,9 +57,13 @@ export const linkValidator: MarkdownValidator = {
     const lines = content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
+      if (line === undefined) continue;
+
       while ((match = linkRegex.exec(line)) !== null) {
         const href = match[2];
         const text = match[1];
+
+        if (href === undefined || text === undefined) continue;
 
         // Only validate internal links starting with /docs/ or /blog/
         if (!href.startsWith("/docs/") && !href.startsWith("/blog/")) continue;
@@ -67,7 +71,7 @@ export const linkValidator: MarkdownValidator = {
         checkedCount++;
 
         // Strip anchor fragments and leading slash
-        const cleanHref = href.split("?")[0].split("#")[0].replace(/^\//, "");
+        const cleanHref = (href.split("?")[0] || "").split("#")[0]?.replace(/^\//, "") || "";
         // Strip docs/ prefix for comparison with slugs
         const slug = cleanHref.startsWith("docs/") ? cleanHref.slice(5) : cleanHref;
 

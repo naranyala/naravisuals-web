@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { allDocs, type DocEntry, type SidebarItem, sidebarData } from "../../generated";
-import type { IAppConfig, IRouterService } from "../../services/container";
+import type { ServiceContainer } from "../../services";
+import { useDocState } from "../../core/store";
 
-export function useNavigation(services: { router: IRouterService; config: IAppConfig }) {
+export function useNavigation(services: ServiceContainer) {
+  const { setDoc } = useDocState();
   const resolveSlug = (): string => {
     const path = services.router.getCurrentPath();
     if (path === "/" || path === "") return "welcome";
@@ -18,6 +20,12 @@ export function useNavigation(services: { router: IRouterService; config: IAppCo
   const [currentSlug, setCurrentSlug] = useState(resolveSlug);
   const currentDoc = allDocs.find((d) => d.slug === currentSlug || d.id === currentSlug) ?? null;
 
+  useEffect(() => {
+    if (currentDoc) {
+      setDoc(currentDoc as any);
+    }
+  }, [currentDoc, setDoc]);
+
   const navigate = (
     target: string,
     isMobile: boolean,
@@ -25,6 +33,10 @@ export function useNavigation(services: { router: IRouterService; config: IAppCo
     setTocVisible: (v: boolean) => void
   ) => {
     const [slug] = target.split("#");
+    if (!slug) return;
+    
+    services.events.emit("nav:navigate", { target, isMobile });
+    
     setCurrentSlug(slug);
     services.router.pushState(
       {},
@@ -34,6 +46,10 @@ export function useNavigation(services: { router: IRouterService; config: IAppCo
     setSidebarVisible(!isMobile);
     setTocVisible(false);
   };
+
+  useEffect(() => {
+    services.events.emit("nav:resolved", { slug: currentSlug });
+  }, [currentSlug, services.events]);
 
   const getDocsInSidebarOrder = (): DocEntry[] => {
     const ordered: DocEntry[] = [];

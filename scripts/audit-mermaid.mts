@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { validateMermaidContent } from "./plugins/validators/mermaid-content";
+import { validateMermaidContent } from "./plugins/validators/mermaid-content.ts";
 
 function getFiles(dir: string): string[] {
   let results: string[] = [];
@@ -25,32 +25,39 @@ console.log(`Scanning ${files.length} markdown files...`);
 let totalDiagrams = 0;
 let failedDiagrams = 0;
 
-for (const file of files) {
-  const content = readFileSync(file, "utf8");
-  const mermaidBlocks = content.match(/```mermaid\s*([\s\S]*?)\s*```/g);
+async function audit() {
+  for (const file of files) {
+    const content = readFileSync(file, "utf8");
+    const mermaidBlocks = content.match(/```mermaid\s*([\s\S]*?)\s*```/g);
 
-  if (!mermaidBlocks) continue;
+    if (!mermaidBlocks) continue;
 
-  mermaidBlocks.forEach((block, index) => {
-    totalDiagrams++;
-    const source = block.replace(/```mermaid\s*([\s\S]*?)\s*```/, "$1").trim();
-    const result = validateMermaidContent(source);
+    for (let index = 0; index < mermaidBlocks.length; index++) {
+      const block = mermaidBlocks[index];
+      if (!block) continue;
+      
+      totalDiagrams++;
+      const source = block.replace(/```mermaid\s*([\s\S]*?)\s*```/, "$1").trim();
+      const result = await validateMermaidContent(source);
 
-    if (result.length > 0) {
-      failedDiagrams++;
-      console.log(`\n❌ File: ${file} (Block ${index + 1})`);
-      console.log(`Source:\n${source}`);
-      console.log(`Errors:`);
-      for (const err of result) {
-        console.log(` - ${err.message}: ${err.detail}`);
+      if (result.length > 0) {
+        failedDiagrams++;
+        console.log(`\n❌ File: ${file} (Block ${index + 1})`);
+        console.log(`Source:\n${source}`);
+        console.log(`Errors:`);
+        for (const err of result) {
+          console.log(` - ${err.message}: ${err.detail}`);
+        }
       }
     }
-  });
+  }
+
+  console.log(`\n--- Audit Complete ---`);
+  console.log(`Total Diagrams: ${totalDiagrams}`);
+  console.log(`Failed: ${failedDiagrams}`);
+  console.log(
+    `Success Rate: ${(((totalDiagrams - failedDiagrams) / totalDiagrams) * 100).toFixed(2)}%`
+  );
 }
 
-console.log(`\n--- Audit Complete ---`);
-console.log(`Total Diagrams: ${totalDiagrams}`);
-console.log(`Failed: ${failedDiagrams}`);
-console.log(
-  `Success Rate: ${(((totalDiagrams - failedDiagrams) / totalDiagrams) * 100).toFixed(2)}%`
-);
+audit();

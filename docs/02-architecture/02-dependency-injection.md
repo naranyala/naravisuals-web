@@ -77,12 +77,19 @@ classDiagram
         +routes: string
     }
 
+    class IEventBusService {
+        +emit(type, event) void
+        +on(type, handler) void
+        +off(type, handler) void
+    }
+
     class ServiceContainer {
         +storage: IStorageService
         +router: IRouterService
         +dom: IDomService
         +theme: IThemeService
         +config: IAppConfig
+        +events: IEventBusService
     }
 
     ServiceContainer --> IStorageService
@@ -90,6 +97,7 @@ classDiagram
     ServiceContainer --> IDomService
     ServiceContainer --> IThemeService
     ServiceContainer --> IAppConfig
+    ServiceContainer --> IEventBusService
 ```
 
 ### IStorageService
@@ -149,38 +157,39 @@ export const createDomService = (): IDomService => ({
 
 ### IThemeService
 
-Manages theme state with mermaid loading state tracking:
+Manages theme state and utilizes the event bus for status updates:
 
-```typescript:desc=Theme service with localStorage persistence and mermaid loading state.
-export const createThemeService = (storage: IStorageService): IThemeService => {
-  let mermaidLoading = false;
-  const callbacks = new Set<(loading: boolean) => void>();
-
+```typescript:desc=Theme service refactored to use the central event bus.
+export const createThemeService = (storage, events): IThemeService => {
   return {
-    getInitialTheme: () => {
-      const stored = storage.getItem("theme");
-      if (stored) return stored === "dark";
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
-    },
-    applyTheme: (isDark) => {
-      document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
-    },
-    toggleTheme: (current) => {
-      const next = !current;
-      storage.setItem("theme", next ? "dark" : "light");
-      return next;
-    },
-    getMermaidLoading: () => mermaidLoading,
+    // ...
     setMermaidLoading: (loading) => {
       mermaidLoading = loading;
-      callbacks.forEach(cb => cb(loading));
+      events.emit("mermaid:loading", loading);
     },
     onMermaidLoadingChange: (callback) => {
-      callbacks.add(callback);
-      return () => callbacks.delete(callback);
+      return events.on("mermaid:loading", callback);
     },
   };
 };
+```
+
+### IEventBusService
+
+A central communication channel powered by `mitt`. It decouples UI components from document lifecycle events:
+
+```typescript:desc=Event bus service interface and typed events.
+export type AppEvents = {
+  "nav:navigate": { target: string };
+  "theme:change": { theme: string; isDark: boolean };
+  "mermaid:loading": boolean;
+  "mermaid:rendered": { slug: string; count: number };
+};
+
+export interface IEventBusService {
+  emit<K extends keyof AppEvents>(type: K, event: AppEvents[K]): void;
+  on<K extends keyof AppEvents>(type: K, handler: (event: AppEvents[K]) => void): () => void;
+}
 ```
 
 ### IAppConfig
@@ -207,9 +216,10 @@ export function createContainer(options = {}): ServiceContainer {
   const storage = options.storage ?? createStorageService();
   const router = options.router ?? createRouterService();
   const dom = options.dom ?? createDomService();
-  const theme = options.theme ?? createThemeService(storage);
+  const events = options.events ?? createEventBusService();
+  const theme = options.theme ?? createThemeService(storage, events);
   const config = createAppConfig(options.config);
-  return { storage, router, dom, theme, config };
+  return { storage, router, dom, theme, config, events };
 }
 
 export const defaultContainer = createContainer();

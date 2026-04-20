@@ -6,6 +6,7 @@
  */
 
 import { useMemo, useState } from "react";
+import { clsx } from "clsx";
 
 interface DocStats {
   wordCount: number;
@@ -49,7 +50,9 @@ export function DocStatsFooter({ contentHtml }: DocStatsFooterProps) {
       const match = className.match(/admonition-(\w+)/);
       if (match) {
         const type = match[1];
-        admonitionTypes[type] = (admonitionTypes[type] || 0) + 1;
+        if (type) {
+          admonitionTypes[type] = (admonitionTypes[type] || 0) + 1;
+        }
       }
     });
 
@@ -98,7 +101,7 @@ export function DocStatsFooter({ contentHtml }: DocStatsFooterProps) {
         aria-expanded={isOpen}
       >
         <span className="doc-stats-toggle-text">{isOpen ? "Hide" : "Show"} Document Stats</span>
-        <span className={`doc-stats-chevron ${isOpen ? "open" : ""}`}>▾</span>
+        <span className={clsx("doc-stats-chevron", { open: isOpen })}>▾</span>
       </button>
 
       {isOpen && (

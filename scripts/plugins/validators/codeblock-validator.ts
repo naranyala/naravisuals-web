@@ -50,6 +50,7 @@ export const codeblockValidator: MarkdownValidator = {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
+      if (line === undefined) continue;
       const fenceMatch = line.match(/^(```|~~~)(\w+)?(.*)$/);
 
       if (fenceMatch && !inCodeBlock) {

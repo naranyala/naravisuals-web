@@ -2,11 +2,11 @@
  * TOC extraction and deduplication.
  */
 
-import { marked } from "marked";
+import type { Token } from "marked";
 import type { DocEntry } from "./types.ts";
 import { slugifyHeading } from "./utils.ts";
 
-export function extractTOC(tokens: marked.Token[]) {
+export function extractTOC(tokens: Token[]) {
   const toc: DocEntry["toc"] = [];
   const seenIds = new Set<string>();
 

@@ -33,8 +33,8 @@ export interface SidebarDocItem {
   id: string;
   label: string;
   slug: string;
-  category?: string;
-  date?: string;
+  category?: string | null;
+  date?: string | null;
 }
 
 export interface SidebarCategoryItem {

@@ -1,5 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { readFileSync } from "node:fs";
 import { defineConfig } from "@rspack/cli";
 import { rspack } from "@rspack/core";
 import { ReactRefreshRspackPlugin } from "@rspack/plugin-react-refresh";
@@ -8,6 +9,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const isProd = process.env.NODE_ENV === "production";
+
+const pkg = JSON.parse(readFileSync(path.resolve(__dirname, "package.json"), "utf-8"));
 
 export default defineConfig({
   entry: {
@@ -68,6 +71,7 @@ export default defineConfig({
     }),
     new rspack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "development"),
+      "process.env.PROJECT_NAME": JSON.stringify(pkg.name),
     }),
     new rspack.CopyRspackPlugin({
       patterns: [
@@ -98,7 +102,6 @@ export default defineConfig({
   stats: "errors-warnings",
   infrastructureLogging: {
     level: "warn",
-    console: false,
   },
   devServer: {
     port: 3000,

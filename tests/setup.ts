@@ -2,6 +2,7 @@
  * Test setup for bun test with testing-library + jsdom
  */
 
+import { afterAll, afterEach, beforeAll } from "bun:test";
 import * as testingLibrary from "@testing-library/react";
 import { JSDOM } from "jsdom";
 import "@testing-library/jest-dom";

@@ -34,6 +34,8 @@ export const mermaidValidator: MarkdownValidator = {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
+      if (line === undefined) continue;
+
       const lineNumber = i + 1;
       const fenceMatch = line.match(/^(```|~~~)(\w+)?(.*)$/);
 
@@ -52,19 +54,19 @@ export const mermaidValidator: MarkdownValidator = {
 
         const validationErrors = await validateMermaidContent(diagramContent, filePath);
 
-        for (const error of validationErrors) {
+        for (const error of validationErrors as any[]) {
           // Extract line number from error detail if available
-          const lineMatch = error.detail?.match(/Line (\d+)/);
+          const lineMatch = (error.detail || "").match(/Line (\d+)/);
           const errorLineNum = lineMatch ? parseInt(lineMatch[1], 10) : 0;
           const actualLineNumber =
             errorLineNum > 0 ? blockStartLine + errorLineNum : blockStartLine;
 
           issues.push({
-            severity: (error.severity as any) || "error",
+            severity: error.severity || "error",
             file: filePath,
             line: actualLineNumber,
             message: `[${filePath}:${actualLineNumber}] ${error.message}`,
-            detail: `${error.detail} (diagram line ${errorLineNum || "N/A"})`,
+            detail: `${error.detail || ""} (diagram line ${errorLineNum || "N/A"})`,
           });
         }
 

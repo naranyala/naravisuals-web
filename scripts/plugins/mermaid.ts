@@ -30,13 +30,15 @@ export const mermaidPlugin: MarkdownPlugin = {
 
       let diagram = codeElement.textContent || "";
       const trimmedDiagram = diagram.trim();
-      const firstLine = trimmedDiagram.split("\n")[0].trim().toLowerCase();
+      const firstLineParts = trimmedDiagram.split("\n");
+      const firstLine = (firstLineParts[0] || "").trim().toLowerCase();
 
       // Determine the target diagram type
       let targetType = lang;
       if (lang === "mermaid") {
         // Auto-detect from content if lang is just "mermaid"
-        const firstWord = trimmedDiagram.split(/\s+/)[0].toLowerCase();
+        const firstWordParts = trimmedDiagram.split(/\s+/);
+        const firstWord = (firstWordParts[0] || "").toLowerCase();
         if (mermaidTypes.includes(firstWord) && firstWord !== "mermaid") {
           targetType = firstWord;
         } else if (firstWord === "graph") {
@@ -52,7 +54,8 @@ export const mermaidPlugin: MarkdownPlugin = {
         
         if (!isPrefixed) {
           const directions = ["LR", "RL", "TD", "TB", "BT"];
-          const firstWord = firstLine.split(/\s+/)[0].toUpperCase();
+          const splitParts = firstLine.split(/\s+/);
+          const firstWord = (splitParts[0] || "").toUpperCase();
           
           if (directions.includes(firstWord)) {
             // Already has a direction, just prefix with type
@@ -132,7 +135,7 @@ export const mermaidPlugin: MarkdownPlugin = {
             <span class="mermaid-loading"><span class="mermaid-spinner"></span></span>
           </div>
         </div>
-        <div class="mermaid" style="display:none;" data-source="${escapeHtml(diagram)}">${escapeHtml(diagram)}</div>
+        <div class="mermaid" style="visibility:hidden;" data-source="${escapeHtml(diagram)}">${escapeHtml(diagram)}</div>
         ${desc ? `<div class="mermaid-diagram-desc">${escapeHtml(desc)}</div>` : ""}
         <div class="mermaid-source-container" style="display:none;">
           <div class="mermaid-source-header">

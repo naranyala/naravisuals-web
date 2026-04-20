@@ -27,16 +27,17 @@ export const mermaidDeepValidator: CompilerMiddleware = {
     const content = unit.content || "";
 
     while ((match = mermaidRegex.exec(content)) !== null) {
-      const type = match[1];
+      const type = match[1] || "mermaid";
       const desc = match[2];
-      let source = match[3].trim();
+      let source = (match[3] || "").trim();
 
       if (!source) continue;
 
       // Determine the target diagram type
       let targetType = type;
       if (type === "mermaid") {
-        const firstWord = source.split(/\s+/)[0].toLowerCase();
+        const splitParts = source.split(/\s+/);
+        const firstWord = (splitParts[0] || "").toLowerCase();
         if (mermaidTypes.includes(firstWord) && firstWord !== "mermaid") {
           targetType = firstWord;
         } else if (firstWord === "graph") {
@@ -47,15 +48,17 @@ export const mermaidDeepValidator: CompilerMiddleware = {
       // Ensure diagram has the correct prefix and direction
       if (targetType !== "mermaid") {
         const trimmedDiagram = source.trim();
-        const firstLine = trimmedDiagram.split("\n")[0].trim().toLowerCase();
+        const firstLineParts = trimmedDiagram.split("\n");
+        const firstLine = (firstLineParts[0] || "").trim().toLowerCase();
         
-        const isPrefixed = firstLine.startsWith(targetType.toLowerCase()) || 
+        const isPrefixed = (firstLine.startsWith(targetType.toLowerCase())) || 
                           (targetType === "graph" && firstLine.startsWith("flowchart")) ||
                           (targetType === "flowchart" && firstLine.startsWith("graph"));
         
         if (!isPrefixed) {
           const directions = ["LR", "RL", "TD", "TB", "BT"];
-          const firstWord = firstLine.split(/\s+/)[0].toUpperCase();
+          const lineParts = firstLine.split(/\s+/);
+          const firstWord = (lineParts[0] || "").toUpperCase();
           
           if (directions.includes(firstWord)) {
             const restOfDiagram = trimmedDiagram.split("\n").slice(1).join("\n");
@@ -80,22 +83,16 @@ export const mermaidDeepValidator: CompilerMiddleware = {
 
 /**
  * Validates a diagram by attempting to simulate its rendering.
- * Note: Since a full Mermaid render in Node/JSDOM is extremely complex due to
- * layout engine dependencies (D3/Dagre), we primarily use the internal parser
- * and a "Well-formed SVG" check.
  */
 async function validateDiagram(source: string, filePath: string) {
-  // We use the official Mermaid parser if possible, or our strict validator
   const errors = await validateMermaidContent(source, filePath);
   
   if (errors.length > 0 && errors.some(e => e.severity === "error")) {
-    throw new Error(errors[0].message + ": " + errors[0].detail);
+    const firstError = errors[0];
+    if (firstError) {
+      throw new Error(firstError.message + ": " + firstError.detail);
+    }
   }
-
-  // To truly validate SVG generation, we would need to run mermaid.render()
-  // in a JSDOM instance with full SVG support.
-  // For now, we perform a "Structure Integrity" check on the source
-  // to catch common deep nesting issues.
   
   checkNestingIntegrity(source);
 }
@@ -114,7 +111,6 @@ function checkNestingIntegrity(source: string) {
     throw new Error(`Unbalanced subgraphs (subgraph:${subgraphs}, end:${ends}). Deep nesting requires explicit 'end' tags.`);
   }
   
-  // Detect "Illegal Nesting" patterns known to break flowchart SVGs
   if (source.includes("subgraph") && source.includes("classDiagram")) {
     throw new Error("Illegal mixing of diagram types: subgraphs are not supported in classDiagrams.");
   }

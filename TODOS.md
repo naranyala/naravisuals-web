@@ -60,6 +60,18 @@ The build pipelines have been evolved into professional-grade **Compiler Engines
 ## ⚡ Post-Migration & Optimization (TS & Rust)
 
 ### Performance & Scalability
+- [ ] **State & Reactivity Overhaul**: Replace standard React `useState/useEffect` patterns with a more performant proxy or signal-based architecture.
+    - [ ] Option A: **Valtio** (Proxy-based). Leverage the existing `valtio` dependency to create a global, mutable state store that components can subscribe to with fine-grained reactivity.
+    - [ ] Option B: **Preact Signals**. Integrate `@preact/signals-react` for a truly reactive dependency graph that bypasses standard React reconciliation for UI-only updates.
+    - [ ] Move UI flags (sidebar visible, TOC visible, settings open) from `MainLayout` state to the reactive store.
+    - [ ] Transition Theme and Font preferences from standard hooks to reactive state atoms.
+    - [ ] Unify `useNavigation` logic with the reactive store to ensure single-source-of-truth for the current document.
+- [ ] **Remark/Rehype/Unified Migration**: Transition from `marked` to the `unified` ecosystem.
+    - [ ] Move build pipeline to `unified()` with `remark-parse` and `rehype-stringify`.
+    - [ ] Implement `remark-gfm` for advanced table support and task lists.
+    - [ ] Use `rehype-shiki` or `rehype-pretty-code` for build-time syntax highlighting.
+    - [ ] Integrate `rehype-slug` and `rehype-autolink-headings` for robust anchor management.
+    - [ ] Move custom plugins (admonitions, mermaid) to standard Unified plugins.
 - [ ] **Incremental Build Engine**: Implement hash-based change detection in `CompilationUnit` to skip processing for unchanged files.
 - [ ] **Async Parallelization**: Transition from sequential processing to `Promise.all` pools in `DocumentationCompiler.compile()`.
 - [ ] **JSDOM Performance**: Evaluate JSDOM overhead for huge documentation sets; consider simpler string parsing for basic post-processing.
