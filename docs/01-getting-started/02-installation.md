@@ -151,7 +151,3 @@ bun run docs
 ```bash:desc=Check for markdown validation issues
 bun run validate:strict
 ```
-
----
-
-Next: [Core Concepts](/docs/getting-started/introduction)

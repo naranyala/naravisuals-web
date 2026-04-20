@@ -17,6 +17,7 @@ import { SettingsPanel } from "./components/SettingsPanel";
 import { ThreeColumnLayout } from "./components/ThreeColumnLayout";
 import { TopBar } from "./components/TopBar";
 import { ArticleFooter } from "../features/docs/ArticleFooter";
+import { WordStatsPanel } from "../features/metadata/WordStatsPanel";
 import { DocViewer } from "../features/docs";
 import { useNavigation } from "./hooks/useNavigation";
 
@@ -45,11 +46,13 @@ export function MainLayout() {
     sidebarVisible, 
     tocVisible, 
     settingsOpen, 
+    wordStatsOpen,
     viewMode,
     updateResponsive,
     toggleSidebar,
     toggleToc,
     setSearch,
+    setWordStatsOpen,
     setSidebar,
     setToc,
     setViewMode,
@@ -86,6 +89,7 @@ export function MainLayout() {
 
   useKeyboardShortcut(() => toggleSidebar(), { key: "b", meta: true });
   useKeyboardShortcut(() => setSearch(true), { key: "k", meta: true });
+  useKeyboardShortcut(() => setWordStatsOpen(!wordStatsOpen), { key: "g", meta: true });
 
   useEffect(() => {
     const unsubscribe = services.router.onPopState(() => {
@@ -148,6 +152,7 @@ export function MainLayout() {
         )
       }
     >
+      <WordStatsPanel />
       <ThreeColumnLayout
         sidebar={
           <Sidebar

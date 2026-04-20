@@ -259,7 +259,3 @@ The build runs automatically during:
 - `bun run docs` — Standalone regeneration (skipping rspack)
 
 During development, file changes trigger a rebuild through rspack's watch mode.
-
----
-
-Next: [Dependency Injection](/docs/architecture/dependency-injection)

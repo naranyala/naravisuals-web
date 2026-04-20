@@ -56,6 +56,7 @@ import "./clipboard.ts";
 
 export { sidebarData } from "./sidebar.ts";
 export { allDocs } from "./docs/index.ts";
+export { wordStats, filteredStats } from "./word-stats.ts";
 export type { DocEntry, SidebarItem, SidebarDocItem, SidebarCategoryItem } from "./types.ts";
 `;
   fs.writeFileSync(path.join(genDir, "index.ts"), topIndexContent, "utf-8");

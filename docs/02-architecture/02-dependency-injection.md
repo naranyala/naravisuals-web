@@ -269,7 +269,3 @@ const testContainer = createContainer({
 ```
 
 This pattern is used throughout the test suite in `tests/`.
-
----
-
-Next: [Frontend Components](/docs/architecture/frontend-components)

@@ -1,0 +1,229 @@
+/* ============================================
+   WORD STATISTICS MODAL & PILLS
+   ============================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: backdropFadeIn 0.2s ease-out;
+}
+
+.word-stats-modal {
+  width: 90%;
+  max-width: 800px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  animation: modalScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.stats-description {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.word-pills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.word-pill {
+  display: flex;
+  align-items: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 2rem;
+  padding: 0.4rem 0.8rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.word-pill:hover {
+  border-color: var(--ifm-color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.pill-word {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.pill-count {
+  margin-left: 0.6rem;
+  padding: 0.1rem 0.5rem;
+  background: var(--bg-code);
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  color: var(--ifm-color-primary);
+  font-family: monospace;
+}
+
+/* Scaling based on frequency rank */
+.pill-large {
+  font-size: 1.25rem;
+  padding: 0.6rem 1.2rem;
+  border-width: 2px;
+}
+
+.pill-large .pill-word {
+  font-weight: 700;
+  color: var(--ifm-color-primary);
+}
+
+.pill-medium {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+.pill-small {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.filtered-words-section {
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.collapsible-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.collapsible-header:hover {
+  background-color: var(--bg-surface);
+  color: var(--text);
+}
+
+.filtered-count {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.filtered-pills {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--bg-code);
+  border-radius: 0.75rem;
+}
+
+.filtered-pill {
+  opacity: 0.5;
+  background: transparent;
+}
+
+.filtered-pill:hover {
+  opacity: 1;
+  background: var(--bg-surface);
+}
+
+/* Sub-modal Search Gateway */
+.sub-modal-overlay {
+  z-index: 10001;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.search-gateway-modal {
+  width: 90%;
+  max-width: 450px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: 0 30px 40px -10px rgba(0, 0, 0, 0.4);
+}
+
+.search-engines-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.search-engine-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.search-engine-btn:hover {
+  background: var(--bg-code);
+  border-color: var(--ifm-color-primary);
+  transform: translateY(-2px);
+}
+
+.engine-icon {
+  font-size: 1.25rem;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}

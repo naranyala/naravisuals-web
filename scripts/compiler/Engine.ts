@@ -24,6 +24,24 @@ import {
 import { buildSidebar } from "../pipeline/sidebar.ts";
 import { Logger } from "../core/logger.ts";
 
+const STOP_WORDS = new Set([
+  // Basic grammar
+  "the", "and", "a", "an", "in", "on", "at", "to", "for", "with", "is", "are", "was", "were", 
+  "be", "been", "being", "have", "has", "had", "do", "does", "did", "of", "by", "from", 
+  "it", "its", "they", "them", "their", "this", "that", "these", "those", "which", "who", "whom",
+  "can", "will", "would", "should", "could", "may", "might", "must", "if", "then", "else", "or",
+  "as", "but", "not", "no", "yes", "all", "any", "each", "every", "some", "more", "most", "less", "least",
+  "than", "then", "also", "very", "too", "own", "other", "such", "only", "well", "how", "when", "where", "why",
+  "both", "either", "neither", "just", "even", "still", "back", "away", "out", "into", "onto", "over", "under",
+  "again", "further", "once", "here", "there", "about", "above", "below", "up", "down", "left", "right",
+  
+  // Meta/Template words to hide across disciplines
+  "example", "using", "used", "use", "within", "between", "through", "across", "during", "without",
+  "following", "provides", "provides", "features", "allows", "allows", "support", "supported",
+  "system", "tool", "project", "documentation", "files", "file", "build", "process", "details",
+  "found", "available", "information", "Overview", "Section", "Table", "Contents", "Next", "Steps"
+]);
+
 export class DocumentationCompiler {
   private readonly ctx: CompilationContext;
   private readonly renderer: MarkdownRenderer;
@@ -65,8 +83,55 @@ export class DocumentationCompiler {
 
     // 5. Generate
     this.generate();
+    this.generateWordStats();
 
     this.logger.raw(`✨ Compilation finished in ${Date.now() - this.ctx.startTime}ms`);
+  }
+
+  private generateWordStats() {
+    const wordCounts: Record<string, number> = {};
+    const filteredCounts: Record<string, number> = {};
+    
+    for (const unit of this.units) {
+      if (!unit.content) continue;
+      
+      const text = unit.content
+        .replace(/#+\s/g, " ") // headers
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // links
+        .replace(/`[^`]+`/g, " ") // inline code
+        .replace(/:::[^\s]+/g, " ") // admonitions
+        .replace(/[^\w\s]/g, " ") // punctuation
+        .toLowerCase();
+        
+      const words = text.split(/\s+/);
+      
+      for (const word of words) {
+        if (word.length < 3) continue;
+        if (/^\d+$/.test(word)) continue;
+        
+        if (STOP_WORDS.has(word)) {
+          filteredCounts[word] = (filteredCounts[word] || 0) + 1;
+        } else {
+          wordCounts[word] = (wordCounts[word] || 0) + 1;
+        }
+      }
+    }
+
+    // Sort by frequency
+    const sortedWords = Object.entries(wordCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 200)
+      .map(([word, count]) => ({ word, count }));
+
+    const sortedFiltered = Object.entries(filteredCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([word, count]) => ({ word, count }));
+
+    const content = `// AUTO-GENERATED — DO NOT EDIT.
+export const wordStats = ${JSON.stringify(sortedWords, null, 2)};
+export const filteredStats = ${JSON.stringify(sortedFiltered, null, 2)};
+`;
+    fs.writeFileSync(path.join(this.ctx.config.outputDir, "word-stats.ts"), content, "utf-8");
   }
 
   private async scanDirectory(baseDir: string, section: "docs" | "blog") {

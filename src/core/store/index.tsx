@@ -8,6 +8,7 @@ interface UIState {
   settingsOpen: boolean;
   astOpen: boolean;
   searchOpen: boolean;
+  wordStatsOpen: boolean;
   viewMode: "view" | "raw";
   isMobile: boolean;
   isTocMobile: boolean;
@@ -19,6 +20,7 @@ interface UIStoreActions {
   setSidebar: (visible: boolean) => void;
   setToc: (visible: boolean) => void;
   setSearch: (open: boolean) => void;
+  setWordStatsOpen: (open: boolean) => void;
   setViewMode: (mode: "view" | "raw") => void;
   updateResponsive: (width: number, mobileBreakpoint: number, tocBreakpoint: number) => void;
   setSettingsOpen: (open: boolean) => void;
@@ -51,6 +53,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     settingsOpen: false,
     astOpen: false,
     searchOpen: false,
+    wordStatsOpen: false,
     viewMode: "view",
     isMobile: false,
     isTocMobile: false,
@@ -81,6 +84,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const setSearch = useCallback((open: boolean) => {
     setUiState(prev => ({ ...prev, searchOpen: open }));
+  }, []);
+
+  const setWordStatsOpen = useCallback((open: boolean) => {
+    setUiState(prev => ({ ...prev, wordStatsOpen: open }));
   }, []);
 
   const setViewMode = useCallback((mode: "view" | "raw") => {
@@ -116,6 +123,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setSidebar,
       setToc,
       setSearch,
+      setWordStatsOpen,
       setViewMode,
       updateResponsive,
       setSettingsOpen,

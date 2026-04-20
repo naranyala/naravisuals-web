@@ -21,9 +21,11 @@ export function TopBar({
     sidebarVisible, 
     settingsOpen, 
     searchOpen, 
+    wordStatsOpen,
     toggleSidebar, 
     setSettingsOpen, 
-    setSearch 
+    setSearch,
+    setWordStatsOpen
   } = useUIState();
 
   const onToggleSettings = () => {
@@ -84,6 +86,14 @@ export function TopBar({
           title="Open all docs in new tab for printing"
         >
           <span className="btn-icon">🖨️</span>
+        </button>
+        <button
+          className={clsx("top-bar-btn top-bar-action-btn", { active: wordStatsOpen })}
+          onClick={() => setWordStatsOpen(!wordStatsOpen)}
+          aria-label="Word statistics"
+          title="Word Frequency Analysis"
+        >
+          <span className="btn-icon">📊</span>
         </button>
       </div>
     </div>

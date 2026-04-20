@@ -9,6 +9,8 @@
  */
 
 import { admonitionsPlugin } from "./admonitions.ts";
+import { cleanNavigationPlugin } from "./clean-navigation.ts";
+import { footnotesPlugin } from "./footnotes.ts";
 import { mathPlugin } from "./math.ts";
 import { mermaidPlugin } from "./mermaid.ts";
 import { timelinePlugin } from "./timeline.ts";
@@ -25,13 +27,16 @@ import type { MarkdownPlugin } from "./types.ts";
  *   4. timeline — transform timeline code blocks in postProcess
  */
 export const plugins: MarkdownPlugin[] = [
+  cleanNavigationPlugin,
   mathPlugin,
   admonitionsPlugin,
   mermaidPlugin,
   timelinePlugin,
+  footnotesPlugin,
 ];
 
 export { admonitionsPlugin } from "./admonitions.ts";
+export { footnotesPlugin } from "./footnotes.ts";
 export { mathPlugin } from "./math.ts";
 export { mermaidPlugin } from "./mermaid.ts";
 export { timelinePlugin } from "./timeline.ts";

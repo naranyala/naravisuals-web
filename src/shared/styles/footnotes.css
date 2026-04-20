@@ -1,0 +1,63 @@
+/* Footnotes styling - Wikipedia style */
+
+.footnotes {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9em;
+  color: var(--text-secondary);
+}
+
+.footnotes hr {
+  display: none; /* We use border-top on .footnotes instead */
+}
+
+.footnotes li {
+  margin-bottom: 0.5rem;
+}
+
+.footnotes li:target {
+  background-color: var(--bg-surface); /* Highlight when jumping from ref */
+  transition: background-color 0.5s ease;
+  border-radius: 4px;
+}
+
+/* Footnote references in text */
+.footnote-ref {
+  vertical-align: super;
+  font-size: 0.75em;
+  font-weight: bold;
+  margin-left: 0.1rem;
+  text-decoration: none;
+  color: var(--ifm-color-primary);
+}
+
+.footnote-ref::before {
+  content: "[";
+}
+
+.footnote-ref::after {
+  content: "]";
+}
+
+/* Back-links in footnotes list */
+.footnote-backref {
+  margin-left: 0.4rem;
+  text-decoration: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  color: var(--ifm-color-primary);
+}
+
+.footnote-backref:hover {
+  text-decoration: underline;
+}
+
+/* Wikipedia often has a "References" header */
+.footnotes::before {
+  content: "References";
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text);
+}

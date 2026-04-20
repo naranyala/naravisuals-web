@@ -45,6 +45,7 @@
 
 /* 13. Footer + pagination */
 @import "./doc-footer.css";
+@import "./footnotes.css";
 
 /* 13.5. Article references panel */
 @import "./article-links-panel.css";
@@ -65,3 +66,4 @@
 @import "./error-boundary.css";
 @import "./view-mode.css";
 @import "./sidebar-navigation.css";
+@import "./word-stats.css";
