@@ -4,7 +4,7 @@
 
 /* Hide residual containers ONLY if they are empty */
 [id^="dmermaid-"]:empty {
-  display: none !important;
+  display: none;
 }
 
 .mermaid-diagram {
@@ -19,7 +19,7 @@
 .mermaid,
 .mermaid-src {
   padding: 1.5rem;
-  overflow: auto;
+  overflow: visible;
   text-align: center;
   background: #ffffff; /* Always white background for diagrams */
   min-height: 50px;
@@ -170,20 +170,20 @@
 }
 
 .mermaid-source-code {
-  margin: 0 !important;
-  padding: 0.75rem 1rem !important;
+  margin: 0;
+  padding: 0.75rem 1rem;
   overflow-x: auto;
-  font-size: 0.8rem !important;
-  line-height: 1.4 !important;
-  background: transparent !important;
-  color: var(--text) !important;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  background: transparent;
+  color: var(--text);
 }
 
 .mermaid-source-code code {
-  background: none !important;
-  padding: 0 !important;
-  border: none !important;
-  color: inherit !important;
+  background: none;
+  padding: 0;
+  border: none;
+  color: inherit;
 }
 
 /* ============================================
@@ -203,8 +203,12 @@
 }
 
 @keyframes modalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .mermaid-fullscreen-header {
@@ -304,8 +308,8 @@
 }
 
 .mermaid-fullscreen-content svg {
-  max-width: none !important;
-  max-height: none !important;
+  max-width: none;
+  max-height: none;
   width: auto;
   height: auto;
   display: block;

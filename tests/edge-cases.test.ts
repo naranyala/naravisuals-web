@@ -243,7 +243,7 @@ describe("Slug validation edge cases", () => {
 describe("Internal link validation edge cases", () => {
   test("handles links with query parameters", () => {
     const diags = new Diagnostics();
-    const knownSlugs = new Set(["docs/a"]);
+    const knownSlugs = new Set(["a"]);
     const content = "See [page](/docs/a?ref=test)";
     validateInternalLinks(content, knownSlugs, "test.md", diags);
     expect(diags.warnings()).toHaveLength(0);
@@ -251,7 +251,7 @@ describe("Internal link validation edge cases", () => {
 
   test("handles links with hash fragments", () => {
     const diags = new Diagnostics();
-    const knownSlugs = new Set(["docs/a"]);
+    const knownSlugs = new Set(["a"]);
     const content = "See [page](/docs/a#section)";
     validateInternalLinks(content, knownSlugs, "test.md", diags);
     expect(diags.warnings()).toHaveLength(0);
@@ -259,7 +259,7 @@ describe("Internal link validation edge cases", () => {
 
   test("handles links with both query and hash", () => {
     const diags = new Diagnostics();
-    const knownSlugs = new Set(["docs/a"]);
+    const knownSlugs = new Set(["a"]);
     const content = "See [page](/docs/a?ref=test#section)";
     validateInternalLinks(content, knownSlugs, "test.md", diags);
     expect(diags.warnings()).toHaveLength(0);
@@ -377,32 +377,32 @@ $$`;
 });
 
 describe("Mermaid plugin edge cases", () => {
-  test("handles mermaid with special characters", () => {
+  test("handles mermaid with special characters", async () => {
     const html = `<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">flowchart TD;A-->B;B--&gt;C;</code></pre></div>`;
-    const result = mermaidPlugin.postProcess?.(html);
+    const result = await mermaidPlugin.postProcess?.(html);
     expect(result).toContain("mermaid-diagram");
   });
 
-  test("handles very large mermaid diagram", () => {
+  test("handles very large mermaid diagram", async () => {
     const nodes = Array.from({ length: 100 }, (_, i) => `N${i}[Node ${i}]`).join(";");
     const edges = Array.from({ length: 99 }, (_, i) => `N${i}-->N${i + 1}`).join(";");
     const diagram = `flowchart TD;${nodes};${edges}`;
     const html = `<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">${diagram}</code></pre></div>`;
-    const result = mermaidPlugin.postProcess?.(html);
+    const result = await mermaidPlugin.postProcess?.(html);
     expect(result).toContain("mermaid-diagram");
   });
 
-  test("handles mermaid with HTML injection attempt", () => {
+  test("handles mermaid with HTML injection attempt", async () => {
     const html = `<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">flowchart TD;A-->B&lt;script&gt;alert('xss')&lt;/script&gt;</code></pre></div>`;
-    const result = mermaidPlugin.postProcess?.(html);
+    const result = await mermaidPlugin.postProcess?.(html);
     // Should escape HTML
     expect(result).not.toContain("<script>");
     expect(result).toContain("mermaid-diagram");
   });
 
-  test("handles mixed case language (MERMAID vs mermaid)", () => {
+  test("handles mixed case language (MERMAID vs mermaid)", async () => {
     const html = `<div class="code-block"><div class="code-header"><span class="code-lang">MERMAID</span></div><pre><code class="language-MERMAID">flowchart TD;A-->B;</code></pre></div>`;
-    const result = mermaidPlugin.postProcess?.(html);
+    const result = await mermaidPlugin.postProcess?.(html);
     expect(result).toContain("mermaid-diagram");
   });
 });

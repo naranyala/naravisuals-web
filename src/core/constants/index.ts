@@ -19,10 +19,22 @@ export const AVAILABLE_THEMES: ThemeOption[] = [
 
 export const AVAILABLE_FONTS: FontOption[] = [
   { id: "inter", label: "Modern Sans", css: '"Inter", system-ui, -apple-system, sans-serif' },
-  { id: "serif", label: "Classic Serif", css: '"Source Serif 4", "Georgia", "Times New Roman", serif' },
+  {
+    id: "serif",
+    label: "Classic Serif",
+    css: '"Source Serif 4", "Georgia", "Times New Roman", serif',
+  },
   { id: "plex", label: "Professional", css: '"IBM Plex Sans", system-ui, sans-serif' },
-  { id: "mono", label: "Technical", css: '"JetBrains Mono", "SFMono-Regular", Consolas, monospace' },
-  { id: "system", label: "System UI", css: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
+  {
+    id: "mono",
+    label: "Technical",
+    css: '"JetBrains Mono", "SFMono-Regular", Consolas, monospace',
+  },
+  {
+    id: "system",
+    label: "System UI",
+    css: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  },
 ];
 
 export const DEFAULT_THEME = "catppuccin";

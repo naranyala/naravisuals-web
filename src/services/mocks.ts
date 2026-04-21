@@ -5,13 +5,8 @@
  * Useful for unit tests, server-side rendering, or custom environments.
  */
 
-import {
-  type IDomService,
-  type IRouterService,
-  type IStorageService,
-  type IThemeService,
-} from "./container";
-import { type IEventBusService, createEventBusService } from "./event-bus";
+import type { IDomService, IRouterService, IStorageService, IThemeService } from "./container";
+import { createEventBusService, type IEventBusService } from "./event-bus";
 
 // ─── Mock Types ───────────────────────────────────────────────────────────
 

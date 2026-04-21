@@ -51,6 +51,7 @@ export interface CompilationUnit {
   filePath: string;
   relPath: string;
   rawContent: string;
+  rawMetadata?: Record<string, unknown>;
   content?: string;
   html?: string;
   metadata?: DocMetadata;

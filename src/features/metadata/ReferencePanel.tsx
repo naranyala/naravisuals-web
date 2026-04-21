@@ -1,7 +1,7 @@
-import { useState } from "react";
 import { clsx } from "clsx";
-import { MetadataPanel } from "./MetadataPanel";
+import { useState } from "react";
 import { ArticleRefsPanel } from "./ArticleRefsPanel";
+import { MetadataPanel } from "./MetadataPanel";
 
 interface ReferencePanelProps {
   metadata: Record<string, string | readonly string[]>;
@@ -10,32 +10,32 @@ interface ReferencePanelProps {
 
 /**
  * Unified Reference Panel
- * 
+ *
  * Consolidates Page Metadata and Footnotes into a single information panel.
  * This panel is always visible to provide a consistent UI across all articles.
  */
 export function ReferencePanel({ metadata, markdownAst }: ReferencePanelProps) {
   const [activeTab, setActiveTab] = useState<"metadata" | "footnotes">("metadata");
-  
+
   const hasMetadata = Object.keys(metadata).length > 0;
 
   return (
     <div className="reference-panel-unified">
       <div className="reference-tabs">
-        <button 
+        <button
           className={clsx("ref-tab", { active: activeTab === "metadata" })}
           onClick={() => setActiveTab("metadata")}
         >
           Metadata
         </button>
-        <button 
+        <button
           className={clsx("ref-tab", { active: activeTab === "footnotes" })}
           onClick={() => setActiveTab("footnotes")}
         >
           Footnotes
         </button>
       </div>
-      
+
       <div className="reference-content">
         {activeTab === "metadata" ? (
           hasMetadata ? (

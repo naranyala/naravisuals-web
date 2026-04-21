@@ -1,50 +1,25 @@
 /**
  * Shared types for the documentation build pipeline.
+ * Derived from TypeBox schemas for runtime and build-time safety.
  */
 
-export interface DocEntry {
-  id: string;
-  slug: string;
-  title: string;
-  sidebar_label: string;
-  sidebar_position: number;
-  category: string;
-  original_category?: string;
-  description: string;
-  content: string;
-  rawContent: string;
-  toc: TocItem[];
-  date?: string;
-  author?: string;
-  tags?: string[];
-  section: "docs" | "blog";
-  metadata?: Record<string, string | string[]>;
-  ast?: any[];
-}
+import {
+  type DocEntry,
+  type SidebarItem,
+  type SidebarDocItem,
+  type SidebarCategoryItem,
+  type TocItem,
+  type AppConfig,
+} from "../../src/shared/schemas.ts";
 
-export interface TocItem {
-  value: string;
-  id: string;
-  level: number;
-}
-
-export interface SidebarDocItem {
-  type: "doc";
-  id: string;
-  label: string;
-  slug: string;
-  category?: string | null;
-  date?: string | null;
-}
-
-export interface SidebarCategoryItem {
-  type: "category";
-  label: string;
-  link?: { type: string; id: string };
-  items: SidebarDocItem[];
-}
-
-export type SidebarItem = SidebarDocItem | SidebarCategoryItem;
+export type {
+  DocEntry,
+  SidebarItem,
+  SidebarDocItem,
+  SidebarCategoryItem,
+  TocItem,
+  AppConfig,
+};
 
 export interface CodeBlockMeta {
   lang: string;

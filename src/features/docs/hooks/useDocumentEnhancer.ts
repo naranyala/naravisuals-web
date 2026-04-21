@@ -1,16 +1,16 @@
-import { useEffect, type RefObject } from "react";
+import { type RefObject, useEffect } from "react";
 import { useServices } from "../../../services";
 
 /**
  * useDocumentEnhancer
- * 
+ *
  * Handles late-binding enhancements like Mermaid and MathJax
  * on the rendered HTML content.
  */
 export function useDocumentEnhancer(
   ref: RefObject<HTMLDivElement | null>,
   slug: string,
-  html: string
+  _html: string
 ) {
   const { events } = useServices();
 
@@ -22,7 +22,7 @@ export function useDocumentEnhancer(
       if (!diagrams || diagrams.length === 0) return;
 
       // Only emit loading if there are unprocessed diagrams
-      const hasUnprocessed = Array.from(diagrams).some(w => w.dataset.processed !== "true");
+      const hasUnprocessed = Array.from(diagrams).some((w) => w.dataset["processed"] !== "true");
       if (!hasUnprocessed) return;
 
       events.emit("mermaid:loading", true);
@@ -35,8 +35,6 @@ export function useDocumentEnhancer(
           const m = await import("mermaid");
           mermaid = m.default;
         }
-        
-        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
 
         mermaid.initialize({
           startOnLoad: false,
@@ -55,8 +53,8 @@ export function useDocumentEnhancer(
         });
 
         for (const w of Array.from(diagrams)) {
-          if (w.dataset.processed === "true") continue;
-          
+          if (w.dataset["processed"] === "true") continue;
+
           const mermaidEl = w.querySelector<HTMLElement>(".mermaid");
           if (!mermaidEl) continue;
 
@@ -65,25 +63,37 @@ export function useDocumentEnhancer(
           mermaidEl.style.visibility = "hidden";
           mermaidEl.style.display = "block";
 
-          const source = w.dataset.mermaidSource || mermaidEl.getAttribute("data-source") || mermaidEl.textContent?.trim() || "";
+          let source =
+            w.dataset["mermaidSource"] ||
+            mermaidEl.getAttribute("data-source") ||
+            mermaidEl.textContent?.trim() ||
+            "";
+
+          // Always decode entities to ensure Mermaid gets raw text
+          if (source.includes("&")) {
+            const decoder = document.createElement("div");
+            decoder.innerHTML = source;
+            source = decoder.textContent || source;
+          }
+
           if (!source) continue;
 
           try {
             // Use a safer ID prefix
             const id = `d${Math.random().toString(36).slice(2, 9)}`;
-            
+
             // Pass mermaidEl as the third argument for measurement
             // This often fixes the "Could not find a suitable point" error
             const { svg } = await mermaid.render(id, source, mermaidEl);
-            
+
             if (mounted) {
               mermaidEl.innerHTML = svg;
               mermaidEl.style.visibility = "visible";
-              w.dataset.processed = "true";
-              
+              w.dataset["processed"] = "true";
+
               // Attach action handlers
               attachMermaidActions(w, id, source);
-              
+
               events.emit("mermaid:rendered", { slug, count: 1 });
             }
           } catch (e) {
@@ -172,7 +182,7 @@ export function useDocumentEnhancer(
 
       const container = overlay.querySelector<HTMLElement>(".mermaid-diagram-container")!;
       const content = overlay.querySelector<HTMLElement>(".mermaid-fullscreen-content")!;
-      
+
       let scale = 1;
       let pointX = 0;
       let pointY = 0;
@@ -222,12 +232,16 @@ export function useDocumentEnhancer(
       });
 
       // Mouse wheel zoom
-      content.addEventListener("wheel", (e) => {
-        e.preventDefault();
-        const delta = e.deltaY > 0 ? 0.9 : 1.1;
-        scale = Math.min(Math.max(scale * delta, 0.1), 10);
-        updateTransform();
-      }, { passive: false });
+      content.addEventListener(
+        "wheel",
+        (e) => {
+          e.preventDefault();
+          const delta = e.deltaY > 0 ? 0.9 : 1.1;
+          scale = Math.min(Math.max(scale * delta, 0.1), 10);
+          updateTransform();
+        },
+        { passive: false }
+      );
 
       // Close on escape
       const handleEsc = (e: KeyboardEvent) => {
@@ -243,13 +257,16 @@ export function useDocumentEnhancer(
     const handleDownload = (svgEl: SVGSVGElement, filename: string) => {
       const clone = svgEl.cloneNode(true) as SVGSVGElement;
       clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-      
+
       const svgData = new XMLSerializer().serializeToString(clone);
-      const svgBlob = new Blob([`<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n${svgData}`], {
-        type: "image/svg+xml;charset=utf-8"
-      });
+      const svgBlob = new Blob(
+        [`<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n${svgData}`],
+        {
+          type: "image/svg+xml;charset=utf-8",
+        }
+      );
       const url = URL.createObjectURL(svgBlob);
-      
+
       const link = document.createElement("a");
       link.href = url;
       link.download = `${filename}.svg`;
@@ -282,5 +299,5 @@ export function useDocumentEnhancer(
       mounted = false;
       clearTimeout(timer);
     };
-  }, [html, slug, ref, events]);
+  }, [slug, ref, events, _html]);
 }

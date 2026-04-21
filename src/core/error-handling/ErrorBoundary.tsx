@@ -39,7 +39,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   override componentDidCatch(error: Error, info: ErrorInfo): void {
     this.setState({ error, info });
     // Log to console in development
-    if (process.env.NODE_ENV !== "production") {
+    if (process.env["NODE_ENV"] !== "production") {
       console.error("[ErrorBoundary] Caught error:", error);
       console.error("[ErrorBoundary] Component stack:", info.componentStack);
     }
@@ -76,7 +76,6 @@ interface DefaultErrorFallbackProps {
 
 function DefaultErrorFallback({
   error,
-  info,
   onReset,
 }: DefaultErrorFallbackProps & { onReset: () => void }) {
   console.error("Error caught by boundary:", error.message);

@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { match } from "ts-pattern";
 import { clsx } from "clsx";
-import { useSignals } from "@preact/signals-react/runtime";
+import { useCallback, useEffect, useState } from "react";
+import { useUIState } from "../core/store";
 import { ReferencePanel } from "../features/metadata";
 import { Sidebar, TableOfContents } from "../features/navigation";
 import { GlobalSearch } from "../features/search/GlobalSearch";
@@ -9,23 +10,29 @@ import { useDocsTheme } from "../features/theme";
 import { allDocs, sidebarData } from "../generated";
 import { useServices } from "../services";
 import { useKeyboardShortcut, useTitle } from "../shared/hooks";
-import { useUIState } from "../core/store";
 import "../shared/styles/index.css";
 
+import { DocViewer } from "../features/docs";
+import { ArticleFooter } from "../features/docs/ArticleFooter";
+import { WordStatsPanel } from "../features/metadata/WordStatsPanel";
 import { AppShell } from "./components/AppShell";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { ThreeColumnLayout } from "./components/ThreeColumnLayout";
 import { TopBar } from "./components/TopBar";
-import { ArticleFooter } from "../features/docs/ArticleFooter";
-import { WordStatsPanel } from "../features/metadata/WordStatsPanel";
-import { DocViewer } from "../features/docs";
 import { useNavigation } from "./hooks/useNavigation";
+import { printAllDocs } from "./utils/print-engine";
+
+import { DocEntrySchema } from "../shared/schemas";
+import { TypeCompiler } from "@sinclair/typebox/compiler";
+
+const docValidator = TypeCompiler.Compile(DocEntrySchema);
 
 export function MainLayout() {
   const services = useServices();
   const docsTheme = useDocsTheme();
-  
+
   const [mermaidLoading, setMermaidLoading] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   useEffect(() => {
     return services.events.on("mermaid:loading", (loading) => {
@@ -38,14 +45,24 @@ export function MainLayout() {
   const { currentDoc, currentSlug, navigate, getDocsInSidebarOrder, setCurrentSlug, resolveSlug } =
     useNavigation(services);
 
+  // Runtime validation of current document
+  useEffect(() => {
+    if (currentDoc) {
+      const doc = currentDoc as any;
+      if (!docValidator.Check(doc)) {
+        const errors = [...docValidator.Errors(doc)];
+        console.warn(`Document validation failed for ${doc.slug}:`, errors);
+      }
+    }
+  }, [currentDoc]);
+
   // ─── Reactive State ───────────────────────────────────────────────
   // We consume the reactive state for UI flags
-  const { 
-    isMobile, 
-    isTocMobile, 
-    sidebarVisible, 
-    tocVisible, 
-    settingsOpen, 
+  const {
+    isMobile,
+    isTocMobile,
+    tocVisible,
+    settingsOpen,
     wordStatsOpen,
     viewMode,
     updateResponsive,
@@ -56,7 +73,7 @@ export function MainLayout() {
     setSidebar,
     setToc,
     setViewMode,
-    setSettingsOpen
+    setSettingsOpen,
   } = useUIState();
 
   // ─── Responsive Handling ──────────────────────────────────────────
@@ -104,11 +121,22 @@ export function MainLayout() {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [currentSlug]);
 
-  const handleNavigate = (target: string) => {
-    navigate(target, isMobile, 
-      (v) => setSidebar(v), 
+  const handleNavigate = useCallback((target: string) => {
+    navigate(
+      target,
+      isMobile,
+      (v) => setSidebar(v),
       (v) => setToc(v)
     );
+  }, [navigate, isMobile, setSidebar, setToc]);
+
+  const handlePrint = async () => {
+    setIsPrinting(true);
+    try {
+      await printAllDocs(allDocs as any, services.config, services.dom);
+    } finally {
+      setIsPrinting(false);
+    }
   };
 
   if (!currentDoc) {
@@ -134,9 +162,9 @@ export function MainLayout() {
       topBar={
         <TopBar
           mermaidLoading={mermaidLoading}
-          currentDoc={currentDoc as any}
+          isPrinting={isPrinting}
           onNavigate={handleNavigate}
-          onPrint={() => {}}
+          onPrint={handlePrint}
         />
       }
       search={<GlobalSearch onNavigate={handleNavigate} />}
@@ -155,11 +183,7 @@ export function MainLayout() {
       <WordStatsPanel />
       <ThreeColumnLayout
         sidebar={
-          <Sidebar
-            sidebar={sidebarData}
-            currentSlug={currentSlug}
-            onNavigate={handleNavigate}
-          />
+          <Sidebar sidebar={sidebarData} currentSlug={currentSlug} onNavigate={handleNavigate} />
         }
         content={
           <>
@@ -179,10 +203,7 @@ export function MainLayout() {
 
             {isTocMobile && currentDoc.toc.length > 0 && (
               <div className="toc-mobile-collapsible">
-                <button
-                  className="toc-mobile-header"
-                  onClick={() => toggleToc()}
-                >
+                <button className="toc-mobile-header" onClick={() => toggleToc()}>
                   <span>Table of Contents</span>
                   <span className={clsx("toc-chevron", { open: tocVisible })}>▾</span>
                 </button>
@@ -190,30 +211,38 @@ export function MainLayout() {
               </div>
             )}
 
-            {viewMode === "view" ? (
-              <>
-                <DocViewer html={currentDoc.content} slug={currentDoc.slug} />
-                <ArticleFooter
-                  contentHtml={currentDoc.content}
-                  onNavigate={handleNavigate}
-                  prevDoc={prevDoc ? { title: prevDoc.sidebar_label || prevDoc.title, slug: prevDoc.slug } : undefined}
-                  nextDoc={nextDoc ? { title: nextDoc.sidebar_label || nextDoc.title, slug: nextDoc.slug } : undefined}
-                />
-              </>
-            ) : (
-              <div className="raw-content-viewer">
-                <pre className="raw-markdown">{currentDoc.rawContent}</pre>
-              </div>
-            )}
+            {match(viewMode)
+              .with("view", () => (
+                <>
+                  <DocViewer html={currentDoc.content} slug={currentDoc.slug} />
+                  <ArticleFooter
+                    contentHtml={currentDoc.content}
+                    onNavigate={handleNavigate}
+                    prevDoc={
+                      prevDoc
+                        ? { title: prevDoc.sidebar_label || prevDoc.title, slug: prevDoc.slug }
+                        : undefined
+                    }
+                    nextDoc={
+                      nextDoc
+                        ? { title: nextDoc.sidebar_label || nextDoc.title, slug: nextDoc.slug }
+                        : undefined
+                    }
+                  />
+                </>
+              ))
+              .with("raw", () => (
+                <div className="raw-content-viewer">
+                  <pre className="raw-markdown">{currentDoc.rawContent}</pre>
+                </div>
+              ))
+              .exhaustive()}
           </>
         }
         reference={
           <>
             <TableOfContents items={currentDoc.toc} />
-            <ReferencePanel 
-              metadata={currentDoc.metadata || {}} 
-              markdownAst={currentDoc.ast} 
-            />
+            <ReferencePanel metadata={currentDoc.metadata || {}} markdownAst={currentDoc.ast} />
           </>
         }
       />

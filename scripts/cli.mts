@@ -18,7 +18,8 @@
  *   ssg info             Show project information
  */
 
-import { spawn, spawnSync } from "node:child_process";
+import { match, P } from "ts-pattern";
+import { spawn } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import net from "node:net";
 import { join } from "node:path";
@@ -62,15 +63,6 @@ function runCommand(command: string, args: string[], options: any = {}) {
       child.stdout?.on("data", options.onOutput);
       child.stderr?.on("data", options.onOutput);
     }
-  });
-}
-
-function _runCommandSync(command: string, args: string[]) {
-  return spawnSync(command, args, {
-    stdio: "pipe",
-    cwd: projectRoot,
-    shell: true,
-    env: { ...process.env },
   });
 }
 
@@ -272,7 +264,7 @@ async function cmdPreview(options: any) {
     logger.blank();
 
     // Then serve with port detection
-    const startPort = Number(options.port) || Number(process.env.PORT) || 3000;
+    const startPort = Number(options.port) || Number(process.env["PORT"]) || 3000;
     const port = await findAvailablePort(startPort);
 
     if (port !== startPort) {
@@ -560,7 +552,9 @@ function parseArgs(argv: any) {
     } else if (arg === "--rust" || arg === "-r") {
       args.useRust = true;
     } else if (arg === "-rust") {
-      logger.warn("The '-rust' flag is deprecated. Please use the standard '--rust' or '-r' instead.");
+      logger.warn(
+        "The '-rust' flag is deprecated. Please use the standard '--rust' or '-r' instead."
+      );
       args.useRust = true;
     } else if (arg === "--no-lint") {
       args.skipLint = true;
@@ -595,31 +589,21 @@ function parseArgs(argv: any) {
 async function main() {
   const args = parseArgs(process.argv);
 
-  // Map command aliases
-  const commandMap = {
-    dev: "dev",
-    serve: "dev",
-    build: "build",
-    bundle: "build",
-    start: "start",
-    preview: "preview",
-    docs: "docs",
-    "docs:build": "docs",
-    lint: "lint",
-    "lint:fix": "lint",
-    check: "lint",
-    typecheck: "typecheck",
-    "type-check": "typecheck",
-    test: "test",
-    tests: "test",
-    clean: "clean",
-    info: "info",
-    status: "info",
-    version: "version",
-    help: "help",
-  };
-
-  const command = (commandMap as any)[args.command] || "help";
+  // Unified command dispatcher using ts-pattern
+  const command = match(args.command)
+    .with(P.union("dev", "serve"), () => "dev")
+    .with(P.union("build", "bundle"), () => "build")
+    .with("start", () => "start")
+    .with("preview", () => "preview")
+    .with(P.union("docs", "docs:build"), () => "docs")
+    .with(P.union("lint", "check"), () => "lint")
+    .with("lint:fix", () => "lint")
+    .with(P.union("typecheck", "type-check"), () => "typecheck")
+    .with(P.union("test", "tests"), () => "test")
+    .with("clean", () => "clean")
+    .with(P.union("info", "status"), () => "info")
+    .with("version", () => "version")
+    .otherwise(() => "help");
 
   // Detect lint:fix
   if (args.command === "lint:fix" || args.fix) {
@@ -629,7 +613,7 @@ async function main() {
   // Handle port detection for relevant commands
   let port = null;
   if (["dev", "start", "preview"].includes(command)) {
-    const startPort = Number(args.port) || Number(process.env.PORT) || 3000;
+    const startPort = Number(args.port) || Number(process.env["PORT"]) || 3000;
     port = await findAvailablePort(startPort);
     if (port !== startPort) {
       logger.warn(`Port ${startPort} is in use, using port ${port} instead`);
@@ -657,7 +641,7 @@ async function main() {
     // Forward command and arguments to Rust binary
     // We explicitly pass the detected port if we found one
     const rustArgs = [command];
-    
+
     // Add other flags
     if (args.skipClean) rustArgs.push("--skip-clean");
     if (args.skipLint) rustArgs.push("--skip-lint");
@@ -680,40 +664,19 @@ async function main() {
   }
 
   try {
-    switch (command) {
-      case "dev":
-        await cmdDev(args);
-        break;
-      case "build":
-        await cmdBuild(args);
-        break;
-      case "start":
-        await cmdStart(args);
-        break;
-      case "preview":
-        await cmdPreview(args);
-        break;
-      case "docs":
-        await cmdDocs();
-        break;
-      case "lint":
-        await cmdLint(args);
-        break;
-      case "typecheck":
-        await cmdTypeCheck();
-        break;
-      case "test":
-        await cmdTest(args);
-        break;
-      case "clean":
-        await cmdClean();
-        break;
-      case "info":
-        await cmdInfo();
-        break;
-      default:
-        showHelp();
-    }
+    await match(command)
+      .with("dev", () => cmdDev(args))
+      .with("build", () => cmdBuild(args))
+      .with("start", () => cmdStart(args))
+      .with("preview", () => cmdPreview(args))
+      .with("docs", () => cmdDocs())
+      .with("lint", () => cmdLint(args))
+      .with("typecheck", () => cmdTypeCheck())
+      .with("test", () => cmdTest(args))
+      .with("clean", () => cmdClean())
+      .with("info", () => cmdInfo())
+      .with("version", async () => showVersion())
+      .otherwise(async () => showHelp());
   } catch (error: any) {
     if (error.code === "ENOENT") {
       logger.error(`Command not found: ${args.command}`);

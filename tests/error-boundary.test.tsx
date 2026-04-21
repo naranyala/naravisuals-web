@@ -4,7 +4,7 @@
 
 import { describe, expect, mock, spyOn, test } from "bun:test";
 import { render } from "@testing-library/react";
-import { createElement as h, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { ErrorBoundary } from "../src/core/error-handling/ErrorBoundary";
 
 // Helper: component that throws during render
@@ -36,7 +36,7 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>
     );
 
-    expect(getByText(/something went wrong/i)).toBeTruthy();
+    expect(getByText(/application error/i)).toBeTruthy();
     expect(getByText("Test render error")).toBeTruthy();
     expect(getByRole("button", { name: /reload page/i })).toBeTruthy();
 

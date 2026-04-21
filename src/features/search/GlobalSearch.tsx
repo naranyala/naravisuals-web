@@ -1,7 +1,7 @@
-import Fuse from "fuse.js";
-import { useMemo, useState, useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
 import { clsx } from "clsx";
+import Fuse from "fuse.js";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { allDocs } from "@/generated";
 import { useUIState } from "../../core/store";
 
@@ -29,12 +29,15 @@ export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => voi
 
   const results = useMemo(() => {
     if (!query) return [];
-    return fuse.search(query).map(r => r.item).slice(0, 8);
+    return fuse
+      .search(query)
+      .map((r) => r.item)
+      .slice(0, 8);
   }, [query, fuse]);
 
   useEffect(() => {
     setSelectedIndex(0);
-  }, [results]);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -44,10 +47,10 @@ export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => voi
         setSearch(false);
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex(prev => (prev + 1) % (results.length || 1));
+        setSelectedIndex((prev) => (prev + 1) % (results.length || 1));
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setSelectedIndex(prev => (prev - 1 + (results.length || 1)) % (results.length || 1));
+        setSelectedIndex((prev) => (prev - 1 + (results.length || 1)) % (results.length || 1));
       } else if (e.key === "Enter") {
         if (results[selectedIndex]) {
           onNavigate(results[selectedIndex].slug);
@@ -75,22 +78,24 @@ export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => voi
         <div className="search-modal" onClick={(e) => e.stopPropagation()}>
           <div className="search-header">
             <span className="search-modal-icon">🔍</span>
-            <input 
+            <input
               ref={inputRef}
-              type="text" 
-              placeholder="Search documentation..." 
+              type="text"
+              placeholder="Search documentation..."
               value={query}
-              onChange={e => setQuery(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
               className="search-input"
             />
-            <div className="search-modal-esc" onClick={() => setSearch(false)}>ESC</div>
+            <div className="search-modal-esc" onClick={() => setSearch(false)}>
+              ESC
+            </div>
           </div>
           <div className="search-body">
             {results.length > 0 ? (
               <div className="search-results-list">
                 {results.map((doc, index) => (
-                  <div 
-                    key={doc.id} 
+                  <div
+                    key={doc.id}
                     className={clsx("search-result-item", { active: index === selectedIndex })}
                     onClick={() => {
                       onNavigate(doc.slug);
@@ -112,7 +117,9 @@ export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => voi
                 {query ? (
                   <div className="search-no-results">
                     <div className="search-empty-icon">∅</div>
-                    <p>No results found for "<strong>{query}</strong>"</p>
+                    <p>
+                      No results found for "<strong>{query}</strong>"
+                    </p>
                   </div>
                 ) : (
                   <div className="search-prompt">
@@ -125,9 +132,15 @@ export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => voi
           </div>
           <div className="search-footer">
             <div className="search-help">
-              <span><kbd>↑↓</kbd> to navigate</span>
-              <span><kbd>↵</kbd> to select</span>
-              <span><kbd>esc</kbd> to close</span>
+              <span>
+                <kbd>↑↓</kbd> to navigate
+              </span>
+              <span>
+                <kbd>↵</kbd> to select
+              </span>
+              <span>
+                <kbd>esc</kbd> to close
+              </span>
             </div>
           </div>
         </div>

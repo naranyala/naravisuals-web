@@ -1,12 +1,12 @@
 ---
-title: Welcome
+title: Abstract
 description: A fast, modern static site generator for documentation built with rspack, React, Shiki, and Mermaid
-sidebar_label: Welcome
+sidebar_label: Abstract
 sidebar_position: 0
-tags: [welcome, getting-started]
+tags: [abstract, getting-started]
 ---
 
-# Welcome to SSG Documentation
+# Abstract
 
 The **SSG Documentation Site Generator** (docts) is a fast, modern tool for building beautiful documentation websites. Powered by **rspack**[^1] for blazing builds, **React** for the UI, **Shiki**[^2] for VS Code-quality syntax highlighting, and **Mermaid** for live diagrams.
 

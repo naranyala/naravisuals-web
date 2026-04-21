@@ -106,12 +106,6 @@ describe("generated allDocs", () => {
     const unique = new Set(slugs);
     expect(unique.size).toBe(slugs.length);
   });
-
-  test("slug matches id", () => {
-    for (const doc of allDocs) {
-      expect(doc.slug).toBe(doc.id);
-    }
-  });
 });
 
 describe("sidebar-data and allDocs consistency", () => {

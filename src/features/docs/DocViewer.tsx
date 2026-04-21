@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import { useDocumentEnhancer } from "./hooks/useDocumentEnhancer";
 
 interface DocViewerProps {
@@ -6,17 +6,11 @@ interface DocViewerProps {
   slug: string;
 }
 
-export function DocViewer({ html, slug }: DocViewerProps) {
+export const DocViewer = memo(({ html, slug }: DocViewerProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  
+
   // Apply late-binding enhancements (Mermaid, MathJax)
   useDocumentEnhancer(ref, slug, html);
 
-  return (
-    <div 
-      ref={ref} 
-      className="doc-content" 
-      dangerouslySetInnerHTML={{ __html: html }} 
-    />
-  );
-}
+  return <div ref={ref} className="doc-content" dangerouslySetInnerHTML={{ __html: html }} />;
+});

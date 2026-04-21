@@ -107,7 +107,9 @@ describe("Mermaid Content Validation", () => {
     });
 
     test("allows directive syntax", async () => {
-      const errors = await validateMermaidContent("%%{init: {'theme':'base'}}%%\nflowchart TD;\nA-->B;");
+      const errors = await validateMermaidContent(
+        "%%{init: {'theme':'base'}}%%\nflowchart TD;\nA-->B;"
+      );
       expect(errors).toHaveLength(0);
     });
   });

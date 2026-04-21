@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
+import { useDocState } from "../../core/store";
 import { allDocs, type DocEntry, type SidebarItem, sidebarData } from "../../generated";
 import type { ServiceContainer } from "../../services";
-import { useDocState } from "../../core/store";
 
 export function useNavigation(services: ServiceContainer) {
   const { setDoc } = useDocState();
   const resolveSlug = (): string => {
     const path = services.router.getCurrentPath();
-    if (path === "/" || path === "") return "welcome";
+    if (path === "/" || path === "") return "abstract";
     if (path === `/${services.config.routes.docs}` || path === `/${services.config.routes.docs}/`) {
-      return "welcome";
+      return "abstract";
     }
     if (path.startsWith(`/${services.config.routes.docs}/`)) {
       return path.replace(`/${services.config.routes.docs}/`, "");
     }
-    return allDocs[0]?.slug || "welcome";
+    return allDocs[0]?.slug || "abstract";
   };
 
   const [currentSlug, setCurrentSlug] = useState(resolveSlug);
@@ -34,9 +34,9 @@ export function useNavigation(services: ServiceContainer) {
   ) => {
     const [slug] = target.split("#");
     if (!slug) return;
-    
+
     services.events.emit("nav:navigate", { target, isMobile });
-    
+
     setCurrentSlug(slug);
     services.router.pushState(
       {},
@@ -82,7 +82,7 @@ export function useNavigation(services: ServiceContainer) {
       setCurrentSlug(resolveSlug());
     });
     return unsubscribe;
-  }, []);
+  }, [services.router.onPopState, resolveSlug]);
 
   return { currentSlug, currentDoc, navigate, getDocsInSidebarOrder, setCurrentSlug, resolveSlug };
 }

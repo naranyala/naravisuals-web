@@ -17,11 +17,9 @@ export interface ValidatorOptions {
 
 export class ValidationManager {
   private docsDir: string;
-  private strict: boolean;
 
   constructor(options: ValidatorOptions = {}) {
     this.docsDir = options.docsDir || paths.docs;
-    this.strict = options.strict || false;
   }
 
   /**

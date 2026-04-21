@@ -1,6 +1,6 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { readFileSync } from "node:fs";
 import { defineConfig } from "@rspack/cli";
 import { rspack } from "@rspack/core";
 import { ReactRefreshRspackPlugin } from "@rspack/plugin-react-refresh";
@@ -70,8 +70,18 @@ export default defineConfig({
       minify: isProd,
     }),
     new rspack.DefinePlugin({
-      "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "development"),
+      "process.env.NODE_ENV": JSON.stringify(process.env["NODE_ENV"] || "development"),
       "process.env.PROJECT_NAME": JSON.stringify(pkg.name),
+      "process.env.SITE_URL": JSON.stringify(process.env["SITE_URL"] || "http://localhost:3000"),
+      // Support bracket notation
+      "process.env['NODE_ENV']": JSON.stringify(process.env["NODE_ENV"] || "development"),
+      "process.env['PROJECT_NAME']": JSON.stringify(pkg.name),
+      "process.env['SITE_URL']": JSON.stringify(process.env["SITE_URL"] || "http://localhost:3000"),
+      'process.env["NODE_ENV"]': JSON.stringify(process.env["NODE_ENV"] || "development"),
+      'process.env["PROJECT_NAME"]': JSON.stringify(pkg.name),
+      'process.env["SITE_URL"]': JSON.stringify(process.env["SITE_URL"] || "http://localhost:3000"),
+      // Fallback for process itself
+      process: "({ env: {} })",
     }),
     new rspack.CopyRspackPlugin({
       patterns: [

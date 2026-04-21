@@ -6,9 +6,9 @@
   margin-bottom: 1rem;
 }
 .shiki code {
-  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace !important;
-  font-size: 0.8rem !important;
-  line-height: 1.6 !important;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.6;
 }
 
 /* ─── Shiki Code Theme System ───────────────────────────────── */

@@ -1,13 +1,12 @@
 /**
  * Mermaid Deep Validator Middleware
- * 
+ *
  * Performs "Pre-Flight" rendering of Mermaid diagrams during the build process
  * to ensure that the generated SVG will be valid and renderable in the browser.
  */
 
-import { JSDOM } from "jsdom";
-import type { CompilerMiddleware } from "../Middleware.ts";
 import { validateMermaidContent } from "../../plugins/validators/mermaid-content.ts";
+import type { CompilerMiddleware } from "../Middleware.ts";
 
 export const mermaidDeepValidator: CompilerMiddleware = {
   name: "mermaid-deep-validator",
@@ -16,19 +15,35 @@ export const mermaidDeepValidator: CompilerMiddleware = {
     // 1. Find all mermaid blocks in the markdown content
     // Supports: ```mermaid, ```flowchart, ```graph, etc.
     const mermaidTypes = [
-      "mermaid", "graph", "flowchart", "sequenceDiagram", "classDiagram", "stateDiagram", 
-      "erDiagram", "gantt", "pie", "quadrantChart", "xyChart", "mindmap", 
-      "timeline", "journey", "requirementDiagram", "gitGraph", "sankey"
+      "mermaid",
+      "graph",
+      "flowchart",
+      "sequenceDiagram",
+      "classDiagram",
+      "stateDiagram",
+      "erDiagram",
+      "gantt",
+      "pie",
+      "quadrantChart",
+      "xyChart",
+      "mindmap",
+      "timeline",
+      "journey",
+      "requirementDiagram",
+      "gitGraph",
+      "sankey",
     ];
     const typesRegex = mermaidTypes.join("|");
-    const mermaidRegex = new RegExp("```(" + typesRegex + ")(?::desc=([^ \\n]+))?\\n([\\s\\S]*?)\\n```", "g");
-    
+    const mermaidRegex = new RegExp(
+      `\`\`\`(${typesRegex})(?::desc=([^\\n]+))?\\n([\\s\\S]*?)\\n\`\`\``,
+      "g"
+    );
+
     let match;
     const content = unit.content || "";
 
     while ((match = mermaidRegex.exec(content)) !== null) {
       const type = match[1] || "mermaid";
-      const desc = match[2];
       let source = (match[3] || "").trim();
 
       if (!source) continue;
@@ -50,16 +65,17 @@ export const mermaidDeepValidator: CompilerMiddleware = {
         const trimmedDiagram = source.trim();
         const firstLineParts = trimmedDiagram.split("\n");
         const firstLine = (firstLineParts[0] || "").trim().toLowerCase();
-        
-        const isPrefixed = (firstLine.startsWith(targetType.toLowerCase())) || 
-                          (targetType === "graph" && firstLine.startsWith("flowchart")) ||
-                          (targetType === "flowchart" && firstLine.startsWith("graph"));
-        
+
+        const isPrefixed =
+          firstLine.startsWith(targetType.toLowerCase()) ||
+          (targetType === "graph" && firstLine.startsWith("flowchart")) ||
+          (targetType === "flowchart" && firstLine.startsWith("graph"));
+
         if (!isPrefixed) {
           const directions = ["LR", "RL", "TD", "TB", "BT"];
           const lineParts = firstLine.split(/\s+/);
           const firstWord = (lineParts[0] || "").toUpperCase();
-          
+
           if (directions.includes(firstWord)) {
             const restOfDiagram = trimmedDiagram.split("\n").slice(1).join("\n");
             source = `${targetType} ${firstWord}\n${restOfDiagram}`;
@@ -78,7 +94,7 @@ export const mermaidDeepValidator: CompilerMiddleware = {
         ctx.error("plugin", unit.relPath, "Mermaid Deep Validation Failed", err.message);
       }
     }
-  }
+  },
 };
 
 /**
@@ -86,14 +102,14 @@ export const mermaidDeepValidator: CompilerMiddleware = {
  */
 async function validateDiagram(source: string, filePath: string) {
   const errors = await validateMermaidContent(source, filePath);
-  
-  if (errors.length > 0 && errors.some(e => e.severity === "error")) {
+
+  if (errors.length > 0 && errors.some((e) => e.severity === "error")) {
     const firstError = errors[0];
     if (firstError) {
-      throw new Error(firstError.message + ": " + firstError.detail);
+      throw new Error(`${firstError.message}: ${firstError.detail}`);
     }
   }
-  
+
   checkNestingIntegrity(source);
 }
 
@@ -104,14 +120,20 @@ function checkNestingIntegrity(source: string) {
   const ends = (source.match(/\bend\b/g) || []).length;
 
   if (openBraces !== closeBraces) {
-    throw new Error(`Unbalanced braces ({:${openBraces}, }:${closeBraces}). This will cause SVG corruption.`);
+    throw new Error(
+      `Unbalanced braces ({:${openBraces}, }:${closeBraces}). This will cause SVG corruption.`
+    );
   }
 
   if (subgraphs !== ends) {
-    throw new Error(`Unbalanced subgraphs (subgraph:${subgraphs}, end:${ends}). Deep nesting requires explicit 'end' tags.`);
+    throw new Error(
+      `Unbalanced subgraphs (subgraph:${subgraphs}, end:${ends}). Deep nesting requires explicit 'end' tags.`
+    );
   }
-  
+
   if (source.includes("subgraph") && source.includes("classDiagram")) {
-    throw new Error("Illegal mixing of diagram types: subgraphs are not supported in classDiagrams.");
+    throw new Error(
+      "Illegal mixing of diagram types: subgraphs are not supported in classDiagrams."
+    );
   }
 }

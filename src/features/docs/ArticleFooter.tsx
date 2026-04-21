@@ -1,6 +1,4 @@
-import { useMemo, useState } from "react";
-import { clsx } from "clsx";
-import { DocFooter, DocStatsFooter } from "../docs";
+import { DocFooter } from "../docs";
 
 interface ArticleFooterProps {
   contentHtml: string;
@@ -11,14 +9,10 @@ interface ArticleFooterProps {
 
 /**
  * Unified Article Footer
- * 
+ *
  * Consolidates pagination navigation and document statistics.
  */
-export function ArticleFooter({
-  prevDoc,
-  nextDoc,
-  onNavigate,
-}: ArticleFooterProps) {
+export function ArticleFooter({ prevDoc, nextDoc, onNavigate }: ArticleFooterProps) {
   return (
     <footer className="article-footer-unified">
       <DocFooter prevDoc={prevDoc} nextDoc={nextDoc} onNavigate={onNavigate} />

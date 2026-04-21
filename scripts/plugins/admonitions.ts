@@ -156,7 +156,7 @@ export const admonitionsPlugin: MarkdownPlugin = {
     return resultLines.join("\n");
   },
 
-  postProcess(html: string): string {
+  async postProcess(html: string): Promise<string> {
     if (blocks.length === 0) return html;
 
     let result = html;
@@ -170,7 +170,7 @@ export const admonitionsPlugin: MarkdownPlugin = {
       const label = block.customTitle || meta.label;
 
       // Process the inner content through marked to get HTML
-      const innerHtml = marked.parse(block.content) as any as string;
+      const innerHtml = (await marked.parse(block.content)) as string;
 
       const admonitionHtml = [
         `<div class="admonition admonition-${block.type}">`,

@@ -1,5 +1,5 @@
-import React from "react";
 import { clsx } from "clsx";
+import type React from "react";
 import { useUIState } from "../../core/store";
 
 interface AppShellProps {
@@ -11,7 +11,7 @@ interface AppShellProps {
 
 /**
  * AppShell
- * 
+ *
  * Root structural primitive. Manages global overlays and top-level scroll.
  */
 export function AppShell({ children, topBar, search, settings }: AppShellProps) {
@@ -22,15 +22,12 @@ export function AppShell({ children, topBar, search, settings }: AppShellProps) 
       {topBar}
       {search}
       {settings}
-      
+
       {/* Mobile Sidebar Overlay */}
       {isMobile && sidebarVisible && (
-        <div 
-          className="mobile-overlay" 
-          onClick={() => setSidebar(false)}
-        />
+        <div className="mobile-overlay" onClick={() => setSidebar(false)} />
       )}
-      
+
       {children}
     </div>
   );

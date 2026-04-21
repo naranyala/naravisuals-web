@@ -90,9 +90,9 @@
 }
 
 .doc-content .code-block pre code {
-  background: none !important;
-  padding: 0 !important;
-  border: none !important;
+  background: none;
+  padding: 0;
+  border: none;
   color: var(--text);
   font-family: inherit;
   font-size: inherit;
@@ -150,31 +150,31 @@
   }
 
   .code-header {
-    background: #f5f5f5 !important;
+    background: #f5f5f5;
     border-bottom: 1px solid #ccc;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
   .code-copy-btn {
-    display: none !important;
+    display: none;
   }
 
   .code-desc {
-    background: #fafafa !important;
+    background: #fafafa;
     border-top: 1px solid #ccc;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
   .doc-content .code-block pre {
-    background: #fafafa !important;
+    background: #fafafa;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
   .doc-content .code-block pre .line::before {
-    color: #888 !important;
+    color: #888;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }

@@ -3,7 +3,7 @@ import type { MarkdownPlugin } from "./types.ts";
 
 /**
  * Custom Footnotes Plugin
- * 
+ *
  * Supports Wikipedia-style footnotes: [^1] and [^1]: content.
  * Avoids issues with broken external plugins.
  */
@@ -12,7 +12,7 @@ export const footnotesPlugin: MarkdownPlugin = {
 
   preProcess(content: string) {
     const footnotes = new Map<string, string>();
-    
+
     // 1. Extract footnote definitions: [^1]: Content
     // We match lines starting with [^ID]:
     const definitionRegex = /^\[\^([^\]]+)\]:\s*(.*)$/gm;
@@ -26,7 +26,7 @@ export const footnotesPlugin: MarkdownPlugin = {
 
     // 2. Replace footnote references: [^1]
     // We avoid matching the definition syntax by ensuring it's not followed by a colon
-    const refRegex = /\[\^([^\]]+)\](?!\:)/g;
+    const refRegex = /\[\^([^\]]+)\](?!:)/g;
     processed = processed.replace(refRegex, (_, id) => {
       if (footnotes.has(id)) {
         return `<sup id="fnref:${id}" class="footnote-ref"><a href="#fn:${id}">${id}</a></sup>`;
@@ -39,11 +39,11 @@ export const footnotesPlugin: MarkdownPlugin = {
     // Since MarkdownPlugin is stateless across files in the current architecture,
     // we can use a trick: append a hidden JSON or just use a WeakMap if we had the unit object.
     // But here we only have the string.
-    
+
     // Alternative: append the footnotes HTML directly in preProcess but marked might mangle it?
-    // Actually, marked will leave HTML alone. 
+    // Actually, marked will leave HTML alone.
     // But we want it at the VERY end, and marked might add closing tags after it.
-    
+
     // Let's use a delimiter and handle it in postProcess.
     const footnotesData = JSON.stringify(Array.from(footnotes.entries()));
     return `${processed}\n\n<!-- FOOTNOTES_DATA:${footnotesData} -->`;
@@ -63,7 +63,7 @@ export const footnotesPlugin: MarkdownPlugin = {
     for (const [id, text] of footnotes) {
       // Parse the footnote text as markdown (inline usually sufficient)
       const parsedText = marked.parseInline(text);
-      
+
       // Wikipedia style: backlink is usually at the end of the note or an arrow
       footnotesHtml += `  <li id="fn:${id}">\n`;
       footnotesHtml += `    ${parsedText}\n`;
@@ -73,5 +73,5 @@ export const footnotesPlugin: MarkdownPlugin = {
     footnotesHtml += `</ol>\n</section>`;
 
     return `${content.trim()}\n${footnotesHtml}`;
-  }
+  },
 };

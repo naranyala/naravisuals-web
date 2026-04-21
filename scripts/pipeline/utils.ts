@@ -23,7 +23,7 @@ export function slugifyHeading(text: string): string {
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
 
-  return slug || "heading-" + Math.random().toString(36).slice(2, 7);
+  return slug || `heading-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 /**

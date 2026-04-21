@@ -520,14 +520,14 @@ describe("mathPlugin — postProcess", () => {
   test("renders inline math with \\(\\) delimiters", () => {
     mathPlugin.preProcess?.("The formula is $E = mc^2$ here.");
     const html = "<p>The formula is MATHINLINE0END here.</p>";
-    const result = (mathPlugin.postProcess as any)?.(html);
+    const result = mathPlugin.postProcess?.(html);
     expect(result).toContain('<span class="math-inline">\\(E = mc^2\\)</span>');
   });
 
   test("renders display math with \\[\\] delimiters", () => {
     mathPlugin.preProcess?.("$$\\int_0^\\infty e^{-x} dx$$");
     const html = "<p>MATHDISPLAY0END</p>";
-    const result = (mathPlugin.postProcess as any)?.(html);
+    const result = mathPlugin.postProcess?.(html);
     expect(result).toContain('<div class="math-display">\\[');
     expect(result).toContain("\\]</div>");
   });
@@ -535,14 +535,14 @@ describe("mathPlugin — postProcess", () => {
   test("escapes HTML in math content", () => {
     mathPlugin.preProcess?.("$a < b > c$");
     const html = "<p>MATHINLINE0END</p>";
-    const result = (mathPlugin.postProcess as any)?.(html);
+    const result = mathPlugin.postProcess?.(html);
     // Math content is kept raw for MathJax to render - HTML chars stay as-is
     expect(result).toContain("\\(a < b > c\\)");
   });
 
   test("returns unchanged HTML when no math blocks", () => {
     const html = "<p>No math here</p>";
-    const result = (mathPlugin.postProcess as any)?.(html);
+    const result = mathPlugin.postProcess?.(html);
     expect(result).toBe(html);
   });
 });
@@ -550,22 +550,22 @@ describe("mathPlugin — postProcess", () => {
 // ─── Mermaid Plugin ──────────────────────────────────────────────────────
 
 describe("mermaidPlugin — postProcess", () => {
-  test("transforms mermaid code block", () => {
+  test("transforms mermaid code block", async () => {
     const html = `<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span><button>Copy</button></div><pre><code class="language-mermaid">flowchart TD;
 A--&gt;B;</code></pre></div>`;
-    const result = mermaidPlugin.postProcess?.(html);
+    const result = await mermaidPlugin.postProcess?.(html);
     expect(result).toContain("mermaid-diagram");
     expect(result).toContain('data-processed="false"');
     expect(result).toContain("mermaid-error");
     expect(result).not.toContain("language-mermaid");
   });
 
-  test("handles multiple mermaid diagrams", () => {
+  test("handles multiple mermaid diagrams", async () => {
     const html = [
       '<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">flowchart TD;A--&gt;B;</code></pre></div>',
       '<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">sequenceDiagram;A-&gt;&gt;B:Hello;</code></pre></div>',
     ].join("\n");
-    const result = mermaidPlugin.postProcess?.(html);
+    const result = await mermaidPlugin.postProcess?.(html);
     // Count mermaid-diagram containers (not the class name occurrences — each
     // container has the class once at the top level, but "mermaid-diagram" also
     // appears in header/error children.  Count the opening div pattern instead.)
@@ -573,10 +573,10 @@ A--&gt;B;</code></pre></div>`;
     expect(containers).toBe(2);
   });
 
-  test("decodes HTML entities in diagram source", () => {
+  test("decodes HTML entities in diagram source", async () => {
     const html =
       '<div class="code-block"><div class="code-header"><span class="code-lang">Mermaid</span></div><pre><code class="language-mermaid">flowchart TD;A--&gt;B;</code></pre></div>';
-    const result = mermaidPlugin.postProcess?.(html);
+    const result = await mermaidPlugin.postProcess?.(html);
     // The plugin decodes entities then re-escapes for safe HTML embedding.
     // The resulting text in the .mermaid element is entity-encoded, which
     // browser textContent will decode back to "A-->B;" at runtime.
@@ -584,10 +584,10 @@ A--&gt;B;</code></pre></div>`;
     expect(result).toContain("A--&gt;B;");
   });
 
-  test("non-mermaid code blocks are unchanged", () => {
+  test("non-mermaid code blocks are unchanged", async () => {
     const html =
       '<div class="code-block"><div class="code-header"><span class="code-lang">TypeScript</span></div><pre><code class="language-typescript">const x = 1;</code></pre></div>';
-    const result = mermaidPlugin.postProcess?.(html);
+    const result = await mermaidPlugin.postProcess?.(html);
     expect(result).toBe(html);
   });
 });
@@ -660,10 +660,10 @@ Some custom content.
 });
 
 describe("admonitionsPlugin — postProcess", () => {
-  test("renders note admonition", () => {
+  test("renders note admonition", async () => {
     admonitionsPlugin.preProcess?.(":::note\nThis is a note.\n:::");
     const html = "<p>ADMONITION0END</p>";
-    const result = admonitionsPlugin.postProcess?.(html);
+    const result = await admonitionsPlugin.postProcess?.(html);
     expect(result).toContain("admonition admonition-note");
     expect(result).toContain("admonition-heading");
     expect(result).toContain("Note");
@@ -671,40 +671,40 @@ describe("admonitionsPlugin — postProcess", () => {
     expect(result).toContain("This is a note.");
   });
 
-  test("renders warning admonition", () => {
+  test("renders warning admonition", async () => {
     admonitionsPlugin.preProcess?.(":::warning\nWatch out!\n:::");
     const html = "<p>ADMONITION0END</p>";
-    const result = admonitionsPlugin.postProcess?.(html);
+    const result = await admonitionsPlugin.postProcess?.(html);
     expect(result).toContain("admonition-warning");
     expect(result).toContain("Warning");
   });
 
-  test("renders danger admonition", () => {
+  test("renders danger admonition", async () => {
     admonitionsPlugin.preProcess?.(":::danger\nCritical issue!\n:::");
     const html = "<p>ADMONITION0END</p>";
-    const result = admonitionsPlugin.postProcess?.(html);
+    const result = await admonitionsPlugin.postProcess?.(html);
     expect(result).toContain("admonition-danger");
     expect(result).toContain("Danger");
   });
 
-  test("renders custom title", () => {
+  test("renders custom title", async () => {
     admonitionsPlugin.preProcess?.(":::note=My Title\nContent\n:::");
     const html = "<p>ADMONITION0END</p>";
-    const result = admonitionsPlugin.postProcess?.(html);
+    const result = await admonitionsPlugin.postProcess?.(html);
     expect(result).toContain("My Title");
   });
 
-  test("processes inner markdown content to HTML", () => {
+  test("processes inner markdown content to HTML", async () => {
     admonitionsPlugin.preProcess?.(":::tip\n**Bold** and *italic*.\n:::");
     const html = "<p>ADMONITION0END</p>";
-    const result = admonitionsPlugin.postProcess?.(html);
+    const result = await admonitionsPlugin.postProcess?.(html);
     expect(result).toContain("<strong>Bold</strong>");
     expect(result).toContain("<em>italic</em>");
   });
 
-  test("returns unchanged HTML when no admonitions", () => {
+  test("returns unchanged HTML when no admonitions", async () => {
     const html = "<p>No admonitions here</p>";
-    const result = admonitionsPlugin.postProcess?.(html);
+    const result = await admonitionsPlugin.postProcess?.(html);
     expect(result).toBe(html);
   });
 });
@@ -712,7 +712,7 @@ describe("admonitionsPlugin — postProcess", () => {
 // ─── End-to-End Pipeline ─────────────────────────────────────────────────
 
 describe("end-to-end pipeline", () => {
-  function processMarkdown(md: string): string {
+  async function processMarkdown(md: string): Promise<string> {
     let processed = md;
     // Order matters: math must run before admonitions so that $...$ inside
     // admonition content gets extracted before the block is replaced with a
@@ -729,18 +729,18 @@ describe("end-to-end pipeline", () => {
     };
     marked.use({ renderer, gfm: true });
 
-    let html = marked.parse(processed) as any as string;
+    let html = (await marked.parse(processed)) as string;
 
     // PostProcess runs in reverse order (matches build script behavior)
     const plugins = [mathPlugin, admonitionsPlugin, mermaidPlugin];
     for (let i = plugins.length - 1; i >= 0; i--) {
       const plugin = plugins[i];
-      if (plugin?.postProcess) html = (plugin.postProcess as any)(html);
+      if (plugin?.postProcess) html = await (plugin.postProcess as any)(html);
     }
     return html;
   }
 
-  test("full pipeline with admonitions, math, and code blocks", () => {
+  test("full pipeline with admonitions, math, and code blocks", async () => {
     const md = `# Doc
 
 :::note
@@ -756,7 +756,7 @@ const price = "$10";
 ## Section
 More text.`;
 
-    const html = processMarkdown(md);
+    const html = await processMarkdown(md);
 
     // Admonition should be rendered
     expect(html).toContain("admonition-note");
@@ -768,7 +768,7 @@ More text.`;
     expect(html).toContain('id="section"');
   });
 
-  test("mermaid diagram in full pipeline with code-block wrapper", () => {
+  test("mermaid diagram in full pipeline with code-block wrapper", async () => {
     // The mermaid plugin postProcess expects the code-block wrapper produced by
     // the build script's renderer.  Simulate that by running the build-script
     // wrapper manually.
@@ -793,13 +793,13 @@ A-->B;
       ].join("");
     };
     marked.use({ renderer, gfm: true });
-    let html = marked.parse(processed) as any as string;
+    let html = (await marked.parse(processed)) as string;
 
     // PostProcess in reverse order (matches build script)
     const postPlugins = [mathPlugin, admonitionsPlugin, mermaidPlugin];
     for (let i = postPlugins.length - 1; i >= 0; i--) {
       const plugin = postPlugins[i];
-      if (plugin?.postProcess) html = (plugin.postProcess as any)(html);
+      if (plugin?.postProcess) html = await (plugin.postProcess as any)(html);
     }
 
     expect(html).toContain("mermaid-diagram");

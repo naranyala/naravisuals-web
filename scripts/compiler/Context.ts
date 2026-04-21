@@ -3,8 +3,8 @@
  * Manages shared state, diagnostics, and configuration during a build.
  */
 
-import type { CompilerConfig, Diagnostic, DiagnosticSeverity, DiagnosticSource } from "./types.ts";
 import { colors } from "../core/index.ts";
+import type { CompilerConfig, Diagnostic, DiagnosticSeverity, DiagnosticSource } from "./types.ts";
 
 export class CompilationContext {
   private diagnostics: Diagnostic[] = [];
@@ -19,11 +19,23 @@ export class CompilationContext {
     this.diagnostics.push(diag);
   }
 
-  error(source: DiagnosticSource, file: string, message: string, detail?: string, line?: number): void {
+  error(
+    source: DiagnosticSource,
+    file: string,
+    message: string,
+    detail?: string,
+    line?: number
+  ): void {
     this.report({ severity: "error", source, file, message, detail, line });
   }
 
-  warn(source: DiagnosticSource, file: string, message: string, detail?: string, line?: number): void {
+  warn(
+    source: DiagnosticSource,
+    file: string,
+    message: string,
+    detail?: string,
+    line?: number
+  ): void {
     this.report({ severity: "warning", source, file, message, detail, line });
   }
 

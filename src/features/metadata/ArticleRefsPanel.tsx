@@ -7,8 +7,8 @@
  * Placed at the very bottom of the article (after DocFooter).
  */
 
-import { useMemo, useState } from "react";
 import { clsx } from "clsx";
+import { useMemo, useState } from "react";
 
 interface FootnoteEntry {
   identifier: string;

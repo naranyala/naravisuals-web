@@ -13,7 +13,7 @@ export function useTheme(): [boolean, () => void] {
   const [isDark, setIsDark] = useState(() => services.theme.getInitialTheme());
 
   const toggle = useCallback(() => {
-    setIsDark((prev) => {
+    setIsDark((prev: boolean) => {
       const next = services.theme.toggleTheme(prev);
       services.theme.applyTheme(next);
       return next;

@@ -110,7 +110,8 @@
     padding: 0;
     justify-content: center;
   }
-  .btn-text, .btn-shortcut {
+  .btn-text,
+  .btn-shortcut {
     display: none;
   }
 }
@@ -124,6 +125,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 .site-title {
@@ -151,6 +154,18 @@
   white-space: nowrap;
   max-width: 250px;
   font-size: 0.82rem;
+}
+
+.print-btn {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  flex-shrink: 0;
+}
+
+.print-btn .btn-icon {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* ============================================
@@ -205,7 +220,7 @@
     height: 100vh;
     box-shadow: 20px 0 50px rgba(0, 0, 0, 0.2);
     transform: translateX(-100%);
-    display: flex !important; /* Always flex but hidden by transform */
+    display: flex; /* Always flex but hidden by transform */
   }
 
   .mobile-sidebar-open .sidebar {
@@ -299,8 +314,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .overlay-toc {
@@ -386,12 +405,15 @@
 }
 
 .mermaid-spinner {
+  display: inline-block;
   width: 12px;
   height: 12px;
   border: 2px solid var(--border);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: mermaid-spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin: 0;
 }
 
 @keyframes mermaid-spin {

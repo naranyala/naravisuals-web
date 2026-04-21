@@ -42,14 +42,9 @@ function getInitialCodeTheme(): ShikiCodeTheme {
 }
 
 function isValidTheme(name: string): name is ShikiCodeTheme {
-  return [
-    "catppuccin",
-    "tokyonight",
-    "gruvbox",
-    "nord",
-    "everforest",
-    "solarized-light",
-  ].includes(name);
+  return ["catppuccin", "tokyonight", "gruvbox", "nord", "everforest", "solarized-light"].includes(
+    name
+  );
 }
 
 /**

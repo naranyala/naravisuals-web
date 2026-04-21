@@ -5,9 +5,18 @@
  * Services can be swapped for testing, SSR, or different implementations.
  */
 
-import { type IEventBusService, createEventBusService } from "./event-bus";
+import { createEventBusService, type IEventBusService } from "./event-bus";
+import { type AppConfig, AppConfigSchema } from "../shared/schemas";
+import { TypeCompiler } from "@sinclair/typebox/compiler";
 
 // ─── Service Interfaces ───────────────────────────────────────────────────
+
+/**
+ * App configuration (Derived from TypeBox Schema)
+ */
+export type IAppConfig = AppConfig;
+
+const configValidator = TypeCompiler.Compile(AppConfigSchema);
 
 /**
  * Storage service - wraps localStorage/sessionStorage
@@ -56,19 +65,6 @@ export interface IThemeService {
   getMermaidLoading(): boolean;
   setMermaidLoading(loading: boolean): void;
   onMermaidLoadingChange(callback: (loading: boolean) => void): () => void;
-}
-
-/**
- * App configuration
- */
-export interface IAppConfig {
-  siteTitle: string;
-  repoEditUrl: string;
-  mobileBreakpoint: number;
-  tocBreakpoint: number;
-  routes: {
-    docs: string;
-  };
 }
 
 // ─── Service Container ────────────────────────────────────────────────────
@@ -225,16 +221,27 @@ export const createThemeService = (
 /**
  * Default app config
  */
-export const createAppConfig = (overrides?: Partial<IAppConfig>): IAppConfig => ({
-  siteTitle: (process.env.PROJECT_NAME as string) || "Docs",
-  repoEditUrl: "https://github.com/your-org/your-repo/edit/main",
-  mobileBreakpoint: 800,
-  tocBreakpoint: 1100,
-  routes: {
-    docs: "docs",
-  },
-  ...overrides,
-});
+export const createAppConfig = (overrides?: Partial<IAppConfig>): IAppConfig => {
+  const config = {
+    siteTitle: (process.env["PROJECT_NAME"] as string) || "Docs",
+    siteUrl: (process.env["SITE_URL"] as string) || "http://localhost:3000",
+    repoEditUrl: "https://github.com/your-org/your-repo/edit/main",
+    mobileBreakpoint: 800,
+    tocBreakpoint: 1100,
+    routes: {
+      docs: "docs",
+    },
+    ...overrides,
+  };
+
+  // Runtime validation of configuration
+  if (!configValidator.Check(config)) {
+    const errors = [...configValidator.Errors(config)];
+    console.warn("App configuration validation failed:", errors);
+  }
+
+  return config;
+};
 
 // ─── Container Builder ────────────────────────────────────────────────────
 

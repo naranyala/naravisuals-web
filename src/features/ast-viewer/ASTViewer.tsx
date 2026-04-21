@@ -6,7 +6,6 @@
  * and HTML output.
  */
 
-import type { Token } from "marked";
 import { useEffect, useMemo, useState } from "react";
 import {
   type ASTTokenNode,

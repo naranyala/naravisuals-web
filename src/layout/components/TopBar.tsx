@@ -1,31 +1,25 @@
-import { DocEntry } from "../../generated";
-import { useServices } from "../../services";
-import { useUIState } from "../../core/store";
 import { clsx } from "clsx";
+import { useUIState } from "../../core/store";
+import { useServices } from "../../services";
 
 interface TopBarProps {
   mermaidLoading: boolean;
-  currentDoc: DocEntry;
+  isPrinting: boolean;
   onNavigate: (target: string) => void;
   onPrint: () => void;
 }
 
-export function TopBar({
-  mermaidLoading,
-  currentDoc,
-  onNavigate,
-  onPrint,
-}: TopBarProps) {
+export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint }: TopBarProps) {
   const { config } = useServices();
-  const { 
-    sidebarVisible, 
-    settingsOpen, 
-    searchOpen, 
+  const {
+    sidebarVisible,
+    settingsOpen,
+    searchOpen,
     wordStatsOpen,
-    toggleSidebar, 
-    setSettingsOpen, 
+    toggleSidebar,
+    setSettingsOpen,
     setSearch,
-    setWordStatsOpen
+    setWordStatsOpen,
   } = useUIState();
 
   const onToggleSettings = () => {
@@ -49,8 +43,8 @@ export function TopBar({
         <h1
           className="site-title"
           style={{ cursor: "pointer" }}
-          onClick={() => onNavigate("welcome")}
-          title="Go to Welcome page"
+          onClick={() => onNavigate("abstract")}
+          title="Go to Abstract page"
         >
           {config.siteTitle}
         </h1>
@@ -80,12 +74,13 @@ export function TopBar({
           <span className="btn-icon">🎨</span>
         </button>
         <button
-          className="top-bar-btn top-bar-action-btn"
+          className={clsx("top-bar-btn top-bar-action-btn print-btn", { loading: isPrinting })}
           onClick={onPrint}
+          disabled={isPrinting}
           aria-label="Print all docs"
           title="Open all docs in new tab for printing"
         >
-          <span className="btn-icon">🖨️</span>
+          <span className="btn-icon">{isPrinting ? <span className="mermaid-spinner" /> : "🖨️"}</span>
         </button>
         <button
           className={clsx("top-bar-btn top-bar-action-btn", { active: wordStatsOpen })}

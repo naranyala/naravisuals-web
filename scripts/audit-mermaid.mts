@@ -35,7 +35,7 @@ async function audit() {
     for (let index = 0; index < mermaidBlocks.length; index++) {
       const block = mermaidBlocks[index];
       if (!block) continue;
-      
+
       totalDiagrams++;
       const source = block.replace(/```mermaid\s*([\s\S]*?)\s*```/, "$1").trim();
       const result = await validateMermaidContent(source);

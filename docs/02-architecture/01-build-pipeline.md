@@ -146,7 +146,7 @@ Numeric prefixes are stripped from filenames for clean URLs:
 
 | File Path | Generated Slug |
 |-----------|---------------|
-| `00-welcome.md` | `welcome` |
+| `00-abstract.md` | `abstract` |
 | `01-getting-started/01-project-overview.md` | `getting-started/project-overview` |
 | `02-architecture/01-build-pipeline.md` | `architecture/build-pipeline` |
 | `03-guides/01-cli-reference.md` | `guides/cli-reference` |
@@ -194,12 +194,12 @@ sequenceDiagram
 Each markdown file becomes a TypeScript file in `src/generated/docs/`:
 
 ```typescript:desc=Generated TypeScript file for a single document.
-// src/generated/docs/welcome.ts
+// src/generated/docs/abstract.ts
 export const doc: DocEntry = {
-  id: "welcome",
-  slug: "welcome",
-  title: "Welcome to rspack-react-docs",
-  sidebar_label: "Welcome",
+  id: "abstract",
+  slug: "abstract",
+  title: "Abstract",
+  sidebar_label: "Abstract",
   sidebar_position: 0,
   category: "",
   description: "A fast, modern static site generator...",

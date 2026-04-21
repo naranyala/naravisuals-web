@@ -6,18 +6,18 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import glob from "fast-glob";
 import { marked } from "marked";
-import type { DocEntry } from "./types.ts";
-import { parseFrontmatter } from "./frontmatter.ts";
-import { createCustomRenderer } from "./renderer.ts";
-import { extractTOC } from "./toc.ts";
+import type { Highlighter } from "shiki";
 import {
-  Diagnostics,
+  type Diagnostics,
   validateCodeBlockDescriptions,
   validateFrontmatter,
 } from "../diagnostics.ts";
 import { plugins } from "../plugins/index.ts";
 import { mermaidValidator } from "../plugins/validators/mermaid-validator.ts";
-import type { Highlighter } from "shiki";
+import { parseFrontmatter } from "./frontmatter.ts";
+import { createCustomRenderer } from "./renderer.ts";
+import { extractTOC } from "./toc.ts";
+import type { DocEntry } from "./types.ts";
 
 const KNOWN_FM_FIELDS = new Set([
   "title",
@@ -63,8 +63,9 @@ export async function scanMdFiles(
 
     const titleMatch = content.match(/^# (.+)$/m);
     const title =
-      (fm.title as string) ||
-      (titleMatch?.[1] || "") ||
+      (fm["title"] as string) ||
+      titleMatch?.[1] ||
+      "" ||
       filename
         .split("-")
         .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
@@ -108,11 +109,14 @@ export async function scanMdFiles(
     }
 
     // Fallback description
-    let description = (fm.description as string) || "";
+    let description = (fm["description"] as string) || "";
     if (!description) {
       const firstPara = html.match(/<p>(.*?)<\/p>/);
       if (firstPara && firstPara[1] !== undefined) {
-        description = firstPara[1].replace(/<[^>]*>/g, "").slice(0, 160).trim();
+        description = firstPara[1]
+          .replace(/<[^>]*>/g, "")
+          .slice(0, 160)
+          .trim();
       }
     }
 
@@ -128,7 +132,7 @@ export async function scanMdFiles(
       }
     }
 
-    const pos = fileIndex !== null ? fileIndex : parseInt(fm.sidebar_position as string, 10) || 999;
+    const pos = fileIndex !== null ? fileIndex : parseInt(fm["sidebar_position"] as string, 10) || 999;
     const metadata: Record<string, string | string[]> = {};
     for (const [key, val] of Object.entries(fm)) {
       if (!KNOWN_FM_FIELDS.has(key) && val !== undefined) {
@@ -140,7 +144,7 @@ export async function scanMdFiles(
       id: slug,
       slug,
       title,
-      sidebar_label: (fm.sidebar_label as string) || title,
+      sidebar_label: (fm["sidebar_label"] as string) || title,
       sidebar_position: section === "blog" ? 9000 + pos : pos,
       category: section === "blog" ? "blog" : category,
       original_category: section === "blog" ? undefined : originalCategory || undefined,
@@ -148,9 +152,9 @@ export async function scanMdFiles(
       content: html,
       rawContent: content,
       toc: extractTOC(tokens),
-      date: fm.date as string | undefined,
-      author: fm.author as string | undefined,
-      tags: fm.tags as string[] | undefined,
+      date: fm["date"] as string | undefined,
+      author: fm["author"] as string | undefined,
+      tags: fm["tags"] as string[] | undefined,
       section,
       metadata,
       ast: tokens,

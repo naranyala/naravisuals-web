@@ -87,7 +87,7 @@ In rspack-react-docs, the sidebar is determined by folder structure and filename
 
 ```text:desc=Sidebar folder structure example
 docs/
-├── 00-welcome.md                          # Position 0
+├── 00-abstract.md                         # Position 0
 ├── 01-getting-started/
 │   ├── 01-overview.md                     # Position 1 in category
 │   └── 02-installation.md                 # Position 2 in category

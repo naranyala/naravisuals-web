@@ -7,7 +7,7 @@ export function parseFrontmatter(md: string) {
   const m = md.match(/^---\r?\n([\s\S]*?)\r?\n?---\r?\n?([\s\S]*)$/);
   const fm: Record<string, any> = {};
   let content = md;
-  
+
   if (m && m[1] !== undefined && m[2] !== undefined) {
     content = m[2];
     const fmLines = m[1].split("\n");

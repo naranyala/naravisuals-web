@@ -3,9 +3,9 @@
  */
 
 import { marked } from "marked";
+import type { Highlighter } from "shiki";
 import type { CodeBlockMeta } from "./types.ts";
 import { slugifyHeading } from "./utils.ts";
-import type { Highlighter } from "shiki";
 
 /**
  * Parse code fence info string → metadata
@@ -22,9 +22,15 @@ export function parseCodeInfo(info: string | undefined): CodeBlockMeta {
     lang = braceMatch[1].trim();
     rest = braceMatch[2].trim();
 
-    const titleMatch = rest.match(/title\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/);
-    const descMatch = rest.match(/desc(?:ription)?\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/);
-    const labelMatch = rest.match(/label\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/);
+    const titleMatch = rest.match(
+      /title\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/
+    );
+    const descMatch = rest.match(
+      /desc(?:ription)?\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/
+    );
+    const labelMatch = rest.match(
+      /label\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/
+    );
     const copyMatch = rest.match(/copy\s*=\s*["']?(true|false)["']?/i);
     const zoomMatch = rest.match(/zoom\s*=\s*["']?(true|false)["']?/i);
 
@@ -72,10 +78,18 @@ export function parseCodeInfo(info: string | undefined): CodeBlockMeta {
 }
 
 export function codeBlockWrapper(inner: string, meta: CodeBlockMeta) {
-  const langLabel = meta.label || (meta.lang ? meta.lang.charAt(0).toUpperCase() + meta.lang.slice(1) : "");
-  const titleHtml = meta.title ? `<span class="code-title">${meta.title.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>` : "";
-  const descHtml = meta.desc ? `<div class="code-desc">${meta.desc.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>` : "";
-  const copyBtnHtml = meta.copy !== false ? `<button class="code-copy-btn" aria-label="Copy code" onclick="copyCode(this)">Copy</button>` : "";
+  const langLabel =
+    meta.label || (meta.lang ? meta.lang.charAt(0).toUpperCase() + meta.lang.slice(1) : "");
+  const titleHtml = meta.title
+    ? `<span class="code-title">${meta.title.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>`
+    : "";
+  const descHtml = meta.desc
+    ? `<div class="code-desc">${meta.desc.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>`
+    : "";
+  const copyBtnHtml =
+    meta.copy !== false
+      ? `<button class="code-copy-btn" aria-label="Copy code" onclick="copyCode(this)">Copy</button>`
+      : "";
 
   return [
     `<div class="code-block" data-lang="${meta.lang}" data-copy="${meta.copy !== false}" data-zoom="${meta.zoom !== false}">`,
@@ -107,11 +121,25 @@ export function createCustomRenderer(highlighter: Highlighter) {
 
     // Skip Shiki for all mermaid types and technical diagrams
     const mermaidTypes = [
-      "mermaid", "graph", "flowchart", "sequenceDiagram", "classDiagram", "stateDiagram", 
-      "erDiagram", "gantt", "pie", "quadrantChart", "xyChart", "mindmap", 
-      "timeline", "journey", "requirementDiagram", "gitGraph", "sankey"
+      "mermaid",
+      "graph",
+      "flowchart",
+      "sequenceDiagram",
+      "classDiagram",
+      "stateDiagram",
+      "erDiagram",
+      "gantt",
+      "pie",
+      "quadrantChart",
+      "xyChart",
+      "mindmap",
+      "timeline",
+      "journey",
+      "requirementDiagram",
+      "gitGraph",
+      "sankey",
     ];
-    
+
     const lowerLang = meta.lang.toLowerCase();
     if (mermaidTypes.includes(lowerLang) || ["timeline", "text (timeline)"].includes(lowerLang)) {
       const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

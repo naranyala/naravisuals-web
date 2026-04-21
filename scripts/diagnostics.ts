@@ -36,7 +36,7 @@ export function validateCodeBlockDescriptions(
       const fence = match[2];
       const language = match[3];
       const infoString = match[4];
-      
+
       inCodeBlock = true;
       fenceChar = fence[0] || "`";
       fenceLength = fence.length;

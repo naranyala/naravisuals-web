@@ -38,7 +38,9 @@ describe("DocViewer", () => {
   });
 
   test("renders blockquotes", () => {
-    renderWithServices(<DocViewer html="<blockquote><p>A wise quote</p></blockquote>" slug="test" />);
+    renderWithServices(
+      <DocViewer html="<blockquote><p>A wise quote</p></blockquote>" slug="test" />
+    );
     expect(document.querySelector("blockquote")).toBeTruthy();
     expect(document.querySelector("blockquote p")?.textContent).toBe("A wise quote");
   });
@@ -65,7 +67,9 @@ describe("DocViewer", () => {
   // ─── Edge Cases ───────────────────────────────────────────────────
 
   test("handles HTML with special characters", () => {
-    renderWithServices(<DocViewer html="<p>Special: &amp; &lt; &gt; &quot; &apos;</p>" slug="test" />);
+    renderWithServices(
+      <DocViewer html="<p>Special: &amp; &lt; &gt; &quot; &apos;</p>" slug="test" />
+    );
     expect(document.querySelector("p")?.textContent).toBe("Special: & < > \" '");
   });
 

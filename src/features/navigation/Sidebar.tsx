@@ -1,7 +1,5 @@
-import Fuse from "fuse.js";
-import { useEffect, useMemo, useState } from "react";
 import { clsx } from "clsx";
-import { allDocs, type SidebarCategoryItem, type SidebarDocItem, type SidebarItem } from "@/generated";
+import type { SidebarCategoryItem, SidebarDocItem, SidebarItem } from "@/generated";
 
 interface SidebarProps {
   sidebar: readonly SidebarItem[];
@@ -95,12 +93,7 @@ export function Sidebar({ sidebar, currentSlug, onNavigate }: SidebarProps) {
         {sidebar.map((item) => {
           const key = item.type === "category" ? `cat:${item.label}` : `doc:${item.slug}`;
           return item.type === "category" ? (
-            <CategoryItem
-              key={key}
-              item={item}
-              currentSlug={currentSlug}
-              onNavigate={onNavigate}
-            />
+            <CategoryItem key={key} item={item} currentSlug={currentSlug} onNavigate={onNavigate} />
           ) : (
             <DocLink key={key} item={item} currentSlug={currentSlug} onNavigate={onNavigate} />
           );

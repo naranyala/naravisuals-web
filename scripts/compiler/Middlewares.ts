@@ -2,9 +2,9 @@
  * Default middlewares for the Documentation Compiler.
  */
 
-import type { CompilerMiddleware } from "./Middleware.ts";
 import { plugins } from "../plugins/index.ts";
-import { validateFrontmatter, validateUniqueSlugs, validateInternalLinks } from "../diagnostics.ts";
+import { frontmatterValidator } from "./FrontmatterSchema.ts";
+import type { CompilerMiddleware } from "./Middleware.ts";
 
 export const pluginMiddleware: CompilerMiddleware = {
   name: "markdown-plugins",
@@ -24,7 +24,7 @@ export const pluginMiddleware: CompilerMiddleware = {
         unit.html = await (plugin.postProcess as any)(unit.html!);
       }
     }
-  }
+  },
 };
 
 export const validationMiddleware: CompilerMiddleware = {
@@ -38,10 +38,30 @@ export const validationMiddleware: CompilerMiddleware = {
   },
 
   onPreParse(unit, ctx) {
-    // Validate frontmatter (legacy validator integration)
-    const fm = (unit as any).metadata; // We mapped it earlier
-    // Need a shim for legacy validateFrontmatter which expects the raw FM object
-    // For now we'll just check required fields manually or fix the legacy validator
+    // Validate frontmatter using TypeBox schema
+    const fm = unit.rawMetadata || {};
+
+    // For validation, we need to convert some fields to numbers if they are strings
+    // because our naive parser often returns everything as strings.
+    const toValidate = { ...fm };
+    if (typeof toValidate["sidebar_position"] === "string") {
+      toValidate["sidebar_position"] = Number.parseInt(toValidate["sidebar_position"], 10);
+    }
+
+    const isValid = frontmatterValidator.Check(toValidate);
+
+    if (!isValid) {
+      const errors = [...frontmatterValidator.Errors(toValidate)];
+      for (const error of errors) {
+        const path = error.path.slice(1); // remove leading /
+        ctx.error(
+          "frontmatter",
+          unit.relPath,
+          `Invalid frontmatter field: "${path}"`,
+          `${error.message} (Value: ${JSON.stringify(error.value)})`
+        );
+      }
+    }
   },
 
   onAssemble(units, ctx) {
@@ -50,21 +70,26 @@ export const validationMiddleware: CompilerMiddleware = {
     for (const unit of units) {
       const slug = unit.metadata?.slug || "";
       if (slugMap.has(slug)) {
-        ctx.error("slugs", unit.relPath, `Duplicate slug: "${slug}"`, `Also used by ${slugMap.get(slug)}`);
+        ctx.error(
+          "slugs",
+          unit.relPath,
+          `Duplicate slug: "${slug}"`,
+          `Also used by ${slugMap.get(slug)}`
+        );
       } else {
         slugMap.set(slug, unit.relPath);
       }
     }
 
     // Internal Links
-    const knownSlugs = new Set(units.map(u => u.metadata?.slug || ""));
+    const knownSlugs = new Set(units.map((u) => u.metadata?.slug || ""));
     for (const unit of units) {
       // Logic from validateInternalLinks
       const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
       let match;
       while ((match = linkRegex.exec(unit.rawContent)) !== null) {
         const href = match[2];
-        if (href !== undefined && href.startsWith("/docs/")) {
+        if (href?.startsWith("/docs/")) {
           const slug = (href.replace("/docs/", "").split("#")[0] || "").split("?")[0] || "";
           if (!knownSlugs.has(slug)) {
             ctx.warn("links", unit.relPath, `Broken link: ${href}`, `Slug "${slug}" not found.`);
@@ -72,5 +97,5 @@ export const validationMiddleware: CompilerMiddleware = {
         }
       }
     }
-  }
+  },
 };

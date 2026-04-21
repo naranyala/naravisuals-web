@@ -15,7 +15,7 @@ export const timelinePlugin: MarkdownPlugin = {
 
     for (const block of codeBlocks) {
       const lang = block.getAttribute("data-lang")?.toLowerCase() || "";
-      
+
       // Support both "timeline" and "text (timeline)"
       if (lang !== "timeline" && lang !== "text (timeline)") continue;
 

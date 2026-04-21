@@ -51,21 +51,21 @@ export const frontmatterValidator: MarkdownValidator = {
 
     // Extract all fields
     const fields = Object.keys(frontmatter);
-    stats.fieldCount = fields.length;
-    stats.fields = fields;
+    stats["fieldCount"] = fields.length;
+    stats["fields"] = fields;
 
     // Track which standard fields are present
     const standardFields = ["title", "description", "sidebar_label", "sidebar_position"];
     const presentStandardFields = standardFields.filter((f) => frontmatter[f] !== undefined);
     const missingStandardFields = standardFields.filter((f) => frontmatter[f] === undefined);
 
-    stats.standardFields = {
+    stats["standardFields"] = {
       present: presentStandardFields,
       missing: missingStandardFields,
     };
 
     // Store full frontmatter data for LLM use
-    stats.data = frontmatter;
+    stats["data"] = frontmatter;
 
     // Provide guidance for LLM-code-agents
     if (missingStandardFields.length > 0) {

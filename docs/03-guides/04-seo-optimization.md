@@ -184,7 +184,7 @@ Located at the project root, `sitemap.xml` lists all available pages for search 
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://your-docs-site.com/docs/welcome</loc>
+    <loc>https://your-docs-site.com/docs/abstract</loc>
     <priority>1.0</priority>
   </url>
   <!-- ... more URLs -->

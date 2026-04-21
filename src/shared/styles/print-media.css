@@ -10,12 +10,13 @@
     size: auto;
   }
 
-  html, body {
-    background: #ffffff !important;
-    color: #1a1a1a !important;
-    font-family: "Source Serif 4", "Georgia", "Times New Roman", serif !important;
-    font-size: 11pt !important;
-    line-height: 1.5 !important;
+  html,
+  body {
+    background: #ffffff;
+    color: #1a1a1a;
+    font-family: "Source Serif 4", "Georgia", "Times New Roman", serif;
+    font-size: 11pt;
+    line-height: 1.5;
     width: 100%;
     height: auto;
     margin: 0;
@@ -49,36 +50,43 @@
   .mermaid-diagram-actions,
   .article-links-panel,
   .mermaid-source-container {
-    display: none !important;
+    display: none;
   }
 
   /* 3. Content Layout */
   .site-wrapper {
-    min-height: auto !important;
-    display: block !important;
-    background: #ffffff !important;
+    min-height: auto;
+    display: block;
+    background: #ffffff;
   }
 
   .doc-page-layout {
-    display: block !important;
-    padding: 0 !important;
+    display: block;
+    padding: 0;
   }
 
   .main-content {
-    max-width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    width: 100% !important;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    width: 100%;
   }
 
   /* 4. Page Break Management */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     page-break-after: avoid;
     break-after: avoid;
-    color: #000 !important;
+    color: #000;
   }
 
-  p, li, blockquote {
+  p,
+  li,
+  blockquote {
     orphans: 3;
     widows: 3;
   }
@@ -94,13 +102,25 @@
   }
 
   /* 5. Typography Enhancements */
-  .doc-content h1 { font-size: 24pt; margin-top: 0; border-bottom: 2pt solid #eee; padding-bottom: 10pt; }
-  .doc-content h2 { font-size: 18pt; margin-top: 30pt; border-bottom: 1pt solid #eee; }
-  .doc-content h3 { font-size: 14pt; margin-top: 20pt; }
+  .doc-content h1 {
+    font-size: 24pt;
+    margin-top: 0;
+    border-bottom: 2pt solid #eee;
+    padding-bottom: 10pt;
+  }
+  .doc-content h2 {
+    font-size: 18pt;
+    margin-top: 30pt;
+    border-bottom: 1pt solid #eee;
+  }
+  .doc-content h3 {
+    font-size: 14pt;
+    margin-top: 20pt;
+  }
 
   /* 6. Links Handling */
   .doc-content a {
-    color: #000 !important;
+    color: #000;
     text-decoration: underline;
   }
 
@@ -113,60 +133,60 @@
 
   /* 7. Elements Specifics */
   .code-block {
-    border: 1pt solid #ddd !important;
-    background: #fdfdfd !important;
-    border-radius: 4pt !important;
+    border: 1pt solid #ddd;
+    background: #fdfdfd;
+    border-radius: 4pt;
   }
 
   .code-header {
-    background: #f8f8f8 !important;
-    border-bottom: 1pt solid #ddd !important;
+    background: #f8f8f8;
+    border-bottom: 1pt solid #ddd;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
   .doc-content .code-block pre {
-    background: #fdfdfd !important;
-    color: #333 !important;
+    background: #fdfdfd;
+    color: #333;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    font-size: 9pt !important;
-    padding: 10pt !important;
+    font-size: 9pt;
+    padding: 10pt;
   }
 
   .doc-content .code-block pre code {
-    color: #333 !important;
+    color: #333;
   }
 
   .admonition {
-    background: #fafafa !important;
-    border: 1pt solid #eee !important;
-    border-left: 4pt solid #333 !important;
+    background: #fafafa;
+    border: 1pt solid #eee;
+    border-left: 4pt solid #333;
   }
 
   .admonition-heading {
-    background: #f0f0f0 !important;
-    border-bottom: 1pt solid #eee !important;
-    color: #000 !important;
+    background: #f0f0f0;
+    border-bottom: 1pt solid #eee;
+    color: #000;
   }
 
   /* 8. Mermaid Diagrams for Print */
   .mermaid-diagram {
-    border: 1pt solid #ddd !important;
-    padding: 10pt !important;
+    border: 1pt solid #ddd;
+    padding: 10pt;
   }
 
   .mermaid-diagram-header {
-    background: #f8f8f8 !important;
-    border-bottom: 1pt solid #ddd !important;
+    background: #f8f8f8;
+    border-bottom: 1pt solid #ddd;
   }
 
   .mermaid {
-    background: #ffffff !important;
-    padding: 15pt !important;
+    background: #ffffff;
+    padding: 15pt;
   }
 
   .mermaid svg text {
-    fill: #000000 !important;
+    fill: #000000;
   }
 }

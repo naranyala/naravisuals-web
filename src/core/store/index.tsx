@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, useMemo } from "react";
+import type React from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import type { DocEntry } from "@/generated";
 
 // --- UI State Types ---
@@ -67,44 +68,47 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   // UI Actions
   const toggleSidebar = useCallback(() => {
-    setUiState(prev => ({ ...prev, sidebarVisible: !prev.sidebarVisible }));
+    setUiState((prev) => ({ ...prev, sidebarVisible: !prev.sidebarVisible }));
   }, []);
 
   const toggleToc = useCallback(() => {
-    setUiState(prev => ({ ...prev, tocVisible: !prev.tocVisible }));
+    setUiState((prev) => ({ ...prev, tocVisible: !prev.tocVisible }));
   }, []);
 
   const setSidebar = useCallback((visible: boolean) => {
-    setUiState(prev => ({ ...prev, sidebarVisible: visible }));
+    setUiState((prev) => ({ ...prev, sidebarVisible: visible }));
   }, []);
 
   const setToc = useCallback((visible: boolean) => {
-    setUiState(prev => ({ ...prev, tocVisible: visible }));
+    setUiState((prev) => ({ ...prev, tocVisible: visible }));
   }, []);
 
   const setSearch = useCallback((open: boolean) => {
-    setUiState(prev => ({ ...prev, searchOpen: open }));
+    setUiState((prev) => ({ ...prev, searchOpen: open }));
   }, []);
 
   const setWordStatsOpen = useCallback((open: boolean) => {
-    setUiState(prev => ({ ...prev, wordStatsOpen: open }));
+    setUiState((prev) => ({ ...prev, wordStatsOpen: open }));
   }, []);
 
   const setViewMode = useCallback((mode: "view" | "raw") => {
-    setUiState(prev => ({ ...prev, viewMode: mode }));
+    setUiState((prev) => ({ ...prev, viewMode: mode }));
   }, []);
 
   const setSettingsOpen = useCallback((open: boolean) => {
-    setUiState(prev => ({ ...prev, settingsOpen: open }));
+    setUiState((prev) => ({ ...prev, settingsOpen: open }));
   }, []);
 
-  const updateResponsive = useCallback((width: number, mobileBreakpoint: number, tocBreakpoint: number) => {
-    setUiState(prev => ({
-      ...prev,
-      isMobile: width <= mobileBreakpoint,
-      isTocMobile: width <= tocBreakpoint,
-    }));
-  }, []);
+  const updateResponsive = useCallback(
+    (width: number, mobileBreakpoint: number, tocBreakpoint: number) => {
+      setUiState((prev) => ({
+        ...prev,
+        isMobile: width <= mobileBreakpoint,
+        isTocMobile: width <= tocBreakpoint,
+      }));
+    },
+    []
+  );
 
   // Doc Actions
   const setDoc = useCallback((doc: DocEntry) => {
@@ -112,28 +116,45 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setSlug = useCallback((slug: string) => {
-    setDocState(prev => ({ ...prev, currentSlug: slug }));
+    setDocState((prev) => ({ ...prev, currentSlug: slug }));
   }, []);
 
-  const value = useMemo(() => ({
-    ui: {
-      ...uiState,
+  const value = useMemo(
+    () => ({
+      ui: {
+        ...uiState,
+        toggleSidebar,
+        toggleToc,
+        setSidebar,
+        setToc,
+        setSearch,
+        setWordStatsOpen,
+        setViewMode,
+        updateResponsive,
+        setSettingsOpen,
+      },
+      doc: {
+        ...docState,
+        setDoc,
+        setSlug,
+      },
+    }),
+    [
+      uiState,
+      docState,
       toggleSidebar,
       toggleToc,
       setSidebar,
       setToc,
       setSearch,
-      setWordStatsOpen,
       setViewMode,
       updateResponsive,
       setSettingsOpen,
-    },
-    doc: {
-      ...docState,
       setDoc,
       setSlug,
-    }
-  }), [uiState, docState, toggleSidebar, toggleToc, setSidebar, setToc, setSearch, setViewMode, updateResponsive, setSettingsOpen, setDoc, setSlug]);
+      setWordStatsOpen,
+    ]
+  );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

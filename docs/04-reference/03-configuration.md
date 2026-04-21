@@ -252,7 +252,7 @@ The `routes.docs` field controls the URL prefix for all documentation pages:
 | `routes.docs: "docs"` (default) | `/docs/getting-started/installation` |
 | `routes.docs: "documentation"` | `/documentation/getting-started/installation` |
 
-The root path `/` and the docs prefix path (e.g., `/docs/`) both resolve to the `welcome` slug.
+The root path `/` and the docs prefix path (e.g., `/docs/`) both resolve to the `abstract` slug.
 
 ## Dependency Injection in Practice
 

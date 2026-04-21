@@ -3,9 +3,10 @@
  */
 
 import { marked } from "marked";
-import { slugifyHeading } from "../pipeline/utils.ts";
-import { parseCodeInfo, codeBlockWrapper } from "../pipeline/renderer.ts";
+import { match, P } from "ts-pattern";
 import type { Highlighter } from "shiki";
+import { codeBlockWrapper, parseCodeInfo } from "../pipeline/renderer.ts";
+import { slugifyHeading } from "../pipeline/utils.ts";
 
 export class MarkdownRenderer {
   private seenIds = new Set<string>();
@@ -39,47 +40,69 @@ export class MarkdownRenderer {
 
     renderer.code = ({ text, lang: rawLang }) => {
       const meta = parseCodeInfo(rawLang);
-
-      // 1. Mermaid/Technical diagrams - keep raw, let browser handle it
-      const mermaidTypes = [
-        "mermaid", "graph", "flowchart", "sequenceDiagram", "classDiagram", "stateDiagram", 
-        "erDiagram", "gantt", "pie", "quadrantChart", "xyChart", "mindmap", 
-        "timeline", "journey", "requirementDiagram", "gitGraph", "sankey", "block", "packet"
-      ];
-      
       const lowerLang = (meta.lang || "").toLowerCase();
-      if (mermaidTypes.includes(lowerLang)) {
-        const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        return codeBlockWrapper(
-          `<pre><code class="language-${meta.lang || ""}">${escaped}</code></pre>`,
-          meta
-        );
-      }
 
-      // 2. Standard code blocks - use build-time Shiki highlighting
-      if (this.highlighter && meta.lang) {
-        const loadedLangs = this.highlighter.getLoadedLanguages();
-        if (loadedLangs.includes(meta.lang as any)) {
-          try {
-            const highlighted = this.highlighter.codeToHtml(text, { 
-              lang: meta.lang, 
-              theme: "github-dark" 
-            });
-            return codeBlockWrapper(highlighted, meta);
-          } catch (e) {
-            console.warn(`Shiki failed to highlight ${meta.lang}`, e);
+      // Dispatch rendering logic using ts-pattern
+      return match(lowerLang)
+        // 1. Technical diagrams (Mermaid, etc)
+        .with(
+          P.union(
+            "mermaid",
+            "graph",
+            "flowchart",
+            "sequenceDiagram",
+            "classDiagram",
+            "stateDiagram",
+            "erDiagram",
+            "gantt",
+            "pie",
+            "quadrantChart",
+            "xyChart",
+            "mindmap",
+            "timeline",
+            "journey",
+            "requirementDiagram",
+            "gitGraph",
+            "sankey",
+            "block",
+            "packet"
+          ),
+          () => {
+            const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return codeBlockWrapper(
+              `<pre><code class="language-${meta.lang || ""}">${escaped}</code></pre>`,
+              meta
+            );
           }
-        }
-      }
-
-      // 3. Fallback/Plaintext
-      const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      return codeBlockWrapper(
-        `<pre><code class="language-${meta.lang || ""}">${escaped}</code></pre>`,
-        meta
-      );
+        )
+        // 2. Standard code blocks with Shiki
+        .when(
+          (lang) => !!(this.highlighter && lang && this.highlighter.getLoadedLanguages().includes(lang as any)),
+          () => {
+            try {
+              const highlighted = this.highlighter!.codeToHtml(text, {
+                lang: meta.lang,
+                theme: "github-dark",
+              });
+              return codeBlockWrapper(highlighted, meta);
+            } catch (e) {
+              console.warn(`Shiki failed to highlight ${meta.lang}`, e);
+              return this.fallbackRenderer(text, meta);
+            }
+          }
+        )
+        // 3. Fallback for everything else
+        .otherwise(() => this.fallbackRenderer(text, meta));
     };
 
     return renderer;
+  }
+
+  private fallbackRenderer(text: string, meta: any) {
+    const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return codeBlockWrapper(
+      `<pre><code class="language-${meta.lang || ""}">${escaped}</code></pre>`,
+      meta
+    );
   }
 }

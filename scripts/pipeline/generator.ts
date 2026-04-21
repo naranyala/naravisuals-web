@@ -64,7 +64,7 @@ export type { DocEntry, SidebarItem, SidebarDocItem, SidebarCategoryItem } from 
 
 export function generateSeoFiles(rootDir: string, allDocs: DocEntry[], siteUrl: string) {
   const today = new Date().toISOString().split("T")[0];
-  
+
   // Sitemap
   let sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -77,10 +77,11 @@ export function generateSeoFiles(rootDir: string, allDocs: DocEntry[], siteUrl: 
 `;
 
   for (const doc of allDocs) {
-    const url = doc.section === "blog" 
-      ? `${siteUrl}/blog/${doc.slug.replace("blog/", "")}` 
-      : `${siteUrl}/docs/${doc.slug}`;
-      
+    const url =
+      doc.section === "blog"
+        ? `${siteUrl}/blog/${doc.slug.replace("blog/", "")}`
+        : `${siteUrl}/docs/${doc.slug}`;
+
     sitemapXml += `  <url>
     <loc>${url}</loc>
     <lastmod>${today}</lastmod>

@@ -30,7 +30,7 @@ describe("App Integration", () => {
 
   test("renders settings toggle button", () => {
     renderWithServices(<MainLayout />);
-    const buttons = document.querySelectorAll(".top-bar-icon-btn");
+    const buttons = document.querySelectorAll(".top-bar-action-btn");
     expect(buttons.length).toBeGreaterThan(0);
   });
 
@@ -82,13 +82,13 @@ describe("App Integration", () => {
 
   // ─── Navigation Edge Cases ────────────────────────────────────────
 
-  test("handles welcome page navigation", () => {
+  test("handles abstract page navigation", () => {
     renderWithServices(<MainLayout />);
-    // Welcome page should be the default landing
+    // Abstract page should be the default landing
     expect(document.querySelector(".site-wrapper")).toBeDefined();
   });
 
-  test("site title is clickable and navigates to welcome", () => {
+  test("site title is clickable and navigates to abstract", () => {
     renderWithServices(<MainLayout />);
     const siteTitle = document.querySelector(".site-title") as HTMLElement;
     expect(siteTitle).toBeDefined();

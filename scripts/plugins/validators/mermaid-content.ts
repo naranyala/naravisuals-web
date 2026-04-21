@@ -10,6 +10,8 @@
  * This ensures it runs reliably in any build environment (Bun, Rust, Node).
  */
 
+import { match, P } from "ts-pattern";
+
 export interface ValidationError {
   message: string;
   detail: string;
@@ -43,18 +45,6 @@ const VALID_DIAGRAM_TYPES = [
   "graph", // Alias for flowchart
 ];
 
-const _RESERVED_KEYWORDS = new Set([
-  "subgraph",
-  "end",
-  "style",
-  "class",
-  "classDef",
-  "direction",
-  "click",
-  "callback",
-  "linkStyle",
-]);
-
 export async function validateMermaidContent(
   content: string,
   _filePath: string = "unknown"
@@ -72,7 +62,7 @@ export async function validateMermaidContent(
   // 1. Find the first line that isn't a comment/metadata line
   const firstActualLineIndex = lines.findIndex((line) => {
     const l = (line || "").trim();
-    return l !== "" && !l.startsWith("%%") && !l.startsWith(":");
+    return l !== "" && !l.startsWith("%%") && !l.startsWith("---") && !l.startsWith(":");
   });
 
   if (firstActualLineIndex === -1 || lines[firstActualLineIndex] === undefined) {
@@ -101,22 +91,26 @@ export async function validateMermaidContent(
   }
 
   // Rule: Flowchart direction should ideally be on the same line as 'flowchart'
-  if ((validType === "flowchart" || validType === "graph") && firstLineParts.length === 1) {
-    const nextLine = lines[firstActualLineIndex + 1]?.trim();
-    const directions = ["LR", "RL", "TD", "TB", "BT"];
-    if (nextLine && directions.includes(nextLine.toUpperCase())) {
-      errors.push({
-        severity: "warning",
-        message: "Disconnected direction",
-        detail: `Put diagram direction (e.g., '${nextLine.toUpperCase()}') on the same line as the diagram type: '${validType} ${nextLine.toUpperCase()}'.`,
-        line: firstActualLineIndex + 1,
-      });
-    }
-  }
+  match([validType, firstLineParts.length])
+    .with([P.union("flowchart", "graph"), 1], () => {
+      const nextLine = lines[firstActualLineIndex + 1]?.trim();
+      const directions = ["LR", "RL", "TD", "TB", "BT"];
+      if (nextLine && directions.includes(nextLine.toUpperCase())) {
+        errors.push({
+          severity: "warning",
+          message: "Disconnected direction",
+          detail: `Put diagram direction (e.g., '${nextLine.toUpperCase()}') on the same line as the diagram type: '${validType} ${nextLine.toUpperCase()}'.`,
+          line: firstActualLineIndex + 1,
+        });
+      }
+    })
+    .otherwise(() => {});
 
   // Rule: Mindmap must have a root node
   if (validType === "mindmap") {
-    const hasRoot = lines.some((l, i) => i > firstActualLineIndex && l.trim() !== "" && !l.trim().startsWith("%%"));
+    const hasRoot = lines.some(
+      (l, i) => i > firstActualLineIndex && l.trim() !== "" && !l.trim().startsWith("%%")
+    );
     if (!hasRoot) {
       errors.push({
         message: "Missing root node",
@@ -137,15 +131,19 @@ export async function validateMermaidContent(
     });
   }
 
-  // Rule: Diagram type and direction must be correctly cased (flowchart LR, graph TD)
-  if (type !== validType && type.toLowerCase() === validType.toLowerCase()) {
-    errors.push({
-      severity: "warning",
-      message: "Lowercase diagram type",
-      detail: `Standard practice is to use PascalCase/Lowercase as defined by Mermaid: use '${validType}' instead of '${type}'.`,
-      line: firstActualLineIndex + 1,
-    });
-  }
+  // Rule: Diagram type and direction must be correctly cased
+  match([type, validType])
+    .with([P.not(validType), P.select()], (valid) => {
+      if (type.toLowerCase() === valid.toLowerCase()) {
+        errors.push({
+          severity: "warning",
+          message: "Lowercase diagram type",
+          detail: `Standard practice is to use PascalCase/Lowercase as defined by Mermaid: use '${valid}' instead of '${type}'.`,
+          line: firstActualLineIndex + 1,
+        });
+      }
+    })
+    .otherwise(() => {});
 
   if (direction && direction === direction.toLowerCase() && direction !== direction.toUpperCase()) {
     errors.push({
@@ -166,6 +164,7 @@ export async function validateMermaidContent(
 
   lines.forEach((line, index) => {
     const lineNum = index + 1;
+    if (line === undefined) return;
     const trimmedLine = line.trim();
     if (!trimmedLine || trimmedLine.startsWith("%%")) return;
 
@@ -221,6 +220,7 @@ export async function validateMermaidContent(
 
     // 4. Content Checks (only on unquoted parts of the line)
     const stripped = unquotedLine.trim();
+    if (index === firstActualLineIndex) return; // Skip diagram type line
 
     // Track subgraphs
     if (stripped.match(/^subgraph\b/)) subgraphCount++;
@@ -272,7 +272,7 @@ export async function validateMermaidContent(
         // Skip keywords
         if (p === "subgraph" || p === "end" || p === "direction") continue;
 
-        const idMatch = p.match(/^([^[({ \t\n\r\f\v]+)/);
+        const idMatch = p.match(/^([^[({ \t\n\r\f\v;]+)/);
         if (idMatch && idMatch[1] !== undefined) {
           const id = idMatch[1];
           // If it is already quoted, it is fine
@@ -296,21 +296,40 @@ export async function validateMermaidContent(
       if (stripped && !stripped.startsWith("%%")) {
         // Simple check for illegal node characters in mindmap if not using shapes () [] etc.
         const firstWord = stripped.split(/\s+/)[0];
-        if (firstWord && !firstWord.includes("(") && !firstWord.includes("[") && !firstWord.includes("{")) {
+        if (
+          firstWord &&
+          !firstWord.includes("(") &&
+          !firstWord.includes("[") &&
+          !firstWord.includes("{")
+        ) {
           if (/[^a-zA-Z0-9_-]/.test(firstWord)) {
-             // Mindmaps are more flexible but certain chars at start can confuse parser
-             // Just a warning
-             errors.push({
-               severity: "info",
-               message: "Complex node ID",
-               detail: `Node '${firstWord}' contains special characters. Wrap in double quotes if rendering fails.`,
-               line: lineNum
-             });
+            // Mindmaps are more flexible but certain chars at start can confuse parser
+            // Just a warning
+            errors.push({
+              severity: "info",
+              message: "Complex node ID",
+              detail: `Node '${firstWord}' contains special characters. Wrap in double quotes if rendering fails.`,
+              line: lineNum,
+            });
           }
         }
       }
     }
   });
+
+  if (inQuote) {
+    errors.push({
+      message: "Unclosed quote",
+      detail: `Diagram has an unclosed quote: ${currentQuoteChar}`,
+    });
+  }
+
+  if (bracketStack.length > 0) {
+    errors.push({
+      message: "Unbalanced brackets",
+      detail: `Diagram has ${bracketStack.length} unclosed opening bracket(s).`,
+    });
+  }
 
   if (subgraphCount !== endCount) {
     errors.push({
@@ -321,6 +340,26 @@ export async function validateMermaidContent(
 
   // 6. Global Quality Checks
   const globalPatterns = [
+    {
+      regex: /&amp;amp;/,
+      message: "Double-encoded ampersand",
+      detail: "Use '&amp;' or '&' instead of '&amp;amp;'",
+    },
+    {
+      regex: /\\x[0-9a-fA-F]{2}/,
+      message: "Hex escape sequence",
+      detail: "Do not use hex escape sequences (\\xNN). Use literal characters.",
+    },
+    {
+      regex: /\\u[0-9a-fA-F]{4}/,
+      message: "Unicode escape sequence",
+      detail: "Do not use unicode escape sequences (\\uNNNN). Use literal characters.",
+    },
+    {
+      regex: /%[0-9a-fA-F]{2}/,
+      message: "URL-encoded character",
+      detail: "Do not use URL-encoded characters (%NN). Use literal characters.",
+    },
     {
       regex: /&#\w+;/,
       message: "HTML entity detected",
@@ -334,25 +373,22 @@ export async function validateMermaidContent(
     {
       regex: /<(?!\/?br\s*\/?)(\/?[a-z][a-z0-9]*)\b[^>]*>/gi,
       message: "Unsupported HTML tag",
-      detail: "HTML tags are not allowed in Mermaid diagrams.",
-    },
-    {
-      regex: /<br\s*\/?>/gi,
-      message: "HTML break tag",
-      detail: "Do not use '<br/>'. Use spaces or multiple nodes instead.",
+      detail: "HTML tags (except <br/>) are not allowed in Mermaid diagrams.",
     },
   ];
 
   globalPatterns.forEach(({ regex, message, detail }) => {
     if (regex.test(content)) {
-      errors.push({ message, detail });
+      errors.push({ severity: "error", message, detail });
     }
   });
 
   // Special check for nested double quotes in flowcharts
   if (validType === "flowchart" || validType === "graph") {
+    // Ignore escaped quotes for this check
+    const cleanContent = content.replace(/\\"/g, " ");
     const nestedQuoteRegex = /[[({][^\])}]*"[^"\])}]*"[^"\])}]*"[^\])}]*[\])}]/;
-    if (nestedQuoteRegex.test(content)) {
+    if (nestedQuoteRegex.test(cleanContent)) {
       errors.push({
         message: "Nested double quotes",
         detail:

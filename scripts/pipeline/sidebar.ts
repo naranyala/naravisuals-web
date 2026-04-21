@@ -23,7 +23,7 @@ export function buildSidebar(docs: DocEntry[]): SidebarItem[] {
           catPrefixes[d.category] = 999;
         }
       }
-      grouped[d.category]!.push(d);
+      grouped[d.category]?.push(d);
     } else {
       uncategorized.push(d);
     }
@@ -31,20 +31,20 @@ export function buildSidebar(docs: DocEntry[]): SidebarItem[] {
 
   const sidebar: SidebarItem[] = [];
 
-  // Add welcome page as first item (before categories)
-  const welcomeDoc = docs.find((d) => d.slug === "welcome");
-  if (welcomeDoc) {
+  // Add abstract page as first item (before categories)
+  const abstractDoc = docs.find((d) => d.slug === "abstract");
+  if (abstractDoc) {
     sidebar.push({
       type: "doc",
-      id: welcomeDoc.id,
-      label: welcomeDoc.sidebar_label || "Welcome",
-      slug: welcomeDoc.slug,
-      date: welcomeDoc.date || null,
+      id: abstractDoc.id,
+      label: abstractDoc.sidebar_label || "Abstract",
+      slug: abstractDoc.slug,
+      date: abstractDoc.date || null,
     });
   }
 
   for (const d of uncategorized.sort((a, b) => a.sidebar_position - b.sidebar_position)) {
-    if (d.slug === "welcome") continue;
+    if (d.slug === "abstract" || d.slug === "references") continue;
     sidebar.push({
       type: "doc",
       id: d.id,
@@ -72,10 +72,7 @@ export function buildSidebar(docs: DocEntry[]): SidebarItem[] {
     sidebar.push({
       type: "category",
       label,
-      link:
-        firstItem && firstItem.id !== undefined
-          ? { type: "doc", id: firstItem.id }
-          : undefined,
+      link: firstItem && firstItem.id !== undefined ? { type: "doc", id: firstItem.id } : undefined,
       items: sortedItems.map((d) => ({
         type: "doc" as const,
         id: d.id,
@@ -84,6 +81,18 @@ export function buildSidebar(docs: DocEntry[]): SidebarItem[] {
         category: d.category,
         date: d.date || null,
       })),
+    });
+  }
+
+  // Add references page as last item (after categories)
+  const referencesDoc = docs.find((d) => d.slug === "references");
+  if (referencesDoc) {
+    sidebar.push({
+      type: "doc",
+      id: referencesDoc.id,
+      label: referencesDoc.sidebar_label || "References",
+      slug: referencesDoc.slug,
+      date: referencesDoc.date || null,
     });
   }
 

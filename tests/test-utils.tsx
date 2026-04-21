@@ -21,7 +21,8 @@ import {
   render,
   screen,
 } from "@testing-library/react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
+import { StoreProvider } from "../src/core/store";
 import {
   type ContainerOptions,
   createContainer,
@@ -62,7 +63,11 @@ export function renderWithServices(
   container.theme = createMockTheme(storage);
 
   function Wrapper({ children }: { children: ReactNode }) {
-    return <ServicesProvider container={container}>{children}</ServicesProvider>;
+    return (
+      <ServicesProvider container={container}>
+        <StoreProvider>{children}</StoreProvider>
+      </ServicesProvider>
+    );
   }
 
   const result = render(ui, {

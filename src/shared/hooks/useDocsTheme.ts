@@ -56,7 +56,7 @@ export function useDocsTheme(): DocsTheme {
   const [isDark, setIsDark] = useState(() => services.theme.getInitialTheme());
 
   const toggleTheme = useCallback(() => {
-    setIsDark((prev) => {
+    setIsDark((prev: boolean) => {
       const next = services.theme.toggleTheme(prev);
       services.theme.applyTheme(next);
       return next;
@@ -135,7 +135,7 @@ export function useDocsTheme(): DocsTheme {
       document.documentElement.setAttribute("data-theme", codeTheme);
       document.documentElement.setAttribute("data-font", font);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [lineHeight, fontSize, font, codeTheme]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     isDark,
@@ -153,12 +153,7 @@ export function useDocsTheme(): DocsTheme {
 }
 
 function isValidTheme(name: string): name is ShikiCodeTheme {
-  return [
-    "catppuccin",
-    "tokyonight",
-    "gruvbox",
-    "nord",
-    "everforest",
-    "solarized-light",
-  ].includes(name);
+  return ["catppuccin", "tokyonight", "gruvbox", "nord", "everforest", "solarized-light"].includes(
+    name
+  );
 }

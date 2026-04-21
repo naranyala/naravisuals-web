@@ -14,7 +14,7 @@ export function extractTOC(tokens: Token[]) {
     if (token.type === "heading" && (token.depth === 2 || token.depth === 3)) {
       const text = (token as any).text;
       let id = slugifyHeading(text);
-      
+
       // Handle duplicate IDs in same file
       let suffix = 1;
       const originalId = id;
@@ -22,7 +22,7 @@ export function extractTOC(tokens: Token[]) {
         id = `${originalId}-${suffix++}`;
       }
       seenIds.add(id);
-      
+
       toc.push({ value: text, id, level: token.depth });
     }
   }
