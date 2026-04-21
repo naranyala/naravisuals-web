@@ -3,23 +3,16 @@
  * Derived from TypeBox schemas for runtime and build-time safety.
  */
 
-import {
-  type DocEntry,
-  type SidebarItem,
-  type SidebarDocItem,
-  type SidebarCategoryItem,
-  type TocItem,
-  type AppConfig,
+import type {
+  AppConfig,
+  DocEntry,
+  SidebarCategoryItem,
+  SidebarDocItem,
+  SidebarItem,
+  TocItem,
 } from "../../src/shared/schemas.ts";
 
-export type {
-  DocEntry,
-  SidebarItem,
-  SidebarDocItem,
-  SidebarCategoryItem,
-  TocItem,
-  AppConfig,
-};
+export type { AppConfig, DocEntry, SidebarCategoryItem, SidebarDocItem, SidebarItem, TocItem };
 
 export interface CodeBlockMeta {
   lang: string;

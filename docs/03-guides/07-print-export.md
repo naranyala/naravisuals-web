@@ -3,6 +3,7 @@ title: Print Export
 description: How the print functionality works with rendered Mermaid SVGs, MathJax, and clean code styling
 sidebar_label: Print Export
 sidebar_position: 7
+tags: ["print", "pdf", "export", "styling"]
 ---
 
 # Print Export

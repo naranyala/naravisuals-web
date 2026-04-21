@@ -10,7 +10,8 @@ interface UIState {
   astOpen: boolean;
   searchOpen: boolean;
   wordStatsOpen: boolean;
-  viewMode: "view" | "raw";
+  graphOpen: boolean;
+  viewMode: "view" | "ast" | "raw";
   isMobile: boolean;
   isTocMobile: boolean;
 }
@@ -22,7 +23,8 @@ interface UIStoreActions {
   setToc: (visible: boolean) => void;
   setSearch: (open: boolean) => void;
   setWordStatsOpen: (open: boolean) => void;
-  setViewMode: (mode: "view" | "raw") => void;
+  setGraphOpen: (open: boolean) => void;
+  setViewMode: (mode: "view" | "ast" | "raw") => void;
   updateResponsive: (width: number, mobileBreakpoint: number, tocBreakpoint: number) => void;
   setSettingsOpen: (open: boolean) => void;
 }
@@ -55,6 +57,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     astOpen: false,
     searchOpen: false,
     wordStatsOpen: false,
+    graphOpen: false,
     viewMode: "view",
     isMobile: false,
     isTocMobile: false,
@@ -91,7 +94,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setUiState((prev) => ({ ...prev, wordStatsOpen: open }));
   }, []);
 
-  const setViewMode = useCallback((mode: "view" | "raw") => {
+  const setGraphOpen = useCallback((open: boolean) => {
+    setUiState((prev) => ({ ...prev, graphOpen: open }));
+  }, []);
+
+  const setViewMode = useCallback((mode: "view" | "ast" | "raw") => {
     setUiState((prev) => ({ ...prev, viewMode: mode }));
   }, []);
 
@@ -129,6 +136,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setToc,
         setSearch,
         setWordStatsOpen,
+        setGraphOpen,
         setViewMode,
         updateResponsive,
         setSettingsOpen,
@@ -153,6 +161,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setDoc,
       setSlug,
       setWordStatsOpen,
+      setGraphOpen,
     ]
   );
 

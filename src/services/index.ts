@@ -13,4 +13,12 @@ export type {
 } from "./container";
 export { createContainer, defaultContainer } from "./container";
 export type { AppEvents, IEventBusService } from "./event-bus";
-export { ServicesProvider, useService, useServices } from "./provider";
+export {
+  ProvideService,
+  ServicesProvider,
+  useConfig,
+  useOptionalService,
+  useService,
+  useServices,
+  useServicesList,
+} from "./provider";

@@ -3,6 +3,7 @@ title: Frontend Components
 description: React component hierarchy, key components, and how they work together
 sidebar_label: Frontend Components
 sidebar_position: 3
+tags: ["react", "components", "architecture", "state-management"]
 ---
 
 # Frontend Components

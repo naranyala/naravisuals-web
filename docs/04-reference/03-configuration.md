@@ -3,6 +3,7 @@ title: Configuration
 description: IAppConfig, service interfaces, and runtime settings
 sidebar_label: Configuration
 sidebar_position: 3
+tags: ["reference", "config", "settings", "di"]
 ---
 
 # Configuration

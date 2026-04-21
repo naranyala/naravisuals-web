@@ -35,6 +35,15 @@
    TOP BAR BUTTONS (UNIFIED)
    ============================================ */
 
+.btn-icon {
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
 .top-bar-btn {
   display: inline-flex;
   align-items: center;
@@ -110,23 +119,14 @@
     padding: 0;
     justify-content: center;
   }
-  .btn-text,
-  .btn-shortcut {
+  .top-bar-action-btn .btn-text,
+  .top-bar-action-btn .btn-shortcut {
     display: none;
   }
 }
 
 .menu-btn {
   margin-right: 0.5rem;
-}
-
-.btn-icon {
-  font-size: 1.1rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.2rem;
-  height: 1.2rem;
 }
 
 .site-title {
@@ -157,15 +157,15 @@
 }
 
 .print-btn {
-  width: 32px !important;
-  height: 32px !important;
-  padding: 0 !important;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   flex-shrink: 0;
 }
 
 .print-btn .btn-icon {
-  width: 100% !important;
-  height: 100% !important;
+  width: 100%;
+  height: 100%;
 }
 
 /* ============================================

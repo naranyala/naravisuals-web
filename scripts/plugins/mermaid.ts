@@ -184,7 +184,7 @@ export const mermaidPlugin: MarkdownPlugin = {
 
       const mermaidDiv = mermaidContainer.querySelector(".mermaid");
       if (mermaidDiv) {
-        // We use escapeHtml here ONLY to satisfy security linting and tests 
+        // We use escapeHtml here ONLY to satisfy security linting and tests
         // that check the raw HTML string for "<script" tags.
         // The frontend useDocumentEnhancer hook will decode this back to raw text.
         mermaidDiv.setAttribute("data-source", escapeHtml(diagram));

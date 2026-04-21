@@ -3,6 +3,7 @@ title: SEO Optimization
 description: How useSeo, sitemap.xml, robots.txt, JSON-LD, and Open Graph work together for discoverability
 sidebar_label: SEO Optimization
 sidebar_position: 4
+tags: ["seo", "metadata", "search", "discoverability"]
 ---
 
 # SEO Optimization

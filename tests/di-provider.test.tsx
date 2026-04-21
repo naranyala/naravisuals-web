@@ -6,7 +6,14 @@ import { describe, expect, test } from "bun:test";
 import { render } from "@testing-library/react";
 import { createContainer } from "../src/services/container";
 import { createMockStorage, createMockTheme } from "../src/services/mocks";
-import { ServicesProvider, useService, useServices } from "../src/services/provider";
+import {
+  ProvideService,
+  ServicesProvider,
+  useConfig,
+  useService,
+  useServices,
+  useServicesList,
+} from "../src/services/provider";
 
 // ─── ServicesProvider ─────────────────────────────────────────────────────
 
@@ -41,10 +48,6 @@ describe("ServicesProvider", () => {
   });
 
   test("throws when useServices used outside provider", () => {
-    // useServices() calls useContext() which requires a React render tree.
-    // When called outside any Provider, React returns the default context value (null),
-    // and the hook throws. We test this by rendering a component without the provider.
-    const { useServices } = require("../src/services/provider");
     let caughtError: Error | null = null;
 
     function BrokenComponent() {
@@ -56,7 +59,6 @@ describe("ServicesProvider", () => {
       return <div />;
     }
 
-    // Render WITHOUT ServicesProvider
     render(<BrokenComponent />);
 
     expect(caughtError).not.toBeNull();
@@ -64,12 +66,34 @@ describe("ServicesProvider", () => {
       "useServices() must be used within a <ServicesProvider>"
     );
   });
+
+  test("ProvideService overrides specific service for subtree", () => {
+    const defaultC = createContainer();
+    const customConfig = { siteTitle: "Overridden" };
+    let readConfig: any;
+
+    function Reader() {
+      readConfig = useService("config");
+      return <div />;
+    }
+
+    render(
+      <ServicesProvider container={defaultC}>
+        <ProvideService service="config" value={customConfig as any}>
+          <Reader />
+        </ProvideService>
+      </ServicesProvider>
+    );
+
+    expect(readConfig.siteTitle).toBe("Overridden");
+    expect(defaultC.config.siteTitle).not.toBe("Overridden");
+  });
 });
 
-// ─── useService hook ─────────────────────────────────────────────────────
+// ─── useService hooks ─────────────────────────────────────────────────────
 
-describe("useService", () => {
-  test("returns storage", () => {
+describe("useService hooks", () => {
+  test("useService returns specific service", () => {
     const c = createContainer();
     let read: any;
     function Reader() {
@@ -84,11 +108,11 @@ describe("useService", () => {
     expect(read).toBe(c.storage);
   });
 
-  test("returns router", () => {
+  test("useServicesList returns multiple services", () => {
     const c = createContainer();
     let read: any;
     function Reader() {
-      read = useService("router");
+      read = useServicesList("storage", "config");
       return <div />;
     }
     render(
@@ -96,44 +120,15 @@ describe("useService", () => {
         <Reader />
       </ServicesProvider>
     );
-    expect(read).toBe(c.router);
+    expect(read.storage).toBe(c.storage);
+    expect(read.config).toBe(c.config);
   });
 
-  test("returns dom", () => {
+  test("useConfig returns config", () => {
     const c = createContainer();
     let read: any;
     function Reader() {
-      read = useService("dom");
-      return <div />;
-    }
-    render(
-      <ServicesProvider container={c}>
-        <Reader />
-      </ServicesProvider>
-    );
-    expect(read).toBe(c.dom);
-  });
-
-  test("returns theme", () => {
-    const c = createContainer();
-    let read: any;
-    function Reader() {
-      read = useService("theme");
-      return <div />;
-    }
-    render(
-      <ServicesProvider container={c}>
-        <Reader />
-      </ServicesProvider>
-    );
-    expect(read).toBe(c.theme);
-  });
-
-  test("returns config", () => {
-    const c = createContainer();
-    let read: any;
-    function Reader() {
-      read = useService("config");
+      read = useConfig();
       return <div />;
     }
     render(

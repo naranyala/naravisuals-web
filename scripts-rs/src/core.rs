@@ -18,6 +18,13 @@ impl Colors {
 }
 
 pub struct Logger;
+
+impl Default for Logger {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Logger {
     pub fn new() -> Self { Self }
 
@@ -55,12 +62,18 @@ pub struct Paths {
     pub root: PathBuf,
 }
 
+impl Default for Paths {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Paths {
     pub fn new() -> Self {
         // In a real scenario, we might search for a marker file
         // For now, assume current directory is root or go up until we find package.json
         let mut current = env::current_dir().expect("Failed to get current dir");
-        while !current.join("package.json").exists() {
+        while current.exists() && !current.join("package.json").exists() {
             if let Some(parent) = current.parent() {
                 current = parent.to_path_buf();
             } else {

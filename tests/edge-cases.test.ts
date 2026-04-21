@@ -6,7 +6,10 @@
  */
 
 import { describe, expect, test } from "bun:test";
+import { marked } from "marked";
 import { Diagnostics, validateInternalLinks, validateUniqueSlugs } from "../scripts/diagnostics.ts";
+import { parseFrontmatter } from "../scripts/pipeline/frontmatter.ts";
+import { extractTOC } from "../scripts/pipeline/toc.ts";
 import { admonitionsPlugin } from "../scripts/plugins/admonitions.ts";
 import { mathPlugin } from "../scripts/plugins/math.ts";
 import { mermaidPlugin } from "../scripts/plugins/mermaid.ts";
@@ -40,7 +43,7 @@ ${longContent}
 ##### Level 5 (should be ignored)
 ### Level 3 Again
 `;
-    const toc = extractTOC(content);
+    const toc = extractTOC(marked.lexer(content));
     // Only h2 and h3 should be extracted
     expect(toc.every((item) => item.level === 2 || item.level === 3)).toBe(true);
     expect(toc.length).toBe(5); // 2 h2s + 3 h3s
@@ -565,79 +568,3 @@ describe("Diagnostics edge cases", () => {
     expect(json.map((d) => d.severity)).toContain("info");
   });
 });
-
-// ─── Helpers (mirrored from build-docs.mts) ────────────────────────────
-
-function parseFrontmatter(md: string) {
-  // Handle both \n and \r\n line endings, and empty frontmatter blocks
-  // The YAML content between --- fences can be empty, so \r?\n before closing --- is optional
-  const m = md.match(/^---\r?\n([\s\S]*?)\r?\n?---\r?\n?([\s\S]*)$/);
-  const fm: Record<string, unknown> = {};
-  let content = md;
-  if (m) {
-    content = m[2] || "";
-    const fmLines = (m[1] || "").split("\n");
-    let currentKey: string | null = null;
-    let currentList: string[] | null = null;
-
-    for (let i = 0; i < fmLines.length; i++) {
-      const line = fmLines[i];
-      if (line === undefined) continue;
-
-      const listMatch = line.match(/^\s+-\s+(.+)$/);
-      if (listMatch && currentKey && currentList !== null) {
-        currentList.push((listMatch[1] || "").trim().replace(/^["']|["']$/g, ""));
-        continue;
-      }
-
-      if (currentKey && currentList !== null) {
-        fm[currentKey] = currentList;
-        currentKey = null;
-        currentList = null;
-      }
-
-      const ci = line.indexOf(":");
-      if (ci > 0) {
-        const key = line.slice(0, ci).trim();
-        const rawVal = line
-          .slice(ci + 1)
-          .trim()
-          .replace(/^["']|["']$/g, "");
-
-        if (rawVal === "") {
-          currentKey = key;
-          currentList = [];
-        } else if (rawVal.startsWith("[")) {
-          try {
-            fm[key] = JSON.parse(rawVal) as unknown;
-          } catch {
-            fm[key] = rawVal.split(",").map((t: string) => t.trim().replace(/["']/g, ""));
-          }
-        } else {
-          fm[key] = rawVal;
-        }
-      }
-    }
-
-    if (currentKey && currentList !== null) {
-      fm[currentKey] = currentList;
-    }
-  }
-  return { fm, content };
-}
-
-function extractTOC(content: string) {
-  const toc: { value: string; id: string; level: number }[] = [];
-  const re = /^(#{2,3})\s+(.+)$/gm;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(content)) !== null) {
-    const level = (m[1] || "").length;
-    const value = m[2] || "";
-    const id = value
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-");
-    toc.push({ value, id, level });
-  }
-  return toc;
-}

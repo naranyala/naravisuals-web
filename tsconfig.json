@@ -33,7 +33,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noPropertyAccessFromIndexSignature": true
+    "noPropertyAccessFromIndexSignature": false
   },
 
   "include": ["src", "scripts", "rspack.config.ts", "bun-env.d.ts"],

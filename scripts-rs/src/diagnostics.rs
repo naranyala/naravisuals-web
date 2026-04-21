@@ -53,6 +53,12 @@ pub struct Diagnostics {
     items: Vec<Diagnostic>,
 }
 
+impl Default for Diagnostics {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Diagnostics {
     #[allow(dead_code)]
     pub fn new() -> Self {
@@ -250,6 +256,14 @@ pub fn validate_frontmatter(fm: &HashMap<String, Value>, file: &str, diags: &mut
             file,
             "Missing recommended field: description",
             None,
+        );
+    }
+    if !fm.contains_key("tags") {
+        diags.warn(
+            DiagnosticSource::Frontmatter,
+            file,
+            "Missing required field: tags",
+            Some("Tags are required for the frontmatter network graph visuals."),
         );
     }
 }
@@ -464,10 +478,8 @@ pub fn analyze_content(
     let code_re = regex::Regex::new(r"(?m)^```(\w+)?").unwrap();
     for cap in code_re.captures_iter(markdown_content) {
         stats.code_blocks += 1;
-        if let Some(lang) = cap.get(1) {
-            if lang.as_str().to_lowercase() == "mermaid" {
-                stats.mermaid_blocks += 1;
-            }
+        if let Some(_lang) = cap.get(1).filter(|l| l.as_str().to_lowercase() == "mermaid") {
+            stats.mermaid_blocks += 1;
         }
     }
 
@@ -501,6 +513,12 @@ struct ReportSection {
     title: String,
     subtitle: Option<String>,
     content: Vec<String>,
+}
+
+impl Default for ReportGenerator {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl ReportGenerator {
@@ -545,7 +563,7 @@ impl ReportGenerator {
                 DiagnosticSeverity::Info => "[INFO]".cyan().bold(),
             };
 
-            println!("{}  {} ({})", icon, d.file.dimmed(), d.source.to_string().dimmed());
+            println!("{} {} {} ({})", icon, sev_text, d.file.dimmed(), d.source.to_string().dimmed());
             println!("       {}", d.message);
             if let Some(detail) = &d.detail {
                 println!("       {} {}", "→".dimmed(), detail.dimmed());

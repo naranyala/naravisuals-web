@@ -3,6 +3,7 @@ title: API Glossary
 description: Definitions of key terms and internal APIs
 sidebar_label: API Glossary
 sidebar_position: 7
+tags: ["reference", "api", "glossary", "terms"]
 ---
 
 # API Glossary

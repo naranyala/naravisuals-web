@@ -2,27 +2,31 @@
  * File generation logic for the documentation site.
  */
 
-import * as fs from "node:fs";
 import * as path from "node:path";
+import type { CompilerContainer } from "../compiler/container.ts";
 import type { DocEntry, SidebarItem } from "./types.ts";
 import { slugToFilename, slugToVarName } from "./utils.ts";
 
-export function cleanGeneratedDir(dir: string) {
-  if (fs.existsSync(dir)) {
-    fs.rmSync(dir, { recursive: true, force: true });
+export function cleanGeneratedDir(container: CompilerContainer, dir: string) {
+  if (container.fs.exists(dir)) {
+    container.fs.rm(dir, { recursive: true, force: true });
   }
-  fs.mkdirSync(dir, { recursive: true });
+  container.fs.mkdir(dir, { recursive: true });
 }
 
-export function generateSidebar(genDir: string, sidebar: SidebarItem[]) {
+export function generateSidebar(container: CompilerContainer, sidebar: SidebarItem[]) {
   const content = `// AUTO-GENERATED — DO NOT EDIT.
 import type { SidebarItem } from "./types.ts";
 export const sidebarData: SidebarItem[] = ${JSON.stringify(sidebar, null, 2)};
 `;
-  fs.writeFileSync(path.join(genDir, "sidebar.ts"), content, "utf-8");
+  container.fs.write(path.join(container.config.outputDir, "sidebar.ts"), content);
 }
 
-export function generateDocFiles(genDocsDir: string, allDocs: DocEntry[]) {
+export function generateDocFiles(
+  container: CompilerContainer,
+  genDocsDir: string,
+  allDocs: DocEntry[]
+) {
   for (const d of allDocs) {
     const filename = slugToFilename(d.id);
     const content = `// AUTO-GENERATED — DO NOT EDIT.
@@ -30,11 +34,15 @@ import type { DocEntry } from "../types.ts";
 
 export const ${slugToVarName(d.id)}: DocEntry = ${JSON.stringify(d, null, 2)};
 `;
-    fs.writeFileSync(path.join(genDocsDir, `${filename}.ts`), content, "utf-8");
+    container.fs.write(path.join(genDocsDir, `${filename}.ts`), content);
   }
 }
 
-export function generateBarrelExports(genDir: string, genDocsDir: string, allDocs: DocEntry[]) {
+export function generateBarrelExports(
+  container: CompilerContainer,
+  genDocsDir: string,
+  allDocs: DocEntry[]
+) {
   // 1. docs/index.ts
   const docsIndexContent = `// AUTO-GENERATED — DO NOT EDIT.
 import type { DocEntry } from "../types.ts";
@@ -48,7 +56,7 @@ export const allDocs: DocEntry[] = [
   ${allDocs.map((d) => slugToVarName(d.id)).join(",\n  ")},
 ];
 `;
-  fs.writeFileSync(path.join(genDocsDir, "index.ts"), docsIndexContent, "utf-8");
+  container.fs.write(path.join(genDocsDir, "index.ts"), docsIndexContent);
 
   // 2. index.ts
   const topIndexContent = `// AUTO-GENERATED — DO NOT EDIT.
@@ -59,10 +67,13 @@ export { allDocs } from "./docs/index.ts";
 export { wordStats, filteredStats } from "./word-stats.ts";
 export type { DocEntry, SidebarItem, SidebarDocItem, SidebarCategoryItem } from "./types.ts";
 `;
-  fs.writeFileSync(path.join(genDir, "index.ts"), topIndexContent, "utf-8");
+  container.fs.write(path.join(container.config.outputDir, "index.ts"), topIndexContent);
 }
 
-export function generateSeoFiles(rootDir: string, allDocs: DocEntry[], siteUrl: string) {
+export function generateSeoFiles(container: CompilerContainer, allDocs: DocEntry[]) {
+  const { config } = container;
+  const rootDir = path.dirname(config.outputDir);
+  const siteUrl = config.siteUrl;
   const today = new Date().toISOString().split("T")[0];
 
   // Sitemap
@@ -91,7 +102,7 @@ export function generateSeoFiles(rootDir: string, allDocs: DocEntry[], siteUrl: 
 `;
   }
   sitemapXml += `</urlset>\n`;
-  fs.writeFileSync(path.join(rootDir, "sitemap.xml"), sitemapXml, "utf-8");
+  container.fs.write(path.join(rootDir, "sitemap.xml"), sitemapXml);
 
   // Robots.txt
   const robotsTxt = `# robots.txt
@@ -99,5 +110,5 @@ User-agent: *
 Allow: /
 Sitemap: ${siteUrl}/sitemap.xml
 `;
-  fs.writeFileSync(path.join(rootDir, "robots.txt"), robotsTxt, "utf-8");
+  container.fs.write(path.join(rootDir, "robots.txt"), robotsTxt);
 }

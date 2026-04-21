@@ -65,7 +65,9 @@ export const referenceValidator: MarkdownValidator = {
       // Extract external links
       const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
       let linkMatch: RegExpExecArray | null;
-      while ((linkMatch = linkRegex.exec(line)) !== null) {
+      while (true) {
+        linkMatch = linkRegex.exec(line);
+        if (linkMatch === null) break;
         const url = linkMatch[2];
         const text = linkMatch[1];
         if (url === undefined || text === undefined) continue;
@@ -95,7 +97,9 @@ export const referenceValidator: MarkdownValidator = {
       // Extract footnote references [^identifier]
       const footnoteRefRegex = /\[\^([^\]]+)\]/g;
       let refMatch: RegExpExecArray | null;
-      while ((refMatch = footnoteRefRegex.exec(line)) !== null) {
+      while (true) {
+        refMatch = footnoteRefRegex.exec(line);
+        if (refMatch === null) break;
         const identifier = refMatch[1];
         if (identifier === undefined) continue;
 

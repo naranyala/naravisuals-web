@@ -3,6 +3,7 @@ title: Hybrid Toolchain
 description: Why and how we use Bun and Rust together
 sidebar_label: Hybrid Toolchain
 sidebar_position: 5
+tags: ["toolchain", "bun", "rust", "hybrid"]
 ---
 
 # Hybrid Toolchain

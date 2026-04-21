@@ -20,7 +20,7 @@ export function extractAllFootnotes(tokens: any[], sourceFile: string): Footnote
       if (token.type === "paragraph" || token.type === "text") {
         const text = token.text || "";
         const defMatch = text.match(/^\[\^([^\]]+)\]:\s*(.+)$/);
-        if (defMatch && defMatch[1] && defMatch[2]) {
+        if (defMatch?.[1] && defMatch[2]) {
           const identifier = defMatch[1];
           footnotes.push({
             identifier,
@@ -34,8 +34,8 @@ export function extractAllFootnotes(tokens: any[], sourceFile: string): Footnote
       // 2. Look for inline references: [^id]
       if (token.text && typeof token.text === "string") {
         const refRegex = /\[\^([^\]]+)\](?!=:)/g;
-        let match: RegExpExecArray | null;
-        while ((match = refRegex.exec(token.text)) !== null) {
+        const matches = Array.from((token.text as string).matchAll(refRegex));
+        for (const match of matches) {
           const identifier = match[1];
           if (identifier && !seenIds.has(identifier)) {
             // Found a reference without a definition in THIS block yet
@@ -61,6 +61,7 @@ title: References
 description: Collected references and citations across the documentation.
 sidebar_label: References
 sidebar_position: 9999
+tags: ["internal", "references", "footnotes"]
 ---
 
 # References
@@ -70,18 +71,22 @@ No references or footnotes found in the documentation.
   }
 
   // Group by identifier to find shared references
-  const byId = footnotes.reduce((acc, fn) => {
-    const list = acc[fn.identifier] || [];
-    list.push(fn);
-    acc[fn.identifier] = list;
-    return acc;
-  }, {} as Record<string, FootnoteDefinition[]>);
+  const byId = footnotes.reduce(
+    (acc, fn) => {
+      const list = acc[fn.identifier] || [];
+      list.push(fn);
+      acc[fn.identifier] = list;
+      return acc;
+    },
+    {} as Record<string, FootnoteDefinition[]>
+  );
 
   let md = `---
 title: References
 description: Collected references and citations across the documentation.
 sidebar_label: References
 sidebar_position: 9999
+tags: ["internal", "references", "footnotes"]
 ---
 
 # References

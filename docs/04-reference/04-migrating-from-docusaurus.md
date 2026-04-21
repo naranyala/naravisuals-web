@@ -3,6 +3,7 @@ title: Migrating from Docusaurus
 description: How to migrate from Docusaurus, VitePress, or other SSGs
 sidebar_label: Migrating from Docusaurus
 sidebar_position: 6
+tags: ["reference", "migration", "docusaurus", "compat"]
 ---
 
 # Migrating from Docusaurus

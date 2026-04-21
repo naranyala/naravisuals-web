@@ -23,12 +23,14 @@ export function ReferencePanel({ metadata, markdownAst }: ReferencePanelProps) {
     <div className="reference-panel-unified">
       <div className="reference-tabs">
         <button
+          type="button"
           className={clsx("ref-tab", { active: activeTab === "metadata" })}
           onClick={() => setActiveTab("metadata")}
         >
           Metadata
         </button>
         <button
+          type="button"
           className={clsx("ref-tab", { active: activeTab === "footnotes" })}
           onClick={() => setActiveTab("footnotes")}
         >

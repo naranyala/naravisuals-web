@@ -23,6 +23,7 @@ function CategoryItem({
   return (
     <div className="sidebar-category">
       <button
+        type="button"
         className={clsx("sidebar-category-header", { active: hasActive })}
         onClick={() => {
           if (item.link) {

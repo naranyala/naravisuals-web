@@ -5,6 +5,14 @@ import { filteredStats, wordStats } from "../../generated";
 
 const SEARCH_ENGINES = [
   { name: "Google", icon: "🔍", url: "https://www.google.com/search?q=" },
+  { name: "Google Images", icon: "🖼️", url: "https://www.google.com/search?tbm=isch&q=" },
+  { name: "X.com", icon: "🐦", url: "https://x.com/search?q=" },
+  { name: "X Images", icon: "📸", url: "https://www.google.com/search?tbm=isch&q=site:x.com+" },
+  {
+    name: "Reddit Images",
+    icon: "🎨",
+    url: "https://www.google.com/search?tbm=isch&q=site:reddit.com+",
+  },
   { name: "YouTube", icon: "📺", url: "https://www.youtube.com/results?search_query=" },
   { name: "Reddit", icon: "🤖", url: "https://www.reddit.com/search/?q=" },
   { name: "Hacker News", icon: "🧡", url: "https://hn.algolia.com/?q=" },
@@ -44,7 +52,7 @@ export function WordStatsPanel() {
       <div className="modal-content word-stats-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Word Frequency Analysis</h2>
-          <button className="modal-close" onClick={closeModals}>
+          <button type="button" className="modal-close" onClick={closeModals}>
             ×
           </button>
         </div>
@@ -71,7 +79,11 @@ export function WordStatsPanel() {
           </div>
 
           <div className="filtered-words-section">
-            <button className="collapsible-header" onClick={() => setShowFiltered(!showFiltered)}>
+            <button
+              type="button"
+              className="collapsible-header"
+              onClick={() => setShowFiltered(!showFiltered)}
+            >
               <span>{showFiltered ? "▼" : "▶"} Show discipline-agnostic words (Filtered)</span>
               <span className="filtered-count">{filteredStats.length} words</span>
             </button>
@@ -99,7 +111,7 @@ export function WordStatsPanel() {
           <div className="modal-content search-gateway-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Search for "{selectedWord}"</h3>
-              <button className="modal-close" onClick={() => setSelectedWord(null)}>
+              <button type="button" className="modal-close" onClick={() => setSelectedWord(null)}>
                 ×
               </button>
             </div>
@@ -107,6 +119,7 @@ export function WordStatsPanel() {
               <div className="search-engines-grid">
                 {SEARCH_ENGINES.map((engine) => (
                   <button
+                    type="button"
                     key={engine.name}
                     className="search-engine-btn"
                     onClick={() => handleSearch(engine.url)}

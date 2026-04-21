@@ -20,11 +20,11 @@ export const AVAILABLE_THEMES: ThemeOption[] = [
 export const AVAILABLE_FONTS: FontOption[] = [
   { id: "inter", label: "Modern Sans", css: '"Inter", system-ui, -apple-system, sans-serif' },
   {
-    id: "serif",
-    label: "Classic Serif",
-    css: '"Source Serif 4", "Georgia", "Times New Roman", serif',
+    id: "grotesque",
+    label: "Compact Grotesque",
+    css: '"Helvetica Neue", Helvetica, Arial, sans-serif',
   },
-  { id: "plex", label: "Professional", css: '"IBM Plex Sans", system-ui, sans-serif' },
+  { id: "geometric", label: "Geometric Sans", css: "ui-sans-serif, system-ui, sans-serif" },
   {
     id: "mono",
     label: "Technical",
@@ -37,7 +37,13 @@ export const AVAILABLE_FONTS: FontOption[] = [
   },
 ];
 
-export const DEFAULT_THEME = "catppuccin";
+export const AVAILABLE_CODE_FONT_SIZES = [
+  { id: "small", label: "Small", css: "0.75rem" },
+  { id: "medium", label: "Medium", css: "0.85rem" },
+  { id: "big", label: "Big", css: "1rem" },
+];
+
+export const DEFAULT_THEME = "nord";
 export const DEFAULT_FONT = "inter";
 
 // ─── Storage Keys ─────────────────────────────────────────────────────────

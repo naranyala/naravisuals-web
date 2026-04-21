@@ -3,6 +3,7 @@ title: CSS & Theme Architecture
 description: How the 6 paper-like themes, CSS custom properties, and goober work together
 sidebar_label: CSS & Themes
 sidebar_position: 2
+tags: ["css", "theming", "styles", "design-system"]
 ---
 
 # CSS & Theme Architecture

@@ -1,0 +1,179 @@
+import cytoscape from "cytoscape";
+import { useEffect, useMemo, useRef } from "react";
+import { useUIState } from "../../core/store";
+import { allDocs } from "../../generated";
+import { useDocsTheme } from "../theme";
+
+/**
+ * Frontmatter Network Graph Visuals
+ *
+ * Visualizes the relationship between documentation articles and their tags.
+ * Each article is a node, and each tag is a node.
+ * Edges connect articles to their associated tags.
+ */
+export function FrontmatterGraph() {
+  const { graphOpen, setGraphOpen } = useUIState();
+  const { isDark } = useDocsTheme();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cyRef = useRef<cytoscape.Core | null>(null);
+
+  const elements = useMemo(() => {
+    const nodes: any[] = [];
+    const edges: any[] = [];
+    const seenTags = new Set<string>();
+
+    for (const doc of allDocs) {
+      // Add Doc node
+      nodes.push({
+        data: {
+          id: doc.id,
+          label: doc.title,
+          type: "doc",
+          slug: doc.slug,
+        },
+      });
+
+      // Process tags
+      if (doc.tags && Array.isArray(doc.tags)) {
+        for (const tag of doc.tags) {
+          const tagId = `tag:${tag}`;
+          if (!seenTags.has(tagId)) {
+            nodes.push({
+              data: {
+                id: tagId,
+                label: tag,
+                type: "tag",
+              },
+            });
+            seenTags.add(tagId);
+          }
+
+          // Add edge from Doc to Tag
+          edges.push({
+            data: {
+              id: `${doc.id}-${tagId}`,
+              source: doc.id,
+              target: tagId,
+            },
+          });
+        }
+      }
+    }
+
+    return [...nodes, ...edges];
+  }, []);
+
+  useEffect(() => {
+    if (!graphOpen || !containerRef.current) return;
+
+    const cy = cytoscape({
+      container: containerRef.current,
+      elements,
+      style: [
+        {
+          selector: "node",
+          style: {
+            label: "data(label)",
+            "font-size": "10px",
+            "text-valign": "center",
+            "text-halign": "center",
+            "background-color": isDark ? "#4c566a" : "#d8dee9",
+            color: isDark ? "#eceff4" : "#2e3440",
+            width: "label",
+            height: "label",
+            padding: "8px",
+            shape: "round-rectangle",
+          },
+        },
+        {
+          selector: 'node[type="tag"]',
+          style: {
+            "background-color": isDark ? "#88c0d0" : "#5e81ac",
+            color: "#ffffff",
+            "font-weight": "bold",
+          },
+        },
+        {
+          selector: 'node[type="doc"]',
+          style: {
+            "border-width": 2,
+            "border-color": isDark ? "#81a1c1" : "#88c0d0",
+          },
+        },
+        {
+          selector: "edge",
+          style: {
+            width: 1,
+            "line-color": isDark ? "#434c5e" : "#e5e9f0",
+            "curve-style": "bezier",
+            opacity: 0.6,
+          },
+        },
+      ],
+      layout: {
+        name: "cose",
+        animate: true,
+        padding: 50,
+        componentSpacing: 100,
+        nodeOverlap: 20,
+        refresh: 20,
+        fit: true,
+      },
+    });
+
+    cyRef.current = cy;
+
+    // Handle clicks
+    cy.on("tap", "node", (evt) => {
+      const node = evt.target;
+      if (node.data("type") === "doc") {
+        // We can't easily trigger navigation from here without more props,
+        // but we can at least show detail.
+        console.log("Clicked doc:", node.data("slug"));
+      }
+    });
+
+    return () => {
+      if (cyRef.current) {
+        cyRef.current.destroy();
+        cyRef.current = null;
+      }
+    };
+  }, [graphOpen, elements, isDark]);
+
+  if (!graphOpen) return null;
+
+  return (
+    <div className="modal-overlay" onClick={() => setGraphOpen(false)}>
+      <div
+        className="modal-content graph-modal"
+        onClick={(e) => e.stopPropagation()}
+        style={{ width: "90vw", height: "85vh", maxWidth: "none" }}
+      >
+        <div className="modal-header">
+          <h2>Frontmatter Network Graph</h2>
+          <div className="graph-legend">
+            <span className="legend-item">
+              <span className="dot tag-dot" /> Tag
+            </span>
+            <span className="legend-item">
+              <span className="dot doc-dot" /> Article
+            </span>
+          </div>
+          <button type="button" className="modal-close" onClick={() => setGraphOpen(false)}>
+            ×
+          </button>
+        </div>
+        <div
+          className="modal-body graph-container-body"
+          style={{ position: "relative", flex: 1, overflow: "hidden" }}
+        >
+          <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
+        </div>
+        <div className="modal-footer">
+          <p>Drag to move nodes • Scroll to zoom • Cose force-directed layout</p>
+        </div>
+      </div>
+    </div>
+  );
+}

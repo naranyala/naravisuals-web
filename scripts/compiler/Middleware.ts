@@ -2,24 +2,24 @@
  * Compiler Middleware System
  */
 
-import type { CompilationContext } from "./Context.ts";
+import type { CompilerContainer } from "./container.ts";
 import type { CompilationUnit } from "./types.ts";
 
 export interface CompilerMiddleware {
   name: string;
 
   /** Run during file discovery, before any parsing */
-  onIngest?(unit: CompilationUnit, ctx: CompilationContext): Promise<void> | void;
+  onIngest?(unit: CompilationUnit, container: CompilerContainer): Promise<void> | void;
 
   /** Run after frontmatter is parsed but before markdown lexing */
-  onPreParse?(unit: CompilationUnit, ctx: CompilationContext): Promise<void> | void;
+  onPreParse?(unit: CompilationUnit, container: CompilerContainer): Promise<void> | void;
 
   /** Run after marked lexing, before rendering to HTML */
-  onTransform?(unit: CompilationUnit, ctx: CompilationContext): Promise<void> | void;
+  onTransform?(unit: CompilationUnit, container: CompilerContainer): Promise<void> | void;
 
   /** Run after HTML is generated */
-  onPostProcess?(unit: CompilationUnit, ctx: CompilationContext): Promise<void> | void;
+  onPostProcess?(unit: CompilationUnit, container: CompilerContainer): Promise<void> | void;
 
   /** Run after all units are processed (for global analysis) */
-  onAssemble?(units: CompilationUnit[], ctx: CompilationContext): Promise<void> | void;
+  onAssemble?(units: CompilationUnit[], container: CompilerContainer): Promise<void> | void;
 }

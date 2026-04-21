@@ -36,7 +36,7 @@ pub fn events_to_ast(events: &[Event]) -> Value {
                     Tag::Item => {
                         node.insert("type".to_string(), json!("list_item"));
                     }
-                    Tag::Table(alignments) => {
+                    Tag::Table(_alignments) => {
                         node.insert("type".to_string(), json!("table"));
                         // Could add alignments if needed
                     }

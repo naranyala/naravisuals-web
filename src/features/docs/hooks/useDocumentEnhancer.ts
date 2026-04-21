@@ -22,7 +22,7 @@ export function useDocumentEnhancer(
       if (!diagrams || diagrams.length === 0) return;
 
       // Only emit loading if there are unprocessed diagrams
-      const hasUnprocessed = Array.from(diagrams).some((w) => w.dataset["processed"] !== "true");
+      const hasUnprocessed = Array.from(diagrams).some((w) => w.dataset.processed !== "true");
       if (!hasUnprocessed) return;
 
       events.emit("mermaid:loading", true);
@@ -53,7 +53,7 @@ export function useDocumentEnhancer(
         });
 
         for (const w of Array.from(diagrams)) {
-          if (w.dataset["processed"] === "true") continue;
+          if (w.dataset.processed === "true") continue;
 
           const mermaidEl = w.querySelector<HTMLElement>(".mermaid");
           if (!mermaidEl) continue;
@@ -64,7 +64,7 @@ export function useDocumentEnhancer(
           mermaidEl.style.display = "block";
 
           let source =
-            w.dataset["mermaidSource"] ||
+            w.dataset.mermaidSource ||
             mermaidEl.getAttribute("data-source") ||
             mermaidEl.textContent?.trim() ||
             "";
@@ -89,7 +89,7 @@ export function useDocumentEnhancer(
             if (mounted) {
               mermaidEl.innerHTML = svg;
               mermaidEl.style.visibility = "visible";
-              w.dataset["processed"] = "true";
+              w.dataset.processed = "true";
 
               // Attach action handlers
               attachMermaidActions(w, id, source);
@@ -180,8 +180,14 @@ export function useDocumentEnhancer(
       document.body.appendChild(overlay);
       document.body.style.overflow = "hidden";
 
-      const container = overlay.querySelector<HTMLElement>(".mermaid-diagram-container")!;
-      const content = overlay.querySelector<HTMLElement>(".mermaid-fullscreen-content")!;
+      const container = overlay.querySelector<HTMLElement>(".mermaid-diagram-container");
+      const content = overlay.querySelector<HTMLElement>(".mermaid-fullscreen-content");
+
+      if (!container || !content) {
+        document.body.removeChild(overlay);
+        document.body.style.overflow = "";
+        return;
+      }
 
       let scale = 1;
       let pointX = 0;
@@ -299,5 +305,5 @@ export function useDocumentEnhancer(
       mounted = false;
       clearTimeout(timer);
     };
-  }, [slug, ref, events, _html]);
+  }, [slug, ref, events]);
 }

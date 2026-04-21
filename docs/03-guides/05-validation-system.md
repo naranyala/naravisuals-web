@@ -3,6 +3,7 @@ title: Validation System
 description: How scripts/validate-all.mts validates markdown content for quality, structure, and completeness
 sidebar_label: Validation System
 sidebar_position: 5
+tags: ["validation", "quality", "linting", "automation"]
 ---
 
 # Validation System

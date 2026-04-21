@@ -5,162 +5,13 @@
 
 import { describe, expect, test } from "bun:test";
 import { marked } from "marked";
+import { parseFrontmatter } from "../scripts/pipeline/frontmatter.ts";
+import { parseCodeInfo } from "../scripts/pipeline/renderer.ts";
+import { extractTOC } from "../scripts/pipeline/toc.ts";
+import { slugifyHeading } from "../scripts/pipeline/utils.ts";
 import { admonitionsPlugin } from "../scripts/plugins/admonitions.ts";
 import { mathPlugin } from "../scripts/plugins/math.ts";
 import { mermaidPlugin } from "../scripts/plugins/mermaid.ts";
-
-// ─── Helpers (mirror of build-docs.mts logic) ────────────────────────────
-
-function parseFrontmatter(md: string) {
-  const m = md.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
-  const fm: Record<string, unknown> = {};
-  let content = md;
-  if (m) {
-    content = m[2];
-    const fmLines = m[1].split("\n");
-    let currentKey: string | null = null;
-    let currentList: string[] | null = null;
-
-    for (let i = 0; i < fmLines.length; i++) {
-      const line = fmLines[i];
-
-      const listMatch = line.match(/^\s+-\s+(.+)$/);
-      if (listMatch && currentKey && currentList !== null) {
-        currentList.push(listMatch[1].trim().replace(/^["']|["']$/g, ""));
-        continue;
-      }
-
-      if (currentKey && currentList !== null) {
-        fm[currentKey] = currentList;
-        currentKey = null;
-        currentList = null;
-      }
-
-      const ci = line.indexOf(":");
-      if (ci > 0) {
-        const key = line.slice(0, ci).trim();
-        const rawVal = line
-          .slice(ci + 1)
-          .trim()
-          .replace(/^["']|["']$/g, "");
-
-        if (rawVal === "") {
-          currentKey = key;
-          currentList = [];
-        } else if (rawVal.startsWith("[")) {
-          try {
-            fm[key] = JSON.parse(rawVal) as unknown;
-          } catch {
-            fm[key] = rawVal.split(",").map((t: string) => t.trim().replace(/["']/g, ""));
-          }
-        } else {
-          fm[key] = rawVal;
-        }
-      }
-    }
-
-    if (currentKey && currentList !== null) {
-      fm[currentKey] = currentList;
-    }
-  }
-  return { fm, content };
-}
-
-function extractTOC(content: string) {
-  const toc: { value: string; id: string; level: number }[] = [];
-  const re = /^(#{2,3})\s+(.+)$/gm;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(content)) !== null) {
-    const id = m[2]
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-");
-    toc.push({ value: m[2], id, level: m[1].length });
-  }
-  return toc;
-}
-
-const SPECIAL_CASES: Record<string, string> = {
-  "c++": "c-plus-plus",
-  "c#": "c-sharp",
-  ".net": "net",
-};
-
-function slugifyHeading(text: string): string {
-  const lower = text.toLowerCase().trim();
-  if (SPECIAL_CASES[lower]) return SPECIAL_CASES[lower];
-  return lower
-    .replace(/\+/g, "-plus-")
-    .replace(/#/g, "-sharp-")
-    .replace(/[^\w\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-function parseCodeInfo(info: string | undefined): {
-  lang: string;
-  title?: string;
-  desc?: string;
-  label?: string;
-  copy?: boolean;
-  zoom?: boolean;
-} {
-  if (!info) return { lang: "", copy: true, zoom: true };
-
-  let lang = "";
-  let rest = "";
-
-  // 1. Try to parse the new syntax: lang { key="value" }
-  const braceMatch = info.match(/^([^\s{]+)\s*\{([\s\S]*)\}\s*$/);
-  if (braceMatch) {
-    lang = braceMatch[1].trim();
-    rest = braceMatch[2].trim();
-
-    const titleMatch = rest.match(
-      /title\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/
-    );
-    const descMatch = rest.match(
-      /desc(?:ription)?\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/
-    );
-    const labelMatch = rest.match(
-      /label\s*=\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^"'\s{}]+))/
-    );
-    const copyMatch = rest.match(/copy\s*=\s*["']?(true|false)["']?/i);
-    const zoomMatch = rest.match(/zoom\s*=\s*["']?(true|false)["']?/i);
-
-    return {
-      lang,
-      title: titleMatch?.[1]?.trim() || titleMatch?.[2]?.trim() || titleMatch?.[3]?.trim(),
-      desc: descMatch?.[1]?.trim() || descMatch?.[2]?.trim() || descMatch?.[3]?.trim(),
-      label: labelMatch?.[1]?.trim() || labelMatch?.[2]?.trim() || labelMatch?.[3]?.trim(),
-      copy: copyMatch ? copyMatch[1].toLowerCase() === "true" : true,
-      zoom: zoomMatch ? zoomMatch[1].toLowerCase() === "true" : true,
-    };
-  }
-
-  // 2. Fall back to existing colon syntax: lang:key=value
-  const colonIndex = info.indexOf(":");
-  lang = colonIndex > 0 ? info.slice(0, colonIndex).trim() : info.trim();
-
-  if (colonIndex === -1) return { lang, copy: true, zoom: true };
-
-  rest = info.slice(colonIndex + 1);
-  const titleMatch = rest.match(/(?:^|:)\s*title\s*=\s*([^:]+?)\s*(?=:|$)/);
-  const descMatch = rest.match(/(?:^|:)\s*desc(?:ription)?\s*=\s*([^:]+?)\s*(?=:|$)/);
-  const labelMatch = rest.match(/(?:^|:)\s*label\s*=\s*([^:]+?)\s*(?=:|$)/);
-  const copyMatch = rest.match(/(?:^|:)\s*copy\s*=\s*(true|false)\s*(?=:|$)/i);
-  const zoomMatch = rest.match(/(?:^|:)\s*zoom\s*=\s*(true|false)\s*(?=:|$)/i);
-
-  return {
-    lang,
-    title: titleMatch ? titleMatch[1].trim().replace(/["'\s]+$/, "") : undefined,
-    desc: descMatch ? descMatch[1].trim().replace(/["'\s]+$/, "") : undefined,
-    label: labelMatch ? labelMatch[1].trim().replace(/["'\s]+$/, "") : undefined,
-    copy: copyMatch ? copyMatch[1].toLowerCase() === "true" : true,
-    zoom: zoomMatch ? zoomMatch[1].toLowerCase() === "true" : true,
-  };
-}
 
 // ─── Frontmatter ─────────────────────────────────────────────────────────
 
@@ -284,7 +135,7 @@ describe("extractTOC", () => {
 Some text
 ## Configuration
 More text`;
-    const toc = extractTOC(content);
+    const toc = extractTOC(marked.lexer(content));
     expect(toc).toHaveLength(2);
     expect(toc[0]).toEqual({
       value: "Getting Started",
@@ -295,7 +146,7 @@ More text`;
 
   test("extracts h3 headings", () => {
     const content = `### Sub Section`;
-    const toc = extractTOC(content);
+    const toc = extractTOC(marked.lexer(content));
     expect(toc).toHaveLength(1);
     expect(toc[0].level).toBe(3);
   });
@@ -305,7 +156,7 @@ More text`;
 ## Main
 #### Too Deep
 ### Just Right`;
-    const toc = extractTOC(content);
+    const toc = extractTOC(marked.lexer(content));
     expect(toc).toHaveLength(2);
     expect(toc[0].value).toBe("Main");
     expect(toc[1].value).toBe("Just Right");
@@ -314,20 +165,20 @@ More text`;
   test("slugifies heading IDs correctly", () => {
     const content = `## What's New?
 ## C++ Support`;
-    const toc = extractTOC(content);
+    const toc = extractTOC(marked.lexer(content));
     expect(toc[0].id).toBe("whats-new");
-    expect(toc[1].id).toBe("c-support");
+    expect(toc[1].id).toBe("c-plus-plus-support");
   });
 
   test("handles headings with inline code", () => {
     const content = `## Using \`proxy()\` in Valtio`;
-    const toc = extractTOC(content);
+    const toc = extractTOC(marked.lexer(content));
     expect(toc).toHaveLength(1);
     expect(toc[0].value).toBe("Using `proxy()` in Valtio");
   });
 
   test("returns empty array for no headings", () => {
-    const toc = extractTOC("Just a paragraph.\nNo headings here.");
+    const toc = extractTOC(marked.lexer("Just a paragraph.\nNo headings here."));
     expect(toc).toHaveLength(0);
   });
 
@@ -337,7 +188,7 @@ More text`;
 ### Sub A2
 ## Section B
 ### Sub B1`;
-    const toc = extractTOC(content);
+    const toc = extractTOC(marked.lexer(content));
     expect(toc).toHaveLength(5);
     expect(toc[0].level).toBe(2);
     expect(toc[1].level).toBe(3);

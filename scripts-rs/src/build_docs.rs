@@ -53,21 +53,23 @@ pub struct SidebarItem {
 }
 
 pub fn build_docs(paths: &Paths, logger: &Logger) -> anyhow::Result<()> {
-    let ctx = CompilationContext::new(paths);
+    let config = CompilerConfig {
+        docs_dir: paths.root.join("docs").to_string_lossy().to_string(),
+        output_dir: paths.root.join("src").join("generated").to_string_lossy().to_string(),
+        site_url: "https://your-docs-site.com".to_string(), // TODO: config
+    };
+    let container = CompilerContainer::new(config, None);
     
-    let pipeline = (
-        FrontmatterMiddleware,
-        AdmonitionPlugin,
-        MathPlugin,
-        TocMiddleware,
-        HighlightMiddleware,
-        MermaidMiddleware,
-        MermaidPlugin,
-        ValidationMiddleware,
-        GeneratorMiddleware,
-    );
-
-    let mut compiler = DocumentationCompiler::new(ctx, pipeline);
+    let mut compiler = DocumentationCompiler::new(container);
+    
+    // Add middlewares in order
+    compiler.use_middleware(Box::new(AdmonitionPlugin));
+    compiler.use_middleware(Box::new(MathPlugin));
+    compiler.use_middleware(Box::new(HighlightMiddleware));
+    compiler.use_middleware(Box::new(MermaidMiddleware));
+    compiler.use_middleware(Box::new(MermaidPlugin));
+    compiler.use_middleware(Box::new(ValidationMiddleware));
+    
     compiler.compile()?;
 
     // SEO and other post-compile tasks
@@ -96,7 +98,7 @@ pub fn build_docs(paths: &Paths, logger: &Logger) -> anyhow::Result<()> {
 
     generate_seo_assets(&paths.root, &all_docs)?;
 
-    logger.raw(&format!("💾 Written to {}", compiler.ctx.config.output_dir));
+    logger.raw(&format!("💾 Written to {}", compiler.container.config.output_dir));
     logger.raw("✨ Done!");
 
     Ok(())
@@ -183,9 +185,9 @@ pub fn parse_frontmatter(md: &str) -> (HashMap<String, Value>, String) {
                 continue;
             }
 
-            if trimmed.starts_with("- ") {
+            if let Some(stripped) = trimmed.strip_prefix("- ") {
                 if let Some(_key) = &current_key {
-                    let val = trimmed[2..]
+                    let val = stripped
                         .trim()
                         .trim_matches('\"')
                         .trim_matches('\'')
@@ -196,13 +198,11 @@ pub fn parse_frontmatter(md: &str) -> (HashMap<String, Value>, String) {
             }
 
             if let Some(idx) = line.find(':') {
-                if let Some(key) = current_key.take() {
-                    if !current_list.is_empty() {
-                        fm.insert(
-                            key,
-                            Value::Array(current_list.drain(..).map(Value::String).collect()),
-                        );
-                    }
+                if let Some(key) = current_key.take().filter(|_| !current_list.is_empty()) {
+                    fm.insert(
+                        key,
+                        Value::Array(current_list.drain(..).map(Value::String).collect()),
+                    );
                 }
 
                 let key = line[..idx].trim().to_string();
@@ -231,13 +231,11 @@ pub fn parse_frontmatter(md: &str) -> (HashMap<String, Value>, String) {
             }
         }
 
-        if let Some(key) = current_key {
-            if !current_list.is_empty() {
-                fm.insert(
-                    key,
-                    Value::Array(current_list.drain(..).map(Value::String).collect()),
-                );
-            }
+        if let Some(key) = current_key.filter(|_| !current_list.is_empty()) {
+            fm.insert(
+                key,
+                Value::Array(current_list.drain(..).map(Value::String).collect()),
+            );
         }
 
         (fm, content.to_string())
@@ -386,8 +384,8 @@ pub fn slug_to_var_name(slug: &str) -> String {
     if slug.is_empty() {
         return "doc_".to_string();
     }
-    let name = slug.replace('/', "_").replace('-', "_");
-    if name.chars().next().map_or(false, |c| c.is_ascii_digit()) {
+    let name = slug.replace(['/', '-'], "_");
+    if name.chars().next().is_some_and(|c| c.is_ascii_digit()) {
         format!("doc_{}", name)
     } else {
         name

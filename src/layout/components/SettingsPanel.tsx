@@ -1,4 +1,4 @@
-import { AVAILABLE_FONTS, AVAILABLE_THEMES } from "../../core/constants";
+import { AVAILABLE_CODE_FONT_SIZES, AVAILABLE_FONTS, AVAILABLE_THEMES } from "../../core/constants";
 
 interface SettingsPanelProps {
   onClose: () => void;
@@ -6,6 +6,8 @@ interface SettingsPanelProps {
   setCodeTheme: (id: string) => void;
   font: string;
   setFont: (id: string) => void;
+  codeFontSize: string;
+  setCodeFontSize: (id: string) => void;
 }
 
 export function SettingsPanel({
@@ -14,13 +16,15 @@ export function SettingsPanel({
   setCodeTheme,
   font,
   setFont,
+  codeFontSize,
+  setCodeFontSize,
 }: SettingsPanelProps) {
   return (
     <div className="settings-overlay" onClick={onClose}>
       <div className="settings-panel" onClick={(e) => e.stopPropagation()}>
         <div className="settings-header">
           <h3>Settings</h3>
-          <button className="settings-close-btn" onClick={onClose}>
+          <button type="button" className="settings-close-btn" onClick={onClose}>
             ✕
           </button>
         </div>
@@ -31,6 +35,7 @@ export function SettingsPanel({
           <div className="theme-grid">
             {AVAILABLE_THEMES.map((t) => (
               <button
+                type="button"
                 key={t.id}
                 className={`theme-chip ${codeTheme === t.id ? "active" : ""}`}
                 onClick={() => setCodeTheme(t.id)}
@@ -53,12 +58,30 @@ export function SettingsPanel({
           <div className="font-grid">
             {AVAILABLE_FONTS.map((f) => (
               <button
+                type="button"
                 key={f.id}
                 className={`font-chip ${font === f.id ? "active" : ""}`}
                 onClick={() => setFont(f.id)}
                 style={{ fontFamily: f.css }}
               >
                 {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Code Font Size */}
+        <div className="settings-section">
+          <div className="settings-label">Code Text Size</div>
+          <div className="font-grid">
+            {AVAILABLE_CODE_FONT_SIZES.map((s) => (
+              <button
+                type="button"
+                key={s.id}
+                className={`font-chip ${codeFontSize === s.id ? "active" : ""}`}
+                onClick={() => setCodeFontSize(s.id)}
+              >
+                {s.label}
               </button>
             ))}
           </div>

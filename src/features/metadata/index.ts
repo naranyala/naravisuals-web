@@ -9,5 +9,7 @@
  */
 
 export { ArticleRefsPanel } from "./ArticleRefsPanel";
+export { FrontmatterGraph } from "./FrontmatterGraph";
 export { MetadataPanel } from "./MetadataPanel";
 export { ReferencePanel } from "./ReferencePanel";
+export { WordStatsPanel } from "./WordStatsPanel";

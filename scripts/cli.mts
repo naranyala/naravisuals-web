@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+
 /**
  * SSG Documentation CLI
  *
@@ -18,12 +19,12 @@
  *   ssg info             Show project information
  */
 
-import { match, P } from "ts-pattern";
 import { spawn } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import net from "node:net";
 import { join } from "node:path";
 import glob from "fast-glob";
+import { match, P } from "ts-pattern";
 import { c, colors } from "./core/index.ts";
 import { Logger } from "./core/logger.ts";
 import { paths } from "./core/paths.ts";
@@ -264,7 +265,7 @@ async function cmdPreview(options: any) {
     logger.blank();
 
     // Then serve with port detection
-    const startPort = Number(options.port) || Number(process.env["PORT"]) || 3000;
+    const startPort = Number(options.port) || Number(process.env.PORT) || 3000;
     const port = await findAvailablePort(startPort);
 
     if (port !== startPort) {
@@ -613,7 +614,7 @@ async function main() {
   // Handle port detection for relevant commands
   let port = null;
   if (["dev", "start", "preview"].includes(command)) {
-    const startPort = Number(args.port) || Number(process.env["PORT"]) || 3000;
+    const startPort = Number(args.port) || Number(process.env.PORT) || 3000;
     port = await findAvailablePort(startPort);
     if (port !== startPort) {
       logger.warn(`Port ${startPort} is in use, using port ${port} instead`);

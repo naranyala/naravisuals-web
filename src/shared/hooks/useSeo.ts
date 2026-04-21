@@ -115,9 +115,9 @@ export function useSeo({
     // 7. Add LLM-friendly content hints (data attributes for machine parsing)
     const root = document.getElementById("root");
     if (root) {
-      if (slug) root.dataset["pageSlug"] = slug;
-      if (title) root.dataset["pageTitle"] = title;
-      if (description) root.dataset["pageDescription"] = description;
+      if (slug) root.dataset.pageSlug = slug;
+      if (title) root.dataset.pageTitle = title;
+      if (description) root.dataset.pageDescription = description;
     }
 
     // Cleanup function

@@ -3,6 +3,7 @@ title: Extending Markdown
 description: Middleware architecture, lifecycle hooks, and AST analysis tools
 sidebar_label: Extending Markdown
 sidebar_position: 2
+tags: ["reference", "extending", "ast", "middleware"]
 ---
 
 # Extending Markdown

@@ -3,6 +3,7 @@ title: CLI Reference
 description: Complete reference for the docts CLI commands, options, and aliases
 sidebar_label: CLI Reference
 sidebar_position: 1
+tags: ["cli", "reference", "commands", "deployment"]
 ---
 
 # CLI Reference

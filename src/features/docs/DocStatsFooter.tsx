@@ -96,6 +96,7 @@ export function DocStatsFooter({ contentHtml }: DocStatsFooterProps) {
   return (
     <div className="doc-stats-footer">
       <button
+        type="button"
         className="doc-stats-toggle"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}

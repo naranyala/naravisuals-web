@@ -3,12 +3,12 @@
  * Orchestrates the full build pipeline.
  */
 
-import * as fs from "node:fs";
 import * as path from "node:path";
+import { TypeCompiler } from "@sinclair/typebox/compiler";
 import glob from "fast-glob";
 import { marked } from "marked";
 import type { Highlighter } from "shiki";
-import { Logger } from "../core/logger.ts";
+import { DocEntrySchema } from "../../src/shared/schemas.ts";
 import { parseFrontmatter } from "../pipeline/frontmatter.ts";
 import {
   cleanGeneratedDir,
@@ -17,19 +17,16 @@ import {
   generateSeoFiles,
   generateSidebar,
 } from "../pipeline/generator.ts";
-import { buildSidebar } from "../pipeline/sidebar.ts";
-import { extractTOC } from "../pipeline/toc.ts";
 import {
   extractAllFootnotes,
-  generateReferencesMarkdown,
   type FootnoteDefinition,
+  generateReferencesMarkdown,
 } from "../pipeline/references.ts";
-import { CompilationContext } from "./Context.ts";
+import { buildSidebar } from "../pipeline/sidebar.ts";
+import { extractTOC } from "../pipeline/toc.ts";
+import { type CompilerContainer, createCompilerContainer } from "./container.ts";
 import type { CompilerMiddleware } from "./Middleware.ts";
-import { MarkdownRenderer } from "./Renderer.ts";
 import type { CompilationUnit, CompilerConfig } from "./types.ts";
-import { DocEntrySchema } from "../../src/shared/schemas.ts";
-import { TypeCompiler } from "@sinclair/typebox/compiler";
 
 const docEntryValidator = TypeCompiler.Compile(DocEntrySchema);
 
@@ -179,16 +176,13 @@ const STOP_WORDS = new Set([
 ]);
 
 export class DocumentationCompiler {
-  private readonly ctx: CompilationContext;
-  private readonly renderer: MarkdownRenderer;
+  private readonly container: CompilerContainer;
   private readonly middlewares: CompilerMiddleware[] = [];
   private units: CompilationUnit[] = [];
   private allFootnotes: FootnoteDefinition[] = [];
-  private readonly logger = new Logger();
 
   constructor(config: CompilerConfig, highlighter?: Highlighter) {
-    this.ctx = new CompilationContext(config);
-    this.renderer = new MarkdownRenderer(highlighter);
+    this.container = createCompilerContainer({ config, highlighter });
   }
 
   public use(middleware: CompilerMiddleware) {
@@ -197,10 +191,21 @@ export class DocumentationCompiler {
   }
 
   public async compile() {
-    this.logger.raw("🚀 Starting Documentation Compiler…");
+    this.container.logger.raw("🚀 Starting Documentation Compiler…");
 
     // 1. Ingest
-    await this.scanDirectory(this.ctx.config.docsDir, "docs");
+    await this.scanDirectory(this.container.config.docsDir, "docs");
+
+    // 1.1 Validate mandatory abstract
+    const hasAbstract = this.units.some((u) => u.relPath === "00-abstract");
+    if (!hasAbstract) {
+      this.container.context.error(
+        "frontmatter",
+        "docs/00-abstract.md",
+        "Mandatory file missing: docs/00-abstract.md",
+        "This file is required for the site abstract/home page."
+      );
+    }
 
     // 2. Process Units
     for (const unit of this.units) {
@@ -211,22 +216,27 @@ export class DocumentationCompiler {
     const refMarkdown = generateReferencesMarkdown(this.allFootnotes);
     const refUnit: CompilationUnit = {
       id: "references",
-      filePath: path.join(this.ctx.config.docsDir, "references.md"),
+      filePath: path.join(this.container.config.docsDir, "references.md"),
       relPath: "references",
       rawContent: refMarkdown,
       section: "docs",
+      rawMetadata: {
+        title: "Footnote References",
+        description: "Auto-generated list of all footnote references across documents.",
+        tags: ["internal", "references", "footnotes"],
+      },
     };
     await this.processUnit(refUnit);
     this.units.push(refUnit);
 
     // 3. Assemble (Global Analysis)
     for (const mw of this.middlewares) {
-      if (mw.onAssemble) await mw.onAssemble(this.units, this.ctx);
+      if (mw.onAssemble) await mw.onAssemble(this.units, this.container);
     }
 
     // 4. Report
-    console.log(this.ctx.formatReport());
-    if (this.ctx.hasErrors()) {
+    console.log(this.container.context.formatReport());
+    if (this.container.context.hasErrors()) {
       throw new Error("Compilation failed due to errors.");
     }
 
@@ -234,7 +244,9 @@ export class DocumentationCompiler {
     this.generate();
     this.generateWordStats();
 
-    this.logger.raw(`✨ Compilation finished in ${Date.now() - this.ctx.startTime}ms`);
+    this.container.logger.raw(
+      `✨ Compilation finished in ${Date.now() - this.container.context.startTime}ms`
+    );
   }
 
   private generateWordStats() {
@@ -280,17 +292,17 @@ export class DocumentationCompiler {
 export const wordStats = ${JSON.stringify(sortedWords, null, 2)};
 export const filteredStats = ${JSON.stringify(sortedFiltered, null, 2)};
 `;
-    fs.writeFileSync(path.join(this.ctx.config.outputDir, "word-stats.ts"), content, "utf-8");
+    this.container.fs.write(path.join(this.container.config.outputDir, "word-stats.ts"), content);
   }
 
   private async scanDirectory(baseDir: string, section: "docs" | "blog") {
-    if (!fs.existsSync(baseDir)) return;
+    if (!this.container.fs.exists(baseDir)) return;
 
     const files = await glob("**/*.md", { cwd: baseDir, absolute: true });
 
     for (const fullPath of files) {
       const relPath = path.relative(baseDir, fullPath).replace(/\.md$/, "");
-      const rawContent = fs.readFileSync(fullPath, "utf-8");
+      const rawContent = this.container.fs.read(fullPath);
 
       const unit: CompilationUnit = {
         id: relPath,
@@ -301,7 +313,7 @@ export const filteredStats = ${JSON.stringify(sortedFiltered, null, 2)};
       };
 
       for (const mw of this.middlewares) {
-        if (mw.onIngest) await mw.onIngest(unit, this.ctx);
+        if (mw.onIngest) await mw.onIngest(unit, this.container);
       }
 
       this.units.push(unit);
@@ -346,31 +358,31 @@ export const filteredStats = ${JSON.stringify(sortedFiltered, null, 2)};
 
     unit.metadata = {
       title:
-        (fm["title"] as string) ||
+        (fm.title as string) ||
         filename
           .split("-")
           .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
           .join(" "),
-      description: (fm["description"] as string) || "",
-      sidebar_label: (fm["sidebar_label"] as string) || (fm["title"] as string) || filename,
-      sidebar_position: parseInt(fm["sidebar_position"] as string, 10) || 999,
+      description: (fm.description as string) || "",
+      sidebar_label: (fm.sidebar_label as string) || (fm.title as string) || filename,
+      sidebar_position: parseInt(fm.sidebar_position as string, 10) || 999,
       category,
       original_category: slugParts.length > 1 ? slugParts[0] : "",
       slug,
-      date: fm["date"] as string,
-      author: fm["author"] as string,
-      tags: Array.isArray(fm["tags"]) ? fm["tags"].map(String) : undefined,
+      date: fm.date as string,
+      author: fm.author as string,
+      tags: Array.isArray(fm.tags) ? fm.tags.map(String) : undefined,
       custom,
     };
 
     // Middleware: Pre-Parse
     for (const mw of this.middlewares) {
-      if (mw.onPreParse) await mw.onPreParse(unit, this.ctx);
+      if (mw.onPreParse) await mw.onPreParse(unit, this.container);
     }
 
     // Parsing
-    this.renderer.reset();
-    const renderer = this.renderer.getRenderer();
+    this.container.renderer.reset();
+    const renderer = this.container.renderer.getRenderer();
     unit.tokens = marked.Lexer.lex(unit.content);
 
     // Collect footnotes (if not the references page itself)
@@ -380,7 +392,7 @@ export const filteredStats = ${JSON.stringify(sortedFiltered, null, 2)};
 
     // Middleware: Transform
     for (const mw of this.middlewares) {
-      if (mw.onTransform) await mw.onTransform(unit, this.ctx);
+      if (mw.onTransform) await mw.onTransform(unit, this.container);
     }
 
     unit.html = marked.parse(unit.content, { renderer }) as string;
@@ -399,15 +411,16 @@ export const filteredStats = ${JSON.stringify(sortedFiltered, null, 2)};
 
     // Middleware: Post-Process
     for (const mw of this.middlewares) {
-      if (mw.onPostProcess) await mw.onPostProcess(unit, this.ctx);
+      if (mw.onPostProcess) await mw.onPostProcess(unit, this.container);
     }
   }
 
   private generate() {
-    const { config } = this.ctx;
+    const { container } = this;
+    const { config } = container;
     const GEN_DOCS_DIR = path.join(config.outputDir, "docs");
 
-    cleanGeneratedDir(GEN_DOCS_DIR);
+    cleanGeneratedDir(container, GEN_DOCS_DIR);
 
     // Transform units back to DocEntry format for legacy generator compatibility
     const allDocs = this.units.map((u) => {
@@ -437,7 +450,7 @@ export const filteredStats = ${JSON.stringify(sortedFiltered, null, 2)};
       if (!docEntryValidator.Check(entry)) {
         const errors = [...docEntryValidator.Errors(entry)];
         const first = errors[0];
-        this.ctx.error(
+        container.context.error(
           "build",
           u.relPath,
           `Generated document failed final validation: ${first?.message}`,
@@ -449,9 +462,9 @@ export const filteredStats = ${JSON.stringify(sortedFiltered, null, 2)};
     });
 
     const sidebar = buildSidebar(allDocs as any);
-    generateSidebar(config.outputDir, sidebar);
-    generateDocFiles(GEN_DOCS_DIR, allDocs as any);
-    generateBarrelExports(config.outputDir, GEN_DOCS_DIR, allDocs as any);
-    generateSeoFiles(path.dirname(config.outputDir), allDocs as any, config.siteUrl);
+    generateSidebar(container, sidebar);
+    generateDocFiles(container, GEN_DOCS_DIR, allDocs as any);
+    generateBarrelExports(container, GEN_DOCS_DIR, allDocs as any);
+    generateSeoFiles(container, allDocs as any);
   }
 }

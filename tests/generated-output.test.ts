@@ -3,10 +3,13 @@
  *
  * Verifies that the build output (src/generated/) has correct structure,
  * valid exports, and consistent cross-references.
+ * Uses shared TypeBox schemas for runtime validation.
  */
 
 import { describe, expect, test } from "bun:test";
+import { Value } from "@sinclair/typebox/value";
 import { allDocs, sidebarData } from "../src/generated";
+import { DocEntrySchema, SidebarItemSchema } from "../src/shared/schemas.ts";
 
 describe("generated sidebarData", () => {
   test("is a non-empty array", () => {
@@ -14,39 +17,36 @@ describe("generated sidebarData", () => {
     expect(sidebarData.length).toBeGreaterThan(0);
   });
 
-  test("items have required fields", () => {
+  test("items conform to SidebarItemSchema", () => {
     for (const item of sidebarData) {
-      expect(item).toHaveProperty("type");
-      expect(item).toHaveProperty("label");
-      if (item.type === "doc") {
-        expect(item).toHaveProperty("id");
-        expect(item).toHaveProperty("slug");
-      }
-      if (item.type === "category") {
-        expect(item).toHaveProperty("items");
-        expect(Array.isArray(item.items)).toBe(true);
-      }
+      expect(
+        Value.Check(SidebarItemSchema, item),
+        `Item failed validation: ${JSON.stringify(item)}`
+      ).toBe(true);
     }
   });
 
-  test("category items contain doc entries", () => {
+  test("category items contain valid doc entries", () => {
     const categories = sidebarData.filter((i) => i.type === "category");
     expect(categories.length).toBeGreaterThan(0);
     for (const cat of categories) {
       for (const doc of cat.items) {
-        expect(doc).toHaveProperty("type", "doc");
-        expect(doc).toHaveProperty("id");
-        expect(doc).toHaveProperty("slug");
+        expect(
+          Value.Check(SidebarItemSchema, doc),
+          `Category child failed validation: ${JSON.stringify(doc)}`
+        ).toBe(true);
+        expect(doc.type).toBe("doc");
       }
     }
   });
 
-  test("uncategorized doc entries have correct structure", () => {
+  test("uncategorized doc entries are valid", () => {
     const docs = sidebarData.filter((i) => i.type === "doc");
     for (const doc of docs) {
-      expect(doc).toHaveProperty("id");
-      expect(doc).toHaveProperty("slug");
-      expect(doc).toHaveProperty("label");
+      expect(
+        Value.Check(SidebarItemSchema, doc),
+        `Doc entry failed validation: ${JSON.stringify(doc)}`
+      ).toBe(true);
     }
   });
 });
@@ -57,20 +57,9 @@ describe("generated allDocs", () => {
     expect(allDocs.length).toBeGreaterThan(0);
   });
 
-  test("each doc has all required fields", () => {
+  test("each doc conforms to DocEntrySchema", () => {
     for (const doc of allDocs) {
-      expect(doc).toHaveProperty("id");
-      expect(doc).toHaveProperty("slug");
-      expect(doc).toHaveProperty("title");
-      expect(doc).toHaveProperty("sidebar_label");
-      expect(doc).toHaveProperty("sidebar_position");
-      expect(doc).toHaveProperty("category");
-      expect(doc).toHaveProperty("description");
-      expect(doc).toHaveProperty("content");
-      expect(doc).toHaveProperty("toc");
-      expect(doc).toHaveProperty("section");
-      expect(doc).toHaveProperty("metadata");
-      expect(typeof doc.metadata).toBe("object");
+      expect(Value.Check(DocEntrySchema, doc), `Doc failed validation: ${doc.id}`).toBe(true);
     }
   });
 
@@ -78,19 +67,6 @@ describe("generated allDocs", () => {
     for (const doc of allDocs) {
       if (doc.content.length > 0) {
         expect(doc.content).toMatch(/<[a-z]/i);
-      }
-    }
-  });
-
-  test("TOC entries are valid", () => {
-    for (const doc of allDocs) {
-      if (doc.toc.length > 0) {
-        for (const item of doc.toc) {
-          expect(item).toHaveProperty("value");
-          expect(item).toHaveProperty("id");
-          expect(item).toHaveProperty("level");
-          expect([2, 3]).toContain(item.level);
-        }
       }
     }
   });
@@ -137,7 +113,7 @@ describe("sidebar-data and allDocs consistency", () => {
       }
       if (item.type === "category") {
         for (const child of item.items) {
-          sidebarIds.add(child.id);
+          collectIds(child);
         }
       }
     }
@@ -152,22 +128,7 @@ describe("sidebar-data and allDocs consistency", () => {
   });
 });
 
-describe("DocEntry type integrity", () => {
-  test("first doc is a valid DocEntry", () => {
-    const doc = allDocs[0];
-    if (!doc) throw new Error("No docs found");
-    expect(typeof doc.id).toBe("string");
-    expect(typeof doc.slug).toBe("string");
-    expect(typeof doc.title).toBe("string");
-    expect(typeof doc.sidebar_label).toBe("string");
-    expect(typeof doc.sidebar_position).toBe("number");
-    expect(typeof doc.category).toBe("string");
-    expect(typeof doc.description).toBe("string");
-    expect(typeof doc.content).toBe("string");
-    expect(Array.isArray(doc.toc)).toBe(true);
-    expect(typeof doc.section).toBe("string");
-  });
-
+describe("Content Integrity", () => {
   test("heading IDs in content are valid", () => {
     for (const doc of allDocs) {
       const headingMatches = doc.content.match(/<h[23] id="[^"]*"/g) || [];

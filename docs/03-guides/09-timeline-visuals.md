@@ -3,6 +3,7 @@ title: Timeline Visuals
 description: Learn how to create professional ASCII timelines in your documentation using the timeline code block.
 sidebar_label: Timeline Visuals
 sidebar_position: 9
+tags: ["visuals", "timeline", "ascii", "roadmap"]
 ---
 
 # Timeline Visuals

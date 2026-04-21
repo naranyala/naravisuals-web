@@ -3,6 +3,7 @@ title: Mermaid.js Evolution & Compatibility
 description: A comprehensive guide to Mermaid.js version history and syntax changes for documentation maintainers.
 sidebar_label: Mermaid Evolution
 sidebar_position: 6
+tags: ["reference", "mermaid", "diagrams", "evolution"]
 ---
 
 # Mermaid.js Evolution & Compatibility

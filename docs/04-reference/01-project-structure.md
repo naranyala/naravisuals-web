@@ -3,6 +3,7 @@ title: Project Structure
 description: Complete project directory tree and generated output overview
 sidebar_label: Project Structure
 sidebar_position: 1
+tags: ["reference", "file-structure", "organization"]
 ---
 
 # Project Structure

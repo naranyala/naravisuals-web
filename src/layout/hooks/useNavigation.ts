@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDocState } from "../../core/store";
 import { allDocs, type DocEntry, type SidebarItem, sidebarData } from "../../generated";
 import type { ServiceContainer } from "../../services";
 
 export function useNavigation(services: ServiceContainer) {
   const { setDoc } = useDocState();
-  const resolveSlug = (): string => {
+  const resolveSlug = useCallback((): string => {
     const path = services.router.getCurrentPath();
     if (path === "/" || path === "") return "abstract";
     if (path === `/${services.config.routes.docs}` || path === `/${services.config.routes.docs}/`) {
@@ -15,7 +15,7 @@ export function useNavigation(services: ServiceContainer) {
       return path.replace(`/${services.config.routes.docs}/`, "");
     }
     return allDocs[0]?.slug || "abstract";
-  };
+  }, [services.router, services.config.routes.docs]);
 
   const [currentSlug, setCurrentSlug] = useState(resolveSlug);
   const currentDoc = allDocs.find((d) => d.slug === currentSlug || d.id === currentSlug) ?? null;

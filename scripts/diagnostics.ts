@@ -194,10 +194,10 @@ export function validateInternalLinks(
   diags: Diagnostics
 ): number {
   const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
-  let match: RegExpExecArray | null;
   let brokenCount = 0;
+  const matches = Array.from(content.matchAll(linkRegex));
 
-  while ((match = linkRegex.exec(content)) !== null) {
+  for (const match of matches) {
     const href = match[2];
     const text = match[1];
     if (href === undefined || text === undefined) continue;
@@ -227,10 +227,10 @@ export function validateFrontmatter(
   file: string,
   diags: Diagnostics
 ): void {
-  if (!fm["title"]) {
+  if (!fm.title) {
     diags.error("frontmatter", file, "Missing required field: title");
   }
-  if (!fm["description"]) {
+  if (!fm.description) {
     diags.warn("frontmatter", file, "Missing recommended field: description");
   }
 }
@@ -278,10 +278,10 @@ export function analyzeAdmonitions(
 ): AdmonitionAnalysis {
   const admonitionRegex = /:::(\w+)/g;
   const types: Record<string, number> = {};
-  let match: RegExpExecArray | null;
   let total = 0;
+  const admonitionMatches = Array.from(markdownContent.matchAll(admonitionRegex));
 
-  while ((match = admonitionRegex.exec(markdownContent)) !== null) {
+  for (const match of admonitionMatches) {
     const type = match[1]?.toLowerCase();
     if (type) {
       types[type] = (types[type] || 0) + 1;
@@ -357,8 +357,8 @@ export function analyzeContent(
   const recommendations: string[] = [];
 
   const codeBlockRegex = /^```(\w+)?/gm;
-  let match: RegExpExecArray | null;
-  while ((match = codeBlockRegex.exec(markdownContent)) !== null) {
+  const codeMatches = Array.from(markdownContent.matchAll(codeBlockRegex));
+  for (const match of codeMatches) {
     stats.codeBlocks++;
     const lang = match[1]?.toLowerCase();
     if (lang === "mermaid") {
@@ -367,7 +367,8 @@ export function analyzeContent(
   }
 
   const admonitionRegex = /:::(\w+)/g;
-  while ((match = admonitionRegex.exec(markdownContent)) !== null) {
+  const admonitionMatches = Array.from(markdownContent.matchAll(admonitionRegex));
+  for (const match of admonitionMatches) {
     const type = match[1]?.toLowerCase();
     if (type) {
       stats.admonitions++;
@@ -376,7 +377,8 @@ export function analyzeContent(
   }
 
   const refRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  while ((match = refRegex.exec(markdownContent)) !== null) {
+  const refMatches = Array.from(markdownContent.matchAll(refRegex));
+  for (const match of refMatches) {
     const url = match[2];
     if (url && !url.startsWith("/") && !url.startsWith("#")) {
       stats.references++;
@@ -384,7 +386,8 @@ export function analyzeContent(
   }
 
   const footnoteRegex = /\[\^(\w+)\]/g;
-  while ((match = footnoteRegex.exec(markdownContent)) !== null) {
+  const footnoteMatches = Array.from(markdownContent.matchAll(footnoteRegex));
+  for (const _match of footnoteMatches) {
     stats.footnotes++;
   }
 

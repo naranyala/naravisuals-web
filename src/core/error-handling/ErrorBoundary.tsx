@@ -39,7 +39,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   override componentDidCatch(error: Error, info: ErrorInfo): void {
     this.setState({ error, info });
     // Log to console in development
-    if (process.env["NODE_ENV"] !== "production") {
+    if (process.env.NODE_ENV !== "production") {
       console.error("[ErrorBoundary] Caught error:", error);
       console.error("[ErrorBoundary] Component stack:", info.componentStack);
     }
@@ -92,10 +92,10 @@ function DefaultErrorFallback({
           </details>
         )}
         <div className="error-actions">
-          <button className="btn-primary" onClick={() => window.location.reload()}>
+          <button type="button" className="btn-primary" onClick={() => window.location.reload()}>
             Reload Page
           </button>
-          <button className="btn-secondary" onClick={onReset}>
+          <button type="button" className="btn-secondary" onClick={onReset}>
             Try to recover
           </button>
         </div>

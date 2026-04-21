@@ -28,7 +28,9 @@ export async function printAllDocs(allDocs: DocEntry[], config: IAppConfig, _dom
       .querySelectorAll(
         ".code-copy-btn, .mermaid-zoom-btn, .mermaid-download-btn, .mermaid-code-btn, .mermaid-diagram-header, .mermaid-source-container, .mermaid-loading"
       )
-      .forEach((el) => el.remove());
+      .forEach((el) => {
+        el.remove();
+      });
 
     printContainer.appendChild(article);
   }
@@ -84,7 +86,9 @@ export async function printAllDocs(allDocs: DocEntry[], config: IAppConfig, _dom
           svgEl.style.height = "auto";
           svgEl.style.display = "block";
           svgEl.style.margin = "1.5rem auto";
-          svgEl.querySelectorAll("text").forEach((t) => (t.style.fill = "#000"));
+          svgEl.querySelectorAll("text").forEach((t) => {
+            t.style.fill = "#000";
+          });
         }
       } catch (e) {
         console.error("Failed to render diagram for print", e);

@@ -41,7 +41,9 @@ export function ArticleRefsPanel({ markdownAst }: ArticleRefsPanelProps) {
         if (token.text && typeof token.text === "string") {
           const refRegex = /\[\^([^\]]+)\]/g;
           let match: RegExpExecArray | null;
-          while ((match = refRegex.exec(token.text)) !== null) {
+          while (true) {
+            match = refRegex.exec(token.text);
+            if (match === null) break;
             const identifier = match[1];
             if (identifier && !footnotesMap.has(identifier)) {
               footnotesMap.set(identifier, {
@@ -100,6 +102,7 @@ export function ArticleRefsPanel({ markdownAst }: ArticleRefsPanelProps) {
   return (
     <div className="article-refs-panel">
       <button
+        type="button"
         className="article-refs-header"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}

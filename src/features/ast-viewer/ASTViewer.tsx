@@ -64,6 +64,7 @@ function TreeNode({ node, depth, expanded, onToggle, path }: TreeNodeProps) {
   return (
     <div className="ast-node" style={{ paddingLeft: indent }}>
       <button
+        type="button"
         className={`ast-node-header ${hasChildren ? "expandable" : ""} ${isExpanded ? "expanded" : ""}`}
         onClick={() => hasChildren && onToggle(path)}
         title={node.type}
@@ -97,6 +98,7 @@ function TreeNode({ node, depth, expanded, onToggle, path }: TreeNodeProps) {
         <div className="ast-node-children">
           {(node.children as any[]).map((child: any, i: number) => (
             <TreeNode
+              // biome-ignore lint/suspicious/noArrayIndexKey: AST nodes don't have unique IDs, path includes depth info
               key={`node-${path}-${i}`}
               node={child}
               depth={depth + 1}
@@ -200,10 +202,10 @@ export function ASTViewer({ ast: tokens }: ASTViewerProps) {
 
       {/* Controls */}
       <div className="ast-controls">
-        <button className="ast-btn" onClick={expandAll}>
+        <button type="button" className="ast-btn" onClick={expandAll}>
           Expand All
         </button>
-        <button className="ast-btn" onClick={collapseAll}>
+        <button type="button" className="ast-btn" onClick={collapseAll}>
           Collapse All
         </button>
         <input

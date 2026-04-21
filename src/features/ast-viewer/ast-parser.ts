@@ -61,22 +61,28 @@ function tokenToNode(token: Token): ASTTokenNode {
   if (ext.loose !== undefined) node.loose = ext.loose;
 
   // Recursively process nested tokens
-  if (ext.tokens) {
+  if (ext.tokens && Array.isArray(ext.tokens)) {
     node.children = ext.tokens.map(tokenToNode);
   }
-  if (ext.items) {
+  if (ext.items && Array.isArray(ext.items)) {
     node.children = ext.items
       .filter((item): item is Tokens.ListItem => typeof item !== "string" && "text" in item)
       .map((item) => tokenToNode(item as unknown as Token));
   }
-  if (ext.header) {
+  if (ext.header && Array.isArray(ext.header)) {
     node.children = ext.header.map((cell) => tokenToNode(cell as unknown as Token));
   }
-  if (ext.rows) {
-    node.children = ext.rows.map((row) => ({
+  if (ext.rows && Array.isArray(ext.rows)) {
+    const rowNodes = ext.rows.map((row) => ({
       type: "row",
-      children: row.map((cell) => tokenToNode(cell as unknown as Token)),
+      children: Array.isArray(row) ? row.map((cell) => tokenToNode(cell as unknown as Token)) : [],
     }));
+
+    if (node.children) {
+      node.children.push(...rowNodes);
+    } else {
+      node.children = rowNodes;
+    }
   }
 
   return node;

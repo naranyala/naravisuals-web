@@ -1,8 +1,8 @@
-import { match } from "ts-pattern";
 import { clsx } from "clsx";
 import { useCallback, useEffect, useState } from "react";
+import { match } from "ts-pattern";
 import { useUIState } from "../core/store";
-import { ReferencePanel } from "../features/metadata";
+import { stripTitlePrefix } from "../core/utils";
 import { Sidebar, TableOfContents } from "../features/navigation";
 import { GlobalSearch } from "../features/search/GlobalSearch";
 import { useSeo } from "../features/seo";
@@ -12,18 +12,18 @@ import { useServices } from "../services";
 import { useKeyboardShortcut, useTitle } from "../shared/hooks";
 import "../shared/styles/index.css";
 
+import { TypeCompiler } from "@sinclair/typebox/compiler";
+import { ASTViewer } from "../features/ast-viewer/ASTViewer";
 import { DocViewer } from "../features/docs";
 import { ArticleFooter } from "../features/docs/ArticleFooter";
-import { WordStatsPanel } from "../features/metadata/WordStatsPanel";
+import { FrontmatterGraph, WordStatsPanel } from "../features/metadata";
+import { DocEntrySchema } from "../shared/schemas";
 import { AppShell } from "./components/AppShell";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { ThreeColumnLayout } from "./components/ThreeColumnLayout";
 import { TopBar } from "./components/TopBar";
 import { useNavigation } from "./hooks/useNavigation";
 import { printAllDocs } from "./utils/print-engine";
-
-import { DocEntrySchema } from "../shared/schemas";
-import { TypeCompiler } from "@sinclair/typebox/compiler";
 
 const docValidator = TypeCompiler.Compile(DocEntrySchema);
 
@@ -117,18 +117,22 @@ export function MainLayout() {
   }, [services, resolveSlug, setCurrentSlug, setSidebar]);
 
   // ─── Scroll to Top on Navigation ──────────────────────────────────
+  // biome-ignore lint/correctness/useExhaustiveDependencies: We want to force scroll to top on every slug change
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-  }, [currentSlug]);
+  }, [currentDoc?.slug]);
 
-  const handleNavigate = useCallback((target: string) => {
-    navigate(
-      target,
-      isMobile,
-      (v) => setSidebar(v),
-      (v) => setToc(v)
-    );
-  }, [navigate, isMobile, setSidebar, setToc]);
+  const handleNavigate = useCallback(
+    (target: string) => {
+      navigate(
+        target,
+        isMobile,
+        (v) => setSidebar(v),
+        (v) => setToc(v)
+      );
+    },
+    [navigate, isMobile, setSidebar, setToc]
+  );
 
   const handlePrint = async () => {
     setIsPrinting(true);
@@ -176,11 +180,14 @@ export function MainLayout() {
             setCodeTheme={docsTheme.setCodeTheme as any}
             font={docsTheme.font}
             setFont={docsTheme.setFont}
+            codeFontSize={docsTheme.codeFontSize}
+            setCodeFontSize={docsTheme.setCodeFontSize}
           />
         )
       }
     >
       <WordStatsPanel />
+      <FrontmatterGraph />
       <ThreeColumnLayout
         sidebar={
           <Sidebar sidebar={sidebarData} currentSlug={currentSlug} onNavigate={handleNavigate} />
@@ -190,10 +197,13 @@ export function MainLayout() {
             <div className="view-mode-container">
               <div className={clsx("view-mode-switcher", viewMode)}>
                 <div className="view-mode-slider" />
-                <button className="view-mode-btn" onClick={() => setViewMode("view")}>
+                <button type="button" className="view-mode-btn" onClick={() => setViewMode("view")}>
                   View
                 </button>
-                <button className="view-mode-btn" onClick={() => setViewMode("raw")}>
+                <button type="button" className="view-mode-btn" onClick={() => setViewMode("ast")}>
+                  AST
+                </button>
+                <button type="button" className="view-mode-btn" onClick={() => setViewMode("raw")}>
                   Raw
                 </button>
               </div>
@@ -203,7 +213,7 @@ export function MainLayout() {
 
             {isTocMobile && currentDoc.toc.length > 0 && (
               <div className="toc-mobile-collapsible">
-                <button className="toc-mobile-header" onClick={() => toggleToc()}>
+                <button type="button" className="toc-mobile-header" onClick={() => toggleToc()}>
                   <span>Table of Contents</span>
                   <span className={clsx("toc-chevron", { open: tocVisible })}>▾</span>
                 </button>
@@ -217,19 +227,31 @@ export function MainLayout() {
                   <DocViewer html={currentDoc.content} slug={currentDoc.slug} />
                   <ArticleFooter
                     contentHtml={currentDoc.content}
+                    markdownAst={currentDoc.ast}
                     onNavigate={handleNavigate}
                     prevDoc={
                       prevDoc
-                        ? { title: prevDoc.sidebar_label || prevDoc.title, slug: prevDoc.slug }
+                        ? {
+                            title: stripTitlePrefix(prevDoc.sidebar_label || prevDoc.title),
+                            slug: prevDoc.slug,
+                          }
                         : undefined
                     }
                     nextDoc={
                       nextDoc
-                        ? { title: nextDoc.sidebar_label || nextDoc.title, slug: nextDoc.slug }
+                        ? {
+                            title: stripTitlePrefix(nextDoc.sidebar_label || nextDoc.title),
+                            slug: nextDoc.slug,
+                          }
                         : undefined
                     }
                   />
                 </>
+              ))
+              .with("ast", () => (
+                <div className="ast-content-viewer">
+                  <ASTViewer ast={currentDoc.ast as any} />
+                </div>
               ))
               .with("raw", () => (
                 <div className="raw-content-viewer">
@@ -239,12 +261,7 @@ export function MainLayout() {
               .exhaustive()}
           </>
         }
-        reference={
-          <>
-            <TableOfContents items={currentDoc.toc} />
-            <ReferencePanel metadata={currentDoc.metadata || {}} markdownAst={currentDoc.ast} />
-          </>
-        }
+        reference={<TableOfContents items={currentDoc.toc} />}
       />
     </AppShell>
   );

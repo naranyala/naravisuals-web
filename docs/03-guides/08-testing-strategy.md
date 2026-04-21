@@ -3,6 +3,7 @@ title: Testing Strategy
 description: How tests are structured with Jest, Testing Library, and mock services
 sidebar_label: Testing Strategy
 sidebar_position: 8
+tags: ["testing", "qa", "bun-test", "components"]
 ---
 
 # Testing Strategy

@@ -2,7 +2,7 @@ use regex::Regex;
 use pulldown_cmark::Event;
 use crate::compiler::pipeline::CompilerMiddleware;
 use crate::compiler::unit::CompilationUnit;
-use crate::compiler::context::CompilationContext;
+use crate::compiler::container::CompilerContainer;
 
 pub struct AdmonitionPlugin;
 
@@ -11,7 +11,7 @@ impl CompilerMiddleware for AdmonitionPlugin {
         "Admonitions"
     }
 
-    fn on_transform_events<'a>(&mut self, events: &mut Vec<Event<'a>>, _ctx: &mut CompilationContext) {
+    fn on_transform_events<'a>(&mut self, events: &mut Vec<Event<'a>>, _container: &mut CompilerContainer) {
         let mut new_events = Vec::new();
         let mut i = 0;
         
@@ -34,7 +34,7 @@ impl CompilerMiddleware for AdmonitionPlugin {
         // to fulfill the "Middleware" requirement while we work on the event stream.
     }
 
-    fn on_pre_parse(&mut self, unit: &mut CompilationUnit, _ctx: &mut CompilationContext) {
+    fn on_pre_parse(&mut self, unit: &mut CompilationUnit, _container: &mut CompilerContainer) {
         let re = Regex::new(r"(?m)^:::(?P<type>\w+)\s*(?P<title>.*)\n(?P<body>[\s\S]*?)^:::").unwrap();
 
         let result = re.replace_all(&unit.content, |caps: &regex::Captures| {
@@ -86,7 +86,7 @@ impl CompilerMiddleware for MathPlugin {
         "Math"
     }
 
-    fn on_pre_parse(&mut self, unit: &mut CompilationUnit, _ctx: &mut CompilationContext) {
+    fn on_pre_parse(&mut self, unit: &mut CompilationUnit, _container: &mut CompilerContainer) {
         // Protect display math: $$ ... $$
         let re_display = Regex::new(r"(?s)\$\$(.*?)\$\$").unwrap();
         let result = re_display.replace_all(&unit.content, |caps: &regex::Captures| {
@@ -110,7 +110,7 @@ impl CompilerMiddleware for MermaidPlugin {
         "Mermaid"
     }
 
-    fn on_post_process(&mut self, unit: &mut CompilationUnit, _ctx: &mut CompilationContext) {
+    fn on_post_process(&mut self, unit: &mut CompilationUnit, _container: &mut CompilerContainer) {
         if let Some(html) = &unit.html {
             let mermaid_types = [
                 "mermaid", "graph", "flowchart", "sequencediagram", "classdiagram", "statediagram", 
@@ -198,8 +198,8 @@ impl CompilerMiddleware for MermaidPlugin {
 mod tests {
     use super::*;
     use crate::compiler::unit::CompilationUnit;
-    use crate::compiler::context::CompilationContext;
-    use crate::core::Paths;
+    use crate::compiler::container::CompilerContainer;
+    use crate::compiler::context::CompilerConfig;
     use tempfile::tempdir;
     use std::path::PathBuf;
     use smol_str::SmolStr;
@@ -220,14 +220,23 @@ mod tests {
         }
     }
 
+    fn create_test_container(temp_dir: &tempfile::TempDir) -> CompilerContainer {
+        let config = CompilerConfig {
+            docs_dir: temp_dir.path().join("docs").to_string_lossy().to_string(),
+            output_dir: temp_dir.path().join("out").to_string_lossy().to_string(),
+            site_url: "http://localhost".to_string(),
+        };
+        CompilerContainer::new(config, None)
+    }
+
     #[test]
     fn test_admonition_plugin() {
         let mut plugin = AdmonitionPlugin;
         let mut unit = create_test_unit(":::tip My Tip\nThis is the body\n:::");
         let dir = tempdir().unwrap();
-        let mut ctx = CompilationContext::new(&Paths::with_root(dir.path().to_path_buf()));
+        let mut container = create_test_container(&dir);
         
-        plugin.on_pre_parse(&mut unit, &mut ctx);
+        plugin.on_pre_parse(&mut unit, &mut container);
         
         assert!(unit.content.contains("admonition-tip"));
         assert!(unit.content.contains("💡"));
@@ -240,9 +249,9 @@ mod tests {
         let mut plugin = MathPlugin;
         let mut unit = create_test_unit("Inline $E=mc^2$ and block:\n$$\nx^2 + y^2 = z^2\n$$");
         let dir = tempdir().unwrap();
-        let mut ctx = CompilationContext::new(&Paths::with_root(dir.path().to_path_buf()));
+        let mut container = create_test_container(&dir);
         
-        plugin.on_pre_parse(&mut unit, &mut ctx);
+        plugin.on_pre_parse(&mut unit, &mut container);
         
         assert!(unit.content.contains("<span class=\"math-inline\">\\(E=mc^2\\)</span>"));
         assert!(unit.content.contains("<div class=\"math-display\">\\[\nx^2 + y^2 = z^2\n\\]</div>"));
@@ -254,9 +263,9 @@ mod tests {
         let mut unit = create_test_unit("");
         unit.html = Some("<pre><code class=\"language-mermaid:desc=My Diagram\">graph TD\nA-->B</code></pre>".to_string());
         let dir = tempdir().unwrap();
-        let mut ctx = CompilationContext::new(&Paths::with_root(dir.path().to_path_buf()));
+        let mut container = create_test_container(&dir);
         
-        plugin.on_post_process(&mut unit, &mut ctx);
+        plugin.on_post_process(&mut unit, &mut container);
         
         let html = unit.html.unwrap();
         assert!(html.contains("mermaid-diagram"));

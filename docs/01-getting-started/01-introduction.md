@@ -3,6 +3,7 @@ title: Introduction
 description: Overview of the SSG Documentation Site Generator and its core concepts
 sidebar_label: Introduction
 sidebar_position: 1
+tags: ["getting-started", "overview", "core-concepts"]
 ---
 
 # Introduction

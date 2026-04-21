@@ -3,6 +3,7 @@ title: Markdown Engine
 description: Deep dive into the stateful rendering layer and middleware system of the documentation compiler.
 sidebar_label: Markdown Engine
 sidebar_position: 4
+tags: ["markdown", "engine", "compiler", "middleware"]
 ---
 
 # Markdown Engine

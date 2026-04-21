@@ -16,10 +16,12 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint }: TopB
     settingsOpen,
     searchOpen,
     wordStatsOpen,
+    graphOpen,
     toggleSidebar,
     setSettingsOpen,
     setSearch,
     setWordStatsOpen,
+    setGraphOpen,
   } = useUIState();
 
   const onToggleSettings = () => {
@@ -34,6 +36,7 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint }: TopB
     <div className="top-bar">
       <div className="top-bar-left">
         <button
+          type="button"
           className={clsx("top-bar-btn menu-btn show-on-mobile", { active: sidebarVisible })}
           onClick={onToggleSidebar}
           aria-label="Toggle sidebar"
@@ -56,6 +59,7 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint }: TopB
       </div>
       <div className="top-bar-right">
         <button
+          type="button"
           className={clsx("top-bar-btn top-bar-action-btn", { active: searchOpen })}
           onClick={() => setSearch(true)}
           aria-label="Search"
@@ -66,6 +70,7 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint }: TopB
           <span className="btn-shortcut hide-on-mobile">⌘K</span>
         </button>
         <button
+          type="button"
           className={clsx("top-bar-btn top-bar-action-btn", { active: settingsOpen })}
           onClick={onToggleSettings}
           aria-label="Toggle settings"
@@ -74,15 +79,28 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint }: TopB
           <span className="btn-icon">🎨</span>
         </button>
         <button
+          type="button"
           className={clsx("top-bar-btn top-bar-action-btn print-btn", { loading: isPrinting })}
           onClick={onPrint}
           disabled={isPrinting}
           aria-label="Print all docs"
           title="Open all docs in new tab for printing"
         >
-          <span className="btn-icon">{isPrinting ? <span className="mermaid-spinner" /> : "🖨️"}</span>
+          <span className="btn-icon">
+            {isPrinting ? <span className="mermaid-spinner" /> : "🖨️"}
+          </span>
         </button>
         <button
+          type="button"
+          className={clsx("top-bar-btn top-bar-action-btn", { active: graphOpen })}
+          onClick={() => setGraphOpen(!graphOpen)}
+          aria-label="Frontmatter graph"
+          title="Frontmatter Network Graph Visuals"
+        >
+          <span className="btn-icon">🕸️</span>
+        </button>
+        <button
+          type="button"
           className={clsx("top-bar-btn top-bar-action-btn", { active: wordStatsOpen })}
           onClick={() => setWordStatsOpen(!wordStatsOpen)}
           aria-label="Word statistics"

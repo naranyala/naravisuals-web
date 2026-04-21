@@ -63,7 +63,7 @@ export async function scanMdFiles(
 
     const titleMatch = content.match(/^# (.+)$/m);
     const title =
-      (fm["title"] as string) ||
+      (fm.title as string) ||
       titleMatch?.[1] ||
       "" ||
       filename
@@ -109,7 +109,7 @@ export async function scanMdFiles(
     }
 
     // Fallback description
-    let description = (fm["description"] as string) || "";
+    let description = (fm.description as string) || "";
     if (!description) {
       const firstPara = html.match(/<p>(.*?)<\/p>/);
       if (firstPara && firstPara[1] !== undefined) {
@@ -132,7 +132,7 @@ export async function scanMdFiles(
       }
     }
 
-    const pos = fileIndex !== null ? fileIndex : parseInt(fm["sidebar_position"] as string, 10) || 999;
+    const pos = fileIndex !== null ? fileIndex : parseInt(fm.sidebar_position as string, 10) || 999;
     const metadata: Record<string, string | string[]> = {};
     for (const [key, val] of Object.entries(fm)) {
       if (!KNOWN_FM_FIELDS.has(key) && val !== undefined) {
@@ -144,7 +144,7 @@ export async function scanMdFiles(
       id: slug,
       slug,
       title,
-      sidebar_label: (fm["sidebar_label"] as string) || title,
+      sidebar_label: (fm.sidebar_label as string) || title,
       sidebar_position: section === "blog" ? 9000 + pos : pos,
       category: section === "blog" ? "blog" : category,
       original_category: section === "blog" ? undefined : originalCategory || undefined,
@@ -152,9 +152,9 @@ export async function scanMdFiles(
       content: html,
       rawContent: content,
       toc: extractTOC(tokens),
-      date: fm["date"] as string | undefined,
-      author: fm["author"] as string | undefined,
-      tags: fm["tags"] as string[] | undefined,
+      date: fm.date as string | undefined,
+      author: fm.author as string | undefined,
+      tags: fm.tags as string[] | undefined,
       section,
       metadata,
       ast: tokens,

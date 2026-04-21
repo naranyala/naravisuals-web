@@ -51,7 +51,6 @@ export const linkValidator: MarkdownValidator = {
     const issues: ValidationIssue[] = [];
     const validSlugs = getValidSlugs();
     const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
-    let match: RegExpExecArray | null;
     let checkedCount = 0;
 
     const lines = content.split("\n");
@@ -59,7 +58,8 @@ export const linkValidator: MarkdownValidator = {
       const line = lines[i];
       if (line === undefined) continue;
 
-      while ((match = linkRegex.exec(line)) !== null) {
+      const matches = Array.from(line.matchAll(linkRegex));
+      for (const match of matches) {
         const href = match[2];
         const text = match[1];
 

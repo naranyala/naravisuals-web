@@ -44,6 +44,13 @@ export function capitalize(text: string): string {
 }
 
 /**
+ * Strip sorting prefix from a title (e.g., "01-Introduction" -> "Introduction")
+ */
+export function stripTitlePrefix(text: string): string {
+  return text.replace(/^[\d\W]+[- ]/, "");
+}
+
+/**
  * Check if a string is URL
  */
 export function isUrl(text: string): boolean {

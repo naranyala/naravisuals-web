@@ -38,7 +38,8 @@ export const FrontmatterSchema = Type.Object({
   ),
   tags: Type.Optional(
     Type.Array(Type.String(), {
-      description: "Topics or categories.",
+      description: "Topics or categories for the network graph.",
+      minItems: 1,
     })
   ),
   slug: Type.Optional(

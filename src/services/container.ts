@@ -5,9 +5,9 @@
  * Services can be swapped for testing, SSR, or different implementations.
  */
 
-import { createEventBusService, type IEventBusService } from "./event-bus";
-import { type AppConfig, AppConfigSchema } from "../shared/schemas";
 import { TypeCompiler } from "@sinclair/typebox/compiler";
+import { type AppConfig, AppConfigSchema } from "../shared/schemas";
+import { createEventBusService, type IEventBusService } from "./event-bus";
 
 // ─── Service Interfaces ───────────────────────────────────────────────────
 
@@ -223,8 +223,8 @@ export const createThemeService = (
  */
 export const createAppConfig = (overrides?: Partial<IAppConfig>): IAppConfig => {
   const config = {
-    siteTitle: (process.env["PROJECT_NAME"] as string) || "Docs",
-    siteUrl: (process.env["SITE_URL"] as string) || "http://localhost:3000",
+    siteTitle: (process.env.PROJECT_NAME as string) || "Docs",
+    siteUrl: (process.env.SITE_URL as string) || "http://localhost:3000",
     repoEditUrl: "https://github.com/your-org/your-repo/edit/main",
     mobileBreakpoint: 800,
     tocBreakpoint: 1100,

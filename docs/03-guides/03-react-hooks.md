@@ -3,6 +3,7 @@ title: React Hooks
 description: All 16 custom React hooks and how they're used throughout the documentation site
 sidebar_label: React Hooks
 sidebar_position: 3
+tags: ["react", "hooks", "state", "side-effects"]
 ---
 
 # React Hooks

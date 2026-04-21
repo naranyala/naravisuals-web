@@ -11,7 +11,7 @@ import type { CompilerMiddleware } from "../Middleware.ts";
 export const mermaidDeepValidator: CompilerMiddleware = {
   name: "mermaid-deep-validator",
 
-  async onTransform(unit, ctx) {
+  async onTransform(unit, container) {
     // 1. Find all mermaid blocks in the markdown content
     // Supports: ```mermaid, ```flowchart, ```graph, etc.
     const mermaidTypes = [
@@ -39,10 +39,10 @@ export const mermaidDeepValidator: CompilerMiddleware = {
       "g"
     );
 
-    let match;
     const content = unit.content || "";
+    const matches = Array.from(content.matchAll(mermaidRegex));
 
-    while ((match = mermaidRegex.exec(content)) !== null) {
+    for (const match of matches) {
       const type = match[1] || "mermaid";
       let source = (match[3] || "").trim();
 
@@ -91,7 +91,12 @@ export const mermaidDeepValidator: CompilerMiddleware = {
       try {
         await validateDiagram(source, unit.relPath);
       } catch (err: any) {
-        ctx.error("plugin", unit.relPath, "Mermaid Deep Validation Failed", err.message);
+        container.context.error(
+          "plugin",
+          unit.relPath,
+          "Mermaid Deep Validation Failed",
+          err.message
+        );
       }
     }
   },

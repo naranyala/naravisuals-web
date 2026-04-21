@@ -3,6 +3,7 @@ title: Writing Plugins
 description: How to create custom MarkdownPlugin extensions to transform markdown content during the build
 sidebar_label: Writing Plugins
 sidebar_position: 6
+tags: ["plugins", "extensibility", "markdown", "transformations"]
 ---
 
 # Writing Plugins

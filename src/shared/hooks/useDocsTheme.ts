@@ -12,12 +12,14 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
+import { AVAILABLE_CODE_FONT_SIZES, DEFAULT_FONT, DEFAULT_THEME } from "../../core/constants";
 import { useServices } from "../../services";
 import type { ShikiCodeTheme } from "./useShikiTheme";
 
 const FONT_SIZE_KEY = "docs-font-size";
 const LINE_HEIGHT_KEY = "docs-line-height";
 const FONT_KEY = "docs-font";
+const CODE_FONT_SIZE_KEY = "docs-code-font-size";
 
 function getStoredNumber(key: string, fallback: number): number {
   if (typeof window === "undefined") return fallback;
@@ -29,10 +31,13 @@ function getStoredNumber(key: string, fallback: number): number {
   }
 }
 
-function applyReadingPrefs(fontSize: number, lineHeight: number) {
+function applyReadingPrefs(fontSize: number, lineHeight: number, codeFontSize: string) {
   if (typeof document === "undefined") return;
   document.documentElement.style.setProperty("--docs-font-size", `${fontSize}px`);
   document.documentElement.style.setProperty("--docs-line-height", String(lineHeight));
+
+  const codeSize = AVAILABLE_CODE_FONT_SIZES.find((s) => s.id === codeFontSize)?.css || "0.85rem";
+  document.documentElement.style.setProperty("--code-font-size", codeSize);
 }
 
 export interface DocsTheme {
@@ -46,6 +51,8 @@ export interface DocsTheme {
   setFontSize: (size: number) => void;
   lineHeight: number;
   setLineHeight: (height: number) => void;
+  codeFontSize: string;
+  setCodeFontSize: (size: string) => void;
   resetReadingPrefs: () => void;
 }
 
@@ -63,34 +70,55 @@ export function useDocsTheme(): DocsTheme {
     });
   }, [services]);
 
-  // ── Code Theme (now the main document theme) ──────────────────────
+  // ── State Declarations (declared before use in callbacks) ─────
+  const [fontSize, setFontSizeState] = useState(() => getStoredNumber(FONT_SIZE_KEY, 15));
+  const [lineHeight, setLineHeightState] = useState(() => getStoredNumber(LINE_HEIGHT_KEY, 1.6));
+
+  const [codeFontSize, setCodeFontSizeState] = useState(() => {
+    if (typeof window === "undefined") return "small";
+    try {
+      return localStorage.getItem(CODE_FONT_SIZE_KEY) || "small";
+    } catch {
+      return "small";
+    }
+  });
+
   const [codeTheme, setCodeThemeState] = useState<ShikiCodeTheme>(() => {
-    if (typeof window === "undefined") return "catppuccin";
+    if (typeof window === "undefined") return DEFAULT_THEME as ShikiCodeTheme;
     try {
       const stored = localStorage.getItem("theme");
       if (stored && isValidTheme(stored)) return stored;
     } catch {}
-    return "catppuccin";
+    return DEFAULT_THEME as ShikiCodeTheme;
   });
 
+  const [font, setFontState] = useState(() => {
+    if (typeof window === "undefined") return DEFAULT_FONT;
+    try {
+      return localStorage.getItem(FONT_KEY) || DEFAULT_FONT;
+    } catch {
+      return DEFAULT_FONT;
+    }
+  });
+
+  // ── Callbacks ───────────────────────────────────────────────
   const setCodeTheme = useCallback((theme: ShikiCodeTheme) => {
     setCodeThemeState(theme);
     if (typeof document !== "undefined") {
-      // Apply as main theme and code theme
       document.documentElement.setAttribute("data-theme", theme);
       document.documentElement.setAttribute("data-code-theme", theme);
     }
     localStorage.setItem("theme", theme);
   }, []);
 
-  // ── Font Size ─────────────────────────────────────────────────
-  const [font, setFontState] = useState(() => {
-    try {
-      return localStorage.getItem(FONT_KEY) || "system";
-    } catch {
-      return "system";
-    }
-  });
+  const setCodeFontSize = useCallback(
+    (size: string) => {
+      setCodeFontSizeState(size);
+      localStorage.setItem(CODE_FONT_SIZE_KEY, size);
+      applyReadingPrefs(fontSize, lineHeight, size);
+    },
+    [fontSize, lineHeight]
+  );
 
   const setFont = useCallback((f: string) => {
     setFontState(f);
@@ -100,42 +128,44 @@ export function useDocsTheme(): DocsTheme {
     localStorage.setItem(FONT_KEY, f);
   }, []);
 
-  const [fontSize, setFontSizeState] = useState(() => getStoredNumber(FONT_SIZE_KEY, 15));
+  const setFontSize = useCallback(
+    (size: number) => {
+      const clamped = Math.min(Math.max(size, 12), 20);
+      setFontSizeState(clamped);
+      localStorage.setItem(FONT_SIZE_KEY, String(clamped));
+      applyReadingPrefs(clamped, lineHeight, codeFontSize);
+    },
+    [lineHeight, codeFontSize]
+  );
 
-  const setFontSize = useCallback((size: number) => {
-    const clamped = Math.min(Math.max(size, 12), 20);
-    setFontSizeState(clamped);
-    localStorage.setItem(FONT_SIZE_KEY, String(clamped));
-    applyReadingPrefs(clamped, getStoredNumber(LINE_HEIGHT_KEY, 1.6));
-  }, []);
-
-  // ── Line Height ───────────────────────────────────────────────
-  const [lineHeight, setLineHeightState] = useState(() => getStoredNumber(LINE_HEIGHT_KEY, 1.6));
-
-  const setLineHeight = useCallback((height: number) => {
-    const clamped = Math.min(Math.max(height, 1.2), 2.2);
-    setLineHeightState(clamped);
-    localStorage.setItem(LINE_HEIGHT_KEY, String(clamped));
-    applyReadingPrefs(getStoredNumber(FONT_SIZE_KEY, 15), clamped);
-  }, []);
+  const setLineHeight = useCallback(
+    (height: number) => {
+      const clamped = Math.min(Math.max(height, 1.2), 2.2);
+      setLineHeightState(clamped);
+      localStorage.setItem(LINE_HEIGHT_KEY, String(clamped));
+      applyReadingPrefs(fontSize, clamped, codeFontSize);
+    },
+    [fontSize, codeFontSize]
+  );
 
   const resetReadingPrefs = useCallback(() => {
     setFontSizeState(15);
     setLineHeightState(1.6);
+    setCodeFontSizeState("small");
     localStorage.removeItem(FONT_SIZE_KEY);
     localStorage.removeItem(LINE_HEIGHT_KEY);
-    applyReadingPrefs(15, 1.6);
+    localStorage.removeItem(CODE_FONT_SIZE_KEY);
+    applyReadingPrefs(15, 1.6, "small");
   }, []);
 
   // ── Apply on mount ────────────────────────────────────────────
   useEffect(() => {
-    applyReadingPrefs(fontSize, lineHeight);
-    // Apply initial theme
+    applyReadingPrefs(fontSize, lineHeight, codeFontSize);
     if (typeof document !== "undefined") {
       document.documentElement.setAttribute("data-theme", codeTheme);
       document.documentElement.setAttribute("data-font", font);
     }
-  }, [lineHeight, fontSize, font, codeTheme]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [lineHeight, fontSize, font, codeTheme, codeFontSize]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     isDark,
@@ -148,6 +178,8 @@ export function useDocsTheme(): DocsTheme {
     setFontSize,
     lineHeight,
     setLineHeight,
+    codeFontSize,
+    setCodeFontSize,
     resetReadingPrefs,
   };
 }
