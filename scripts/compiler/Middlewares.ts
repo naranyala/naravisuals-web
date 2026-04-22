@@ -2,6 +2,32 @@
  * Default middlewares for the Documentation Compiler.
  */
 
+function stripCodeBlocks(content: string): string {
+  const lines = content.split("\n");
+  const result: string[] = [];
+  let fenceLength = 0;
+  let inCodeBlock = false;
+
+  for (const line of lines) {
+    const match = line.match(/^(`{3,})/);
+    if (match?.[1]) {
+      const length = match[1].length;
+      if (!inCodeBlock) {
+        inCodeBlock = true;
+        fenceLength = length;
+        continue;
+      } else if (length >= fenceLength) {
+        inCodeBlock = false;
+        continue;
+      }
+    }
+    if (!inCodeBlock) {
+      result.push(line);
+    }
+  }
+  return result.join("\n");
+}
+
 import { plugins } from "../plugins/index.ts";
 import { validators as granularValidators } from "../plugins/validators/index.ts";
 import { frontmatterValidator } from "./FrontmatterSchema.ts";
@@ -96,10 +122,7 @@ export const validationMiddleware: CompilerMiddleware = {
     }
 
     // Header Hierarchy Check
-    const contentWithoutCodeBlocks = content.replace(
-      /`{3,}[\s\S]*?`{3,}/g,
-      ""
-    );
+    const contentWithoutCodeBlocks = stripCodeBlocks(content);
     const headerRegex = /^(#{1,6})\s+/gm;
     let lastLevel = 0;
     let match: RegExpExecArray | null;

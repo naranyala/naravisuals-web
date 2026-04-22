@@ -42,6 +42,7 @@
   justify-content: center;
   width: 1.2rem;
   height: 1.2rem;
+  flex-shrink: 0;
 }
 
 .top-bar-btn {
@@ -70,6 +71,11 @@
 
 .top-bar-btn:active {
   transform: translateY(0);
+}
+
+.top-bar-btn.loading {
+  width: 32px;
+  padding: 0;
 }
 
 .top-bar-btn.active {

@@ -8,6 +8,32 @@
 
 import type { MarkdownValidator, ValidationIssue, ValidationResult } from "./types.ts";
 
+function stripCodeBlocks(content: string): string {
+  const lines = content.split("\n");
+  const result: string[] = [];
+  let fenceLength = 0;
+  let inCodeBlock = false;
+
+  for (const line of lines) {
+    const match = line.match(/^(`{3,})/);
+    if (match?.[1]) {
+      const length = match[1].length;
+      if (!inCodeBlock) {
+        inCodeBlock = true;
+        fenceLength = length;
+        continue;
+      } else if (length >= fenceLength) {
+        inCodeBlock = false;
+        continue;
+      }
+    }
+    if (!inCodeBlock) {
+      result.push(line);
+    }
+  }
+  return result.join("\n");
+}
+
 export const structureValidator: MarkdownValidator = {
   name: "structure",
   label: "Markdown Structure",
@@ -17,10 +43,7 @@ export const structureValidator: MarkdownValidator = {
     const issues: ValidationIssue[] = [];
 
     // Strip code blocks to avoid false positives (e.g., JSDoc *)
-    const contentWithoutCodeBlocks = content.replace(
-      /`{3,}[\s\S]*?`{3,}/g,
-      ""
-    );
+    const contentWithoutCodeBlocks = stripCodeBlocks(content);
 
     // 1. List Consistency
     const dashMatches = (contentWithoutCodeBlocks.match(/^[ \t]*- /gm) || []).length;

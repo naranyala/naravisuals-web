@@ -224,9 +224,7 @@ export const referenceValidator: MarkdownValidator = {
     }
 
     // Check if all external links are in references section
-    const uniqueValidExternalLinks = Array.from(
-      new Set(validExternalLinks.map((l) => l.url))
-    );
+    const uniqueValidExternalLinks = Array.from(new Set(validExternalLinks.map((l) => l.url)));
     if (
       hasReferencesSection &&
       uniqueValidExternalLinks.length > 0 &&
