@@ -96,11 +96,15 @@ export const validationMiddleware: CompilerMiddleware = {
     }
 
     // Header Hierarchy Check
+    const contentWithoutCodeBlocks = content.replace(
+      /`{3,}[\s\S]*?`{3,}/g,
+      ""
+    );
     const headerRegex = /^(#{1,6})\s+/gm;
     let lastLevel = 0;
     let match: RegExpExecArray | null;
     // biome-ignore lint/suspicious/noAssignInExpressions: standard regex loop
-    while ((match = headerRegex.exec(content)) !== null) {
+    while ((match = headerRegex.exec(contentWithoutCodeBlocks)) !== null) {
       const group = match[1];
       if (group) {
         const level = group.length;

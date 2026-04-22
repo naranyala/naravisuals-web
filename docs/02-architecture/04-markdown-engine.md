@@ -57,9 +57,9 @@ This protection ensures that even if the React frontend re-renders or navigates 
 
 ### Deep Structural Validation
 The compiler performs a **Deep Structural Scan** on diagrams. It catches logic errors that regex-based validators often miss:
-*   **Unbalanced Subgraphs**: Ensures every `subgraph` has a matching `end`.
-*   **Symmetry Checks**: Verifies curly braces and square brackets in complex flowcharts.
-*   **Mixing Violations**: Prevents illegal mixing of diagram types (e.g., subgraphs inside class diagrams).
+s*-   **Unbalanced Subgraphs**: Ensures every `subgraph` has a matching `end`.
+s*-   **Symmetry Checks**: Verifies curly braces and square brackets in complex flowcharts.
+s*-   **Mixing Violations**: Prevents illegal mixing of diagram types (e.g., subgraphs inside class diagrams).
 
 ## Design Philosophy
 

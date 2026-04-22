@@ -224,14 +224,21 @@ export const referenceValidator: MarkdownValidator = {
     }
 
     // Check if all external links are in references section
-    if (hasReferencesSection && validExternalLinks.length > 0 && referencesSectionEntries > 0) {
+    const uniqueValidExternalLinks = Array.from(
+      new Set(validExternalLinks.map((l) => l.url))
+    );
+    if (
+      hasReferencesSection &&
+      uniqueValidExternalLinks.length > 0 &&
+      referencesSectionEntries > 0
+    ) {
       // This is informational - we can't perfectly match URLs, but we can check count
-      if (referencesSectionEntries < validExternalLinks.length) {
+      if (referencesSectionEntries < uniqueValidExternalLinks.length) {
         issues.push({
           severity: "warning",
           file: filePath,
           line: referencesSectionLine + 1,
-          message: `References section has ${referencesSectionEntries} entries but article has ${validExternalLinks.length} external links`,
+          message: `References section has ${referencesSectionEntries} entries but article has ${uniqueValidExternalLinks.length} unique external links`,
           detail: "Consider adding all external links to the References section",
         });
       }

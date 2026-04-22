@@ -42,34 +42,34 @@ The root structural component. It manages global overlays (Search, Settings) and
 
 ### 2. ThreeColumnLayout
 A specialized layout primitive designed for documentation. It manages the responsive transition between:
-*   **Navigation Column**: Fixed/collapsible sidebar.
-*   **Content Column**: Primary reading area.
-*   **Reference Column**: Contains the Table of Contents and the unified Reference Panel.
+s*-   **Navigation Column**: Fixed/collapsible sidebar.
+s*-   **Content Column**: Primary reading area.
+s*-   **Reference Column**: Contains the Table of Contents and the unified Reference Panel.
 
 ### 3. Unified Reference Panel
 Located in the right column, this panel is **always visible**. It uses a tabbed interface to provide quick access to:
-*   **Metadata**: Frontmatter fields (tags, author, date).
-*   **Footnotes**: Automated extraction of markdown references (`[^1]`).
+s*-   **Metadata**: Frontmatter fields (tags, author, date).
+s*-   **Footnotes**: Automated extraction of markdown references (`[^1]`).
 
 [^1]: Footnotes are automatically parsed from the AST and rendered in the Reference Panel.
 
 ### 4. ArticleFooter
 Consolidates two previously separate components into one clean "end-of-article" experience:
-*   **Pagination**: Links to the next and previous documents in the sidebar order.
-*   **Statistics**: Document-wide metrics (word count, diagram counts, estimated reading time).
+s*-   **Pagination**: Links to the next and previous documents in the sidebar order.
+s*-   **Statistics**: Document-wide metrics (word count, diagram counts, estimated reading time).
 
 ## Reactive Integration
 
 Instead of prop-drilling state, components subscribe to centralized **React Context** stores:
-*   `useUIState()`: Controls panel visibility and responsive breakpoints.
-*   `useDocState()`: Tracks the currently active document and its metadata.
+s*-   `useUIState()`: Controls panel visibility and responsive breakpoints.
+s*-   `useDocState()`: Tracks the currently active document and its metadata.
 
 ## Document Enhancements
 
 All late-binding enhancements are handled by the `useDocumentEnhancer` hook. This keeps the `DocViewer` component focused purely on rendering HTML, while the hook manages:
-*   Asynchronous Mermaid rendering.
-*   MathJax typesetting.
-*   Interaction handlers (Zoom, Download).
+s*-   Asynchronous Mermaid rendering.
+s*-   MathJax typesetting.
+s*-   Interaction handlers (Zoom, Download).
 
 ## Entry Point: `frontend.tsx`
 

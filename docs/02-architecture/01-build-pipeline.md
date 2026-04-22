@@ -56,24 +56,24 @@ flowchart TB
 
 ### 1. `CompilationUnit`
 Each markdown file is loaded into memory as a unit. It tracks:
-*   **Raw Content**: The original markdown string.
-*   **Metadata**: Derived from frontmatter or content fallbacks.
-*   **AST Tokens**: The parsed `marked` token stream.
-*   **HTML**: The final transformed markup.
+s*-   **Raw Content**: The original markdown string.
+s*-   **Metadata**: Derived from frontmatter or content fallbacks.
+s*-   **AST Tokens**: The parsed `marked` token stream.
+s*-   **HTML**: The final transformed markup.
 
 ### 2. `CompilationContext`
 A unified object that lives for the duration of the build. It prevents "prop-drilling" by providing a single source for:
-*   **Diagnostics**: Accumulated errors and warnings.
-*   **Configuration**: Global build settings.
-*   **State Tracking**: Information shared across multiple files (like slug uniqueness).
+s*-   **Diagnostics**: Accumulated errors and warnings.
+s*-   **Configuration**: Global build settings.
+s*-   **State Tracking**: Information shared across multiple files (like slug uniqueness).
 
 ### 3. Middleware Lifecycle
 The transformation logic is decoupled into reusable middlewares:
-*   **`onIngest`**: Initial path validation and unit creation.
-*   **`onPreParse`**: Text-level transformations (e.g., math sentinel extraction).
-*   **`onTransform`**: AST-level analysis and deep syntax validation.
-*   **`onPostProcess`**: Final HTML enhancements and feature injection.
-*   **`onAssemble`**: Cross-document logic (e.g., link checking across all units).
+s*-   **`onIngest`**: Initial path validation and unit creation.
+s*-   **`onPreParse`**: Text-level transformations (e.g., math sentinel extraction).
+s*-   **`onTransform`**: AST-level analysis and deep syntax validation.
+s*-   **`onPostProcess`**: Final HTML enhancements and feature injection.
+s*-   **`onAssemble`**: Cross-document logic (e.g., link checking across all units).
 
 ## Output Strategy
 

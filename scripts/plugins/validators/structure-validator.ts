@@ -16,9 +16,15 @@ export const structureValidator: MarkdownValidator = {
   validate(content: string, filePath: string): ValidationResult {
     const issues: ValidationIssue[] = [];
 
+    // Strip code blocks to avoid false positives (e.g., JSDoc *)
+    const contentWithoutCodeBlocks = content.replace(
+      /`{3,}[\s\S]*?`{3,}/g,
+      ""
+    );
+
     // 1. List Consistency
-    const dashMatches = (content.match(/^[ \t]*- /gm) || []).length;
-    const starMatches = (content.match(/^[ \t]*\* /gm) || []).length;
+    const dashMatches = (contentWithoutCodeBlocks.match(/^[ \t]*- /gm) || []).length;
+    const starMatches = (contentWithoutCodeBlocks.match(/^[ \t]*\* /gm) || []).length;
 
     if (dashMatches > 0 && starMatches > 0) {
       issues.push({
