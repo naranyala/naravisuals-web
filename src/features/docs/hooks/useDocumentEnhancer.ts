@@ -136,6 +136,11 @@ export function useDocumentEnhancer(
           const isHidden = sourceContainer.style.display === "none";
           sourceContainer.style.display = isHidden ? "block" : "none";
           codeBtn.classList.toggle("active", isHidden);
+          if (isHidden) {
+            setTimeout(() => {
+              sourceContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 50);
+          }
         }
       });
 

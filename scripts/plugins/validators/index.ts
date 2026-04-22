@@ -8,21 +8,16 @@
 import { admonitionValidator } from "./admonition-validator.ts";
 import { codeblockValidator } from "./codeblock-validator.ts";
 import { frontmatterValidator } from "./frontmatter-validator.ts";
+import { imageValidator } from "./image-validator.ts";
 import { linkValidator } from "./link-validator.ts";
 import { mermaidValidator } from "./mermaid-validator.ts";
 import { referenceValidator } from "./reference-validator.ts";
+import { structureValidator } from "./structure-validator.ts";
 import type { MarkdownValidator } from "./types.ts";
 
 /**
  * All registered validators.
  * Order matters: validators run in this order.
- *
- * - codeblockValidator: STRICT - fails build if missing descriptions
- * - mermaidValidator: STRICT - fails build if invalid mermaid content
- * - frontmatterValidator: NOT strict - exposes frontmatter data for LLM use
- * - admonitionValidator: NOT strict - only informs about enrichment
- * - referenceValidator: STRICT - fails build if missing references/footnotes
- * - linkValidator: STRICT - fails build if broken internal links
  */
 export const validators: MarkdownValidator[] = [
   codeblockValidator,
@@ -31,11 +26,15 @@ export const validators: MarkdownValidator[] = [
   admonitionValidator,
   referenceValidator,
   linkValidator,
+  imageValidator,
+  structureValidator,
 ];
 
 export { admonitionValidator } from "./admonition-validator.ts";
 export { codeblockValidator } from "./codeblock-validator.ts";
 export { frontmatterValidator } from "./frontmatter-validator.ts";
+export { imageValidator } from "./image-validator.ts";
 export { linkValidator } from "./link-validator.ts";
 export { mermaidValidator } from "./mermaid-validator.ts";
 export { referenceValidator } from "./reference-validator.ts";
+export { structureValidator } from "./structure-validator.ts";

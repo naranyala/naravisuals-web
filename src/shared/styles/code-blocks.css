@@ -19,7 +19,7 @@
 
 .code-block {
   margin-bottom: 1rem;
-  border-radius: 0.5rem;
+  border-radius: 0;
   overflow: hidden;
   border: 1px solid var(--border);
   background: var(--bg-surface);
@@ -57,7 +57,7 @@
   color: var(--text-secondary);
   cursor: pointer;
   padding: 0.2rem 0.55rem;
-  border-radius: 0.25rem;
+  border-radius: 0;
   font-size: 0.68rem;
   font-weight: 500;
   transition: all 0.15s;
@@ -185,7 +185,7 @@
   background: var(--bg-code);
   color: var(--text);
   padding: 0.2rem 0.4rem;
-  border-radius: 0.3rem;
+  border-radius: 0;
   border: 1px solid var(--border);
   font-size: 0.875em;
   font-weight: 500;

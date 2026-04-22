@@ -3,6 +3,7 @@
  */
 
 import { plugins } from "../plugins/index.ts";
+import { validators as granularValidators } from "../plugins/validators/index.ts";
 import { frontmatterValidator } from "./FrontmatterSchema.ts";
 import type { CompilerMiddleware } from "./Middleware.ts";
 
@@ -75,6 +76,44 @@ export const validationMiddleware: CompilerMiddleware = {
         "Missing or empty field: tags",
         "Tags are required for the frontmatter network graph visuals."
       );
+    }
+  },
+
+  async onTransform(unit, container) {
+    const content = unit.content || "";
+    const relPath = unit.relPath;
+
+    // Run all registered granular markdown validators
+    for (const validator of granularValidators) {
+      const result = await validator.validate(content, relPath);
+      for (const issue of result.issues) {
+        if (issue.severity === "error") {
+          container.context.error("content", relPath, issue.message, issue.detail);
+        } else if (issue.severity === "warning") {
+          container.context.warn("content", relPath, issue.message, issue.detail);
+        }
+      }
+    }
+
+    // Header Hierarchy Check
+    const headerRegex = /^(#{1,6})\s+/gm;
+    let lastLevel = 0;
+    let match: RegExpExecArray | null;
+    // biome-ignore lint/suspicious/noAssignInExpressions: standard regex loop
+    while ((match = headerRegex.exec(content)) !== null) {
+      const group = match[1];
+      if (group) {
+        const level = group.length;
+        if (level > lastLevel + 1 && lastLevel > 0) {
+          container.context.warn(
+            "content",
+            relPath,
+            `Skipped header level: h${lastLevel} to h${level}`,
+            "Headers should follow a logical hierarchy (h1 > h2 > h3)."
+          );
+        }
+        lastLevel = level;
+      }
     }
   },
 

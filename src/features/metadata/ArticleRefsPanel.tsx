@@ -24,7 +24,7 @@ interface ArticleRefsPanelProps {
 }
 
 export function ArticleRefsPanel({ markdownAst }: ArticleRefsPanelProps) {
-  const [isOpen, setIsOpen] = useState(true); // Expanded by default
+  const [isOpen, setIsOpen] = useState(false); // Collapsed by default
 
   // Extract footnotes from AST tokens
   const footnotes = useMemo<FootnoteEntry[]>(() => {

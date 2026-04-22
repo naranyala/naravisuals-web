@@ -73,7 +73,6 @@ export function TableOfContents({ items }: TableOfContentsProps) {
 
   return (
     <div className="toc">
-      <p className="toc-title">On this page</p>
       <ul className="toc-list">
         {items.map((item) => {
           const isActive = activeHash === `#${item.id}`;

@@ -10,7 +10,7 @@
 .mermaid-diagram {
   margin-bottom: 1.5rem;
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border-radius: 0;
   overflow: hidden;
   background: var(--bg-surface);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -89,7 +89,7 @@
   color: var(--text-secondary);
   cursor: pointer;
   padding: 0.25rem;
-  border-radius: 0.25rem;
+  border-radius: 0;
   transition: all 0.15s;
   line-height: 0;
 }
@@ -154,7 +154,7 @@
   color: var(--text-secondary);
   cursor: pointer;
   padding: 0.15rem 0.4rem;
-  border-radius: 0.2rem;
+  border-radius: 0;
   font-size: 0.6rem;
   transition: all 0.15s;
 }
@@ -236,7 +236,7 @@
   color: var(--text);
   cursor: pointer;
   padding: 0.5rem;
-  border-radius: 0.5rem;
+  border-radius: 0;
   transition: all 0.2s;
 }
 
@@ -270,7 +270,7 @@
   color: white;
   cursor: pointer;
   padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  border-radius: 0;
   font-size: 0.9rem;
   font-weight: 600;
   transition: all 0.2s;
@@ -320,7 +320,7 @@
   padding: 1.5rem;
   background: rgba(243, 139, 168, 0.1);
   border: 1px solid #f38ba8;
-  border-radius: 0.5rem;
+  border-radius: 0;
   color: #f38ba8;
 }
 

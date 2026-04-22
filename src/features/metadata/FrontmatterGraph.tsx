@@ -1,5 +1,5 @@
 import cytoscape from "cytoscape";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useUIState } from "../../core/store";
 import { allDocs } from "../../generated";
 import { useDocsTheme } from "../theme";
@@ -74,14 +74,14 @@ export function FrontmatterGraph() {
           selector: "node",
           style: {
             label: "data(label)",
-            "font-size": "10px",
+            "font-size": "14px",
             "text-valign": "center",
             "text-halign": "center",
             "background-color": isDark ? "#4c566a" : "#d8dee9",
             color: isDark ? "#eceff4" : "#2e3440",
             width: "label",
             height: "label",
-            padding: "8px",
+            padding: "10px",
             shape: "round-rectangle",
           },
         },
@@ -114,21 +114,19 @@ export function FrontmatterGraph() {
         name: "cose",
         animate: true,
         padding: 50,
-        componentSpacing: 100,
-        nodeOverlap: 20,
+        componentSpacing: 150,
+        nodeOverlap: 50,
         refresh: 20,
         fit: true,
+        idealEdgeLength: 80,
       },
     });
 
     cyRef.current = cy;
 
-    // Handle clicks
     cy.on("tap", "node", (evt) => {
       const node = evt.target;
       if (node.data("type") === "doc") {
-        // We can't easily trigger navigation from here without more props,
-        // but we can at least show detail.
         console.log("Clicked doc:", node.data("slug"));
       }
     });
@@ -141,6 +139,30 @@ export function FrontmatterGraph() {
     };
   }, [graphOpen, elements, isDark]);
 
+  const handleZoomIn = useCallback(() => {
+    if (cyRef.current) {
+      cyRef.current.zoom({
+        level: cyRef.current.zoom() * 1.3,
+        renderedPosition: { x: cyRef.current.width() / 2, y: cyRef.current.height() / 2 },
+      });
+    }
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    if (cyRef.current) {
+      cyRef.current.zoom({
+        level: cyRef.current.zoom() / 1.3,
+        renderedPosition: { x: cyRef.current.width() / 2, y: cyRef.current.height() / 2 },
+      });
+    }
+  }, []);
+
+  const handleFit = useCallback(() => {
+    if (cyRef.current) {
+      cyRef.current.fit(undefined, 50);
+    }
+  }, []);
+
   if (!graphOpen) return null;
 
   return (
@@ -152,6 +174,17 @@ export function FrontmatterGraph() {
       >
         <div className="modal-header">
           <h2>Frontmatter Network Graph</h2>
+          <div className="graph-zoom-controls">
+            <button type="button" className="zoom-btn" onClick={handleZoomIn} title="Zoom in">
+              +
+            </button>
+            <button type="button" className="zoom-btn" onClick={handleZoomOut} title="Zoom out">
+              −
+            </button>
+            <button type="button" className="zoom-btn" onClick={handleFit} title="Fit to view">
+              ⊡
+            </button>
+          </div>
           <div className="graph-legend">
             <span className="legend-item">
               <span className="dot tag-dot" /> Tag

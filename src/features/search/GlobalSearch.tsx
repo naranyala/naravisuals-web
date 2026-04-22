@@ -15,15 +15,29 @@ export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => voi
   const inputRef = useRef<HTMLInputElement>(null);
 
   const fuse = useMemo(() => {
-    const searchableDocs = allDocs.map((doc) => ({
-      ...doc,
-      plainText: doc.content.replace(/<[^>]*>/g, " "),
-    }));
+    const searchableDocs = allDocs.map((doc) => {
+      const plainText = doc.content.replace(/<[^>]*>/g, " ");
+      const tocText = doc.toc?.map((t) => t.value).join(" ") || "";
+
+      return {
+        ...doc,
+        plainText,
+        tocText,
+      };
+    });
 
     return new Fuse(searchableDocs, {
-      keys: ["title", "tags", "description", "plainText"],
-      threshold: 0.4,
+      keys: [
+        { name: "title", weight: 0.4 },
+        { name: "tocText", weight: 0.3 },
+        { name: "tags", weight: 0.15 },
+        { name: "description", weight: 0.1 },
+        { name: "plainText", weight: 0.05 },
+      ],
+      threshold: 0.3,
       includeMatches: true,
+      ignoreLocation: true,
+      minMatchCharLength: 2,
     });
   }, []);
 
@@ -32,7 +46,7 @@ export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => voi
     return fuse
       .search(query)
       .map((r) => r.item)
-      .slice(0, 8);
+      .slice(0, 15);
   }, [query, fuse]);
 
   useEffect(() => {

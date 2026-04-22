@@ -10,6 +10,32 @@ pub struct ValidationMiddleware;
 impl CompilerMiddleware for ValidationMiddleware {
     fn name(&self) -> &'static str { "Validation" }
 
+    fn on_transform(&mut self, unit: &mut CompilationUnit, container: &mut CompilerContainer) {
+        // Content validation
+        crate::diagnostics::validate_code_block_descriptions(&unit.content, &unit.rel_path, &mut container.context.diagnostics);
+        
+        // Header Hierarchy Check
+        let re_header = regex::Regex::new(r"(?m)^(#{1,6})\s+").unwrap();
+        let mut last_level = 0;
+        for cap in re_header.captures_iter(&unit.content) {
+            let level = cap[1].len();
+            if level > last_level + 1 && last_level > 0 {
+                container.context.warn(
+                    crate::diagnostics::DiagnosticSource::Content,
+                    &unit.rel_path,
+                    &format!("Skipped header level: h{} to h{}", last_level, level),
+                    Some("Headers should follow a logical hierarchy (h1 > h2 > h3)."),
+                );
+            }
+            last_level = level;
+        }
+    }
+
+    fn on_transform_events<'a>(&mut self, events: &mut Vec<Event<'a>>, container: &mut CompilerContainer) {
+        // Mermaid validation happens here because we have the raw text of the diagram
+        // handled in MermaidMiddleware or we can do it here by scanning events
+    }
+
     fn on_assemble(&mut self, units: &mut [CompilationUnit], container: &mut CompilerContainer) {
         // Unique Slugs
         let slug_entries: Vec<(String, String)> = units

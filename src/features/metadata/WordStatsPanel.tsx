@@ -6,18 +6,20 @@ import { filteredStats, wordStats } from "../../generated";
 const SEARCH_ENGINES = [
   { name: "Google", icon: "🔍", url: "https://www.google.com/search?q=" },
   { name: "Google Images", icon: "🖼️", url: "https://www.google.com/search?tbm=isch&q=" },
-  { name: "X.com", icon: "🐦", url: "https://x.com/search?q=" },
   { name: "X Images", icon: "📸", url: "https://www.google.com/search?tbm=isch&q=site:x.com+" },
   {
     name: "Reddit Images",
     icon: "🎨",
     url: "https://www.google.com/search?tbm=isch&q=site:reddit.com+",
   },
+  { name: "X.com", icon: "🐦", url: "https://x.com/search?q=" },
   { name: "YouTube", icon: "📺", url: "https://www.youtube.com/results?search_query=" },
   { name: "Reddit", icon: "🤖", url: "https://www.reddit.com/search/?q=" },
   { name: "Hacker News", icon: "🧡", url: "https://hn.algolia.com/?q=" },
   { name: "GitHub", icon: "🐙", url: "https://github.com/search?q=" },
   { name: "Wikipedia", icon: "📖", url: "https://en.wikipedia.org/wiki/Special:Search?search=" },
+  { name: "Grokipedia", icon: "📚", url: "https://www.google.com/search?q=site:grokipedia.com+" },
+  { name: "DuckDuckGo", icon: "🦆", url: "https://duckduckgo.com/?q=" },
 ];
 
 /**

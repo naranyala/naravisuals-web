@@ -80,7 +80,7 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint }: TopB
         </button>
         <button
           type="button"
-          className={clsx("top-bar-btn top-bar-action-btn print-btn", { loading: isPrinting })}
+          className={clsx("top-bar-btn top-bar-action-btn", { loading: isPrinting })}
           onClick={onPrint}
           disabled={isPrinting}
           aria-label="Print all docs"
