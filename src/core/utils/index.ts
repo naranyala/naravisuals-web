@@ -7,6 +7,13 @@
 // ─── String Utilities ─────────────────────────────────────────────────────
 
 /**
+ * Replace all placeholders in a URL template with an encoded query
+ */
+export function formatSearchUrl(template: string, query: string): string {
+  return template.replaceAll("%s", encodeURIComponent(query));
+}
+
+/**
  * Slugify a string (convert to URL-friendly format)
  */
 export function slugify(text: string): string {

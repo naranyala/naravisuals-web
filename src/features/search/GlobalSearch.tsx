@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { allDocs } from "@/generated";
 import { useUIState } from "../../core/store";
+import { formatSearchUrl } from "../../core/utils";
+import { SEARCH_ENGINES } from "./search-engines";
 
 /**
  * Global Search Component (Command Palette style)
@@ -125,6 +127,27 @@ export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => voi
                     {index === selectedIndex && <div className="result-enter">↵</div>}
                   </div>
                 ))}
+                {query && (
+                  <div className="search-external-section">
+                    <div className="search-section-title">Search Externally</div>
+                    <div className="search-external-grid">
+                      {SEARCH_ENGINES.slice(0, 6).map((engine) => (
+                        <button
+                          type="button"
+                          key={engine.name}
+                          className="search-external-btn"
+                          onClick={() => {
+                            window.open(formatSearchUrl(engine.url, query), "_blank");
+                            setSearch(false);
+                          }}
+                        >
+                          <span className="engine-icon">{engine.icon}</span>
+                          <span className="engine-name">{engine.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="search-empty">

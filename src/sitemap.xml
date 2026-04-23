@@ -157,6 +157,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://your-docs-site.com/docs/reference/large-dataset-table</loc>
+    <lastmod>2026-04-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://your-docs-site.com/docs/references</loc>
     <lastmod>2026-04-23</lastmod>
     <changefreq>monthly</changefreq>

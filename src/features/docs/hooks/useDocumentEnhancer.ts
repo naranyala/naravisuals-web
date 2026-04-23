@@ -156,6 +156,19 @@ export function useDocumentEnhancer(
       });
     };
 
+    const handleDownload = (svgEl: SVGSVGElement, filename: string) => {
+      const svgData = new XMLSerializer().serializeToString(svgEl);
+      const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = svgUrl;
+      downloadLink.download = `${filename}.svg`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(svgUrl);
+    };
+
     const handleZoom = (svgHtml: string) => {
       const overlay = document.createElement("div");
       overlay.className = "mermaid-fullscreen-overlay";
@@ -265,27 +278,174 @@ export function useDocumentEnhancer(
       window.addEventListener("keydown", handleEsc);
     };
 
-    const handleDownload = (svgEl: SVGSVGElement, filename: string) => {
-      const clone = svgEl.cloneNode(true) as SVGSVGElement;
-      clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    const renderTables = () => {
+      const containers = ref.current?.querySelectorAll<HTMLElement>(".table-container");
+      if (!containers || containers.length === 0) return;
 
-      const svgData = new XMLSerializer().serializeToString(clone);
-      const svgBlob = new Blob(
-        [`<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n${svgData}`],
-        {
-          type: "image/svg+xml;charset=utf-8",
+      for (const container of Array.from(containers)) {
+        if (container.dataset.enhanced === "true") continue;
+
+        // Find the preceding heading to use as title
+        let title = "Table";
+        let prev = container.previousElementSibling;
+        while (prev) {
+          if (/^H[1-6]$/.test(prev.tagName)) {
+            title = (prev.textContent?.trim() || "Table").replace(/#\s*$/, "");
+            break;
+          }
+          prev = prev.previousElementSibling;
         }
-      );
-      const url = URL.createObjectURL(svgBlob);
 
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${filename}.svg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+        // Create the wrapper
+        const wrapper = document.createElement("div");
+        wrapper.className = "table-enhanced-wrapper";
+
+        // Create the titlebar
+        const titlebar = document.createElement("div");
+        titlebar.className = "table-enhanced-titlebar";
+
+        const actions = document.createElement("div");
+        actions.className = "table-enhanced-actions";
+
+        const zoomBtn = document.createElement("button");
+        zoomBtn.className = "table-enhanced-btn";
+        zoomBtn.title = "Fullscreen";
+        zoomBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>`;
+        zoomBtn.onclick = () => handleTableZoom(container);
+
+        const downloadBtn = document.createElement("button");
+        downloadBtn.className = "table-enhanced-btn";
+        downloadBtn.title = "Download as Image";
+        downloadBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>`;
+        downloadBtn.onclick = (e) => handleTableDownload(container, e.currentTarget as HTMLElement);
+
+        actions.appendChild(zoomBtn);
+        actions.appendChild(downloadBtn);
+
+        const titleEl = document.createElement("span");
+        titleEl.className = "table-enhanced-title";
+        titleEl.textContent = title;
+
+        titlebar.appendChild(titleEl);
+        titlebar.appendChild(actions);
+
+        // Wrap the original container
+        const contentDiv = document.createElement("div");
+        contentDiv.className = "table-enhanced-container";
+
+        wrapper.appendChild(titlebar);
+        wrapper.appendChild(contentDiv);
+
+        // Insert wrapper before container first, then move container into it
+        if (container.parentNode) {
+          container.parentNode.insertBefore(wrapper, container);
+          contentDiv.appendChild(container);
+        }
+        
+        container.dataset.enhanced = "true";
+      }
     };
+
+    const handleTableZoom = (container: HTMLElement) => {
+      const overlay = document.createElement("div");
+      overlay.className = "mermaid-fullscreen-overlay";
+      overlay.innerHTML = `
+        <div class="mermaid-fullscreen-header">
+          <span class="mermaid-fullscreen-title">Table Preview</span>
+          <div class="mermaid-fullscreen-controls"></div>
+          <button class="mermaid-fullscreen-close">
+            <span>Close Preview</span>
+          </button>
+        </div>
+        <div class="mermaid-fullscreen-content">
+          <div class="mermaid-fullscreen-viewport">
+            <div class="mermaid-diagram-container table-zoom-container"></div>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(overlay);
+      document.body.style.overflow = "hidden";
+
+      const targetContainer = overlay.querySelector<HTMLElement>(".mermaid-diagram-container");
+      if (targetContainer) {
+        const clone = container.cloneNode(true) as HTMLElement;
+        // Remove constraints that cause cropping or scrolling inside the zoom view
+        clone.style.width = "max-content";
+        clone.style.overflow = "visible";
+        clone.style.margin = "0";
+        
+        // Also ensure the table inside the clone is not forced to 100% width of a smaller container
+        const table = clone.querySelector("table");
+        if (table) {
+          table.style.width = "max-content";
+        }
+        
+        targetContainer.appendChild(clone);
+      }
+
+      overlay.querySelector(".mermaid-fullscreen-close")?.addEventListener("click", () => {
+        document.body.removeChild(overlay);
+        document.body.style.overflow = "";
+      });
+
+      const handleEsc = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          document.body.removeChild(overlay);
+          document.body.style.overflow = "";
+          window.removeEventListener("keydown", handleEsc);
+        }
+      };
+      window.addEventListener("keydown", handleEsc);
+    };
+
+    const handleTableDownload = async (container: HTMLElement, btn: HTMLElement) => {
+      const originalContent = btn.innerHTML;
+      try {
+        (btn as HTMLButtonElement).disabled = true;
+        btn.innerHTML = `<div class="mermaid-spinner"></div>`;
+        
+        // Create a temporary wrapper to ensure we capture the full table without cropping
+        const tempWrapper = document.createElement("div");
+        tempWrapper.style.position = "absolute";
+        tempWrapper.style.left = "-9999px";
+        tempWrapper.style.top = "0";
+        tempWrapper.style.width = "auto";
+        
+        const clone = container.cloneNode(true) as HTMLElement;
+        clone.style.width = "max-content";
+        clone.style.overflow = "visible";
+        
+        const table = clone.querySelector("table");
+        if (table) {
+          table.style.width = "max-content";
+        }
+        
+        tempWrapper.appendChild(clone);
+        document.body.appendChild(tempWrapper);
+        
+        const { default: html2canvas } = await import("html2canvas");
+        const canvas = await html2canvas(clone, {
+          backgroundColor: getComputedStyle(document.body).backgroundColor,
+          logging: false,
+          scale: 2,
+          useCORS: true,
+        });
+        
+        document.body.removeChild(tempWrapper);
+        
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = `table-${Math.random().toString(36).slice(2, 9)}.png`;
+        link.click();
+       } catch (e) {
+         console.error("Table download failed", e);
+       } finally {
+         (btn as HTMLButtonElement).disabled = false;
+         btn.innerHTML = originalContent;
+       }
+     };
+
 
     const renderMath = async () => {
       if (typeof window === "undefined" || !(window as any).MathJax) return;
@@ -301,6 +461,7 @@ export function useDocumentEnhancer(
       requestAnimationFrame(() => {
         if (mounted) {
           renderMermaid();
+          renderTables();
           renderMath();
         }
       });

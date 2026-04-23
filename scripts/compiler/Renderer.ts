@@ -26,6 +26,12 @@ export class MarkdownRenderer {
   public getRenderer(): any {
     const renderer = new marked.Renderer();
 
+    const defaultTable = renderer.table.bind(renderer);
+    renderer.table = (args: any) => {
+      const html = defaultTable(args);
+      return `<div class="table-container">${html}</div>`;
+    };
+
     renderer.heading = ({ text, depth }) => {
       let id = slugifyHeading(text);
       let suffix = 1;

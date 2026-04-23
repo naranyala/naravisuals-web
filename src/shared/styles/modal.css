@@ -186,3 +186,55 @@
   font-weight: 700;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
 }
+
+.search-external-section {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.search-section-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  font-weight: 700;
+  opacity: 0.6;
+}
+
+.search-external-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.search-external-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.search-external-btn:hover {
+  background: var(--bg);
+  border-color: var(--ifm-color-primary);
+  transform: translateY(-2px);
+}
+
+.search-external-btn .engine-icon {
+  font-size: 1rem;
+}
+
+.search-external-btn .engine-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

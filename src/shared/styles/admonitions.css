@@ -84,26 +84,6 @@
   margin: 0.75rem 0;
 }
 
-.doc-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-  font-size: 0.82rem;
-}
-.doc-content th,
-.doc-content td {
-  border: 1px solid var(--border);
-  padding: 0.5rem 0.7rem;
-  text-align: left;
-}
-.doc-content th {
-  background: var(--bg-surface);
-  font-weight: 600;
-}
-.doc-content tr:nth-child(even) {
-  background: var(--bg-surface);
-}
-
 .hash-link {
   opacity: 0;
   margin-left: 0.35rem;

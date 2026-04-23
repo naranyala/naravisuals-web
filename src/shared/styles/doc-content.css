@@ -70,3 +70,96 @@
 .doc-content a:hover {
   text-decoration-thickness: 2px;
 }
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: none;
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin-bottom: 0;
+}
+
+.table-container th,
+.table-container td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table-container th {
+  background: var(--bg-surface);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.table-container tr:nth-child(even) {
+  background: var(--bg-code);
+}
+
+/* Enhanced Table Wrapper */
+.table-enhanced-wrapper {
+  margin: 2rem 0;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  overflow: hidden;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.table-enhanced-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+  box-shadow: inset 0 -1px 0 0 var(--border);
+}
+
+.table-enhanced-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.table-enhanced-btn {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-color);
+  padding: 0.35rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.table-enhanced-btn:hover {
+  background: var(--bg-surface);
+  border-color: var(--text-secondary);
+  transform: translateY(-1px);
+}
+
+.table-enhanced-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-enhanced-container {
+  overflow: auto;
+}
