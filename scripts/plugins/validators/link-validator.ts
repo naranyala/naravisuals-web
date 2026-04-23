@@ -65,10 +65,29 @@ export const linkValidator: MarkdownValidator = {
 
         if (href === undefined || text === undefined) continue;
 
-        // Only validate internal links starting with /docs/ or /blog/
-        if (!href.startsWith("/docs/") && !href.startsWith("/blog/")) continue;
+        // Only validate internal links starting with /docs/, /blog/, ./docs/, or ../docs/
+        const isInternal = href.startsWith("/docs/") || 
+                           href.startsWith("/blog/") || 
+                           href.startsWith("./docs/") || 
+                           href.startsWith("../docs/");
+
+        if (!isInternal) continue;
 
         checkedCount++;
+
+        // Special check for 00-introduction.md -> 00-abstract.md rename suggestion
+        if (href.includes("00-introduction.md")) {
+          const abstractPath = path.join(paths.root, "docs", "00-abstract.md");
+          if (fs.existsSync(abstractPath)) {
+            issues.push({
+              severity: "warning",
+              file: filePath,
+              line: i + 1,
+              message: `Outdated reference to 00-introduction.md`,
+              detail: `Found reference to "00-introduction.md". Consider renaming it to "00-abstract.md" as it now exists.`,
+            });
+          }
+        }
 
         // Strip anchor fragments and leading slash
         const cleanHref = (href.split("?")[0] || "").split("#")[0]?.replace(/^\//, "") || "";

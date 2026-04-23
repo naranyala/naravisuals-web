@@ -100,8 +100,8 @@ export const admonitionsPlugin: MarkdownPlugin = {
       }
 
       // Check for admonition start
-      const admonitionMatch = line.match(/^:::(\w+)([^\n]*)$/);
-      if (admonitionMatch && admonitionMatch[1] !== undefined && admonitionMatch[2] !== undefined) {
+      const admonitionMatch = line.match(/^(:::|!!!)\s*(\w+)([^\n]*)$/);
+      if (admonitionMatch && admonitionMatch[2] !== undefined && admonitionMatch[3] !== undefined) {
         // If we're already in an admonition, this might be a nested one or content
         // For simplicity, treat it as content
         if (currentAdmonition) {
@@ -109,16 +109,16 @@ export const admonitionsPlugin: MarkdownPlugin = {
         } else {
           currentAdmonition = {
             startLine: i,
-            type: admonitionMatch[1],
-            title: admonitionMatch[2],
+            type: admonitionMatch[2],
+            title: admonitionMatch[3],
           };
           admonitionContent = [];
         }
         continue;
       }
-
+    
       // Check for admonition end
-      if (line.trim() === ":::" && currentAdmonition) {
+      if ((line.trim() === ":::" || line.trim() === "!!!") && currentAdmonition) {
         const id = `ADMONITION${index++}END`;
         const normalizedType = currentAdmonition.type.toLowerCase();
         const customTitle = currentAdmonition.title.trim() || undefined;

@@ -257,7 +257,8 @@ impl DocumentationCompiler {
                 .cow_replace("(", " ")
                 .cow_replace(")", " ")
                 .cow_replace("`", " ")
-                .cow_replace(":::", " ")
+                 .cow_replace(":::", " ")
+                 .cow_replace("!!!", " ")
                 .to_string();
 
             for word in cleaned.split_whitespace() {

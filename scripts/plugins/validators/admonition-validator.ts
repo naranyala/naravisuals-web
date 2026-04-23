@@ -38,9 +38,9 @@ export const admonitionValidator: MarkdownValidator = {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (line === undefined) continue;
-      const match = line.match(/^:::(\w+)/);
-      if (match && match[1] !== undefined) {
-        const type = match[1].toLowerCase();
+      const match = line.match(/^(:::|!!!)(\w+)/);
+      if (match && match[2] !== undefined) {
+        const type = match[2].toLowerCase();
         totalAdmonitions++;
         typeCounts[type] = (typeCounts[type] || 0) + 1;
       }

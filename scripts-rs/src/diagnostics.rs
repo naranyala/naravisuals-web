@@ -429,7 +429,7 @@ pub fn analyze_admonitions(
     file: &str,
     _diags: &mut Diagnostics,
 ) -> AdmonitionAnalysis {
-    let admonition_regex = regex::Regex::new(r":::(\w+)").unwrap();
+    let admonition_regex = regex::Regex::new(r"(:::|!!!)(\w+)").unwrap();
     let mut types = HashMap::new();
     let mut total = 0;
 
@@ -483,7 +483,7 @@ pub fn analyze_content(
         }
     }
 
-    let adm_re = regex::Regex::new(r":::(\w+)").unwrap();
+    let adm_re = regex::Regex::new(r"(:::|!!!)(\w+)").unwrap();
     stats.admonitions = adm_re.find_iter(markdown_content).count();
 
     let ref_re = regex::Regex::new(r"\[([^\]]+)\]\(([^)]+)\)").unwrap();

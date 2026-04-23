@@ -35,7 +35,7 @@ impl CompilerMiddleware for AdmonitionPlugin {
     }
 
     fn on_pre_parse(&mut self, unit: &mut CompilationUnit, _container: &mut CompilerContainer) {
-        let re = Regex::new(r"(?m)^:::(?P<type>\w+)\s*(?P<title>.*)\n(?P<body>[\s\S]*?)^:::").unwrap();
+        let re = Regex::new(r"(?m)^(:::|!!!)\s*(?P<type>\w+)\s*(?P<title>.*)\n(?P<body>[\s\S]*?)^(:::|!!!)").unwrap();
 
         let result = re.replace_all(&unit.content, |caps: &regex::Captures| {
             let t = &caps["type"];
