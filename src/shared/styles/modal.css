@@ -89,7 +89,7 @@
   font-family: inherit;
 }
 
-.search-modal-esc {
+.search-modal-esc, .search-modal-action {
   font-size: 0.7rem;
   font-weight: 700;
   padding: 0.25rem 0.5rem;
@@ -98,6 +98,43 @@
   border-radius: 0.4rem;
   color: var(--text-secondary);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  min-width: 2rem;
+}
+
+.search-modal-action:hover {
+  background: var(--bg);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.search-modal-action.is-clear {
+  color: var(--text-secondary);
+}
+
+.search-modal-action.is-clear:hover {
+  color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+}
+
+.search-engine-select {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.4rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M0 3l5 5 5-5z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.4rem center;
+  padding-right: 1.5rem;
 }
 
 .search-body {

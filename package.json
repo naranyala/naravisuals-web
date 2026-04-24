@@ -28,6 +28,8 @@
     "validate:llm": "bun run scripts/validate-all.mts --llm"
   },
   "dependencies": {
+    "@leeoniya/ufuzzy": "^1.0.19",
+    "@m31coding/fuzzy-search": "^2.0.0",
     "@preact/signals-react": "^3.10.0",
     "@sinclair/typebox": "^0.34.49",
     "clsx": "^2.1.1",
@@ -35,6 +37,7 @@
     "dompurify": "^3.4.0",
     "fast-glob": "^3.3.3",
     "fuse.js": "^7.3.0",
+    "fuzzysort": "^3.1.0",
     "goober": "^2.1.18",
     "highlight.js": "^11.11.1",
     "html2canvas": "^1.4.1",

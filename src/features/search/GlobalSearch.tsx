@@ -1,11 +1,10 @@
 import { clsx } from "clsx";
-import Fuse from "fuse.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { allDocs } from "@/generated";
 import { useUIState } from "../../core/store";
 import { formatSearchUrl } from "../../core/utils";
 import { SEARCH_ENGINES } from "./search-engines";
+import { SEARCH_ENGINE_MAP, DEFAULT_SEARCH_ENGINE, SearchEngineType } from "./search-engines-impl";
 
 /**
  * Global Search Component (Command Palette style)
@@ -13,43 +12,31 @@ import { SEARCH_ENGINES } from "./search-engines";
 export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => void }) {
   const { searchOpen, setSearch } = useUIState();
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedEngine, setSelectedEngine] = useState<SearchEngineType>(DEFAULT_SEARCH_ENGINE);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const fuse = useMemo(() => {
-    const searchableDocs = allDocs.map((doc) => {
-      const plainText = doc.content.replace(/<[^>]*>/g, " ");
-      const tocText = doc.toc?.map((t) => t.value).join(" ") || "";
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 150);
 
-      return {
-        ...doc,
-        plainText,
-        tocText,
-      };
-    });
+    return () => clearTimeout(handler);
+  }, [query]);
 
-    return new Fuse(searchableDocs, {
-      keys: [
-        { name: "title", weight: 0.4 },
-        { name: "tocText", weight: 0.3 },
-        { name: "tags", weight: 0.15 },
-        { name: "description", weight: 0.1 },
-        { name: "plainText", weight: 0.05 },
-      ],
-      threshold: 0.3,
-      includeMatches: true,
-      ignoreLocation: true,
-      minMatchCharLength: 2,
-    });
-  }, []);
+  const searchEngine = useMemo(() => {
+    const EngineClass = SEARCH_ENGINE_MAP[selectedEngine];
+    return new EngineClass();
+  }, [selectedEngine]);
 
   const results = useMemo(() => {
-    if (!query) return [];
-    return fuse
-      .search(query)
+    if (!debouncedQuery) return [];
+    return searchEngine
+      .search(debouncedQuery)
       .map((r) => r.item)
       .slice(0, 15);
-  }, [query, fuse]);
+  }, [debouncedQuery, searchEngine]);
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -102,8 +89,23 @@ export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => voi
               onChange={(e) => setQuery(e.target.value)}
               className="search-input"
             />
-            <div className="search-modal-esc" onClick={() => setSearch(false)}>
-              ESC
+            <select 
+              className="search-engine-select"
+              value={selectedEngine}
+              onChange={(e) => setSelectedEngine(e.target.value as SearchEngineType)}
+            >
+              {Object.entries(SEARCH_ENGINE_MAP).map(([id, Engine]) => (
+                <option key={id} value={id}>
+                  {(Engine as any).name}
+                </option>
+              ))}
+            </select>
+            <div 
+              className={clsx("search-modal-action", { "is-clear": query.length > 0 })} 
+              onClick={() => query.length > 0 ? setQuery("") : setSearch(false)}
+              title={query.length > 0 ? "Clear search" : "Close search"}
+            >
+              {query.length > 0 ? "✕" : "✕"}
             </div>
           </div>
           <div className="search-body">
