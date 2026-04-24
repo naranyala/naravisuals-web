@@ -14,10 +14,12 @@ function DocLink({
   item,
   currentSlug,
   onNavigate,
+  level = 0,
 }: {
   item: SidebarDocItem;
   currentSlug: string;
   onNavigate: (slug: string) => void;
+  level?: number;
 }) {
   return (
     <div className="sidebar-item-wrapper">
@@ -30,6 +32,7 @@ function DocLink({
           e.preventDefault();
           onNavigate(item.slug);
         }}
+        style={{ paddingLeft: `${level * 0.75 + 0.75}rem` }}
       >
         <span className="sidebar-link-label">{item.label}</span>
       </a>
@@ -53,7 +56,7 @@ function SidebarNode({
   level?: number;
 }) {
   if (item.type === "doc") {
-    return <DocLink item={item as SidebarDocItem} currentSlug={currentSlug} onNavigate={onNavigate} />;
+    return <DocLink item={item as SidebarDocItem} currentSlug={currentSlug} onNavigate={onNavigate} level={level} />;
   }
 
   const category = item as SidebarCategoryItem;
@@ -71,9 +74,14 @@ function SidebarNode({
         type="button"
         className={clsx("sidebar-category-header", { active: hasActive })}
         onClick={handleToggle}
-        style={{ paddingLeft: `${level * 0.5 + 0.5}rem` }}
+        style={{ paddingLeft: `${level * 0.75 + 0.75}rem` }}
       >
-        <span className="sidebar-category-label">{category.label}</span>
+        <span className="sidebar-category-label">
+          {category.label}
+          {category.count !== undefined && category.count > 0 && (
+            <span className="sidebar-category-count">({category.count})</span>
+          )}
+        </span>
         <span className={clsx("sidebar-category-arrow", { "is-rotated": mode === "focused" })}>›</span>
       </button>
       
@@ -116,21 +124,26 @@ function FocusedView({
   return (
     <div className="sidebar-content">
       {path.length > 0 && (
-        <button 
-          type="button" 
-          className="sidebar-back-btn" 
-          onClick={() => {
-            sidebarService.popCategory();
-            setPath(sidebarService.getCurrentPath());
-          }}
-        >
-          <span className="back-icon">←</span>
-          <span className="back-label">
-            Back to {path.length > 1 
-              ? path.slice(0, -1).map(p => p.label).join(" › ") 
-              : "Root"}
-          </span>
-        </button>
+        <div className="sidebar-focused-header">
+          <button 
+            type="button" 
+            className="sidebar-back-btn" 
+            onClick={() => {
+              sidebarService.popCategory();
+              setPath(sidebarService.getCurrentPath());
+            }}
+          >
+            <span className="back-icon">←</span>
+            <span className="back-label">
+              Back to {path.length > 1 
+                ? path.slice(0, -1).map(p => p.label).join(" › ") 
+                : "Root"}
+            </span>
+          </button>
+          <div className="sidebar-current-category">
+            {path[path.length - 1]!.label}
+          </div>
+        </div>
       )}
       <div className="sidebar-tree-view">
         {currentItems.map((item) => (

@@ -68,6 +68,7 @@ export const SidebarItemSchema = Type.Union([
       })
     ),
     items: Type.Array(Type.Any()), // Use Type.Any to avoid circular reference in schema
+    count: Type.Optional(Type.Number()),
   }),
 ]);
 
@@ -77,6 +78,7 @@ export type SidebarCategoryItem = {
   label: string;
   link?: { type: string; id: string };
   items: SidebarItem[];
+  count?: number;
 };
 export type SidebarItem = Static<typeof SidebarItemSchema> | SidebarCategoryItem;
 

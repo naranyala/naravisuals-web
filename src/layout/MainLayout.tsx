@@ -29,6 +29,7 @@ const docValidator = TypeCompiler.Compile(DocEntrySchema);
 
 export function MainLayout() {
   const services = useServices();
+  const { sidebar: sidebarService } = services;
   const docsTheme = useDocsTheme();
 
   const [mermaidLoading, setMermaidLoading] = useState(false);
@@ -161,6 +162,11 @@ export function MainLayout() {
   const prevDoc = idx > 0 ? sorted[idx - 1] : null;
   const nextDoc = idx < sorted.length - 1 ? sorted[idx + 1] : null;
 
+  const pathResult = sidebarService.resolvePathForSlug(sidebarData, currentSlug);
+  const breadcrumbs = pathResult.isOk() 
+    ? [...pathResult.value.map(p => p.label), currentDoc?.title || ""] 
+    : [currentDoc?.title || ""];
+
   return (
     <AppShell
       topBar={
@@ -266,7 +272,12 @@ export function MainLayout() {
               .exhaustive()}
           </>
         }
-        reference={<TableOfContents items={currentDoc.toc} />}
+        reference={
+          <TableOfContents 
+            items={currentDoc.toc} 
+            breadcrumbs={breadcrumbs} 
+          />
+        }
       />
     </AppShell>
   );

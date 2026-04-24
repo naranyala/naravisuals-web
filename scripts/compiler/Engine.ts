@@ -44,147 +44,21 @@ function capitalizeSlug(slug: string): string {
 
 const STOP_WORDS = new Set([
   // Basic grammar
-  "the",
-  "and",
-  "a",
-  "an",
-  "in",
-  "on",
-  "at",
-  "to",
-  "for",
-  "with",
-  "is",
-  "are",
-  "was",
-  "were",
-  "be",
-  "been",
-  "being",
-  "have",
-  "has",
-  "had",
-  "do",
-  "does",
-  "did",
-  "of",
-  "by",
-  "from",
-  "it",
-  "its",
-  "they",
-  "them",
-  "their",
-  "this",
-  "that",
-  "these",
-  "those",
-  "which",
-  "who",
-  "whom",
-  "can",
-  "will",
-  "would",
-  "should",
-  "could",
-  "may",
-  "might",
-  "must",
-  "if",
-  "then",
-  "else",
-  "or",
-  "as",
-  "but",
-  "not",
-  "no",
-  "yes",
-  "all",
-  "any",
-  "each",
-  "every",
-  "some",
-  "more",
-  "most",
-  "less",
-  "least",
-  "than",
-  "then",
-  "also",
-  "very",
-  "too",
-  "own",
-  "other",
-  "such",
-  "only",
-  "well",
-  "how",
-  "when",
-  "where",
-  "why",
-  "both",
-  "either",
-  "neither",
-  "just",
-  "even",
-  "still",
-  "back",
-  "away",
-  "out",
-  "into",
-  "onto",
-  "over",
-  "under",
-  "again",
-  "further",
-  "once",
-  "here",
-  "there",
-  "about",
-  "above",
-  "below",
-  "up",
-  "down",
-  "left",
-  "right",
+  "the", "and", "a", "an", "in", "on", "at", "to", "for", "with", "is", "are", "was", "were", "be", "been", "being",
+  "have", "has", "had", "do", "does", "did", "of", "by", "from", "it", "its", "they", "them", "their", "this", "that",
+  "these", "those", "which", "who", "whom", "can", "will", "would", "should", "could", "may", "might", "must",
+  "if", "then", "else", "or", "as", "but", "not", "no", "yes", "all", "any", "each", "every", "some", "more", "most",
+  "less", "least", "than", "then", "also", "very", "too", "own", "other", "such", "only", "well", "how", "when",
+  "where", "why", "both", "either", "neither", "just", "even", "still", "back", "away", "out", "into", "onto",
+  "over", "under", "again", "further", "once", "here", "there", "about", "above", "below", "up", "down", "left", "right",
+  "my", "your", "his", "her", "its", "our", "their", "me", "you", "him", "her", "us", "them", "this", "that", "these", "those",
+  "am", "are", "is", "was", "were", "be", "been", "being", "have", "has", "had", "do", "does", "did", "shall", "will", "should",
+  "would", "may", "might", "must", "can", "could",
 
   // Meta/Template words to hide across disciplines
-  "example",
-  "using",
-  "used",
-  "use",
-  "within",
-  "between",
-  "through",
-  "across",
-  "during",
-  "without",
-  "following",
-  "provides",
-  "provides",
-  "features",
-  "allows",
-  "allows",
-  "support",
-  "supported",
-  "system",
-  "tool",
-  "project",
-  "documentation",
-  "files",
-  "file",
-  "build",
-  "process",
-  "details",
-  "found",
-  "available",
-  "information",
-  "Overview",
-  "Section",
-  "Table",
-  "Contents",
-  "Next",
-  "Steps",
+  "example", "using", "used", "use", "within", "between", "through", "across", "during", "without", "following", "provides",
+  "features", "allows", "support", "supported", "system", "tool", "project", "documentation", "files", "file", "build",
+  "process", "details", "found", "available", "information", "Overview", "Section", "Table", "Contents", "Next", "Steps",
 ]);
 
 export class DocumentationCompiler {
@@ -268,21 +142,22 @@ export class DocumentationCompiler {
     const filteredCounts: Record<string, number> = {};
 
     for (const unit of this.units) {
-      if (!unit.content) continue;
+      if (!unit.rawContent) continue;
 
-      const text = unit.content
-        .replace(/#+\s/g, " ") // headers
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // links
-        .replace(/`[^`]+`/g, " ") // inline code
-        .replace(/:::[^\s]+/g, " ") // admonitions
-        .replace(/[^\w\s]/g, " ") // punctuation
+      // Clean markdown to get pure text
+      const text = unit.rawContent
+        .replace(/```[\s\S]*?```/g, " ") // Remove code blocks
+        .replace(/`[^`]*`/g, " ") // Remove inline code
+        .replace(/!\[[^\]]*\]\([^)]*\)/g, " ") // Remove images
+        .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1") // Keep link text, remove URL
+        .replace(/#+\s/g, " ") // Remove headers
+        .replace(/[^a-zA-Z\s]/g, " ") // Remove punctuation/numbers/symbols
         .toLowerCase();
 
       const words = text.split(/\s+/);
 
       for (const word of words) {
         if (word.length < 3) continue;
-        if (/^\d+$/.test(word)) continue;
 
         if (STOP_WORDS.has(word)) {
           filteredCounts[word] = (filteredCounts[word] || 0) + 1;
@@ -300,6 +175,7 @@ export class DocumentationCompiler {
 
     const sortedFiltered = Object.entries(filteredCounts)
       .sort((a, b) => b[1] - a[1])
+      .slice(0, 200)
       .map(([word, count]) => ({ word, count }));
 
     const content = `// AUTO-GENERATED — DO NOT EDIT.

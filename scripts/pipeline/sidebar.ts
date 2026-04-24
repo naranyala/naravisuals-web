@@ -24,13 +24,12 @@ export function buildSidebar(docs: DocEntry[]): SidebarItem[] {
         label,
         items: [],
         link: undefined,
-      };
+        count: 0,
+      } as SidebarCategoryItem;
       currentLevel.push(category);
       // Sort categories by numeric prefix if possible, otherwise by label
       currentLevel.sort((a, b) => {
         if (a.type === "category" && b.type === "category") {
-          // We can't easily get the numeric prefix here because we've already cleaned the label.
-          // In a real system, we'd store the original segment.
           return a.label.localeCompare(b.label);
         }
         return 0;
@@ -42,6 +41,24 @@ export function buildSidebar(docs: DocEntry[]): SidebarItem[] {
     }
 
     return getOrCreateCategory(path.slice(1), category.items, doc);
+  }
+
+  // Helper to recursively count documents in a category
+  function countDocs(item: SidebarItem): number {
+    if (item.type === "doc") return 1;
+    if (item.type === "category") {
+      return item.items.reduce((acc, child) => acc + countDocs(child), 0);
+    }
+    return 0;
+  }
+
+  function applyCounts(items: SidebarItem[]) {
+    for (const item of items) {
+      if (item.type === "category") {
+        item.count = countDocs(item);
+        applyCounts(item.items);
+      }
+    }
   }
 
   // Process all docs
@@ -105,9 +122,10 @@ export function buildSidebar(docs: DocEntry[]): SidebarItem[] {
     if (a.type === "doc" && a.slug === "references") return 1;
     if (b.type === "doc" && b.slug === "references") return -1;
     
-    // This is a simplified sort. For a real project, we'd use the sidebar_position from the doc/category.
     return 0;
   });
+
+  applyCounts(root);
 
   return root;
 }
