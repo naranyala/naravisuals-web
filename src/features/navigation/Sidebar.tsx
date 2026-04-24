@@ -1,4 +1,5 @@
 import { clsx } from "clsx";
+import { useEffect, useState } from "react";
 import type { SidebarCategoryItem, SidebarDocItem, SidebarItem } from "@/generated";
 
 interface SidebarProps {
@@ -11,28 +12,31 @@ function CategoryItem({
   item,
   currentSlug,
   onNavigate,
+  isExpanded,
+  onToggle,
 }: {
   item: SidebarCategoryItem;
   currentSlug: string;
   onNavigate: (slug: string) => void;
+  isExpanded: boolean;
+  onToggle: () => void;
 }) {
   const hasActive = item.items.some(
     (child) => child.slug === currentSlug || child.id === currentSlug
   );
 
   return (
-    <div className="sidebar-category">
+    <div className={clsx("sidebar-category", { "is-expanded": isExpanded })}>
       <button
         type="button"
         className={clsx("sidebar-category-header", { active: hasActive })}
-        onClick={() => {
-          if (item.link) {
-            const target = item.items.find((i) => i.id === item.link?.id) || item.items[0];
-            if (target) onNavigate(target.slug);
-          }
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle();
         }}
       >
         <span className="sidebar-category-label">{item.label}</span>
+        <span className={clsx("sidebar-category-arrow", { "is-rotated": isExpanded })}>▾</span>
       </button>
       <ul className="sidebar-sublist">
         {item.items.map((child) => (
@@ -88,13 +92,46 @@ function DocLink({
 }
 
 export function Sidebar({ sidebar, currentSlug, onNavigate }: SidebarProps) {
+  const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(() => {
+    const activeCat = sidebar.find((item) => 
+      item.type === "category" && 
+      item.items.some((child) => child.slug === currentSlug || child.id === currentSlug)
+    );
+    return activeCat ? `cat:${activeCat.label}` : null;
+  });
+
+  useEffect(() => {
+    const activeCat = sidebar.find((item) => 
+      item.type === "category" && 
+      item.items.some((child) => child.slug === currentSlug || child.id === currentSlug)
+    );
+    if (activeCat) {
+      setExpandedCategoryId(`cat:${activeCat.label}`);
+    }
+  }, [currentSlug, sidebar]);
+
+  const isPermanentlyExpanded = (item: SidebarCategoryItem) => {
+    const label = item.label.toLowerCase();
+    return label.includes("references") || label.includes("abstract");
+  };
+
   return (
     <div className="sidebar-content">
       <div className="sidebar-tree-view">
         {sidebar.map((item) => {
           const key = item.type === "category" ? `cat:${item.label}` : `doc:${item.slug}`;
           return item.type === "category" ? (
-            <CategoryItem key={key} item={item} currentSlug={currentSlug} onNavigate={onNavigate} />
+            <CategoryItem 
+              key={key} 
+              item={item} 
+              currentSlug={currentSlug} 
+              onNavigate={onNavigate} 
+              isExpanded={expandedCategoryId === key || isPermanentlyExpanded(item)}
+              onToggle={() => {
+                if (isPermanentlyExpanded(item)) return;
+                setExpandedCategoryId(prev => prev === key ? null : key);
+              }}
+            />
           ) : (
             <DocLink key={key} item={item} currentSlug={currentSlug} onNavigate={onNavigate} />
           );

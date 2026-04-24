@@ -138,7 +138,17 @@ export function useDocumentEnhancer(
           codeBtn.classList.toggle("active", isHidden);
           if (isHidden) {
             setTimeout(() => {
-              sourceContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+              const mermaidEl = container.querySelector(".mermaid");
+              const diagramHeight = mermaidEl ? mermaidEl.offsetHeight : 0;
+              const elementPosition = sourceContainer.getBoundingClientRect().top;
+              
+              // Scroll so that roughly half the diagram remains visible above the raw code
+              const offsetPosition = elementPosition + window.pageYOffset - (diagramHeight / 2);
+
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: "smooth",
+              });
             }, 50);
           }
         }
@@ -426,7 +436,7 @@ export function useDocumentEnhancer(
         
         const { default: html2canvas } = await import("html2canvas");
         const canvas = await html2canvas(clone, {
-          backgroundColor: getComputedStyle(document.body).backgroundColor,
+          backgroundColor: "#ffffff",
           logging: false,
           scale: 2,
           useCORS: true,
