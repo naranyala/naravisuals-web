@@ -41,6 +41,12 @@ export type DocEntry = Static<typeof DocEntrySchema>;
 /**
  * Sidebar Navigation Schemas
  */
+/**
+ * Sidebar Navigation Schemas
+ */
+/**
+ * Sidebar Navigation Schemas
+ */
 export const SidebarDocItemSchema = Type.Object({
   type: Type.Literal("doc"),
   id: Type.String(),
@@ -50,23 +56,29 @@ export const SidebarDocItemSchema = Type.Object({
   date: Type.Optional(Type.Union([Type.String(), Type.Null()])),
 });
 
-export const SidebarCategoryItemSchema = Type.Object({
-  type: Type.Literal("category"),
-  label: Type.String(),
-  link: Type.Optional(
-    Type.Object({
-      type: Type.String(),
-      id: Type.String(),
-    })
-  ),
-  items: Type.Array(SidebarDocItemSchema),
-});
-
-export const SidebarItemSchema = Type.Union([SidebarDocItemSchema, SidebarCategoryItemSchema]);
+export const SidebarItemSchema = Type.Union([
+  SidebarDocItemSchema,
+  Type.Object({
+    type: Type.Literal("category"),
+    label: Type.String(),
+    link: Type.Optional(
+      Type.Object({
+        type: Type.String(),
+        id: Type.String(),
+      })
+    ),
+    items: Type.Array(Type.Any()), // Use Type.Any to avoid circular reference in schema
+  }),
+]);
 
 export type SidebarDocItem = Static<typeof SidebarDocItemSchema>;
-export type SidebarCategoryItem = Static<typeof SidebarCategoryItemSchema>;
-export type SidebarItem = Static<typeof SidebarItemSchema>;
+export type SidebarCategoryItem = {
+  type: "category";
+  label: string;
+  link?: { type: string; id: string };
+  items: SidebarItem[];
+};
+export type SidebarItem = Static<typeof SidebarItemSchema> | SidebarCategoryItem;
 
 /**
  * App Configuration Schema

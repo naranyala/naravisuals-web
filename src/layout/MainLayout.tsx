@@ -190,7 +190,12 @@ export function MainLayout() {
       <FrontmatterGraph />
       <ThreeColumnLayout
         sidebar={
-          <Sidebar sidebar={sidebarData} currentSlug={currentSlug} onNavigate={handleNavigate} />
+          <Sidebar 
+          sidebar={sidebarData} 
+          currentSlug={currentSlug} 
+          onNavigate={handleNavigate} 
+          isMobile={isMobile} 
+        />
         }
         content={
           <>

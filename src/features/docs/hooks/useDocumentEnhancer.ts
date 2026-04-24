@@ -139,7 +139,7 @@ export function useDocumentEnhancer(
           if (isHidden) {
             setTimeout(() => {
               const mermaidEl = container.querySelector(".mermaid");
-              const diagramHeight = mermaidEl ? mermaidEl.offsetHeight : 0;
+              const diagramHeight = mermaidEl ? (mermaidEl as HTMLElement).offsetHeight : 0;
               const elementPosition = sourceContainer.getBoundingClientRect().top;
               
               // Scroll so that roughly half the diagram remains visible above the raw code
@@ -358,7 +358,7 @@ export function useDocumentEnhancer(
 
     const handleTableZoom = (container: HTMLElement) => {
       const overlay = document.createElement("div");
-      overlay.className = "mermaid-fullscreen-overlay";
+      overlay.className = "mermaid-fullscreen-overlay table-zoom-overlay";
       overlay.innerHTML = `
         <div class="mermaid-fullscreen-header">
           <span class="mermaid-fullscreen-title">Table Preview</span>
@@ -367,8 +367,8 @@ export function useDocumentEnhancer(
             <span>Close Preview</span>
           </button>
         </div>
-        <div class="mermaid-fullscreen-content">
-          <div class="mermaid-fullscreen-viewport">
+        <div class="mermaid-fullscreen-content table-zoom-content">
+          <div class="mermaid-fullscreen-viewport table-zoom-viewport">
             <div class="mermaid-diagram-container table-zoom-container"></div>
           </div>
         </div>

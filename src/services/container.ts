@@ -8,8 +8,21 @@
 import { TypeCompiler } from "@sinclair/typebox/compiler";
 import { type AppConfig, AppConfigSchema } from "../shared/schemas";
 import { createEventBusService, type IEventBusService } from "./event-bus";
+import { Ok, Err, type Result } from "better-result";
+import type { SidebarItem, SidebarCategoryItem } from "@/generated";
 
 // ─── Service Interfaces ───────────────────────────────────────────────────
+
+/**
+ * Sidebar Navigation Service - manages the drill-down state
+ */
+export interface ISidebarService {
+  getCurrentPath(): readonly SidebarCategoryItem[];
+  pushCategory(category: SidebarCategoryItem): void;
+  popCategory(): void;
+  resolvePathForSlug(sidebar: readonly SidebarItem[], slug: string): Result<SidebarCategoryItem[], Error>;
+  onPathChange(callback: (path: readonly SidebarCategoryItem[]) => void): () => void;
+}
 
 /**
  * App configuration (Derived from TypeBox Schema)
@@ -74,6 +87,7 @@ export interface ServiceContainer {
   router: IRouterService;
   dom: IDomService;
   theme: IThemeService;
+  sidebar: ISidebarService;
   config: IAppConfig;
   events: IEventBusService;
 }
@@ -181,6 +195,47 @@ export const createDomService = (): IDomService => ({
 });
 
 /**
+ * Default sidebar navigation service
+ */
+export const createSidebarService = (events: IEventBusService): ISidebarService => {
+  let path: SidebarCategoryItem[] = [];
+
+  const findPathToSlug = (
+    items: readonly SidebarItem[],
+    slug: string,
+    currentPath: SidebarCategoryItem[] = []
+  ): Result<SidebarCategoryItem[], Error> => {
+    for (const item of items) {
+      if (item.type === "doc") {
+        if (item.slug === slug || item.id === slug) {
+          return new Ok(currentPath);
+        }
+      } else if (item.type === "category") {
+        const result = findPathToSlug(item.items, slug, [...currentPath, item]);
+        if (result.isOk()) return result;
+      }
+    }
+    return new Err(new Error(`Slug ${slug} not found in sidebar`));
+  };
+
+  return {
+    getCurrentPath: () => path,
+    pushCategory: (category) => {
+      path = [...path, category];
+      events.emit("ui:sidebar:pathChanged", { path });
+    },
+    popCategory: () => {
+      path = path.slice(0, -1);
+      events.emit("ui:sidebar:pathChanged", { path });
+    },
+    resolvePathForSlug: (sidebar, slug) => findPathToSlug(sidebar, slug),
+    onPathChange: (callback) => {
+      events.on("ui:sidebar:pathChanged", ({ path }) => callback(path));
+      return () => events.off("ui:sidebar:pathChanged", (e: any) => callback(e.path));
+    },
+  };
+};
+/**
  * Default theme service
  */
 export const createThemeService = (
@@ -251,6 +306,7 @@ export interface ContainerOptions {
   router?: IRouterService;
   dom?: IDomService;
   theme?: IThemeService;
+  sidebar?: ISidebarService;
   events?: IEventBusService;
 }
 
@@ -263,9 +319,10 @@ export function createContainer(options: ContainerOptions = {}): ServiceContaine
   const dom = options.dom ?? createDomService();
   const events = options.events ?? createEventBusService();
   const theme = options.theme ?? createThemeService(storage, events);
+  const sidebar = options.sidebar ?? createSidebarService(events);
   const config = createAppConfig(options.config);
 
-  return { storage, router, dom, theme, config, events };
+  return { storage, router, dom, theme, sidebar, config, events };
 }
 
 /**

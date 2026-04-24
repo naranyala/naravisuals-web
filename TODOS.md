@@ -1,95 +1,61 @@
-# Build System Compatibility & Migration Tracker
+# Reactivity Rewrite Roadmap
 
-This document tracks the feature parity between the legacy **TypeScript (Bun)** scripts and the new **Rust (scripts-rs)** build engine, as well as the overall architectural evolution of the documentation platform.
+The application is transitioning from local component state and scattered event handling to a centralized Service-oriented reactivity model using `mitt` for events and `better-result` for functional error handling.
 
-## Compatibility Matrix
+## Completed
 
-| Feature | TypeScript (Bun) | Rust (scripts-rs) | Notes |
-| :--- | :---: | :---: | :--- |
-| **Markdown Parsing** | ✅ (marked) | ✅ (pulldown-cmark) | Different parsers may have slight rendering differences. |
-| **Syntax Highlighting** | ✅ (Shiki) | ⚠️ (Syntect) | Shiki provides better VS-quality themes. |
-| **Admonitions** | ✅ Full | ⚠️ Basic | Rust implementation uses regex; doesn't handle nested markdown well. |
-| **Mermaid Diagrams** | ✅ (v11) | ❌ | High priority for Rust migration. |
-| **MathJax (LaTeX)** | ✅ | ❌ | Needed for technical documentation. |
-| **Unified Reporting** | ✅ | ❌ | Rust still uses legacy diagnostic formatting. |
-| **Link Validation** | ✅ | ✅ | Both check internal `/docs/` and `/blog/` links. |
-| **Slugs Validation** | ✅ | ✅ | Both prevent duplicate URL paths. |
-| **Codeblock Descriptions** | ✅ | ✅ | Mandatory `:desc=` attribute enforcement. |
-| **SEO Generation** | ✅ | ✅ | Sitemap and robots.txt generation. |
-| **Dev Server (HMR)** | ✅ | ⚠️ | Rust CLI proxies to `rspack serve`. |
+### Core Infrastructure
+- [x] Dependency Injection Container: Implemented `ServiceContainer` to manage service lifecycles.
+- [x] Event Bus: Implemented `IEventBusService` using `mitt` for cross-cutting communication.
+- [x] Storage abstraction: Implemented `IStorageService` to wrap `localStorage`.
+- [x] Router abstraction: Implemented `IRouterService` to wrap History API.
+- [x] DOM abstraction: Implemented `IDomService` for browser API isolation.
+- [x] App Configuration: Implemented `IAppConfig` with runtime validation via TypeBox.
 
----
+### Feature Reactivity
+- [x] Sidebar Navigation Reactivity:
+    - Implemented `ISidebarService` to manage navigation depth (path).
+    - Integrated with `ServiceContainer` and `IEventBusService`.
+    - Rewrote `Sidebar.tsx` to be a reactive view of the service state.
+    - Used `better-result` for path resolution logic.
+- [x] Theme & Appearance Reactivity:
+    - Implemented `IThemeService` for dark/light mode management.
+    - Centralized persistence logic using `IStorageService`.
+    - Integrated with `IEventBusService` for reactive theme changes.
 
-## Migration TODOs
+### Build & Tooling (SSG Pipeline)
+- [x] Unified CLI: Implemented `docts` CLI for project lifecycle management.
+- [x] Documentation Compiler: Implemented a custom SSG engine to generate `src/generated` from markdown.
+- [x] Build Pipeline: Integrated rspack for production bundling and dev server.
+- [x] Validation Suite: Implemented strict content validation and Mermaid deep validation.
+- [x] Rust Engine: Implemented a high-performance compiler alternative in `scripts-rs`.
+- [x] Quality Gate: Integrated Biome (linting) and tsc (type checking) into the build process.
 
-### Phase 1: Feature Parity (High Priority)
-- [ ] **Mermaid Plugin**: Implement Mermaid block detection and wrapper generation in Rust.
-- [ ] **MathJax Plugin**: Implement math extraction/protection logic in Rust.
-- [ ] **Advanced Admonitions**: Move from regex to token-based admonition parsing in Rust.
-- [ ] **Unified Reporting**: Implement `ReportGenerator` logic in Rust to match the new TS format.
+## In Progress
+- [ ] Document Lifecycle & Enhancement State:
+    - [x] Moved Mermaid loading states into `IThemeService` (as a temporary home).
+    - [ ] Create a dedicated `ContentService` to manage overall content rendering and loading states.
+    - [ ] Implement centralized "is Rendering" state for global progress indicators.
 
-### Phase 2: Performance & DX (Medium Priority)
-- [ ] **Shiki Integration**: Explore using Shiki (via bindings) or improving Syntect output in Rust.
-- [ ] **Parallel Processing**: Utilize Rust's `rayon` for multi-threaded markdown transformation.
-- [ ] **Watcher Implementation**: Native Rust file watcher to replace Bun-based dev loop.
+## Planned Rewrites
 
-### Phase 3: Primary Switch (Low Priority)
-- [ ] **Default to Rust**: Change the default `bun run build` to use the Rust engine.
-- [ ] **Retire Bun Scripts**: Archive `.mts` scripts once Rust engine is 100% compatible.
+### 1. Search State Management
+- **Current State**: Search logic is embedded in features/search.
+- **Goal**: Create a `SearchService` that manages the search query, results, and active filters.
+- **Key Changes**:
+    - Implement a reactive `query` state.
+    - Emit `search:resultsChanged` events.
+    - Use `better-result` to handle search engine failures.
 
----
+### 2. Global UI State (Modals, Drawers, AST Viewer)
+- **Current State**: Managed via `useState` in `MainLayout` or specific feature components.
+- **Goal**: Create a `UIService` to manage the visibility of global overlays.
+- **Key Changes**:
+    - Implement `togglePanel(panelId)` and `closeAllPanels()`.
+    - Emit events when panels open/close to adjust main content margins.
 
-## Build Pipeline Modernization (TS & Rust - COMPLETED)
-
-The build pipelines have been evolved into professional-grade **Compiler Engines** to ensure maintainability and performance.
-
-### 🏗️ Core Architecture (DONE)
-- [x] **Stateful Compiler Engine**: Implemented `DocumentationCompiler` in both TS (`scripts/compiler/Engine.ts`) and Rust (`scripts-rs/src/compiler/engine.rs`).
-- [x] **Middleware Lifecycle**: Formalized middleware pattern with hooks (`onIngest`, `onPreParse`, `onTransform`, `onPostProcess`, `onAssemble`).
-- [x] **Virtual File System (VFS)**: Implemented in-memory representation via `CompilationUnit` to facilitate cross-document analysis.
-- [x] **Token-Aware Transformation**: Rust engine now supports `pulldown-cmark` event stream interception.
-
-### ⚡ Mermaid v11 Integration (DONE)
-- [x] **Smart Header Correction**: Auto-prefixing of diagram types and default directions (e.g., `flowchart TD`).
-- [x] **Deep Validation Middleware**: Implemented `mermaidDeepValidator` to catch syntax errors during the build.
-- [x] **Frontend Post-Render Validation**: React component now detects internal Mermaid error SVGs and provides a "Syntax Error" UI instead of a blank space.
-- [x] **CSS Stylization Reset**: Cleaned up legacy `!important` overrides to allow Mermaid's own theme engine to work for complex types (mindmaps, quadrants).
-
----
-
-## ⚡ Post-Migration & Optimization (TS & Rust)
-
-### Performance & Scalability
-- [ ] **State & Reactivity Overhaul**: Replace standard React `useState/useEffect` patterns with a more performant proxy or signal-based architecture.
-    - [ ] Option A: **Valtio** (Proxy-based). Leverage the existing `valtio` dependency to create a global, mutable state store that components can subscribe to with fine-grained reactivity.
-    - [ ] Option B: **Preact Signals**. Integrate `@preact/signals-react` for a truly reactive dependency graph that bypasses standard React reconciliation for UI-only updates.
-    - [ ] Move UI flags (sidebar visible, TOC visible, settings open) from `MainLayout` state to the reactive store.
-    - [ ] Transition Theme and Font preferences from standard hooks to reactive state atoms.
-    - [ ] Unify `useNavigation` logic with the reactive store to ensure single-source-of-truth for the current document.
-- [ ] **Remark/Rehype/Unified Migration**: Transition from `marked` to the `unified` ecosystem.
-    - [ ] Move build pipeline to `unified()` with `remark-parse` and `rehype-stringify`.
-    - [ ] Implement `remark-gfm` for advanced table support and task lists.
-    - [ ] Use `rehype-shiki` or `rehype-pretty-code` for build-time syntax highlighting.
-    - [ ] Integrate `rehype-slug` and `rehype-autolink-headings` for robust anchor management.
-    - [ ] Move custom plugins (admonitions, mermaid) to standard Unified plugins.
-- [ ] **Incremental Build Engine**: Implement hash-based change detection in `CompilationUnit` to skip processing for unchanged files.
-- [ ] **Async Parallelization**: Transition from sequential processing to `Promise.all` pools in `DocumentationCompiler.compile()`.
-- [ ] **JSDOM Performance**: Evaluate JSDOM overhead for huge documentation sets; consider simpler string parsing for basic post-processing.
-
-### Quality & Robustness
-- [ ] **Unified Schema Validation**: Move from heuristics to a strict schema-based validation for frontmatter (using Zod or similar).
-- [ ] **AST-Based Search**: Leverage the generated `ast` in `DocEntry` for deeper cross-linking and full-text search indexing.
-- [ ] **Global CSS Audit**: Review all shared styles for potential collisions with third-party components (MathJax/Mermaid).
-
----
-
-## Known Discrepancies & Potential Debt
-
-### ⚠️ Technical Debt
-- **CSS Over-Specificity**: Some styles in `mermaid.css` still use `!important` which might interfere with user-defined Mermaid themes via directives.
-- **Renderer State**: The `MarkdownRenderer` resets `seenIds` per-file, but doesn't handle global cross-document anchor uniqueness yet.
-
-### 🐞 Potential Bugs
-- **Mermaid v11 Measurement**: Some diagrams might collapse in hidden tabs or accordions due to `getBoundingClientRect()` limitations; consider a `ResizeObserver` or `IntersectionObserver` re-render.
-- **Deep Nesting**: Nested subgraphs in flowcharts occasionally corrupt the generated SVG layout if headers are not perfectly aligned.
-- **Markdown Encoding**: Double-escaping of HTML entities in code blocks can still occur if multiple plugins attempt to escape the same text.
+## Implementation Guidelines
+- **Service-First**: Logic must live in a service, not a component.
+- **Event-Driven**: Use `IEventBusService` for cross-cutting concerns.
+- **Functional Errors**: Use `better-result` for any operation that can fail (lookups, API calls, parsing).
+- **DI Pattern**: All services must be registered in `ServiceContainer`.
