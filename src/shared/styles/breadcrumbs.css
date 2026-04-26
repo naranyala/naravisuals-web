@@ -2,6 +2,60 @@
    BREADCRUMBS
    ============================================ */
 
+.top-bar-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.top-bar-breadcrumb-item.root {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.top-bar-breadcrumb-separator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.top-bar-breadcrumb-separator span:first-child {
+  opacity: 0.5;
+  font-weight: 300;
+}
+
+.top-bar-breadcrumb-item.root {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.top-bar-breadcrumb-item {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: color 0.15s;
+  font-weight: 400;
+}
+
+.top-bar-breadcrumb-item:hover {
+  color: var(--ifm-color-primary);
+}
+
+.top-bar-breadcrumb-item.current {
+  color: var(--text);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Legacy breadcrumbs */
 .breadcrumbs {
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;

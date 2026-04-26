@@ -23,14 +23,17 @@ import { spawn } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import net from "node:net";
 import { join } from "node:path";
+import path from "node:path";
 import glob from "fast-glob";
 import { match, P } from "ts-pattern";
+
 import { c, colors } from "./core/index.ts";
 import { Logger } from "./core/logger.ts";
 import { paths } from "./core/paths.ts";
 
 const logger = new Logger();
 const projectRoot = paths.root;
+process.env.PROJECT_NAME = path.basename(projectRoot);
 
 function banner() {
   logger.raw("", colors.cyan);
@@ -136,7 +139,9 @@ async function cmdDev(options: any) {
     logger.blank();
 
     // Pass port as CLI argument, not just env var
-    await runCommand("bunx", ["rspack", "serve", "--port", String(port)]);
+    await runCommand("bunx", ["rspack", "serve", "--port", String(port)], {
+      env: { ...process.env, PROJECT_NAME: path.basename(projectRoot) },
+    });
   } catch (error: any) {
     logger.error(`Development server failed: ${error.message}`);
     process.exit(1);

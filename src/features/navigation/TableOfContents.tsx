@@ -9,7 +9,6 @@ interface TOCItem {
 
 interface TableOfContentsProps {
   items: readonly TOCItem[];
-  breadcrumbs?: string[];
 }
 
 /**
@@ -38,7 +37,7 @@ function scrollActiveIntoView(_activeId: string) {
   }
 }
 
-export function TableOfContents({ items, breadcrumbs }: TableOfContentsProps) {
+export function TableOfContents({ items }: TableOfContentsProps) {
   const [activeHash, setActiveHash] = useState("");
 
   useEffect(() => {
@@ -74,11 +73,6 @@ export function TableOfContents({ items, breadcrumbs }: TableOfContentsProps) {
 
   return (
     <div className="toc">
-      {breadcrumbs && breadcrumbs.length > 0 && (
-        <div className="toc-breadcrumbs">
-          {breadcrumbs.join(" › ")}
-        </div>
-      )}
       <ul className="toc-list">
         {items.map((item) => {
           const isActive = activeHash === `#${item.id}`;

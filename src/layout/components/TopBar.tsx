@@ -2,14 +2,20 @@ import { clsx } from "clsx";
 import { useUIState } from "../../core/store";
 import { useServices } from "../../services";
 
+interface BreadcrumbItem {
+  label: string;
+  slug?: string;
+}
+
 interface TopBarProps {
   mermaidLoading: boolean;
   isPrinting: boolean;
   onNavigate: (target: string) => void;
   onPrint: () => void;
+  breadcrumbs: BreadcrumbItem[];
 }
 
-export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint }: TopBarProps) {
+export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint, breadcrumbs }: TopBarProps) {
   const { config } = useServices();
   const {
     sidebarVisible,
@@ -32,6 +38,15 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint }: TopB
     toggleSidebar();
   };
 
+  const handleBreadcrumbClick = (e: React.MouseEvent, slug: string) => {
+    e.preventDefault();
+    if (slug === breadcrumbs[breadcrumbs.length - 1]?.slug) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      onNavigate(slug);
+    }
+  };
+
   return (
     <div className="top-bar">
       <div className="top-bar-left">
@@ -43,14 +58,23 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint }: TopB
         >
           <span className="btn-icon">☰</span>
         </button>
-        <h1
-          className="site-title"
-          style={{ cursor: "pointer" }}
-          onClick={() => onNavigate("abstract")}
-          title="Go to Abstract page"
-        >
-          {config.siteTitle}
-        </h1>
+        <div className="top-bar-breadcrumbs">
+          {breadcrumbs.map((item, idx) => (
+            <div key={idx} className={clsx("top-bar-breadcrumb-separator", { first: idx === 0 })}>
+              {idx !== 0 && <span>›</span>}
+              <a
+                href={`/${config.routes.docs}/${item.slug}`}
+                className={clsx("top-bar-breadcrumb-item", { 
+                  root: idx === 0, 
+                  current: idx === breadcrumbs.length - 1 
+                })}
+                onClick={(e) => handleBreadcrumbClick(e, item.slug)}
+              >
+                {item.label}
+              </a>
+            </div>
+          ))}
+        </div>
         {mermaidLoading && (
           <span className="mermaid-loading-indicator" title="Loading diagrams...">
             <span className="mermaid-spinner" />

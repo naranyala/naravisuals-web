@@ -1,8 +1,10 @@
 import { clsx } from "clsx";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
+
 import { match } from "ts-pattern";
 import { useUIState } from "../core/store";
-import { stripTitlePrefix } from "../core/utils";
+import { stripTitlePrefix, deslugify } from "../core/utils";
+
 import { Sidebar, TableOfContents } from "../features/navigation";
 import { GlobalSearch } from "../features/search/GlobalSearch";
 import { useSeo } from "../features/seo";
@@ -45,6 +47,16 @@ export function MainLayout() {
   // We use the hook to get the initial doc based on the URL
   const { currentDoc, currentSlug, navigate, getDocsInSidebarOrder, setCurrentSlug, resolveSlug } =
     useNavigation(services);
+
+  // Track sidebar navigation path for breadcrumbs
+  const [sidebarPath, setSidebarPath] = useState(sidebarService.getCurrentPath());
+
+  useEffect(() => {
+    const unsubscribe = sidebarService.onPathChange((path) => {
+      setSidebarPath(path);
+    });
+    return unsubscribe;
+  }, [sidebarService]);
 
   // Runtime validation of current document
   useEffect(() => {
@@ -163,9 +175,46 @@ export function MainLayout() {
   const nextDoc = idx < sorted.length - 1 ? sorted[idx + 1] : null;
 
   const pathResult = sidebarService.resolvePathForSlug(sidebarData, currentSlug);
-  const breadcrumbs = pathResult.isOk() 
-    ? [...pathResult.value.map(p => p.label), currentDoc?.title || ""] 
-    : [currentDoc?.title || ""];
+  
+  const getFirstDocSlug = useCallback((item: any): string | undefined => {
+    if (!item) return undefined;
+    if (item.type === "doc") return item.slug || item.id;
+    if (item.type === "category" && Array.isArray(item.items)) {
+      for (const subItem of item.items) {
+        const slug = getFirstDocSlug(subItem);
+        if (slug) return slug;
+      }
+    }
+    return undefined;
+  }, []);
+
+  const breadcrumbs = useMemo(() => {
+    const root = { label: deslugify(services.config.siteTitle || "Docs"), slug: "abstract" };
+    
+    // Find the actual structural path of the current document
+    const docPathResult = sidebarService.resolvePathForSlug(sidebarData, currentSlug);
+    const actualDocPath = docPathResult.isOk() ? docPathResult.value : [];
+
+    // The active path is what the user is currently seeing in the sidebar
+    const activePath = sidebarPath;
+
+    const intermediates = activePath.map(p => ({
+      label: deslugify(p.label),
+      slug: p.link?.id ?? getFirstDocSlug(p) ?? "abstract",
+    }));
+
+    // We show the current document if:
+    // 1. It exists.
+    // 2. It is actually a descendant of the currently active sidebar path.
+    const isDescendant = actualDocPath.length >= activePath.length && 
+      actualDocPath.slice(0, activePath.length).every((p, i) => p.label === activePath[i]?.label);
+
+    if (currentDoc && isDescendant) {
+      return [root, ...intermediates, { label: deslugify(currentDoc.title), slug: currentSlug }];
+    }
+    
+    return [root, ...intermediates];
+  }, [sidebarData, currentSlug, services.config.siteTitle, currentDoc, sidebarPath, sidebarService, getFirstDocSlug]);
 
   return (
     <AppShell
@@ -175,6 +224,7 @@ export function MainLayout() {
           isPrinting={isPrinting}
           onNavigate={handleNavigate}
           onPrint={handlePrint}
+          breadcrumbs={breadcrumbs}
         />
       }
       search={<GlobalSearch onNavigate={handleNavigate} />}
@@ -275,7 +325,6 @@ export function MainLayout() {
         reference={
           <TableOfContents 
             items={currentDoc.toc} 
-            breadcrumbs={breadcrumbs} 
           />
         }
       />

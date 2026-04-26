@@ -20,6 +20,7 @@ export interface ISidebarService {
   getCurrentPath(): readonly SidebarCategoryItem[];
   pushCategory(category: SidebarCategoryItem): void;
   popCategory(): void;
+  setPath(path: readonly SidebarCategoryItem[]): void;
   resolvePathForSlug(sidebar: readonly SidebarItem[], slug: string): Result<SidebarCategoryItem[], Error>;
   onPathChange(callback: (path: readonly SidebarCategoryItem[]) => void): () => void;
 }
@@ -228,6 +229,10 @@ export const createSidebarService = (events: IEventBusService): ISidebarService 
       path = path.slice(0, -1);
       events.emit("ui:sidebar:pathChanged", { path });
     },
+    setPath: (newPath) => {
+      path = newPath;
+      events.emit("ui:sidebar:pathChanged", { path });
+    },
     resolvePathForSlug: (sidebar, slug) => findPathToSlug(sidebar, slug),
     onPathChange: (callback) => {
       events.on("ui:sidebar:pathChanged", ({ path }) => callback(path));
@@ -278,8 +283,9 @@ export const createThemeService = (
  */
 export const createAppConfig = (overrides?: Partial<IAppConfig>): IAppConfig => {
   const config = {
-    siteTitle: (process.env.PROJECT_NAME as string) || "Docs",
+    siteTitle: (process.env.PROJECT_NAME as string) || "",
     siteUrl: (process.env.SITE_URL as string) || "http://localhost:3000",
+
     repoEditUrl: "https://github.com/your-org/your-repo/edit/main",
     mobileBreakpoint: 800,
     tocBreakpoint: 1100,

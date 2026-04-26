@@ -207,7 +207,13 @@ export function Sidebar({ sidebar, currentSlug, onNavigate, isMobile = false }: 
   useEffect(() => {
     const result = sidebarService.resolvePathForSlug(sidebar, currentSlug);
     if (result.isOk()) {
+      sidebarService.setPath(result.value);
       setPath(result.value);
+    } else {
+      // If the slug is not found in the sidebar tree (e.g. "abstract" or a direct link),
+      // reset the sidebar path to root.
+      sidebarService.setPath([]);
+      setPath([]);
     }
   }, [currentSlug, sidebar, sidebarService]);
 
