@@ -174,8 +174,6 @@ export function MainLayout() {
   const prevDoc = idx > 0 ? sorted[idx - 1] : null;
   const nextDoc = idx < sorted.length - 1 ? sorted[idx + 1] : null;
 
-  const pathResult = sidebarService.resolvePathForSlug(sidebarData, currentSlug);
-  
   const getFirstDocSlug = useCallback((item: any): string | undefined => {
     if (!item) return undefined;
     if (item.type === "doc") return item.slug || item.id;

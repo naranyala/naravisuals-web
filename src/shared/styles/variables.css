@@ -23,6 +23,7 @@
   --border: #494d64;
   --text: #cad3f5;
   --text-secondary: #a5adcb;
+  --site-max-width: 1600px;
 }
 
 [data-theme="catppuccin"] {

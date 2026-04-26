@@ -37,12 +37,17 @@ export function useNavigation(services: ServiceContainer) {
 
     services.events.emit("nav:navigate", { target, isMobile });
 
-    setCurrentSlug(slug);
-    services.router.pushState(
-      {},
-      "",
-      services.router.buildUrl(services.config.routes.docs, target)
-    );
+    if (slug === "/") {
+      setCurrentSlug("abstract");
+      services.router.pushState({}, "", "/");
+    } else {
+      setCurrentSlug(slug);
+      services.router.pushState(
+        {},
+        "",
+        services.router.buildUrl(services.config.routes.docs, target)
+      );
+    }
     setSidebarVisible(!isMobile);
     setTocVisible(false);
   };
@@ -51,31 +56,35 @@ export function useNavigation(services: ServiceContainer) {
     services.events.emit("nav:resolved", { slug: currentSlug });
   }, [currentSlug, services.events]);
 
-  const getDocsInSidebarOrder = (): DocEntry[] => {
+  const getDocsInSidebarOrder = useCallback((): DocEntry[] => {
     const ordered: DocEntry[] = [];
-    for (const item of sidebarData as SidebarItem[]) {
-      if (item.type === "doc") {
-        const doc = allDocs.find((d) => d.slug === item.slug || d.id === item.id);
-        if (doc) ordered.push(doc);
-      } else if (item.type === "category") {
-        if (item.link) {
-          const linkDoc = allDocs.find((d) => d.slug === item.link?.id || d.id === item.link?.id);
-          if (linkDoc && !ordered.find((d) => d.slug === linkDoc.slug)) {
-            ordered.push(linkDoc);
+
+    const traverse = (items: SidebarItem[]) => {
+      for (const item of items) {
+        if (item.type === "doc") {
+          const doc = allDocs.find((d) => d.slug === item.slug || d.id === item.id);
+          if (doc && !ordered.find((d) => d.slug === doc.slug)) {
+            ordered.push(doc);
           }
-        }
-        for (const child of item.items) {
-          if (child.type === "doc") {
-            const doc = allDocs.find((d) => d.slug === child.slug || d.id === child.id);
-            if (doc && !ordered.find((d) => d.slug === doc.slug)) {
-              ordered.push(doc);
+        } else if (item.type === "category") {
+          // 1. If category has a landing page doc, add it first
+          if (item.link) {
+            const linkDoc = allDocs.find((d) => d.slug === item.link?.id || d.id === item.link?.id);
+            if (linkDoc && !ordered.find((d) => d.slug === linkDoc.slug)) {
+              ordered.push(linkDoc);
             }
+          }
+          // 2. Recursively add all docs in child items
+          if (item.items) {
+            traverse(item.items);
           }
         }
       }
-    }
+    };
+
+    traverse(sidebarData as SidebarItem[]);
     return ordered;
-  };
+  }, []);
 
   useEffect(() => {
     const unsubscribe = services.router.onPopState(() => {

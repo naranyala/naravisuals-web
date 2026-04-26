@@ -199,7 +199,7 @@ export const createDomService = (): IDomService => ({
  * Default sidebar navigation service
  */
 export const createSidebarService = (events: IEventBusService): ISidebarService => {
-  let path: SidebarCategoryItem[] = [];
+  let path: readonly SidebarCategoryItem[] = [];
 
   const findPathToSlug = (
     items: readonly SidebarItem[],

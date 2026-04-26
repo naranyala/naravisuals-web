@@ -10,7 +10,7 @@ export type AppEvents = {
 
   // UI State
   "ui:sidebar:toggle": boolean;
-  "ui:sidebar:pathChanged": { path: any[] };
+  "ui:sidebar:pathChanged": { path: readonly any[] };
   "ui:toc:toggle": boolean;
   "ui:settings:toggle": boolean;
   "ui:ast:toggle": boolean;

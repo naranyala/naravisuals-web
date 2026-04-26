@@ -38,8 +38,9 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint, breadc
     toggleSidebar();
   };
 
-  const handleBreadcrumbClick = (e: React.MouseEvent, slug: string) => {
+  const handleBreadcrumbClick = (e: React.MouseEvent, slug: string | undefined) => {
     e.preventDefault();
+    if (!slug) return;
     if (slug === breadcrumbs[breadcrumbs.length - 1]?.slug) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
@@ -49,7 +50,8 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint, breadc
 
   return (
     <div className="top-bar">
-      <div className="top-bar-left">
+      <div className="top-bar-container">
+        <div className="top-bar-left">
         <button
           type="button"
           className={clsx("top-bar-btn menu-btn show-on-mobile", { active: sidebarVisible })}
@@ -63,12 +65,12 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint, breadc
             <div key={idx} className={clsx("top-bar-breadcrumb-separator", { first: idx === 0 })}>
               {idx !== 0 && <span>›</span>}
               <a
-                href={`/${config.routes.docs}/${item.slug}`}
+                href={idx === 0 ? "/" : `/${config.routes.docs}/${item.slug}`}
                 className={clsx("top-bar-breadcrumb-item", { 
                   root: idx === 0, 
                   current: idx === breadcrumbs.length - 1 
                 })}
-                onClick={(e) => handleBreadcrumbClick(e, item.slug)}
+                onClick={(e) => handleBreadcrumbClick(e, idx === 0 ? "/" : item.slug)}
               >
                 {item.label}
               </a>
@@ -132,6 +134,7 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint, breadc
         >
           <span className="btn-icon">📊</span>
         </button>
+      </div>
       </div>
     </div>
   );
