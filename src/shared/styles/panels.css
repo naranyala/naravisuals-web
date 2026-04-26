@@ -123,10 +123,10 @@
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
-/* Theme chips grid */
+/* Theme chips list */
 .theme-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
@@ -192,10 +192,10 @@
   text-overflow: ellipsis;
 }
 
-/* Font grid */
+/* Font list */
 .font-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
@@ -211,7 +211,7 @@
     border-color 0.15s,
     background 0.15s,
     box-shadow 0.15s;
-  text-align: center;
+  text-align: left;
 }
 
 .font-chip:hover {

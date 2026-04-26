@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { clsx } from "clsx";
 import { useUIState } from "../../core/store";
 import { useServices } from "../../services";
@@ -30,6 +31,22 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint, breadc
     setGraphOpen,
   } = useUIState();
 
+  const [breadcrumbDropdownOpen, setBreadcrumbDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    if (!breadcrumbDropdownOpen) return;
+
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".top-bar-breadcrumb-dropdown") && !target.closest(".top-bar-btn")) {
+        setBreadcrumbDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [breadcrumbDropdownOpen]);
+
   const onToggleSettings = () => {
     setSettingsOpen(!settingsOpen);
   };
@@ -60,7 +77,15 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint, breadc
         >
           <span className="btn-icon">☰</span>
         </button>
-        <div className="top-bar-breadcrumbs">
+        <button
+          type="button"
+          className={clsx("top-bar-btn show-on-mobile", { active: breadcrumbDropdownOpen })}
+          onClick={() => setBreadcrumbDropdownOpen(!breadcrumbDropdownOpen)}
+          aria-label="Toggle breadcrumbs"
+        >
+          <span className="btn-icon">📂</span>
+        </button>
+        <div className={clsx("top-bar-breadcrumbs", { "hide-on-mobile": true })}>
           {breadcrumbs.map((item, idx) => (
             <div key={idx} className={clsx("top-bar-breadcrumb-separator", { first: idx === 0 })}>
               {idx !== 0 && <span>›</span>}
@@ -83,6 +108,28 @@ export function TopBar({ mermaidLoading, isPrinting, onNavigate, onPrint, breadc
           </span>
         )}
       </div>
+      {breadcrumbDropdownOpen && (
+        <div className="top-bar-breadcrumb-dropdown show-on-mobile">
+          <div className="top-bar-breadcrumb-dropdown-content">
+            {breadcrumbs.map((item, idx) => (
+              <a
+                key={idx}
+                href={idx === 0 ? "/" : `/${config.routes.docs}/${item.slug}`}
+                className={clsx("top-bar-breadcrumb-dropdown-item", { 
+                  current: idx === breadcrumbs.length - 1 
+                })}
+                onClick={(e) => {
+                  handleBreadcrumbClick(e, idx === 0 ? "/" : item.slug);
+                  setBreadcrumbDropdownOpen(false);
+                }}
+              >
+                {idx !== 0 && <span className="separator">›</span>}
+                {item.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="top-bar-right">
         <button
           type="button"

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useUIState } from "../../core/store";
 import { allDocs } from "../../generated";
 import { useDocsTheme } from "../theme";
+import { Modal } from "../../shared/components/Modal";
 
 /**
  * Frontmatter Network Graph Visuals
@@ -163,28 +164,14 @@ export function FrontmatterGraph() {
     }
   }, []);
 
-  if (!graphOpen) return null;
-
   return (
-    <div className="modal-overlay" onClick={() => setGraphOpen(false)}>
-      <div
-        className="modal-content graph-modal"
-        onClick={(e) => e.stopPropagation()}
-        style={{ width: "90vw", height: "85vh", maxWidth: "none" }}
-      >
-        <div className="modal-header">
-          <h2>Frontmatter Network Graph</h2>
-          <div className="graph-zoom-controls">
-            <button type="button" className="zoom-btn" onClick={handleZoomIn} title="Zoom in">
-              +
-            </button>
-            <button type="button" className="zoom-btn" onClick={handleZoomOut} title="Zoom out">
-              −
-            </button>
-            <button type="button" className="zoom-btn" onClick={handleFit} title="Fit to view">
-              ⊡
-            </button>
-          </div>
+    <Modal
+      isOpen={graphOpen}
+      onClose={() => setGraphOpen(false)}
+      title="Frontmatter Network Graph"
+      className="graph-modal-container"
+      header={
+        <div className="graph-zoom-controls">
           <div className="graph-legend">
             <span className="legend-item">
               <span className="dot tag-dot" /> Tag
@@ -193,20 +180,27 @@ export function FrontmatterGraph() {
               <span className="dot doc-dot" /> Article
             </span>
           </div>
-          <button type="button" className="modal-close" onClick={() => setGraphOpen(false)}>
-            ×
+          <button type="button" className="zoom-btn" onClick={handleZoomIn} title="Zoom in">
+            +
+          </button>
+          <button type="button" className="zoom-btn" onClick={handleZoomOut} title="Zoom out">
+            −
+          </button>
+          <button type="button" className="zoom-btn" onClick={handleFit} title="Fit to view">
+            ⊡
           </button>
         </div>
-        <div
-          className="modal-body graph-container-body"
-          style={{ position: "relative", flex: 1, overflow: "hidden" }}
-        >
-          <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
-        </div>
-        <div className="modal-footer">
-          <p>Drag to move nodes • Scroll to zoom • Cose force-directed layout</p>
-        </div>
+      }
+      footer={
+        <p>Drag to move nodes • Scroll to zoom • Cose force-directed layout</p>
+      }
+    >
+      <div
+        className="graph-container-body"
+        style={{ position: "relative", height: "70vh", overflow: "hidden" }}
+      >
+        <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
       </div>
-    </div>
+    </Modal>
   );
 }

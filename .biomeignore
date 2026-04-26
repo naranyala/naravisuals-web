@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+.vercel/
+
+# Rust build artifacts
+scripts-rs/target/
+
+# IDEs and Version Control
+.git/
+.vscode/
+.idea/
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+Cargo.lock
+
+# Archived or legacy code
+scripts/archived/
+
+# Documentation (Optional: ignore if you don't want Biome to lint JSON/CSS within docs)
+# docs/

@@ -1,0 +1,64 @@
+import { clsx } from "clsx";
+import { createPortal } from "react-dom";
+import React from "react";
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
+  header?: React.ReactNode;
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+  className?: string;
+  fullScreenOnMobile?: boolean;
+}
+
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  header,
+  children,
+  footer,
+  className,
+  fullScreenOnMobile = true,
+}: ModalProps) {
+  if (!isOpen) return null;
+
+  return createPortal(
+    <div className="modal-overlay" onClick={onClose}>
+      <div 
+        className={clsx(
+          "modal-container", 
+          fullScreenOnMobile && "mobile-fullscreen", 
+          className
+        )} 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="modal-header">
+          {header ? (
+            <>
+              <div className="modal-header-content">{header}</div>
+              <button type="button" className="modal-close-btn" onClick={onClose}>
+                ✕
+              </button>
+            </>
+          ) : (
+            <>
+              {title && <h2 className="modal-title">{title}</h2>}
+              <button type="button" className="modal-close-btn" onClick={onClose}>
+                ✕
+              </button>
+            </>
+          )}
+        </div>
+        <div className="modal-body">
+          {children}
+        </div>
+        {footer && <div className="modal-footer">{footer}</div>}
+      </div>
+    </div>,
+    document.body
+  );
+}
+

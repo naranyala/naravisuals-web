@@ -39,7 +39,7 @@
 }
 
 /* Fuzzy Search Specific Modal Styles */
-.search-modal {
+.search-modal-container {
   width: 100%;
   background: var(--bg);
   border-radius: 1rem;
@@ -65,12 +65,11 @@
   }
 }
 
-.search-header {
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--border);
+.search-modal-header-inner {
   display: flex;
   align-items: center;
   gap: 1rem;
+  width: 100%;
 }
 
 .search-modal-icon {
@@ -88,6 +87,7 @@
   outline: none;
   font-family: inherit;
 }
+
 
 .search-modal-esc, .search-modal-action {
   font-size: 0.7rem;
