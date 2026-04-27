@@ -124,7 +124,7 @@ export class FuzzySortSearchEngine implements SearchEngine {
   constructor() {
     this.searchableItems = allDocs.map((doc) => {
       const plainText = doc.content.replace(/<[^>]*>/g, " ");
-      const tocText = doc.toc?.map((t) => t.value).join(" ") || "";
+      const tocText = doc.toc?.map((t: TocItem) => t.value).join(" ") || "";
       return {
         ...doc,
         searchText: `${doc.title} ${doc.description || ""} ${doc.tags?.join(" ") || ""} ${tocText} ${plainText}`,

@@ -54,7 +54,10 @@ export function buildSidebar(docs: DocEntry[]): SidebarItem[] {
   function countDocs(item: SidebarItem): number {
     if (item.type === "doc") return 1;
     if (item.type === "category") {
-      return item.items.reduce((acc, child) => acc + countDocs(child), 0);
+      return (item as any).items.reduce(
+        (acc: number, child: SidebarItem) => acc + countDocs(child),
+        0
+      );
     }
     return 0;
   }

@@ -7,6 +7,19 @@ import type { CompilerContainer } from "../compiler/container.ts";
 import type { DocEntry, SidebarItem } from "./types.ts";
 import { slugToFilename, slugToVarName } from "./utils.ts";
 
+export function generateTypes(container: CompilerContainer) {
+  const content = `// AUTO-GENERATED — DO NOT EDIT.
+export type { 
+  DocEntry, 
+  TocItem, 
+  SidebarItem, 
+  SidebarDocItem, 
+  SidebarCategoryItem 
+} from "../shared/schemas";
+`;
+  container.fs.write(path.join(container.config.outputDir, "types.ts"), content);
+}
+
 export function cleanGeneratedDir(container: CompilerContainer, dir: string) {
   if (container.fs.exists(dir)) {
     container.fs.rm(dir, { recursive: true, force: true });
@@ -16,7 +29,7 @@ export function cleanGeneratedDir(container: CompilerContainer, dir: string) {
 
 export function generateSidebar(container: CompilerContainer, sidebar: SidebarItem[]) {
   const content = `// AUTO-GENERATED — DO NOT EDIT.
-import type { SidebarItem } from "./types";
+import type { SidebarItem } from "@/generated/types";
 export const sidebarData: SidebarItem[] = ${JSON.stringify(sidebar, null, 2)};
 `;
   container.fs.write(path.join(container.config.outputDir, "sidebar.ts"), content);
@@ -30,7 +43,7 @@ export function generateDocFiles(
   for (const d of allDocs) {
     const filename = slugToFilename(d.id);
     const content = `// AUTO-GENERATED — DO NOT EDIT.
-import type { DocEntry } from "../types";
+import type { DocEntry } from "@/generated/types";
 
 export const ${slugToVarName(d.id)}: DocEntry = ${JSON.stringify(d, null, 2)};
 `;
@@ -45,7 +58,7 @@ export function generateBarrelExports(
 ) {
   // 1. docs/index.ts
   const docsIndexContent = `// AUTO-GENERATED — DO NOT EDIT.
-import type { DocEntry } from "../types";
+import type { DocEntry } from "@/generated/types";
 ${allDocs.map((d) => `import { ${slugToVarName(d.id)} } from "./${slugToFilename(d.id)}";`).join("\n")}
 
 export {
@@ -60,7 +73,6 @@ export const allDocs: DocEntry[] = [
 
   // 2. index.ts
   const topIndexContent = `// AUTO-GENERATED — DO NOT EDIT.
-import "./clipboard";
 
 export { sidebarData } from "./sidebar";
 export { allDocs } from "./docs/index";

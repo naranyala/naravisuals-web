@@ -16,6 +16,7 @@ import {
   generateDocFiles,
   generateSeoFiles,
   generateSidebar,
+  generateTypes,
 } from "../pipeline/generator.ts";
 import {
   extractAllFootnotes,
@@ -513,6 +514,7 @@ export const filteredStats = ${JSON.stringify(sortedFiltered, null, 2)};
     });
 
     const sidebar = buildSidebar(allDocs as any);
+    generateTypes(container);
     generateSidebar(container, sidebar);
     generateDocFiles(container, GEN_DOCS_DIR, allDocs as any);
     generateBarrelExports(container, GEN_DOCS_DIR, allDocs as any);

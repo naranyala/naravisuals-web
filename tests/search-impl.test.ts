@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { FuseSearchEngine, UFuzzySearchEngine, M31FuzzySearchEngine } from "../src/features/search/search-engines-impl";
+import {
+  FuseSearchEngine,
+  M31FuzzySearchEngine,
+  UFuzzySearchEngine,
+} from "../src/features/search/search-engines-impl";
 import { allDocs } from "../src/generated";
 
 describe("Local Search Engine Implementations", () => {
@@ -31,11 +35,7 @@ describe("Local Search Engine Implementations", () => {
   // In a real scenario, we'd pass docs to the constructor
   (allDocs as any).splice(0, allDocs.length, ...mockDocs);
 
-  const engines = [
-    new FuseSearchEngine(),
-    new UFuzzySearchEngine(),
-    new M31FuzzySearchEngine(),
-  ];
+  const engines = [new FuseSearchEngine(), new UFuzzySearchEngine(), new M31FuzzySearchEngine()];
 
   engines.forEach((engine) => {
     describe(`${engine.name} Search`, () => {

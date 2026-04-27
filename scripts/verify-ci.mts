@@ -1,15 +1,15 @@
 #!/usr/bin/env bun
 /**
  * CI Mirror Verification
- * 
+ *
  * Simulates the Cloudflare build environment to catch "ghost" type errors
  * and generation failures before they hit the cloud.
  */
 
 import { spawn } from "node:child_process";
-import { existsSync, rmSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
-import { c, colors } from "./core/index.ts";
+import { colors } from "./core/index.ts";
 import { Logger } from "./core/logger.ts";
 import { paths } from "./core/paths.ts";
 

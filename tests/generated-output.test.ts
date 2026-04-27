@@ -148,14 +148,17 @@ describe("Content Integrity", () => {
       if (!doc.toc) continue;
       for (const item of doc.toc) {
         const idPattern = new RegExp(`id="${item.id}"`);
-        expect(idPattern.test(doc.content), `TOC ID ${item.id} not found in content of ${doc.id}`).toBe(true);
+        expect(
+          idPattern.test(doc.content),
+          `TOC ID ${item.id} not found in content of ${doc.id}`
+        ).toBe(true);
       }
     }
   });
 
   test("slugs are URL-safe", () => {
     for (const doc of allDocs) {
-      expect(doc.slug).toMatch(/^[a-z0-9\/-]+$/);
+      expect(doc.slug).toMatch(/^[a-z0-9/-]+$/);
     }
   });
 });
