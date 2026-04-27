@@ -2,21 +2,28 @@
  * Sidebar tree generation.
  */
 
-import type { DocEntry, SidebarItem, SidebarCategoryItem } from "./types.ts";
+import type { DocEntry, SidebarCategoryItem, SidebarItem } from "./types.ts";
 
 export function buildSidebar(docs: DocEntry[]): SidebarItem[] {
   const root: SidebarItem[] = [];
-  
+
   // Helper to find or create a category in the tree
-  function getOrCreateCategory(path: string[], currentLevel: SidebarItem[], doc: DocEntry): SidebarCategoryItem {
-    const segment = path[0]!;
+  function getOrCreateCategory(
+    path: string[],
+    currentLevel: SidebarItem[],
+    doc: DocEntry
+  ): SidebarCategoryItem {
+    const segment = path[0];
+    if (!segment) return { type: "category", label: "Unknown", items: [] } as SidebarCategoryItem;
     const label = segment
       .replace(/^\d{2}-/, "")
       .split("-")
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ");
 
-    let category = currentLevel.find((item) => item.type === "category" && item.label === label) as SidebarCategoryItem;
+    let category = currentLevel.find(
+      (item) => item.type === "category" && item.label === label
+    ) as SidebarCategoryItem;
 
     if (!category) {
       category = {
@@ -121,7 +128,7 @@ export function buildSidebar(docs: DocEntry[]): SidebarItem[] {
     if (b.type === "doc" && b.slug === "abstract") return 1;
     if (a.type === "doc" && a.slug === "references") return 1;
     if (b.type === "doc" && b.slug === "references") return -1;
-    
+
     return 0;
   });
 

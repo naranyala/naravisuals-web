@@ -2,8 +2,8 @@ import cytoscape from "cytoscape";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useUIState } from "../../core/store";
 import { allDocs } from "../../generated";
-import { useDocsTheme } from "../theme";
 import { Modal } from "../../shared/components/Modal";
+import { useDocsTheme } from "../theme";
 
 /**
  * Frontmatter Network Graph Visuals
@@ -191,9 +191,7 @@ export function FrontmatterGraph() {
           </button>
         </div>
       }
-      footer={
-        <p>Drag to move nodes • Scroll to zoom • Cose force-directed layout</p>
-      }
+      footer={<p>Drag to move nodes • Scroll to zoom • Cose force-directed layout</p>}
     >
       <div
         className="graph-container-body"

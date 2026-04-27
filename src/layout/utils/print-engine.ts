@@ -1,4 +1,4 @@
-import type { DocEntry } from "../../generated";
+import type { DocEntry, TocItem } from "../../generated";
 import type { IAppConfig, IDomService } from "../../services/container";
 
 export async function printAllDocs(allDocs: DocEntry[], config: IAppConfig, _dom: IDomService) {
@@ -111,9 +111,9 @@ export async function printAllDocs(allDocs: DocEntry[], config: IAppConfig, _dom
     `;
 
       const subEntries = (doc.toc || [])
-        .filter((item) => item.level > 1 && item.level <= 3)
+        .filter((item: TocItem) => item.level > 1 && item.level <= 3)
         .map(
-          (item) => `
+          (item: TocItem) => `
       <li class="toc-item toc-level-${item.level}">
         <a href="#section-${doc.slug.replace(/\//g, "-")}#${item.id}">${item.value}</a>
         <span class="toc-filler"></span>

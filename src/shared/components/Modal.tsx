@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
+import type React from "react";
 import { createPortal } from "react-dom";
-import React from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -27,12 +27,8 @@ export function Modal({
 
   return createPortal(
     <div className="modal-overlay" onClick={onClose}>
-      <div 
-        className={clsx(
-          "modal-container", 
-          fullScreenOnMobile && "mobile-fullscreen", 
-          className
-        )} 
+      <div
+        className={clsx("modal-container", fullScreenOnMobile && "mobile-fullscreen", className)}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
@@ -52,13 +48,10 @@ export function Modal({
             </>
           )}
         </div>
-        <div className="modal-body">
-          {children}
-        </div>
+        <div className="modal-body">{children}</div>
         {footer && <div className="modal-footer">{footer}</div>}
       </div>
     </div>,
     document.body
   );
 }
-

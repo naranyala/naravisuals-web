@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { SEARCH_ENGINES } from "../src/features/search/search-engines";
 import { formatSearchUrl } from "../src/core/utils";
+import { SEARCH_ENGINES } from "../src/features/search/search-engines";
 
 describe("Search Engines Configuration", () => {
   test("all search engines should have a valid URL template with %s", () => {
@@ -23,7 +23,7 @@ describe("Search Engines Configuration", () => {
   test("special characters in query should be properly encoded", () => {
     const query = "c++ & java #programming";
     const resultUrl = formatSearchUrl(SEARCH_ENGINES[0].url, query);
-    
+
     // Check that the result does not contain literal '&', '#', or '+' unless they are part of the base URL
     // Since the base URL for Google is https://www.google.com/search?q=%s
     // The result should be https://www.google.com/search?q=c%2B%2B%20%26%20java%20%23programming

@@ -1,9 +1,9 @@
 import { clsx } from "clsx";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { match } from "ts-pattern";
 import { useUIState } from "../core/store";
-import { stripTitlePrefix, deslugify } from "../core/utils";
+import { deslugify, stripTitlePrefix } from "../core/utils";
 
 import { Sidebar, TableOfContents } from "../features/navigation";
 import { GlobalSearch } from "../features/search/GlobalSearch";
@@ -156,19 +156,6 @@ export function MainLayout() {
     }
   };
 
-  if (!currentDoc) {
-    return (
-      <div className="site-wrapper">
-        <div className="top-bar">
-          <h1 className="site-title">{services.config.siteTitle}</h1>
-        </div>
-        <div className="empty-state">
-          <p>No documentation found.</p>
-        </div>
-      </div>
-    );
-  }
-
   const sorted = getDocsInSidebarOrder();
   const idx = sorted.findIndex((d) => d.slug === currentSlug || d.id === currentSlug);
   const prevDoc = idx > 0 ? sorted[idx - 1] : null;
@@ -188,7 +175,7 @@ export function MainLayout() {
 
   const breadcrumbs = useMemo(() => {
     const root = { label: deslugify(services.config.siteTitle || "Docs"), slug: "abstract" };
-    
+
     // Find the actual structural path of the current document
     const docPathResult = sidebarService.resolvePathForSlug(sidebarData, currentSlug);
     const actualDocPath = docPathResult.isOk() ? docPathResult.value : [];
@@ -196,7 +183,7 @@ export function MainLayout() {
     // The active path is what the user is currently seeing in the sidebar
     const activePath = sidebarPath;
 
-    const intermediates = activePath.map(p => ({
+    const intermediates = activePath.map((p) => ({
       label: deslugify(p.label),
       slug: p.link?.id ?? getFirstDocSlug(p) ?? "abstract",
     }));
@@ -204,15 +191,36 @@ export function MainLayout() {
     // We show the current document if:
     // 1. It exists.
     // 2. It is actually a descendant of the currently active sidebar path.
-    const isDescendant = actualDocPath.length >= activePath.length && 
+    const isDescendant =
+      actualDocPath.length >= activePath.length &&
       actualDocPath.slice(0, activePath.length).every((p, i) => p.label === activePath[i]?.label);
 
     if (currentDoc && isDescendant) {
       return [root, ...intermediates, { label: deslugify(currentDoc.title), slug: currentSlug }];
     }
-    
+
     return [root, ...intermediates];
-  }, [sidebarData, currentSlug, services.config.siteTitle, currentDoc, sidebarPath, sidebarService, getFirstDocSlug]);
+  }, [
+    currentSlug,
+    services.config.siteTitle,
+    currentDoc,
+    sidebarPath,
+    sidebarService,
+    getFirstDocSlug,
+  ]);
+
+  if (!currentDoc) {
+    return (
+      <div className="site-wrapper">
+        <div className="top-bar">
+          <h1 className="site-title">{services.config.siteTitle}</h1>
+        </div>
+        <div className="empty-state">
+          <p>No documentation found.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AppShell
@@ -244,12 +252,12 @@ export function MainLayout() {
       <FrontmatterGraph />
       <ThreeColumnLayout
         sidebar={
-          <Sidebar 
-          sidebar={sidebarData} 
-          currentSlug={currentSlug} 
-          onNavigate={handleNavigate} 
-          isMobile={isMobile} 
-        />
+          <Sidebar
+            sidebar={sidebarData}
+            currentSlug={currentSlug}
+            onNavigate={handleNavigate}
+            isMobile={isMobile}
+          />
         }
         content={
           <>
@@ -320,11 +328,7 @@ export function MainLayout() {
               .exhaustive()}
           </>
         }
-        reference={
-          <TableOfContents 
-            items={currentDoc.toc} 
-          />
-        }
+        reference={<TableOfContents items={currentDoc.toc} />}
       />
     </AppShell>
   );

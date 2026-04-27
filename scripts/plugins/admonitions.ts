@@ -116,7 +116,7 @@ export const admonitionsPlugin: MarkdownPlugin = {
         }
         continue;
       }
-    
+
       // Check for admonition end
       if ((line.trim() === ":::" || line.trim() === "!!!") && currentAdmonition) {
         const id = `ADMONITION${index++}END`;

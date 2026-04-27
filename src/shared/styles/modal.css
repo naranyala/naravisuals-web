@@ -88,8 +88,8 @@
   font-family: inherit;
 }
 
-
-.search-modal-esc, .search-modal-action {
+.search-modal-esc,
+.search-modal-action {
   font-size: 0.7rem;
   font-weight: 700;
   padding: 0.25rem 0.5rem;

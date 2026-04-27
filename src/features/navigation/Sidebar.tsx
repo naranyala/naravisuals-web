@@ -56,12 +56,19 @@ function SidebarNode({
   level?: number;
 }) {
   if (item.type === "doc") {
-    return <DocLink item={item as SidebarDocItem} currentSlug={currentSlug} onNavigate={onNavigate} level={level} />;
+    return (
+      <DocLink
+        item={item as SidebarDocItem}
+        currentSlug={currentSlug}
+        onNavigate={onNavigate}
+        level={level}
+      />
+    );
   }
 
   const category = item as SidebarCategoryItem;
   const hasActive = category.items.some(
-    (child) => (child as any).slug === currentSlug || (child as any).id === currentSlug
+    (child: SidebarItem) => (child as any).slug === currentSlug || (child as any).id === currentSlug
   );
 
   const handleToggle = () => {
@@ -82,12 +89,14 @@ function SidebarNode({
             <span className="sidebar-category-count">({category.count})</span>
           )}
         </span>
-        <span className={clsx("sidebar-category-arrow", { "is-rotated": mode === "focused" })}>›</span>
+        <span className={clsx("sidebar-category-arrow", { "is-rotated": mode === "focused" })}>
+          ›
+        </span>
       </button>
-      
+
       {mode === "focused" && (
         <div className="sidebar-sublist">
-          {category.items.map((child) => (
+          {category.items.map((child: SidebarItem) => (
             <SidebarNode
               key={`node:${child.label || (child as any).slug}`}
               item={child}
@@ -104,30 +113,30 @@ function SidebarNode({
   );
 }
 
-function FocusedView({ 
-  sidebar, 
-  currentSlug, 
-  onNavigate, 
-  path, 
-  setPath, 
-  sidebarService 
-}: { 
-  sidebar: readonly SidebarItem[]; 
-  currentSlug: string; 
-  onNavigate: (slug: string) => void; 
+function FocusedView({
+  sidebar,
+  currentSlug,
+  onNavigate,
+  path,
+  setPath,
+  sidebarService,
+}: {
+  sidebar: readonly SidebarItem[];
+  currentSlug: string;
+  onNavigate: (slug: string) => void;
   path: readonly SidebarCategoryItem[];
   setPath: (path: readonly SidebarCategoryItem[]) => void;
   sidebarService: any;
 }) {
-  const currentItems = path.length === 0 ? sidebar : path[path.length - 1]!.items;
+  const currentItems = path.length === 0 ? sidebar : (path[path.length - 1]?.items ?? []);
 
   return (
     <div className="sidebar-content">
       {path.length > 0 && (
         <div className="sidebar-focused-header">
-          <button 
-            type="button" 
-            className="sidebar-back-btn" 
+          <button
+            type="button"
+            className="sidebar-back-btn"
             onClick={() => {
               sidebarService.popCategory();
               setPath(sidebarService.getCurrentPath());
@@ -135,19 +144,21 @@ function FocusedView({
           >
             <span className="back-icon">←</span>
             <span className="back-label">
-              Back to {path.length > 1 
-                ? path.slice(0, -1).map(p => p.label).join(" › ") 
+              Back to{" "}
+              {path.length > 1
+                ? path
+                    .slice(0, -1)
+                    .map((p) => p.label)
+                    .join(" › ")
                 : "Root"}
             </span>
           </button>
-          <div className="sidebar-current-category">
-            {path[path.length - 1]!.label}
-          </div>
+          <div className="sidebar-current-category">{path[path.length - 1]?.label}</div>
         </div>
       )}
       <div className="sidebar-tree-view">
-        {currentItems.map((item) => (
-          <SidebarNode 
+        {currentItems.map((item: SidebarItem) => (
+          <SidebarNode
             key={`focused:${item.label || (item as any).slug}`}
             item={item}
             currentSlug={currentSlug}
@@ -164,14 +175,14 @@ function FocusedView({
   );
 }
 
-function TreeView({ 
-  sidebar, 
-  currentSlug, 
-  onNavigate, 
-}: { 
-  sidebar: readonly SidebarItem[]; 
-  currentSlug: string; 
-  onNavigate: (slug: string) => void; 
+function TreeView({
+  sidebar,
+  currentSlug,
+  onNavigate,
+}: {
+  sidebar: readonly SidebarItem[];
+  currentSlug: string;
+  onNavigate: (slug: string) => void;
 }) {
   const { sidebar: sidebarService } = useServices();
 
@@ -179,13 +190,13 @@ function TreeView({
     <div className="sidebar-content">
       <div className="sidebar-tree-view">
         {sidebar.map((item) => (
-          <SidebarNode 
+          <SidebarNode
             key={`expanded:${item.label || (item as any).slug}`}
             item={item}
             currentSlug={currentSlug}
             onNavigate={onNavigate}
             mode="expanded"
-            onExpand={(cat) => sidebarService.pushCategory(cat)} 
+            onExpand={(cat) => sidebarService.pushCategory(cat)}
           />
         ))}
       </div>
@@ -218,7 +229,16 @@ export function Sidebar({ sidebar, currentSlug, onNavigate, isMobile = false }: 
   }, [currentSlug, sidebar, sidebarService]);
 
   if (path.length > 0 || isMobile) {
-    return <FocusedView sidebar={sidebar} currentSlug={currentSlug} onNavigate={onNavigate} path={path} setPath={setPath} sidebarService={sidebarService} />;
+    return (
+      <FocusedView
+        sidebar={sidebar}
+        currentSlug={currentSlug}
+        onNavigate={onNavigate}
+        path={path}
+        setPath={setPath}
+        sidebarService={sidebarService}
+      />
+    );
   }
 
   return <TreeView sidebar={sidebar} currentSlug={currentSlug} onNavigate={onNavigate} />;

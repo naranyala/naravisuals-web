@@ -1,10 +1,10 @@
 import { clsx } from "clsx";
 import { useState } from "react";
 import { useUIState } from "../../core/store";
-import { filteredStats, wordStats } from "../../generated";
 import { formatSearchUrl } from "../../core/utils";
-import { SEARCH_ENGINES, SEARCH_CATEGORIES } from "../search/search-engines";
+import { filteredStats, wordStats } from "../../generated";
 import { Modal } from "../../shared/components/Modal";
+import { SEARCH_CATEGORIES, SEARCH_ENGINES } from "../search/search-engines";
 
 /**
  * Word Statistics Panel
@@ -36,15 +36,13 @@ export function WordStatsPanel() {
       isOpen={wordStatsOpen}
       onClose={closeModals}
       title={selectedWord ? `Search for "${selectedWord}"` : "Word Frequency Analysis"}
-      header={selectedWord ? (
-        <button
-          type="button"
-          className="btn-back"
-          onClick={() => setSelectedWord(null)}
-        >
-          ← Back to Stats
-        </button>
-      ) : undefined}
+      header={
+        selectedWord ? (
+          <button type="button" className="btn-back" onClick={() => setSelectedWord(null)}>
+            ← Back to Stats
+          </button>
+        ) : undefined
+      }
     >
       {!selectedWord ? (
         <>
@@ -132,4 +130,3 @@ export function WordStatsPanel() {
     </Modal>
   );
 }
-

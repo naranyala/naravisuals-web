@@ -1,8 +1,8 @@
-import Fuse from "fuse.js";
 import uFuzzy from "@leeoniya/ufuzzy";
 import * as M31Fuzzy from "@m31coding/fuzzy-search";
+import Fuse from "fuse.js";
 import fuzzysort from "fuzzysort";
-import { allDocs } from "@/generated";
+import { allDocs, type TocItem } from "@/generated";
 
 export interface SearchResult {
   item: any;
@@ -18,12 +18,12 @@ export class FuseSearchEngine implements SearchEngine {
   static readonly name = "Fuse.js";
   name = FuseSearchEngine.name;
   private fuse: Fuse<any>;
-// ... (rest of the class)
+  // ... (rest of the class)
 
   constructor() {
     const searchableDocs = allDocs.map((doc) => {
       const plainText = doc.content.replace(/<[^>]*>/g, " ");
-      const tocText = doc.toc?.map((t) => t.value).join(" ") || "";
+      const tocText = doc.toc?.map((t: TocItem) => t.value).join(" ") || "";
 
       return {
         ...doc,
@@ -65,23 +65,23 @@ export class UFuzzySearchEngine implements SearchEngine {
     this.ufuzzy = new uFuzzy();
     this.items = allDocs.map((doc) => {
       const plainText = doc.content.replace(/<[^>]*>/g, " ");
-      const tocText = doc.toc?.map((t) => t.value).join(" ") || "";
-      
+      const tocText = doc.toc?.map((t: TocItem) => t.value).join(" ") || "";
+
       return `${doc.title} ${doc.description || ""} ${doc.tags?.join(" ") || ""} ${tocText} ${plainText}`;
     });
   }
 
   search(query: string): SearchResult[] {
     const result = this.ufuzzy.search(this.items, query);
-    
+
     // result is [idxs, info, order] or [idxs, null, null] or [null, null, null]
     const idxs = result[0];
     if (!idxs) return [];
 
     // If it's a RankedResult, we should use the order
     const order = result[2];
-    const finalIdxs = order 
-      ? order.map(i => idxs[i]).filter((i): i is number => i !== undefined) 
+    const finalIdxs = order
+      ? order.map((i) => idxs[i]).filter((i): i is number => i !== undefined)
       : idxs;
 
     return finalIdxs.map((idx) => ({
@@ -102,14 +102,8 @@ export class M31FuzzySearchEngine implements SearchEngine {
       (doc: any) => doc.id,
       (doc: any) => {
         const plainText = doc.content.replace(/<[^>]*>/g, " ");
-        const tocText = doc.toc?.map((t: any) => t.value).join(" ") || "";
-        return [
-          doc.title,
-          doc.description || "",
-          ...(doc.tags || []),
-          tocText,
-          plainText
-        ];
+        const tocText = doc.toc?.map((t: TocItem) => t.value).join(" ") || "";
+        return [doc.title, doc.description || "", ...(doc.tags || []), tocText, plainText];
       }
     );
   }

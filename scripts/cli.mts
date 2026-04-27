@@ -22,8 +22,7 @@
 import { spawn } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import net from "node:net";
-import { join } from "node:path";
-import path from "node:path";
+import path, { join } from "node:path";
 import glob from "fast-glob";
 import { match, P } from "ts-pattern";
 

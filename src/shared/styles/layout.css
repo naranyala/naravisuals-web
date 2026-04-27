@@ -305,7 +305,6 @@
   min-width: 0;
 }
 
-
 .modal-title {
   font-size: 1.1rem;
   font-weight: 600;
@@ -370,8 +369,6 @@
     max-height: none;
   }
 }
-
-
 
 .site-wrapper {
   min-height: 100vh;
@@ -514,7 +511,9 @@
   padding-left: 0.6rem;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.2s ease-out, opacity 0.2s ease;
+  transition:
+    max-height 0.2s ease-out,
+    opacity 0.2s ease;
   opacity: 0;
 }
 

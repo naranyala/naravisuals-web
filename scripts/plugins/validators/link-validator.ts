@@ -66,10 +66,11 @@ export const linkValidator: MarkdownValidator = {
         if (href === undefined || text === undefined) continue;
 
         // Only validate internal links starting with /docs/, /blog/, ./docs/, or ../docs/
-        const isInternal = href.startsWith("/docs/") || 
-                           href.startsWith("/blog/") || 
-                           href.startsWith("./docs/") || 
-                           href.startsWith("../docs/");
+        const isInternal =
+          href.startsWith("/docs/") ||
+          href.startsWith("/blog/") ||
+          href.startsWith("./docs/") ||
+          href.startsWith("../docs/");
 
         if (!isInternal) continue;
 

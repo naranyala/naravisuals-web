@@ -6,10 +6,10 @@
  */
 
 import { TypeCompiler } from "@sinclair/typebox/compiler";
+import { Err, Ok, type Result } from "better-result";
+import type { SidebarCategoryItem, SidebarItem } from "@/generated";
 import { type AppConfig, AppConfigSchema } from "../shared/schemas";
 import { createEventBusService, type IEventBusService } from "./event-bus";
-import { Ok, Err, type Result } from "better-result";
-import type { SidebarItem, SidebarCategoryItem } from "@/generated";
 
 // ─── Service Interfaces ───────────────────────────────────────────────────
 
@@ -21,7 +21,10 @@ export interface ISidebarService {
   pushCategory(category: SidebarCategoryItem): void;
   popCategory(): void;
   setPath(path: readonly SidebarCategoryItem[]): void;
-  resolvePathForSlug(sidebar: readonly SidebarItem[], slug: string): Result<SidebarCategoryItem[], Error>;
+  resolvePathForSlug(
+    sidebar: readonly SidebarItem[],
+    slug: string
+  ): Result<SidebarCategoryItem[], Error>;
   onPathChange(callback: (path: readonly SidebarCategoryItem[]) => void): () => void;
 }
 

@@ -21,11 +21,7 @@ export function SettingsPanel({
   setCodeFontSize,
 }: SettingsPanelProps) {
   return (
-    <Modal 
-      isOpen={true} 
-      onClose={onClose} 
-      title="Settings"
-    >
+    <Modal isOpen={true} onClose={onClose} title="Settings">
       {/* Theme */}
       <div className="settings-section">
         <div className="settings-label">Theme</div>

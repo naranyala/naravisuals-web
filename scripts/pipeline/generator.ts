@@ -16,7 +16,7 @@ export function cleanGeneratedDir(container: CompilerContainer, dir: string) {
 
 export function generateSidebar(container: CompilerContainer, sidebar: SidebarItem[]) {
   const content = `// AUTO-GENERATED — DO NOT EDIT.
-import type { SidebarItem } from "./types.ts";
+import type { SidebarItem } from "./types";
 export const sidebarData: SidebarItem[] = ${JSON.stringify(sidebar, null, 2)};
 `;
   container.fs.write(path.join(container.config.outputDir, "sidebar.ts"), content);
@@ -30,7 +30,7 @@ export function generateDocFiles(
   for (const d of allDocs) {
     const filename = slugToFilename(d.id);
     const content = `// AUTO-GENERATED — DO NOT EDIT.
-import type { DocEntry } from "../types.ts";
+import type { DocEntry } from "../types";
 
 export const ${slugToVarName(d.id)}: DocEntry = ${JSON.stringify(d, null, 2)};
 `;
@@ -45,8 +45,8 @@ export function generateBarrelExports(
 ) {
   // 1. docs/index.ts
   const docsIndexContent = `// AUTO-GENERATED — DO NOT EDIT.
-import type { DocEntry } from "../types.ts";
-${allDocs.map((d) => `import { ${slugToVarName(d.id)} } from "./${slugToFilename(d.id)}.ts";`).join("\n")}
+import type { DocEntry } from "../types";
+${allDocs.map((d) => `import { ${slugToVarName(d.id)} } from "./${slugToFilename(d.id)}";`).join("\n")}
 
 export {
   ${allDocs.map((d) => slugToVarName(d.id)).join(",\n  ")},
@@ -60,12 +60,12 @@ export const allDocs: DocEntry[] = [
 
   // 2. index.ts
   const topIndexContent = `// AUTO-GENERATED — DO NOT EDIT.
-import "./clipboard.ts";
+import "./clipboard";
 
-export { sidebarData } from "./sidebar.ts";
-export { allDocs } from "./docs/index.ts";
-export { wordStats, filteredStats } from "./word-stats.ts";
-export type { DocEntry, SidebarItem, SidebarDocItem, SidebarCategoryItem } from "./types.ts";
+export { sidebarData } from "./sidebar";
+export { allDocs } from "./docs/index";
+export { wordStats, filteredStats } from "./word-stats";
+export type { DocEntry, TocItem, SidebarItem, SidebarDocItem, SidebarCategoryItem } from "./types";
 `;
   container.fs.write(path.join(container.config.outputDir, "index.ts"), topIndexContent);
 }

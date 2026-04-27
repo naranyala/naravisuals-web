@@ -202,41 +202,6 @@
   animation: modalFadeIn 0.25s ease-out;
 }
 
-.table-zoom-overlay .mermaid-fullscreen-header {
-  background: var(--bg-code);
-  border-bottom: 1px solid var(--border);
-}
-
-.table-zoom-overlay .mermaid-fullscreen-title {
-  color: var(--text);
-}
-
-.table-zoom-overlay .mermaid-fullscreen-close {
-  background: var(--ifm-color-primary);
-  color: white;
-}
-
-.table-zoom-content {
-  background: var(--bg-code) !important;
-}
-
-.table-zoom-viewport {
-  background: var(--bg-code) !important;
-}
-
-.table-zoom-overlay .mermaid-fullscreen-overlay {
-  background: rgba(0, 0, 0, 0.85);
-}
-
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 .mermaid-fullscreen-header {
   display: flex;
   align-items: center;
@@ -343,6 +308,32 @@
   width: auto;
   height: auto;
   display: block;
+}
+
+.table-zoom-overlay .mermaid-fullscreen-header {
+  background: var(--bg-code);
+  border-bottom: 1px solid var(--border);
+}
+
+.table-zoom-overlay .mermaid-fullscreen-title {
+  color: var(--text);
+}
+
+.table-zoom-overlay .mermaid-fullscreen-close {
+  background: var(--ifm-color-primary);
+  color: white;
+}
+
+.mermaid-fullscreen-overlay .table-zoom-content {
+  background: var(--bg-code);
+}
+
+.mermaid-fullscreen-overlay .table-zoom-viewport {
+  background: var(--bg-code);
+}
+
+.table-zoom-overlay .mermaid-fullscreen-overlay {
+  background: rgba(0, 0, 0, 0.85);
 }
 
 /* Error fallback */

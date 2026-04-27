@@ -141,9 +141,9 @@ export function useDocumentEnhancer(
               const mermaidEl = container.querySelector(".mermaid");
               const diagramHeight = mermaidEl ? (mermaidEl as HTMLElement).offsetHeight : 0;
               const elementPosition = sourceContainer.getBoundingClientRect().top;
-              
+
               // Scroll so that roughly half the diagram remains visible above the raw code
-              const offsetPosition = elementPosition + window.pageYOffset - (diagramHeight / 2);
+              const offsetPosition = elementPosition + window.pageYOffset - diagramHeight / 2;
 
               window.scrollTo({
                 top: offsetPosition,
@@ -351,7 +351,7 @@ export function useDocumentEnhancer(
           container.parentNode.insertBefore(wrapper, container);
           contentDiv.appendChild(container);
         }
-        
+
         container.dataset.enhanced = "true";
       }
     };
@@ -384,13 +384,13 @@ export function useDocumentEnhancer(
         clone.style.width = "max-content";
         clone.style.overflow = "visible";
         clone.style.margin = "0";
-        
+
         // Also ensure the table inside the clone is not forced to 100% width of a smaller container
         const table = clone.querySelector("table");
         if (table) {
           table.style.width = "max-content";
         }
-        
+
         targetContainer.appendChild(clone);
       }
 
@@ -414,26 +414,26 @@ export function useDocumentEnhancer(
       try {
         (btn as HTMLButtonElement).disabled = true;
         btn.innerHTML = `<div class="mermaid-spinner"></div>`;
-        
+
         // Create a temporary wrapper to ensure we capture the full table without cropping
         const tempWrapper = document.createElement("div");
         tempWrapper.style.position = "absolute";
         tempWrapper.style.left = "-9999px";
         tempWrapper.style.top = "0";
         tempWrapper.style.width = "auto";
-        
+
         const clone = container.cloneNode(true) as HTMLElement;
         clone.style.width = "max-content";
         clone.style.overflow = "visible";
-        
+
         const table = clone.querySelector("table");
         if (table) {
           table.style.width = "max-content";
         }
-        
+
         tempWrapper.appendChild(clone);
         document.body.appendChild(tempWrapper);
-        
+
         const { default: html2canvas } = await import("html2canvas");
         const canvas = await html2canvas(clone, {
           backgroundColor: "#ffffff",
@@ -441,21 +441,20 @@ export function useDocumentEnhancer(
           scale: 2,
           useCORS: true,
         });
-        
+
         document.body.removeChild(tempWrapper);
-        
+
         const link = document.createElement("a");
         link.href = canvas.toDataURL("image/png");
         link.download = `table-${Math.random().toString(36).slice(2, 9)}.png`;
         link.click();
-       } catch (e) {
-         console.error("Table download failed", e);
-       } finally {
-         (btn as HTMLButtonElement).disabled = false;
-         btn.innerHTML = originalContent;
-       }
-     };
-
+      } catch (e) {
+        console.error("Table download failed", e);
+      } finally {
+        (btn as HTMLButtonElement).disabled = false;
+        btn.innerHTML = originalContent;
+      }
+    };
 
     const renderMath = async () => {
       if (typeof window === "undefined" || !(window as any).MathJax) return;

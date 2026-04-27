@@ -2,9 +2,13 @@ import { clsx } from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useUIState } from "../../core/store";
 import { formatSearchUrl } from "../../core/utils";
-import { SEARCH_ENGINES } from "./search-engines";
-import { SEARCH_ENGINE_MAP, DEFAULT_SEARCH_ENGINE, SearchEngineType } from "./search-engines-impl";
 import { Modal } from "../../shared/components/Modal";
+import { SEARCH_ENGINES } from "./search-engines";
+import {
+  DEFAULT_SEARCH_ENGINE,
+  SEARCH_ENGINE_MAP,
+  type SearchEngineType,
+} from "./search-engines-impl";
 
 /**
  * Global Search Component (Command Palette style)
@@ -88,7 +92,7 @@ export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => voi
             onChange={(e) => setQuery(e.target.value)}
             className="search-input"
           />
-          <select 
+          <select
             className="search-engine-select"
             value={selectedEngine}
             onChange={(e) => setSelectedEngine(e.target.value as SearchEngineType)}
@@ -100,15 +104,14 @@ export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => voi
             ))}
           </select>
           {query.length > 0 && (
-            <div 
-              className="search-modal-action is-clear" 
+            <div
+              className="search-modal-action is-clear"
               onClick={() => setQuery("")}
               title="Clear search"
             >
               ✕
             </div>
           )}
-
         </div>
       }
       footer={
