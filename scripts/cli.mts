@@ -162,6 +162,13 @@ async function cmdBuild(options: any) {
       logger.success("Dist cleaned");
     }
 
+    // Step 1.5: Clean generated files to avoid stale artifacts (Crucial for CI consistency)
+    if (!options.skipClean) {
+      logger.step("Cleaning generated directory...");
+      await runCommand("rm", ["-rf", join(projectRoot, "src/generated")]);
+      logger.success("Generated files cleaned");
+    }
+
     // Step 2: Build docs
     logger.step("Building documentation...");
     await runCommand("bun", ["run", "scripts/build-docs.mts"]);

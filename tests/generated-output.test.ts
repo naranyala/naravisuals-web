@@ -26,17 +26,22 @@ describe("generated sidebarData", () => {
     }
   });
 
-  test("category items contain valid doc entries", () => {
+  test("category items contain valid sidebar items", () => {
     const categories = sidebarData.filter((i) => i.type === "category");
     expect(categories.length).toBeGreaterThan(0);
-    for (const cat of categories) {
-      for (const doc of cat.items) {
+    function validateRecursive(items: (typeof sidebarData)[0][]) {
+      for (const item of items) {
         expect(
-          Value.Check(SidebarItemSchema, doc),
-          `Category child failed validation: ${JSON.stringify(doc)}`
+          Value.Check(SidebarItemSchema, item),
+          `Item failed validation: ${JSON.stringify(item)}`
         ).toBe(true);
-        expect(doc.type).toBe("doc");
+        if (item.type === "category") {
+          validateRecursive(item.items);
+        }
       }
+    }
+    for (const cat of categories) {
+      validateRecursive(cat.items);
     }
   });
 
@@ -90,11 +95,11 @@ describe("sidebar-data and allDocs consistency", () => {
 
     function checkItem(item: (typeof sidebarData)[0]) {
       if (item.type === "doc") {
-        expect(docIds.has(item.id)).toBe(true);
+        expect(docIds.has(item.id), `Doc ID ${item.id} not found in allDocs`).toBe(true);
       }
       if (item.type === "category") {
         for (const child of item.items) {
-          expect(docIds.has(child.id)).toBe(true);
+          checkItem(child);
         }
       }
     }
@@ -136,5 +141,44 @@ describe("Content Integrity", () => {
         expect(match).toMatch(/id="[a-z0-9-]+"/);
       }
     }
+  });
+
+  test("TOC IDs match content IDs", () => {
+    for (const doc of allDocs) {
+      if (!doc.toc) continue;
+      for (const item of doc.toc) {
+        const idPattern = new RegExp(`id="${item.id}"`);
+        expect(idPattern.test(doc.content), `TOC ID ${item.id} not found in content of ${doc.id}`).toBe(true);
+      }
+    }
+  });
+
+  test("slugs are URL-safe", () => {
+    for (const doc of allDocs) {
+      expect(doc.slug).toMatch(/^[a-z0-9\/-]+$/);
+    }
+  });
+});
+
+describe("Sidebar Structural Integrity", () => {
+  test("categories are not empty", () => {
+    const categories = sidebarData.filter((i) => i.type === "category");
+    for (const cat of categories) {
+      expect(cat.items.length, `Category ${cat.label} is empty`).toBeGreaterThan(0);
+    }
+  });
+
+  test("no duplicate labels at same level", () => {
+    function checkDuplicates(items: (typeof sidebarData)[0][]) {
+      const labels = new Set();
+      for (const item of items) {
+        expect(labels.has(item.label), `Duplicate label ${item.label} found`).toBe(false);
+        labels.add(item.label);
+        if (item.type === "category") {
+          checkDuplicates(item.items);
+        }
+      }
+    }
+    checkDuplicates(sidebarData);
   });
 });
