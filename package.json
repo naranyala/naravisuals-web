@@ -16,6 +16,7 @@
     "test:watch": "bun run scripts/cli.mts test --watch",
     "test:coverage": "bun run scripts/cli.mts test --coverage",
     "type-check": "bunx tsc --noEmit",
+    "rspack": "rspack",
     "lint": "bun run scripts/cli.mts lint",
     "lint:fix": "bun run scripts/cli.mts lint:fix",
     "verify-ci": "bun run scripts/verify-ci.mts",

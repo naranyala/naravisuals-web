@@ -1,16 +1,11 @@
-/**
- * Entry point for the React app with Dependency Injection.
- *
- * This module initializes the React application with the dependency injection
- * container, error boundary, and root layout component.
- */
-
 import { setup } from "goober";
 import type { ReactElement, ReactNode } from "react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ErrorBoundary } from "./core/error-handling";
 import { StoreProvider } from "./core/store";
+import { MetadataProvider } from "./features/metadata/MetadataProvider";
+import { SearchProvider } from "./features/search/SearchProvider";
 import { MainLayout } from "./layout";
 import { defaultContainer, ServicesProvider } from "./services";
 import "./shared/styles/error-boundary.css";
@@ -52,7 +47,11 @@ root.render(
     <ErrorBoundary>
       <ServicesProvider container={defaultContainer}>
         <StoreProvider>
-          <MainLayout />
+          <MetadataProvider>
+            <SearchProvider>
+              <MainLayout />
+            </SearchProvider>
+          </MetadataProvider>
         </StoreProvider>
       </ServicesProvider>
     </ErrorBoundary>

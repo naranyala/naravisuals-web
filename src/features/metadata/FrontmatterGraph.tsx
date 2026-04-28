@@ -1,9 +1,9 @@
 import cytoscape from "cytoscape";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useUIState } from "../../core/store";
 import { allDocs } from "../../generated";
 import { Modal } from "../../shared/components/Modal";
 import { useDocsTheme } from "../theme";
+import { useMetadata } from "./MetadataProvider";
 
 /**
  * Frontmatter Network Graph Visuals
@@ -13,7 +13,7 @@ import { useDocsTheme } from "../theme";
  * Edges connect articles to their associated tags.
  */
 export function FrontmatterGraph() {
-  const { graphOpen, setGraphOpen } = useUIState();
+  const { graphOpen, setGraphOpen } = useMetadata();
   const { isDark } = useDocsTheme();
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<cytoscape.Core | null>(null);

@@ -7,10 +7,7 @@ interface UIState {
   sidebarVisible: boolean;
   tocVisible: boolean;
   settingsOpen: boolean;
-  astOpen: boolean;
-  searchOpen: boolean;
-  wordStatsOpen: boolean;
-  graphOpen: boolean;
+  menuOpen: boolean;
   viewMode: "view" | "ast" | "raw";
   isMobile: boolean;
   isTocMobile: boolean;
@@ -21,9 +18,7 @@ interface UIStoreActions {
   toggleToc: () => void;
   setSidebar: (visible: boolean) => void;
   setToc: (visible: boolean) => void;
-  setSearch: (open: boolean) => void;
-  setWordStatsOpen: (open: boolean) => void;
-  setGraphOpen: (open: boolean) => void;
+  setMenuOpen: (open: boolean) => void;
   setViewMode: (mode: "view" | "ast" | "raw") => void;
   updateResponsive: (width: number, mobileBreakpoint: number, tocBreakpoint: number) => void;
   setSettingsOpen: (open: boolean) => void;
@@ -54,10 +49,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     sidebarVisible: true,
     tocVisible: false,
     settingsOpen: false,
-    astOpen: false,
-    searchOpen: false,
-    wordStatsOpen: false,
-    graphOpen: false,
+    menuOpen: false,
     viewMode: "view",
     isMobile: false,
     isTocMobile: false,
@@ -86,16 +78,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setUiState((prev) => ({ ...prev, tocVisible: visible }));
   }, []);
 
-  const setSearch = useCallback((open: boolean) => {
-    setUiState((prev) => ({ ...prev, searchOpen: open }));
-  }, []);
-
-  const setWordStatsOpen = useCallback((open: boolean) => {
-    setUiState((prev) => ({ ...prev, wordStatsOpen: open }));
-  }, []);
-
-  const setGraphOpen = useCallback((open: boolean) => {
-    setUiState((prev) => ({ ...prev, graphOpen: open }));
+  const setMenuOpen = useCallback((open: boolean) => {
+    setUiState((prev) => ({ ...prev, menuOpen: open }));
   }, []);
 
   const setViewMode = useCallback((mode: "view" | "ast" | "raw") => {
@@ -126,60 +110,55 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setDocState((prev) => ({ ...prev, currentSlug: slug }));
   }, []);
 
-  const value = useMemo(
+  const ui = useMemo(
     () => ({
-      ui: {
-        ...uiState,
-        toggleSidebar,
-        toggleToc,
-        setSidebar,
-        setToc,
-        setSearch,
-        setWordStatsOpen,
-        setGraphOpen,
-        setViewMode,
-        updateResponsive,
-        setSettingsOpen,
-      },
-      doc: {
-        ...docState,
-        setDoc,
-        setSlug,
-      },
-    }),
-    [
-      uiState,
-      docState,
+      ...uiState,
       toggleSidebar,
       toggleToc,
       setSidebar,
       setToc,
-      setSearch,
+      setMenuOpen,
       setViewMode,
       updateResponsive,
       setSettingsOpen,
-      setDoc,
-      setSlug,
-      setWordStatsOpen,
-      setGraphOpen,
+    }),
+    [
+      uiState,
+      toggleSidebar,
+      toggleToc,
+      setSidebar,
+      setToc,
+      setMenuOpen,
+      setViewMode,
+      updateResponsive,
+      setSettingsOpen,
     ]
   );
 
-  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
-}
+  const doc = useMemo(
+    () => ({
+      ...docState,
+      setDoc,
+      setSlug,
+    }),
+    [docState, setDoc, setSlug]
+  );
 
-export function useStore() {
-  const context = useContext(StoreContext);
-  if (!context) {
-    throw new Error("useStore must be used within a StoreProvider");
-  }
-  return context;
+  return <StoreContext.Provider value={{ ui, doc }}>{children}</StoreContext.Provider>;
 }
 
 export function useUIState() {
-  return useStore().ui;
+  const context = useContext(StoreContext);
+  if (!context) {
+    throw new Error("useUIState must be used within a StoreProvider");
+  }
+  return context.ui;
 }
 
 export function useDocState() {
-  return useStore().doc;
+  const context = useContext(StoreContext);
+  if (!context) {
+    throw new Error("useDocState must be used within a StoreProvider");
+  }
+  return context.doc;
 }

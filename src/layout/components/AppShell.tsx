@@ -7,6 +7,7 @@ interface AppShellProps {
   topBar: React.ReactNode;
   search: React.ReactNode;
   settings: React.ReactNode;
+  menuOpen?: boolean;
 }
 
 /**
@@ -14,8 +15,8 @@ interface AppShellProps {
  *
  * Root structural primitive. Manages global overlays and top-level scroll.
  */
-export function AppShell({ children, topBar, search, settings }: AppShellProps) {
-  const { isMobile, sidebarVisible, setSidebar } = useUIState();
+export function AppShell({ children, topBar, search, settings, menuOpen }: AppShellProps) {
+  const { isMobile, sidebarVisible, setSidebar, setMenuOpen } = useUIState();
 
   return (
     <div className={clsx("site-wrapper", { "mobile-sidebar-open": isMobile && sidebarVisible })}>
@@ -26,6 +27,11 @@ export function AppShell({ children, topBar, search, settings }: AppShellProps) 
       {/* Mobile Sidebar Overlay */}
       {isMobile && sidebarVisible && (
         <div className="mobile-overlay" onClick={() => setSidebar(false)} />
+      )}
+
+      {/* Mobile Menu Overlay */}
+      {isMobile && menuOpen && (
+        <div className="mobile-overlay" onClick={() => setMenuOpen(false)} />
       )}
 
       {children}

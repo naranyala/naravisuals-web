@@ -4,9 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { match } from "ts-pattern";
 import { useUIState } from "../core/store";
 import { deslugify, stripTitlePrefix } from "../core/utils";
-
+import { useMetadata } from "../features/metadata/MetadataProvider";
 import { Sidebar, TableOfContents } from "../features/navigation";
 import { GlobalSearch } from "../features/search/GlobalSearch";
+import { useSearch } from "../features/search/SearchProvider";
 import { useSeo } from "../features/seo";
 import { useDocsTheme } from "../features/theme";
 import { allDocs, sidebarData } from "../generated";
@@ -21,6 +22,7 @@ import { ArticleFooter } from "../features/docs/ArticleFooter";
 import { FrontmatterGraph, WordStatsPanel } from "../features/metadata";
 import { DocEntrySchema } from "../shared/schemas";
 import { AppShell } from "./components/AppShell";
+import { MockupMenuPanel } from "./components/MockupMenuPanel";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { ThreeColumnLayout } from "./components/ThreeColumnLayout";
 import { TopBar } from "./components/TopBar";
@@ -35,7 +37,6 @@ export function MainLayout() {
   const docsTheme = useDocsTheme();
 
   const [mermaidLoading, setMermaidLoading] = useState(false);
-  const [isPrinting, setIsPrinting] = useState(false);
 
   useEffect(() => {
     return services.events.on("mermaid:loading", (loading) => {
@@ -76,18 +77,19 @@ export function MainLayout() {
     isTocMobile,
     tocVisible,
     settingsOpen,
-    wordStatsOpen,
+    menuOpen,
     viewMode,
     updateResponsive,
     toggleSidebar,
     toggleToc,
-    setSearch,
-    setWordStatsOpen,
     setSidebar,
     setToc,
     setViewMode,
     setSettingsOpen,
+    setMenuOpen,
   } = useUIState();
+  const { setSearch } = useSearch();
+  const { wordStatsOpen, setWordStatsOpen } = useMetadata();
 
   // ─── Responsive Handling ──────────────────────────────────────────
   useEffect(() => {
@@ -146,15 +148,6 @@ export function MainLayout() {
     },
     [navigate, isMobile, setSidebar, setToc]
   );
-
-  const handlePrint = async () => {
-    setIsPrinting(true);
-    try {
-      await printAllDocs(allDocs as any, services.config, services.dom);
-    } finally {
-      setIsPrinting(false);
-    }
-  };
 
   const sorted = getDocsInSidebarOrder();
   const idx = sorted.findIndex((d) => d.slug === currentSlug || d.id === currentSlug);
@@ -227,9 +220,7 @@ export function MainLayout() {
       topBar={
         <TopBar
           mermaidLoading={mermaidLoading}
-          isPrinting={isPrinting}
           onNavigate={handleNavigate}
-          onPrint={handlePrint}
           breadcrumbs={breadcrumbs}
         />
       }
@@ -248,6 +239,15 @@ export function MainLayout() {
         )
       }
     >
+      <MockupMenuPanel
+        isOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        onPrint={async () => {
+          await printAllDocs(allDocs as any, services.config, services.dom);
+        }}
+        onToggleSettings={() => setSettingsOpen(!settingsOpen)}
+        isTopDrawer={true}
+      />
       <WordStatsPanel />
       <FrontmatterGraph />
       <ThreeColumnLayout

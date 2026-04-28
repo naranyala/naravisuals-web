@@ -137,7 +137,7 @@ async function cmdDev(options: any) {
     logger.blank();
 
     // Pass port as CLI argument, not just env var
-    await runCommand("bunx", ["rspack", "serve", "--port", String(port)], {
+    await runCommand("bun", ["run", "rspack", "serve", "--port", String(port)], {
       env: { ...process.env, PROJECT_NAME: path.basename(projectRoot) },
     });
   } catch (error: any) {
@@ -195,9 +195,8 @@ async function cmdBuild(options: any) {
 
     // Step 4: Production build
     logger.step("Running rspack production build...");
-    await runCommand("bunx", ["rspack", "build"], {
+    await runCommand("bun", ["run", "rspack", "build"], {
       env: { NODE_ENV: "production" },
-      silent: true,
     });
     logger.success("Production bundle created");
 

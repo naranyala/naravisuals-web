@@ -10,32 +10,13 @@ interface BreadcrumbItem {
 
 interface TopBarProps {
   mermaidLoading: boolean;
-  isPrinting: boolean;
   onNavigate: (target: string) => void;
-  onPrint: () => void;
   breadcrumbs: BreadcrumbItem[];
 }
 
-export function TopBar({
-  mermaidLoading,
-  isPrinting,
-  onNavigate,
-  onPrint,
-  breadcrumbs,
-}: TopBarProps) {
+export function TopBar({ mermaidLoading, onNavigate, breadcrumbs }: TopBarProps) {
   const { config } = useServices();
-  const {
-    sidebarVisible,
-    settingsOpen,
-    searchOpen,
-    wordStatsOpen,
-    graphOpen,
-    toggleSidebar,
-    setSettingsOpen,
-    setSearch,
-    setWordStatsOpen,
-    setGraphOpen,
-  } = useUIState();
+  const { sidebarVisible, menuOpen, toggleSidebar, setMenuOpen } = useUIState();
 
   const [breadcrumbDropdownOpen, setBreadcrumbDropdownOpen] = useState(false);
 
@@ -52,10 +33,6 @@ export function TopBar({
     document.addEventListener("mousedown", handleOutsideClick);
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [breadcrumbDropdownOpen]);
-
-  const onToggleSettings = () => {
-    setSettingsOpen(!settingsOpen);
-  };
 
   const onToggleSidebar = () => {
     toggleSidebar();
@@ -142,53 +119,13 @@ export function TopBar({
         <div className="top-bar-right">
           <button
             type="button"
-            className={clsx("top-bar-btn top-bar-action-btn", { active: searchOpen })}
-            onClick={() => setSearch(true)}
-            aria-label="Search"
-            title="Search (Cmd+K)"
+            className={clsx("top-bar-btn context-menu-btn", { active: menuOpen })}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Context menu"
+            title="Context Menu"
           >
-            <span className="btn-icon">🔍</span>
-            <span className="btn-text hide-on-mobile">Search...</span>
-            <span className="btn-shortcut hide-on-mobile">⌘K</span>
-          </button>
-          <button
-            type="button"
-            className={clsx("top-bar-btn top-bar-action-btn", { active: settingsOpen })}
-            onClick={onToggleSettings}
-            aria-label="Toggle settings"
-            title="Settings"
-          >
-            <span className="btn-icon">🎨</span>
-          </button>
-          <button
-            type="button"
-            className={clsx("top-bar-btn top-bar-action-btn", { loading: isPrinting })}
-            onClick={onPrint}
-            disabled={isPrinting}
-            aria-label="Print all docs"
-            title="Open all docs in new tab for printing"
-          >
-            <span className="btn-icon">
-              {isPrinting ? <span className="mermaid-spinner" /> : "🖨️"}
-            </span>
-          </button>
-          <button
-            type="button"
-            className={clsx("top-bar-btn top-bar-action-btn", { active: graphOpen })}
-            onClick={() => setGraphOpen(!graphOpen)}
-            aria-label="Frontmatter graph"
-            title="Frontmatter Network Graph Visuals"
-          >
-            <span className="btn-icon">🕸️</span>
-          </button>
-          <button
-            type="button"
-            className={clsx("top-bar-btn top-bar-action-btn", { active: wordStatsOpen })}
-            onClick={() => setWordStatsOpen(!wordStatsOpen)}
-            aria-label="Word statistics"
-            title="Word Frequency Analysis"
-          >
-            <span className="btn-icon">📊</span>
+            <span className="btn-icon">☰</span>
+            <span className="btn-text">Context Menu</span>
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { clsx } from "clsx";
 import type React from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 interface ModalProps {
@@ -23,10 +24,21 @@ export function Modal({
   className,
   fullScreenOnMobile = true,
 }: ModalProps) {
-  if (!isOpen) return null;
+  const [isVisible, setIsVisible] = useState(isOpen);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true);
+    } else {
+      const timer = setTimeout(() => setIsVisible(false), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!isVisible) return null;
 
   return createPortal(
-    <div className="modal-overlay" onClick={onClose}>
+    <div className={clsx("modal-overlay", { visible: isOpen, hidden: !isOpen })} onClick={onClose}>
       <div
         className={clsx("modal-container", fullScreenOnMobile && "mobile-fullscreen", className)}
         onClick={(e) => e.stopPropagation()}

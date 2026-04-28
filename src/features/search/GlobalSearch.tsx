@@ -1,8 +1,8 @@
 import { clsx } from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useUIState } from "../../core/store";
 import { formatSearchUrl } from "../../core/utils";
 import { Modal } from "../../shared/components/Modal";
+import { useSearch } from "./SearchProvider";
 import { SEARCH_ENGINES } from "./search-engines";
 import {
   DEFAULT_SEARCH_ENGINE,
@@ -14,7 +14,7 @@ import {
  * Global Search Component (Command Palette style)
  */
 export function GlobalSearch({ onNavigate }: { onNavigate: (slug: string) => void }) {
-  const { searchOpen, setSearch } = useUIState();
+  const { searchOpen, setSearch } = useSearch();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);

@@ -1,10 +1,10 @@
 import { clsx } from "clsx";
 import { useState } from "react";
-import { useUIState } from "../../core/store";
 import { formatSearchUrl } from "../../core/utils";
 import { filteredStats, wordStats } from "../../generated";
 import { Modal } from "../../shared/components/Modal";
 import { SEARCH_CATEGORIES, SEARCH_ENGINES } from "../search/search-engines";
+import { useMetadata } from "./MetadataProvider";
 
 /**
  * Word Statistics Panel
@@ -13,7 +13,7 @@ import { SEARCH_CATEGORIES, SEARCH_ENGINES } from "../search/search-engines";
  * Clicking a word opens an external search gateway.
  */
 export function WordStatsPanel() {
-  const { wordStatsOpen, setWordStatsOpen } = useUIState();
+  const { wordStatsOpen, setWordStatsOpen } = useMetadata();
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [showFiltered, setShowFiltered] = useState(false);
 
