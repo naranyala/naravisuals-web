@@ -1,5 +1,4 @@
 import { clsx } from "clsx";
-import { useEffect, useState } from "react";
 import { useUIState } from "../../core/store";
 import { useServices } from "../../services";
 
@@ -16,23 +15,7 @@ interface TopBarProps {
 
 export function TopBar({ mermaidLoading, onNavigate, breadcrumbs }: TopBarProps) {
   const { config } = useServices();
-  const { sidebarVisible, menuOpen, toggleSidebar, setMenuOpen } = useUIState();
-
-  const [breadcrumbDropdownOpen, setBreadcrumbDropdownOpen] = useState(false);
-
-  useEffect(() => {
-    if (!breadcrumbDropdownOpen) return;
-
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest(".top-bar-breadcrumb-dropdown") && !target.closest(".top-bar-btn")) {
-        setBreadcrumbDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [breadcrumbDropdownOpen]);
+  const { isMobile, sidebarVisible, menuOpen, toggleSidebar, setMenuOpen } = useUIState();
 
   const onToggleSidebar = () => {
     toggleSidebar();
@@ -51,24 +34,23 @@ export function TopBar({ mermaidLoading, onNavigate, breadcrumbs }: TopBarProps)
   return (
     <div className="top-bar">
       <div className="top-bar-container">
-        <div className="top-bar-left">
-          <button
-            type="button"
-            className={clsx("top-bar-btn menu-btn show-on-mobile", { active: sidebarVisible })}
-            onClick={onToggleSidebar}
-            aria-label="Toggle sidebar"
-          >
-            <span className="btn-icon">☰</span>
-          </button>
-          <button
-            type="button"
-            className={clsx("top-bar-btn show-on-mobile", { active: breadcrumbDropdownOpen })}
-            onClick={() => setBreadcrumbDropdownOpen(!breadcrumbDropdownOpen)}
-            aria-label="Toggle breadcrumbs"
-          >
-            <span className="btn-icon">📂</span>
-          </button>
-          <div className={clsx("top-bar-breadcrumbs", { "hide-on-mobile": true })}>
+          <div className="top-bar-left">
+            {isMobile && (
+              <button
+                type="button"
+                className={clsx("top-bar-btn menu-btn", { active: sidebarVisible })}
+                onClick={onToggleSidebar}
+                aria-label="Toggle sidebar"
+              >
+                <span className="btn-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
+                    <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" />
+                  </svg>
+                </span>
+              </button>
+            )}
+            <div className="top-bar-breadcrumbs">
+
             {breadcrumbs.map((item, idx) => (
               <div
                 key={item.slug || item.label}
@@ -94,28 +76,6 @@ export function TopBar({ mermaidLoading, onNavigate, breadcrumbs }: TopBarProps)
             </span>
           )}
         </div>
-        {breadcrumbDropdownOpen && (
-          <div className="top-bar-breadcrumb-dropdown show-on-mobile">
-            <div className="top-bar-breadcrumb-dropdown-content">
-              {breadcrumbs.map((item, idx) => (
-                <a
-                  key={item.slug || item.label}
-                  href={idx === 0 ? "/" : `/${config.routes.docs}/${item.slug}`}
-                  className={clsx("top-bar-breadcrumb-dropdown-item", {
-                    current: idx === breadcrumbs.length - 1,
-                  })}
-                  onClick={(e) => {
-                    handleBreadcrumbClick(e, idx === 0 ? "/" : item.slug);
-                    setBreadcrumbDropdownOpen(false);
-                  }}
-                >
-                  {idx !== 0 && <span className="separator">›</span>}
-                  {item.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
         <div className="top-bar-right">
           <button
             type="button"
@@ -124,7 +84,13 @@ export function TopBar({ mermaidLoading, onNavigate, breadcrumbs }: TopBarProps)
             aria-label="Context menu"
             title="Context Menu"
           >
-            <span className="btn-icon">☰</span>
+            <span className="btn-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <circle cx="12" cy="5" r="2" />
+                <circle cx="12" cy="12" r="2" />
+                <circle cx="12" cy="19" r="2" />
+              </svg>
+            </span>
             <span className="btn-text">Context Menu</span>
           </button>
         </div>

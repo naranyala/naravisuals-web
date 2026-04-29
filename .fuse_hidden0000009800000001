@@ -3,4 +3,3 @@ node_modules
 dist
 src/generated
 scripts-rs/target
-src/sitemap.xml

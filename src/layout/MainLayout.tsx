@@ -74,6 +74,7 @@ export function MainLayout() {
   // We consume the reactive state for UI flags
   const {
     isMobile,
+    sidebarVisible,
     isTocMobile,
     tocVisible,
     settingsOpen,
@@ -104,6 +105,12 @@ export function MainLayout() {
     return services.dom.onResize(update);
   }, [services, updateResponsive]);
 
+  useEffect(() => {
+    if (!isMobile) {
+      setSidebar(true);
+    }
+  }, [isMobile, setSidebar]);
+
   // ─── Side Effects ──────────────────────────────────────────────────
   useTitle(currentDoc?.title || "", services.config.siteTitle);
 
@@ -119,7 +126,7 @@ export function MainLayout() {
     toc: currentDoc?.toc as any,
   });
 
-  useKeyboardShortcut(() => toggleSidebar(), { key: "b", meta: true });
+  useKeyboardShortcut(() => isMobile && toggleSidebar(), { key: "b", meta: true });
   useKeyboardShortcut(() => setSearch(true), { key: "k", meta: true });
   useKeyboardShortcut(() => setWordStatsOpen(!wordStatsOpen), { key: "g", meta: true });
 
@@ -251,12 +258,18 @@ export function MainLayout() {
       <WordStatsPanel />
       <FrontmatterGraph />
       <ThreeColumnLayout
+        sidebarCollapsed={!sidebarVisible}
         sidebar={
           <Sidebar
             sidebar={sidebarData}
             currentSlug={currentSlug}
             onNavigate={handleNavigate}
             isMobile={isMobile}
+            articlePosition={
+              idx >= 0
+                ? { current: idx + 1, total: sorted.length }
+                : undefined
+            }
           />
         }
         content={

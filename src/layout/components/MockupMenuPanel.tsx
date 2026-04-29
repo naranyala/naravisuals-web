@@ -1,4 +1,5 @@
 import { clsx } from "clsx";
+import { useEffect, useRef, useState } from "react";
 import { useMetadata } from "../../features/metadata/MetadataProvider";
 import { useSearch } from "../../features/search/SearchProvider";
 import { Modal } from "../../shared/components/Modal";
@@ -22,6 +23,20 @@ export function MockupMenuPanel({
 }: MockupMenuPanelProps) {
   const { setSearch } = useSearch();
   const { setGraphOpen, setWordStatsOpen } = useMetadata();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScroll, setCanScroll] = useState(false);
+
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollRef.current) {
+        const { scrollWidth, clientWidth } = scrollRef.current;
+        setCanScroll(scrollWidth > clientWidth);
+      }
+    };
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, [isOpen]);
 
   const menuItems = [
     { icon: "🔍", label: "Search", onClick: () => setSearch(true) },
@@ -34,38 +49,43 @@ export function MockupMenuPanel({
     { icon: "📝", label: "Edit", onClick: onClose },
     { icon: "🔗", label: "Copy Link", onClick: onClose },
     { icon: "🏷️", label: "Tags", onClick: onClose },
-    { icon: "👁️", label: "Preview", onClick: onClose },
-    { icon: "💾", label: "Save", onClick: onClose },
-    { icon: "📤", label: "Export", onClick: onClose },
-    { icon: "⚙️", label: "Config", onClick: onClose },
-    { icon: "👤", label: "Profile", onClick: onClose },
-    { icon: "❓", label: "Help", onClick: onClose },
-    { icon: "🏠", label: "Home", onClick: onClose },
-    { icon: "📚", label: "Docs", onClick: onClose },
   ];
 
   if (isTopDrawer) {
     return (
-      <div className={clsx("top-push-drawer-container", { open: isOpen })}>
-        <div className="top-push-drawer">
-          <div className="mockup-menu-grid top-drawer-grid">
-            {menuItems.map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                className="mockup-menu-item"
-                onClick={() => {
-                  item.onClick();
-                  onClose();
-                }}
-              >
-                <span className="menu-item-icon">{item.icon}</span>
-                <span className="menu-item-label">{item.label}</span>
-              </button>
-            ))}
+      <>
+        {isOpen && (
+          <div className="top-push-drawer-backdrop" onClick={onClose} />
+        )}
+        <div className={clsx("top-push-drawer-container", { open: isOpen })}>
+          <div className="top-push-drawer">
+            <div 
+              className={clsx("mockup-menu-grid top-drawer-grid", { scrollable: canScroll })} 
+              ref={scrollRef}
+            >
+              {menuItems.map((item, idx) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  className="mockup-menu-item"
+                  onClick={() => {
+                    item.onClick();
+                    onClose();
+                  }}
+                >
+                  <span className="menu-item-icon">{item.icon}</span>
+                  <span className="menu-item-label">{item.label}</span>
+                </button>
+              ))}
+              {canScroll && (
+                <div className="top-drawer-scroll-indicator">
+                  →
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 

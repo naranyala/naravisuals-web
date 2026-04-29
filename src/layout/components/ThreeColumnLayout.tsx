@@ -1,22 +1,18 @@
+import { clsx } from "clsx";
 import type React from "react";
 
 interface ThreeColumnLayoutProps {
   sidebar: React.ReactNode;
   content: React.ReactNode;
   reference: React.ReactNode;
+  sidebarCollapsed?: boolean;
 }
 
-/**
- * ThreeColumnLayout
- *
- * Primitive for the main documentation view.
- * Handles the responsive transition from 3-col to 1-col.
- */
-export function ThreeColumnLayout({ sidebar, content, reference }: ThreeColumnLayoutProps) {
+export function ThreeColumnLayout({ sidebar, content, reference, sidebarCollapsed = false }: ThreeColumnLayoutProps) {
   return (
     <div className="doc-page-layout">
       {/* Navigation Column */}
-      <nav className="sidebar">{sidebar}</nav>
+      <nav className={clsx("sidebar", { collapsed: sidebarCollapsed })}>{sidebar}</nav>
 
       {/* Main Content Column */}
       <main className="main-content">{content}</main>

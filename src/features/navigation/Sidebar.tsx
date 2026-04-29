@@ -8,6 +8,10 @@ interface SidebarProps {
   currentSlug: string;
   onNavigate: (slug: string) => void;
   isMobile?: boolean;
+  articlePosition?: {
+    current: number;
+    total: number;
+  };
 }
 
 function DocLink({
@@ -204,7 +208,13 @@ function TreeView({
   );
 }
 
-export function Sidebar({ sidebar, currentSlug, onNavigate, isMobile = false }: SidebarProps) {
+export function Sidebar({
+  sidebar,
+  currentSlug,
+  onNavigate,
+  isMobile = false,
+  articlePosition,
+}: SidebarProps) {
   const { sidebar: sidebarService } = useServices();
   const [path, setPath] = useState<readonly SidebarCategoryItem[]>(sidebarService.getCurrentPath());
 
@@ -221,25 +231,32 @@ export function Sidebar({ sidebar, currentSlug, onNavigate, isMobile = false }: 
       sidebarService.setPath(result.value);
       setPath(result.value);
     } else {
-      // If the slug is not found in the sidebar tree (e.g. "abstract" or a direct link),
-      // reset the sidebar path to root.
       sidebarService.setPath([]);
       setPath([]);
     }
   }, [currentSlug, sidebar, sidebarService]);
 
-  if (path.length > 0 || isMobile) {
-    return (
-      <FocusedView
-        sidebar={sidebar}
-        currentSlug={currentSlug}
-        onNavigate={onNavigate}
-        path={path}
-        setPath={setPath}
-        sidebarService={sidebarService}
-      />
-    );
-  }
-
-  return <TreeView sidebar={sidebar} currentSlug={currentSlug} onNavigate={onNavigate} />;
+  return (
+    <>
+      {path.length > 0 || isMobile ? (
+        <FocusedView
+          sidebar={sidebar}
+          currentSlug={currentSlug}
+          onNavigate={onNavigate}
+          path={path}
+          setPath={setPath}
+          sidebarService={sidebarService}
+        />
+      ) : (
+        <TreeView sidebar={sidebar} currentSlug={currentSlug} onNavigate={onNavigate} />
+      )}
+      {articlePosition && articlePosition.total > 0 && (
+        <div className="sidebar-article-nav">
+          <span className="sidebar-article-position">
+            {String(articlePosition.current).padStart(2, "0")} / {articlePosition.total}
+          </span>
+        </div>
+      )}
+    </>
+  );
 }

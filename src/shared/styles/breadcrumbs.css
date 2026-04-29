@@ -3,15 +3,73 @@
    ============================================ */
 
 .top-bar-breadcrumbs {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-secondary);
   min-width: 0;
   flex: 1;
   overflow: hidden;
+  padding: 0 0.25rem;
+}
+
+.top-bar-breadcrumb-separator {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.top-bar-breadcrumb-separator > span {
+  flex-shrink: 0;
+  margin: 0 0.5rem;
+  opacity: 0.4;
+  font-weight: 300;
+  font-size: 0.8rem;
+}
+
+.top-bar-breadcrumb-item {
+  background: none;
+  border: none;
+  padding: 0.25rem 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: color 0.15s;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 120px;
+}
+
+.top-bar-breadcrumb-item:hover {
+  color: var(--text);
+}
+
+.top-bar-breadcrumb-item.current {
+  color: var(--text);
+  font-weight: 500;
+  cursor: default;
+  pointer-events: none;
+}
+
+.top-bar-breadcrumb-separator {
+  display: inline-flex;
+  align-items: center;
+}
+
+.top-bar-breadcrumb-separator span {
+  margin: 0 0.15rem;
+  opacity: 0.5;
+  font-weight: 300;
+}
+
+.top-bar-breadcrumb-separator:not(.first) {
+  margin-left: 0.1rem;
 }
 
 .breadcrumb-ellipsis {

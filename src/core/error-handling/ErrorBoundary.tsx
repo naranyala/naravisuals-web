@@ -38,10 +38,15 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
     this.setState({ error, info });
-    // Log to console in development
     if (process.env.NODE_ENV !== "production") {
       console.error("[ErrorBoundary] Caught error:", error);
       console.error("[ErrorBoundary] Component stack:", info.componentStack);
+    }
+  }
+
+  override componentDidUpdate(prevProps: ErrorBoundaryProps, prevState: ErrorBoundaryState): void {
+    if (this.state.hasError && !prevState.hasError) {
+      document.title = "Error | " + document.title;
     }
   }
 
@@ -78,17 +83,28 @@ function DefaultErrorFallback({
   error,
   onReset,
 }: DefaultErrorFallbackProps & { onReset: () => void }) {
-  console.error("Error caught by boundary:", error.message);
+  const stackLines = error.stack?.split("\n").slice(1, 6) ?? [];
+  
   return (
     <div className="error-fallback">
       <div className="error-fallback-content">
-        <div className="error-icon">⚠️</div>
-        <h2>Application Error</h2>
+        <div className="error-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 9v4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <h2>Something went wrong</h2>
         <p className="error-message">{error.message}</p>
-        {error.stack && (
+        {stackLines.length > 0 && (
           <details className="error-details">
             <summary>Stack Trace</summary>
-            <pre>{error.stack}</pre>
+            <pre className="error-stack">
+              {stackLines.map((line, idx) => (
+                <div key={idx} className="stack-line">
+                  <span className="stack-frame">{line.trim()}</span>
+                </div>
+              ))}
+            </pre>
           </details>
         )}
         <div className="error-actions">
@@ -96,7 +112,7 @@ function DefaultErrorFallback({
             Reload Page
           </button>
           <button type="button" className="btn-secondary" onClick={onReset}>
-            Try to recover
+            Try Again
           </button>
         </div>
       </div>

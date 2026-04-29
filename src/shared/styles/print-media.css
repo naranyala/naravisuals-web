@@ -4,32 +4,7 @@
    ============================================ */
 
 @media print {
-  /* 1. Reset Global Styles for Paper */
-  @page {
-    margin: 2cm 1.5cm;
-    size: auto;
-  }
-
-  html,
-  body {
-    background: #ffffff;
-    color: #1a1a1a;
-    font-family: "Source Serif 4", "Georgia", "Times New Roman", serif;
-    font-size: 11pt;
-    line-height: 1.5;
-    width: 100%;
-    height: auto;
-    margin: 0;
-    padding: 0;
-  }
-
-  /* 2. Hide ALL digital UI elements */
-  .top-bar,
-  .sidebar,
-  .toc-container,
-  .scroll-panel,
-  .breadcrumbs,
-  .doc-footer,
+  .top-bar-btn,
   .scroll-to-top-btn,
   .print-btn,
   .font-switcher,

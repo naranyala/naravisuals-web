@@ -32,6 +32,12 @@
   cursor: pointer;
   border: none;
 }
+
+[role="button"],
+.clickable,
+[data-clickable] {
+  cursor: pointer;
+}
 .btn-primary {
   background: var(--ifm-color-primary);
   color: #fff;
