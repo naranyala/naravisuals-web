@@ -2,6 +2,14 @@
    DOC CONTENT
    ============================================ */
 
+.doc-content img,
+.doc-content video,
+.doc-content iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 .doc-content {
   line-height: 1.6;
 }

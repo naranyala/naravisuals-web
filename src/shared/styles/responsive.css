@@ -50,8 +50,9 @@
   .doc-page-layout {
     display: flex;
     flex-direction: column;
+    align-items: center;
     height: auto;
-    overflow: visible;
+    overflow-x: hidden;
   }
   .sidebar {
     position: fixed;
@@ -78,7 +79,10 @@
   .main-content {
     padding: 2rem 1.25rem;
     padding-top: calc(2rem + var(--topbar-height));
+    margin-left: auto;
+    margin-right: auto;
     width: 100%;
+    max-width: 800px;
     min-width: 0;
   }
   .top-bar-container {
