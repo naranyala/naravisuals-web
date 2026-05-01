@@ -238,7 +238,7 @@ const nextDoc = idx < sorted.length - 1 ? sorted[idx + 1] : null;
 
 ## DocViewer.tsx -- Document Renderer
 
-`/media/naranyala/Data/projects-remote/deepdive-tts-sst-playground/src/DocViewer.tsx` renders the HTML content produced by the [Markdown Engine](/docs/architecture/markdown-engine) and then asynchronously enhances it with Mermaid diagrams and MathJax math.
+`src/DocViewer.tsx` renders the HTML content produced by the [Markdown Engine](/docs/02-architecture/04-markdown-engine) and then asynchronously enhances it with Mermaid diagrams and MathJax math.
 
 ### Rendering Pipeline
 
@@ -633,6 +633,6 @@ Preferences are persisted to `localStorage` and applied as CSS custom properties
 
 ## Cross-References
 
-- [Build Pipeline](/docs/architecture/build-pipeline) -- how markdown becomes the `allDocs` array consumed by `App.tsx`
-- [Dependency Injection](/docs/architecture/dependency-injection) -- the 5 services (`IStorageService`, `IRouterService`, `IDomService`, `IThemeService`, `IAppConfig`) injected into every component
-- [Markdown Engine](/docs/architecture/markdown-engine) -- how `marked`, Shiki, and plugins produce the HTML that `DocViewer` renders
+- [Build Pipeline](/docs/02-architecture/01-build-pipeline) -- how markdown becomes the `allDocs` array consumed by `App.tsx`
+- [Dependency Injection](/docs/02-architecture/02-dependency-injection) -- the 5 services (`IStorageService`, `IRouterService`, `IDomService`, `IThemeService`, `IAppConfig`) injected into every component
+- [Markdown Engine](/docs/02-architecture/04-markdown-engine) -- how `marked`, Shiki, and plugins produce the HTML that `DocViewer` renders

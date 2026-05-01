@@ -114,7 +114,8 @@ export function useDocumentEnhancer(
 
     const attachMermaidActions = (container: HTMLElement, id: string, source: string) => {
       const zoomBtn = container.querySelector(".mermaid-zoom-btn");
-      const downloadBtn = container.querySelector(".mermaid-download-btn");
+      const downloadSvgBtn = container.querySelector(".mermaid-download-svg-btn");
+      const downloadJpgBtn = container.querySelector(".mermaid-download-jpg-btn");
       const codeBtn = container.querySelector(".mermaid-code-btn");
       const sourceContainer = container.querySelector<HTMLElement>(".mermaid-source-container");
       const copyBtn = container.querySelector(".mermaid-source-copy-btn");
@@ -122,13 +123,27 @@ export function useDocumentEnhancer(
       zoomBtn?.addEventListener("click", () => {
         const diagramEl = container.querySelector(".mermaid");
         const svgEl = diagramEl?.querySelector("svg");
-        if (svgEl) handleZoom(svgEl.outerHTML);
+        if (svgEl) {
+          handleZoom(svgEl.outerHTML);
+          container.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
       });
 
-      downloadBtn?.addEventListener("click", () => {
+      downloadSvgBtn?.addEventListener("click", () => {
         const diagramEl = container.querySelector(".mermaid");
         const svgEl = diagramEl?.querySelector("svg");
-        if (svgEl instanceof SVGSVGElement) handleDownload(svgEl, `diagram-${id}`);
+        if (svgEl instanceof SVGSVGElement) {
+          handleDownload(svgEl, `diagram-${id}`, "svg");
+          container.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      });
+
+      downloadJpgBtn?.addEventListener("click", () => {
+        const diagramEl = container.querySelector(".mermaid");
+        if (diagramEl) {
+          handleDownload(diagramEl as HTMLElement, `diagram-${id}`, "jpg");
+          container.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
       });
 
       codeBtn?.addEventListener("click", () => {
@@ -166,17 +181,35 @@ export function useDocumentEnhancer(
       });
     };
 
-    const handleDownload = (svgEl: SVGSVGElement, filename: string) => {
-      const svgData = new XMLSerializer().serializeToString(svgEl);
-      const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-      const svgUrl = URL.createObjectURL(svgBlob);
-      const downloadLink = document.createElement("a");
-      downloadLink.href = svgUrl;
-      downloadLink.download = `${filename}.svg`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-      URL.revokeObjectURL(svgUrl);
+    const handleDownload = async (
+      target: SVGSVGElement | HTMLElement,
+      filename: string,
+      format: "svg" | "jpg"
+    ) => {
+      if (format === "svg") {
+        const svgEl = target as SVGSVGElement;
+        const svgData = new XMLSerializer().serializeToString(svgEl);
+        const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+        const svgUrl = URL.createObjectURL(svgBlob);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = svgUrl;
+        downloadLink.download = `${filename}.svg`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(svgUrl);
+      } else {
+        const { default: html2canvas } = await import("html2canvas");
+        const canvas = await html2canvas(target as HTMLElement, {
+          backgroundColor: "#ffffff",
+          scale: 2,
+          useCORS: true,
+        });
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/jpeg", 0.9);
+        link.download = `${filename}.jpg`;
+        link.click();
+      }
     };
 
     const handleZoom = (svgHtml: string) => {

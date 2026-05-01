@@ -44,9 +44,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
   }
 
-  override componentDidUpdate(prevProps: ErrorBoundaryProps, prevState: ErrorBoundaryState): void {
+  override componentDidUpdate(_prevProps: ErrorBoundaryProps, prevState: ErrorBoundaryState): void {
     if (this.state.hasError && !prevState.hasError) {
-      document.title = "Error | " + document.title;
+      document.title = `Error | ${document.title}`;
     }
   }
 
@@ -84,13 +84,24 @@ function DefaultErrorFallback({
   onReset,
 }: DefaultErrorFallbackProps & { onReset: () => void }) {
   const stackLines = error.stack?.split("\n").slice(1, 6) ?? [];
-  
+
   return (
     <div className="error-fallback">
       <div className="error-fallback-content">
         <div className="error-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 9v4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            aria-label="Error icon"
+          >
+            <title>Error icon</title>
+            <path
+              d="M12 9v4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </div>
         <h2>Something went wrong</h2>
@@ -99,8 +110,8 @@ function DefaultErrorFallback({
           <details className="error-details">
             <summary>Stack Trace</summary>
             <pre className="error-stack">
-              {stackLines.map((line, idx) => (
-                <div key={idx} className="stack-line">
+              {stackLines.map((line) => (
+                <div key={line} className="stack-line">
                   <span className="stack-frame">{line.trim()}</span>
                 </div>
               ))}

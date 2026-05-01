@@ -36,7 +36,7 @@ export function MockupMenuPanel({
     checkScroll();
     window.addEventListener("resize", checkScroll);
     return () => window.removeEventListener("resize", checkScroll);
-  }, [isOpen]);
+  }, []);
 
   const menuItems = [
     { icon: "🔍", label: "Search", onClick: () => setSearch(true) },
@@ -54,16 +54,14 @@ export function MockupMenuPanel({
   if (isTopDrawer) {
     return (
       <>
-        {isOpen && (
-          <div className="top-push-drawer-backdrop" onClick={onClose} />
-        )}
+        {isOpen && <div className="top-push-drawer-backdrop" onClick={onClose} />}
         <div className={clsx("top-push-drawer-container", { open: isOpen })}>
           <div className="top-push-drawer">
-            <div 
-              className={clsx("mockup-menu-grid top-drawer-grid", { scrollable: canScroll })} 
+            <div
+              className={clsx("mockup-menu-grid top-drawer-grid", { scrollable: canScroll })}
               ref={scrollRef}
             >
-              {menuItems.map((item, idx) => (
+              {menuItems.map((item, _idx) => (
                 <button
                   key={item.label}
                   type="button"
@@ -77,11 +75,7 @@ export function MockupMenuPanel({
                   <span className="menu-item-label">{item.label}</span>
                 </button>
               ))}
-              {canScroll && (
-                <div className="top-drawer-scroll-indicator">
-                  →
-                </div>
-              )}
+              {canScroll && <div className="top-drawer-scroll-indicator">→</div>}
             </div>
           </div>
         </div>

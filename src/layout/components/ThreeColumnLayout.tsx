@@ -8,7 +8,12 @@ interface ThreeColumnLayoutProps {
   sidebarCollapsed?: boolean;
 }
 
-export function ThreeColumnLayout({ sidebar, content, reference, sidebarCollapsed = false }: ThreeColumnLayoutProps) {
+export function ThreeColumnLayout({
+  sidebar,
+  content,
+  reference,
+  sidebarCollapsed = false,
+}: ThreeColumnLayoutProps) {
   return (
     <div className="doc-page-layout">
       {/* Navigation Column */}

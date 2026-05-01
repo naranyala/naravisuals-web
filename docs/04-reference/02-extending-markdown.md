@@ -75,5 +75,5 @@ export const strictLanguageMiddleware: CompilerMiddleware = {
 | **Timelines** | ` ```timeline ` | `onPostProcess` (Technical wrapper) |
 
 ## Related
-- [Markdown Engine](/docs/architecture/markdown-engine) — Details on the stateful renderer.
-- [Writing Plugins](/docs/guides/writing-plugins) — Tutorial on creating custom middleware.
+- [Markdown Engine](/docs/02-architecture/04-markdown-engine) — Details on the stateful renderer.
+- [Writing Plugins](/docs/03-guides/06-writing-plugins) — Tutorial on creating custom middleware.

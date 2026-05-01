@@ -60,6 +60,6 @@ mindmap
 
 ## Next Steps
 
-- **[Installation](./installation)**: Get up and running in minutes.
-- **[Build Pipeline](../architecture/build-pipeline)**: Understand the transformation process.
-- **[CLI Reference](../guides/cli-reference)**: Learn about the `docts` command.
+- **[Installation](./02-installation)**: Get up and running in minutes.
+- **[Build Pipeline](../architecture/01-build-pipeline)**: Understand the transformation process.
+- **[CLI Reference](../guides/01-cli-reference)**: Learn about the `docts` command.

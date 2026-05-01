@@ -128,12 +128,12 @@ export const mermaidPlugin: MarkdownPlugin = {
         </button>`
         : "";
 
-      const downloadBtnHtml = `      <button class="mermaid-download-btn" title="Download SVG" aria-label="Download diagram SVG">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
+      const downloadSvgBtnHtml = `      <button class="mermaid-download-svg-btn" title="Download SVG" aria-label="Download diagram SVG">
+        <span>SVG</span>
+      </button>`;
+
+      const downloadJpgBtnHtml = `      <button class="mermaid-download-jpg-btn" title="Download JPG" aria-label="Download diagram JPG">
+        <span>JPG</span>
       </button>`;
 
       const codeBtnHtml = `      <button class="mermaid-code-btn" title="Show/Hide Mermaid Source" aria-label="Toggle diagram source code">
@@ -161,26 +161,27 @@ export const mermaidPlugin: MarkdownPlugin = {
 
       // Always generate the same structure, let the frontend handle the rendering attempt
       mermaidContainer.innerHTML = `
-        <div class="mermaid-diagram-header">
-          <span class="mermaid-diagram-label">Diagram</span>
-          <div class="mermaid-diagram-actions">
-            ${zoomBtnHtml}
-            ${downloadBtnHtml}
-            ${codeBtnHtml}
-            <span class="mermaid-loading"><span class="mermaid-spinner"></span></span>
-          </div>
-        </div>
-        <div class="mermaid" style="visibility:hidden;">${escapeHtml(diagram)}</div>
-        ${desc ? `<div class="mermaid-diagram-desc">${escapeHtml(desc)}</div>` : ""}
-        <div class="mermaid-source-container" style="display:none;">
-          <div class="mermaid-source-header">
-            <span>Mermaid Notation</span>
-            <button class="mermaid-source-copy-btn">Copy</button>
-          </div>
-          <pre class="mermaid-source-code"><code>${escapeHtml(diagram)}</code></pre>
-        </div>
-        <div class="mermaid-error" style="${validationErrorHtml ? "display:block;" : "display:none;"}">${validationErrorHtml}</div>
-      `;
+         <div class="mermaid-diagram-header">
+           <span class="mermaid-diagram-label">Diagram</span>
+           <div class="mermaid-diagram-actions">
+             ${zoomBtnHtml}
+             ${downloadSvgBtnHtml}
+             ${downloadJpgBtnHtml}
+             ${codeBtnHtml}
+             <span class="mermaid-loading"><span class="mermaid-spinner"></span></span>
+           </div>
+         </div>
+         <div class="mermaid" style="visibility:hidden;">${escapeHtml(diagram)}</div>
+         ${desc ? `<div class="mermaid-diagram-desc">${escapeHtml(desc)}</div>` : ""}
+         <div class="mermaid-source-container" style="display:none;">
+           <div class="mermaid-source-header">
+             <span>Mermaid Notation</span>
+             <button class="mermaid-source-copy-btn">Copy</button>
+           </div>
+           <pre class="mermaid-source-code"><code>${escapeHtml(diagram)}</code></pre>
+         </div>
+         <div class="mermaid-error" style="${validationErrorHtml ? "display:block;" : "display:none;"}">${validationErrorHtml}</div>
+       `;
 
       const mermaidDiv = mermaidContainer.querySelector(".mermaid");
       if (mermaidDiv) {

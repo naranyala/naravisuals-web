@@ -79,7 +79,8 @@
 }
 
 .mermaid-zoom-btn,
-.mermaid-download-btn,
+.mermaid-download-svg-btn,
+.mermaid-download-jpg-btn,
 .mermaid-code-btn {
   display: flex;
   align-items: center;

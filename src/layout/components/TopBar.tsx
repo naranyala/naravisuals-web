@@ -34,23 +34,30 @@ export function TopBar({ mermaidLoading, onNavigate, breadcrumbs }: TopBarProps)
   return (
     <div className="top-bar">
       <div className="top-bar-container">
-          <div className="top-bar-left">
-            {isMobile && (
-              <button
-                type="button"
-                className={clsx("top-bar-btn menu-btn", { active: sidebarVisible })}
-                onClick={onToggleSidebar}
-                aria-label="Toggle sidebar"
-              >
-                <span className="btn-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-                    <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" />
-                  </svg>
-                </span>
-              </button>
-            )}
-            <div className="top-bar-breadcrumbs">
-
+        <div className="top-bar-left">
+          {isMobile && (
+            <button
+              type="button"
+              className={clsx("top-bar-btn menu-btn", { active: sidebarVisible })}
+              onClick={onToggleSidebar}
+              aria-label="Toggle sidebar"
+            >
+              <span className="btn-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  width="18"
+                  height="18"
+                  aria-label="Menu"
+                >
+                  <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" />
+                </svg>
+              </span>
+            </button>
+          )}
+          <div className="top-bar-breadcrumbs">
             {breadcrumbs.map((item, idx) => (
               <div
                 key={item.slug || item.label}
@@ -85,7 +92,13 @@ export function TopBar({ mermaidLoading, onNavigate, breadcrumbs }: TopBarProps)
             title="Context Menu"
           >
             <span className="btn-icon">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                width="18"
+                height="18"
+                aria-label="Context Menu"
+              >
                 <circle cx="12" cy="5" r="2" />
                 <circle cx="12" cy="12" r="2" />
                 <circle cx="12" cy="19" r="2" />

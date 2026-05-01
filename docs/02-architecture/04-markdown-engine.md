@@ -68,5 +68,5 @@ s*-   **Mixing Violations**: Prevents illegal mixing of diagram types (e.g., sub
 3.  **Strict Typing**: Every document is a strictly-typed `CompilationUnit`, making the build system predictable and easy to debug.
 
 ## Related
-- [Build Pipeline](/docs/architecture/build-pipeline) — How the compiler orchestrates these stages.
-- [Writing Plugins](/docs/guides/writing-plugins) — Guide to creating your own middlewares.
+- [Build Pipeline](/docs/02-architecture/01-build-pipeline) — How the compiler orchestrates these stages.
+- [Writing Plugins](/docs/03-guides/06-writing-plugins) — Guide to creating your own middlewares.

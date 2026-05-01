@@ -265,11 +265,7 @@ export function MainLayout() {
             currentSlug={currentSlug}
             onNavigate={handleNavigate}
             isMobile={isMobile}
-            articlePosition={
-              idx >= 0
-                ? { current: idx + 1, total: sorted.length }
-                : undefined
-            }
+            articlePosition={idx >= 0 ? { current: idx + 1, total: sorted.length } : undefined}
           />
         }
         content={

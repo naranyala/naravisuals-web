@@ -282,6 +282,6 @@ bun run dev           # Preview in browser
 
 ## Related
 
-- [CLI Reference](/docs/guides/cli-reference) -- `docts build` runs the plugin pipeline
-- [Validation System](/docs/guides/validation-system) -- validators vs plugins
-- [CSS & Theme Architecture](/docs/guides/css-theme-architecture) -- styling plugin output
+- [CLI Reference](/docs/03-guides/01-cli-reference) -- `docts build` runs the plugin pipeline
+- [Validation System](/docs/03-guides/05-validation-system) -- validators vs plugins
+- [CSS & Theme Architecture](/docs/03-guides/02-css-theme-architecture) -- styling plugin output

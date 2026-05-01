@@ -14,7 +14,7 @@ The `docts` CLI is the unified command-line interface for the SSG Documentation 
 docts <command> [options]
 ```
 
-The CLI is defined in [scripts/cli.mts](/docs/guides/cli-reference) and is registered as the package binary in `package.json`.
+The CLI is defined in [scripts/cli.mts](./scripts/cli.mts) and is registered as the package binary in `package.json`.
 
 ## Command Overview
 
@@ -282,6 +282,6 @@ sequenceDiagram
 
 ## Related
 
-- [Validation System](/docs/guides/validation-system) -- the `--strict` and `--skip-validation` flags control content validation
-- [Writing Plugins](/docs/guides/writing-plugins) -- the build pipeline applies markdown plugins
-- [Testing Strategy](/docs/guides/testing-strategy) -- the `test` command runs the test suite
+- [Validation System](/docs/03-guides/05-validation-system) -- the `--strict` and `--skip-validation` flags control content validation
+- [Writing Plugins](/docs/03-guides/06-writing-plugins) -- the build pipeline applies markdown plugins
+- [Testing Strategy](/docs/03-guides/08-testing-strategy) -- the `test` command runs the test suite

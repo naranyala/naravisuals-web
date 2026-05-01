@@ -9,6 +9,7 @@ interface DocFooterProps {
 export function DocFooter({ prevDoc, nextDoc, onNavigate }: DocFooterProps) {
   const handleNavigate = (slug: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
     if (onNavigate) {
       onNavigate(slug);
     } else {
