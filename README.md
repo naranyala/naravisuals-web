@@ -128,3 +128,32 @@ docts build --rust
 
 ## 📜 License
 MIT © [Naranyala](https://github.com/naranyala)
+
+---
+
+## 🧐 Architectural Opinion & Critique
+
+### The Good
+- **Type-Safe Content**: The decision to generate a TypeScript "database" for documentation is brilliant. It brings the rigor of software engineering (type checking, IDE autocompletion) to content creation.
+- **Frontend Decoupling**: The use of a Dependency Injection container for browser services is a masterclass in clean architecture, ensuring the UI is testable and agnostic of the environment.
+- **Build-Time Rigor**: Moving validation (links, frontmatter, Mermaid syntax) to the build step prevents the "runtime surprise" common in many SSGs.
+
+### The Critique
+- **The "Double Engine" Burden**: Maintaining separate TS and Rust engines for the same logic is a significant maintenance overhead. Every new feature or bug fix must be implemented and tested twice.
+- **Scale Bottleneck**: While generating TS files is great for small-to-medium sets, a massive documentation site (thousands of files) may lead to extremely large generated files, potentially slowing down the TS compiler and the IDE's language server.
+- **Tight Coupling to Generated Structure**: The frontend is heavily dependent on the exact shape of the generated files. Any breaking change in the generator requires an immediate synchronized update in the frontend.
+
+---
+
+## 🗺️ Future Roadmap & Suggestions
+
+### ⚡ Performance & Scalability
+- **Code Splitting**: Implement dynamic imports for the generated documentation. Instead of one large `allDocs` array, load documents on demand to keep the initial bundle size small.
+- **Incremental Builds**: Optimize the compiler to only re-process modified files and their dependencies, reducing build times for large sites.
+- **Unified Engine (WASM)**: Replace the dual-engine approach by compiling the Rust engine to WASM and running it within the Bun environment. This provides Rust speed with TS flexibility.
+
+### 🛠️ Developer Experience
+- **Plugin Registry**: Transform the middleware pipeline into a formal plugin system where users can load third-party extensions via a configuration file.
+- **Live Preview Server**: Implement a WebSocket-based live preview that renders Markdown changes in the browser instantly without a full rebuild.
+- **Visual Schema Editor**: Create a small tool to visually edit the TypeBox schemas that define document metadata.
+
