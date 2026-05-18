@@ -1,4 +1,0 @@
-# robots.txt
-User-agent: *
-Allow: /
-Sitemap: https://your-docs-site.com/sitemap.xml
