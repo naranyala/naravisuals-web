@@ -1,4 +1,8 @@
-pub struct DocEntry { pub path: &'static str, pub title: &'static str, pub content: &'static str }
+pub struct DocEntry {
+    pub path: &'static str,
+    pub title: &'static str,
+    pub content: &'static str,
+}
 
 pub const DOCS: &[DocEntry] = &[
     DocEntry { path: "00-introduction/00-overview", title: "Overview of Tauri and Leptos", content: include_str!("../docs/00-introduction/00-overview.md") },

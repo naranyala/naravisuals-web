@@ -40,13 +40,13 @@ pub const SIDEBAR_CSS: &str = r#"
     opacity: 0.8;
 }
 
-.search-trigger {
+.tools-btn {
     background: transparent;
     border: 1px solid var(--border-color);
     color: var(--text-color);
-    padding: 0.25rem 0.5rem;
+    padding: 0.5rem 1rem;
     border-radius: 4px;
-    font-size: 0.7rem;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
@@ -55,7 +55,7 @@ pub const SIDEBAR_CSS: &str = r#"
     margin-left: 0.5rem;
 }
 
-.search-trigger:hover {
+.tools-btn:hover {
     background-color: var(--hover-bg);
     border-color: var(--primary-color);
 }

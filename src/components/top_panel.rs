@@ -40,7 +40,7 @@ pub fn TopPanel(
                         "50%"
                     </button>
                 </div>
-                <button class="search-trigger" on:click=move |_| set_tools_open.update(|o| *o = !*o)>
+                <button class="tools-btn" on:click=move |_| set_tools_open.update(|o| *o = !*o)>
                     "🧰"
                 </button>
             </div>

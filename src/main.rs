@@ -1,6 +1,7 @@
 mod utils;
 mod components;
 mod docs_data;
+mod renderer;
 
 use leptos::*;
 use components::App;

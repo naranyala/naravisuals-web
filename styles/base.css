@@ -63,10 +63,10 @@ body {
     background: transparent;
     border: none;
     color: var(--text-color);
-    font-size: 1.25rem;
+    font-size: 1.75rem;
     cursor: pointer;
     display: none;
-    padding: 0.25rem 0.5rem;
+    padding: 0.5rem 0.75rem;
 }
 
 .panel-title {
@@ -84,8 +84,8 @@ body {
     background: transparent;
     border: 1px solid var(--border-color);
     color: var(--text-color);
-    padding: 0.25rem 0.5rem;
-    font-size: 0.7rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s;
     margin: 0;
@@ -112,6 +112,23 @@ body {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
     color: var(--bg-color);
+}
+
+.tools-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+    margin-left: 0.5rem;
+}
+
+.tools-btn:hover {
+    background-color: var(--hover-bg);
+    border-color: var(--primary-color);
 }
 
 .layout {
