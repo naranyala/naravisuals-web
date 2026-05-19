@@ -4,7 +4,7 @@ use leptos_meta::*;
 use pulldown_cmark;
 
 mod docs_data;
-use docs_data::{DOCS, DocEntry};
+use docs_data::DOCS;
 
 // Embed CSS at compile time to avoid all MIME type and loading issues
 const CSS_CONTENT: &str = include_str!("../styles/base.css");
@@ -18,9 +18,15 @@ fn MarkdownContent() -> impl IntoView {
 
     let content = move || {
         let f = filename();
-        // Find the entry in our embedded DOCS array
         DOCS.iter()
-            .find(|entry| entry.path == f || (f.is_empty() && entry.path == "home"))
+            .find(|entry| entry.path == f)
+            .or_else(|| {
+                if f.is_empty() {
+                    DOCS.first()
+                } else {
+                    None
+                }
+            })
             .map(|entry| entry.content)
             .unwrap_or("Article not found")
     };
@@ -77,7 +83,7 @@ fn App() -> impl IntoView {
             <Layout>
                 <Routes>
                     <Route path="" view=move || view! { <MarkdownContent /> }/>
-                    <Route path="/:filename" view=move || view! { <MarkdownContent /> }/>
+                    <Route path="/*filename" view=move || view! { <MarkdownContent /> }/>
                 </Routes>
             </Layout>
         </Router>
