@@ -3,6 +3,7 @@ use leptos_router::*;
 use std::collections::BTreeMap;
 use crate::utils::search::{SearchResult, highlight_match, extract_headings_simple};
 use crate::docs_data::DOCS;
+use crate::search_index::SEARCH_INDEX;
 
 #[component]
 pub fn ToolsSidebar(is_open: ReadSignal<bool>, on_close: Callback<()>) -> impl IntoView {
@@ -15,7 +16,6 @@ pub fn ToolsSidebar(is_open: ReadSignal<bool>, on_close: Callback<()>) -> impl I
         ("🚀", "Deploy", "deploy"),
         ("📊", "Analytics", "analytics"),
         ("🔒", "Security", "security"),
-        ("🔍", "Search", "search"),
     ];
 
     let results = move || {
@@ -27,17 +27,44 @@ pub fn ToolsSidebar(is_open: ReadSignal<bool>, on_close: Callback<()>) -> impl I
         let q_lower = q.to_lowercase();
         let mut path_matches: BTreeMap<String, (String, Option<String>, Option<String>)> = BTreeMap::new();
         
-        for entry in DOCS {
+        for entry in SEARCH_INDEX {
             let mut matched_title = false;
+            let mut matched_content = false;
 
-            if entry.title.to_lowercase().contains(&q_lower) {
-                matched_title = true;
+            if entry.path.contains('/') {
+                // Find the title from DOCS
+                if let Some(doc) = DOCS.iter().find(|d| d.path == entry.path) {
+                    if doc.title.to_lowercase().contains(&q_lower) {
+                        matched_title = true;
+                    }
+                }
+            } else {
+                // Simple path
+                if let Some(doc) = DOCS.iter().find(|d| d.path == entry.path) {
+                    if doc.title.to_lowercase().contains(&q_lower) {
+                        matched_title = true;
+                    }
+                }
+            }
+
+            if entry.content.to_lowercase().contains(&q_lower) {
+                matched_content = true;
             }
             
-            if matched_title {
-                let highlighted_title = highlight_match(&entry.title, &q);
+            if matched_title || matched_content {
+                let title = DOCS.iter()
+                    .find(|d| d.path == entry.path)
+                    .map(|d| highlight_match(&d.title, &q))
+                    .unwrap_or_else(|| entry.path.to_string());
+
+                let snippet = if matched_content {
+                    Some(highlight_match(entry.content, &q))
+                } else {
+                    None
+                };
+
                 path_matches.entry(entry.path.to_string())
-                    .or_insert((highlighted_title.clone(), None, None));
+                    .or_insert((title, None, snippet));
             }
         }
 
@@ -64,76 +91,22 @@ pub fn ToolsSidebar(is_open: ReadSignal<bool>, on_close: Callback<()>) -> impl I
             </div>
             <div class="tools-sidebar-content">
                 {move || {
-                    if show_search.get() {
-                        view! {
-                            <div class="search-container">
-                                <button class="back-btn" on:click=move |_| set_show_search.set(false)>
-                                    "← Back to Tools"
-                                </button>
-                                <input 
-                                    type="text" 
-                                    class="search-sidebar-input"
-                                    placeholder="Search any query" 
-                                    on:input=move |ev| set_query.set(event_target_value(&ev))
-                                />
-                                <div class="search-results-list">
-                                    {move || {
-                                        let res = results();
-                                        if res.is_empty() && !query.get().is_empty() {
-                                            view! { <div style="text-align: center; color: var(--text-muted); padding: 2rem;">"No results found"</div> }.into_view()
-                                        } else {
-                                            res.into_iter().map(|res| {
-                                                let href_title = format!("/{}", res.path);
-                                                view! {
-                                                    <div class="search-result-group">
-                                                        <A class="search-result-item" href=href_title.clone() on:click=move |_| {
-                                                            set_show_search.set(false);
-                                                            on_close.call(());
-                                                        }>
-                                                            <span class="search-result-title" inner_html=res.title></span>
-                                                            {res.snippet.map(|s| view! { <div class="search-result-snippet" inner_html=s></div> })}
-                                                        </A>
-                                                        {res.heading.map(|h| {
-                                                            let clean_heading = h.replace("<mark>", "").replace("</mark>", "");
-                                                            let heading_id = clean_heading.to_lowercase().replace(' ', "-");
-                                                            let href_heading = format!("{}/#{}", res.path, heading_id);
-                                                            view! {
-                                                                <A class="search-result-item-heading" href=href_heading on:click=move |_| {
-                                                                    set_show_search.set(false);
-                                                                    on_close.call(());
-                                                                }>
-                                                                    <span class="search-result-heading" inner_html=h></span>
-                                                                </A>
-                                                            }
-                                                        })}
-                                                    </div>
-                                                }.into_view()
-                                            }).collect_view()
-                                        }
-                                    }}
-                                </div>
-                            </div>
-                        }.into_view()
-                    } else {
-                        view! {
-                            <div class="tools-grid">
-                                {tools.iter().map(|(icon, name, id)| {
-                                    let icon = *icon;
-                                    let name = *name;
-                                    let id = *id;
-                                    view! {
-                                        <div class="tool-item" on:click=move |_| {
-                                            if id == "search" {
-                                                set_show_search.set(true);
-                                            }
-                                        }>
-                                            <span class="tool-icon">{icon}</span>
-                                            <span class="tool-name">{name}</span>
-                                        </div>
-                                    }
-                                }).collect_view()}
-                            </div>
-                        }.into_view()
+                    view! {
+                        <div class="tools-grid">
+                            {tools.iter().map(|(icon, name, id)| {
+                                let icon = *icon;
+                                let name = *name;
+                                let id = *id;
+                                view! {
+                                    <div class="tool-item" on:click=move |_| {
+                                        // Handle specific tool actions here
+                                    }>
+                                        <span class="tool-icon">{icon}</span>
+                                        <span class="tool-name">{name}</span>
+                                    </div>
+                                }
+                            }).collect_view()}
+                        </div>
                     }
                 }}
             </div>

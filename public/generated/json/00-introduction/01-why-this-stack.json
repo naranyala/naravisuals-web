@@ -28,25 +28,37 @@
       }
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Electron**: While powerful, Electron bundles a full Chromium browser and Node.js runtime, leading to massive binary sizes (often 100MB+) and high RAM consumption."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Pure Native (C++/Qt)**: Offers extreme performance but often comes with a steeper learning curve, slower development cycles, and more complex UI design processes."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Electron"
+            }
+          ]
+        },
+        {
+          "Text": ": While powerful, Electron bundles a full Chromium browser and Node.js runtime, leading to massive binary sizes (often 100MB+) and high RAM consumption."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Pure Native (C++/Qt)"
+            }
+          ]
+        },
+        {
+          "Text": ": Offers extreme performance but often comes with a steeper learning curve, slower development cycles, and more complex UI design processes."
+        }
       ]
     },
     {
@@ -60,34 +72,54 @@
       }
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Tauri**: Instead of bundling a browser, Tauri uses the system's native webview (WebView2 on Windows, WebKit on macOS/Linux). This results in binaries that are often under 10MB."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Leptos**: By using Rust on the frontend via WebAssembly, you get compile-time type safety and fine-grained reactivity, meaning the UI only updates the exact DOM nodes that change."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Rust**: You use one language for everything. The same types and logic can often be shared between the frontend and backend."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Tauri"
+            }
+          ]
+        },
+        {
+          "Text": ": Instead of bundling a browser, Tauri uses the system's native webview (WebView2 on Windows, WebKit on macOS/Linux). This results in binaries that are often under 10MB."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Leptos"
+            }
+          ]
+        },
+        {
+          "Text": ": By using Rust on the frontend via WebAssembly, you get compile-time type safety and fine-grained reactivity, meaning the UI only updates the exact DOM nodes that change."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Rust"
+            }
+          ]
+        },
+        {
+          "Text": ": You use one language for everything. The same types and logic can often be shared between the frontend and backend."
+        }
       ]
     }
   ]

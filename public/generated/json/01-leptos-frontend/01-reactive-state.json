@@ -41,34 +41,42 @@
       }
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`count()`: Returns the current value."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`set_count.set(val)`: Updates the value."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`set_count.update(|n| *n += 1)`: Updates the value using a closure."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "count()"
+        },
+        {
+          "Text": ": Returns the current value."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "set_count.set(val)"
+        },
+        {
+          "Text": ": Updates the value."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "set_count.update(|n| *n += 1)"
+        },
+        {
+          "Text": ": Updates the value using a closure."
+        }
       ]
     },
     {

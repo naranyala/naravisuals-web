@@ -52,55 +52,71 @@
       ]
     },
     {
-      "OrderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Invoke (Request-Response)**: The frontend asks the backend to do something and waits for a result."
-              }
-            ]
-          }
-        ]
+      "OrderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Invoke (Request-Response)"
+            }
+          ]
+        },
+        {
+          "Text": ": The frontend asks the backend to do something and waits for a result."
+        }
       ]
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "*Example*: \"Please calculate the sum of these numbers and tell me the answer.\""
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Italic": [
+            {
+              "Text": "Example"
+            }
+          ]
+        },
+        {
+          "Text": ": \"Please calculate the sum of these numbers and tell me the answer.\""
+        }
       ]
     },
     {
-      "OrderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Emit (Event-Driven)**: The backend (or frontend) sends a message without expecting an immediate reply."
-              }
-            ]
-          }
-        ]
+      "OrderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Emit (Event-Driven)"
+            }
+          ]
+        },
+        {
+          "Text": ": The backend (or frontend) sends a message without expecting an immediate reply."
+        }
       ]
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "*Example*: \"The download is 50% complete.\""
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Italic": [
+            {
+              "Text": "Example"
+            }
+          ]
+        },
+        {
+          "Text": ": \"The download is 50% complete.\""
+        }
       ]
     },
     {

@@ -52,43 +52,55 @@
       ]
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`tauri-plugin-fs`: Filesystem access."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`tauri-plugin-shell`: Opening URLs or executing external commands."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`tauri-plugin-http`: Making native HTTP requests (bypassing CORS)."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`tauri-plugin-dialog`: Native save/open file dialogs."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "tauri-plugin-fs"
+        },
+        {
+          "Text": ": Filesystem access."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "tauri-plugin-shell"
+        },
+        {
+          "Text": ": Opening URLs or executing external commands."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "tauri-plugin-http"
+        },
+        {
+          "Text": ": Making native HTTP requests (bypassing CORS)."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "tauri-plugin-dialog"
+        },
+        {
+          "Text": ": Native save/open file dialogs."
+        }
       ]
     },
     {
@@ -109,25 +121,43 @@
       ]
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "Use the **Rust API** for secure, heavy-duty operations."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "Use the **JS API** for simple UI-driven tasks (like opening a folder picker)."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Use the "
+        },
+        {
+          "Bold": [
+            {
+              "Text": "Rust API"
+            }
+          ]
+        },
+        {
+          "Text": " for secure, heavy-duty operations."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Use the "
+        },
+        {
+          "Bold": [
+            {
+              "Text": "JS API"
+            }
+          ]
+        },
+        {
+          "Text": " for simple UI-driven tasks (like opening a folder picker)."
+        }
       ]
     }
   ]

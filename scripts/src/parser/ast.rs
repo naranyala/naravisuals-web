@@ -6,7 +6,7 @@ pub enum Node {
     /// Document root
     Document(Vec<Node>),
     
-    /// Heading (level 1-6)
+    /// Heading (level 1-e.g. 1-6)
     Heading { level: u8, children: Vec<Node> },
     
     /// Paragraph
@@ -45,6 +45,9 @@ pub enum Node {
     /// Blockquote
     Blockquote(Vec<Node>),
     
+    /// Table
+    Table { headers: Vec<Node>, rows: Vec<Vec<Node>> },
+    
     /// Horizontal rule
     HorizontalRule,
     
@@ -72,4 +75,7 @@ impl Node {
 
 /// List item with optional nested lists
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct ListItem(pub Vec<Node>);
+pub struct ListItem {
+    pub checked: Option<bool>,
+    pub children: Vec<Node>,
+}

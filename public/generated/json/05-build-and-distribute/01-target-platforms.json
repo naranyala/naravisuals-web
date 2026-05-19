@@ -35,15 +35,237 @@
         {
           "Bold": [
             {
-              "Text": "WebView2 (based on Edge/Chromium).Tauri uses WebKit (the engine behind Safari).Tauri uses WebKitGTK.Cross-compiling (e.g., building a Windows "
-            },
-            {
-              "InlineCode": ".exe"
-            },
-            {
-              "Text": " from a Mac) is complex in Rust. The recommended approach is to use GitHub Actions or other CI/CD pipelines to build the app on native runners for each platform."
+              "Text": "WebView2"
             }
           ]
+        },
+        {
+          "Text": " (based on Edge/Chromium)."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Installer"
+            }
+          ]
+        },
+        {
+          "Text": ": Generates "
+        },
+        {
+          "InlineCode": ".msi"
+        },
+        {
+          "Text": " and "
+        },
+        {
+          "InlineCode": ".exe"
+        },
+        {
+          "Text": "."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Requirements"
+            }
+          ]
+        },
+        {
+          "Text": ": Users must have the WebView2 runtime installed (which is pre-installed on Windows 10/11)."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "macOS"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Tauri uses "
+        },
+        {
+          "Bold": [
+            {
+              "Text": "WebKit"
+            }
+          ]
+        },
+        {
+          "Text": " (the engine behind Safari)."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Installer"
+            }
+          ]
+        },
+        {
+          "Text": ": Generates "
+        },
+        {
+          "InlineCode": ".app"
+        },
+        {
+          "Text": " and "
+        },
+        {
+          "InlineCode": ".dmg"
+        },
+        {
+          "Text": "."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Requirements"
+            }
+          ]
+        },
+        {
+          "Text": ": Standard macOS environment. Note that for distribution, you will need an Apple Developer account to \"sign\" and \"notarize\" your app, otherwise users will see a security warning."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Linux"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Tauri uses "
+        },
+        {
+          "Bold": [
+            {
+              "Text": "WebKitGTK"
+            }
+          ]
+        },
+        {
+          "Text": "."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Installer"
+            }
+          ]
+        },
+        {
+          "Text": ": Generates "
+        },
+        {
+          "InlineCode": ".deb"
+        },
+        {
+          "Text": " and "
+        },
+        {
+          "InlineCode": "AppImage"
+        },
+        {
+          "Text": "."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Requirements"
+            }
+          ]
+        },
+        {
+          "Text": ": The user must have the necessary WebKitGTK libraries installed on their system."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Cross-Compilation"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Cross-compiling (e.g., building a Windows "
+        },
+        {
+          "InlineCode": ".exe"
+        },
+        {
+          "Text": " from a Mac) is complex in Rust. The recommended approach is to use "
+        },
+        {
+          "Bold": [
+            {
+              "Text": "GitHub Actions"
+            }
+          ]
+        },
+        {
+          "Text": " or other CI/CD pipelines to build the app on native runners for each platform."
         }
       ]
     }

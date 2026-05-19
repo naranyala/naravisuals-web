@@ -25,6 +25,7 @@
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>
         window.applyCodeEnhancements = function() {
             // 1. Scroll to top of content area
@@ -34,7 +35,13 @@
             // 2. Syntax Highlighting
             hljs.highlightAll();
 
-            // 3. Copy Buttons
+            // 3. Mermaid Diagrams
+            if (window.mermaid) {
+                mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+                mermaid.run();
+            }
+
+            // 4. Copy Buttons
             document.querySelectorAll('pre').forEach((block) => {
                 if (block.querySelector('.copy-code-btn')) return;
 

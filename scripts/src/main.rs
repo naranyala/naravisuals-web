@@ -146,7 +146,29 @@ fn main() {
     let docs_data_path = project_root.join("src").join("docs_data.rs");
     fs::write(&docs_data_path, rust_data).expect("Failed to write docs_data.rs");
 
+    // 4. Generate Search Index
+    let mut search_index = String::from("pub struct SearchEntry {\n");
+    search_index.push_str("    pub path: &'static str,\n");
+    search_index.push_str("    pub content: &'static str,\n");
+    search_index.push_str("}\n\n");
+
+    search_index.push_str("pub const SEARCH_INDEX: &[SearchEntry] = &[\n");
+    for (rel_path, _, ast) in &entries {
+        let content = extract_all_text(ast);
+        // Escape quotes and backslashes for the Rust string literal
+        let escaped_content = content.replace('\\', "\\\\").replace('"', "\\\"");
+        search_index.push_str(&format!(
+            "    SearchEntry {{ path: \"{}\", content: \"{}\" }},\n",
+            rel_path, escaped_content
+        ));
+    }
+    search_index.push_str("];\n");
+
+    let search_index_path = project_root.join("src").join("search_index.rs");
+    fs::write(&search_index_path, search_index).expect("Failed to write search_index.rs");
+
     println!("\nMarkdown compilation complete: {} files embedded in src/docs_data.rs", entries.len());
+    println!("Search index generated: {} files in src/search_index.rs", entries.len());
 }
 
 pub(crate) fn generate_rust_mod_files(generated_dir: &Path, entries: &[(String, String, md_compiler::parser::ast::Node)]) {

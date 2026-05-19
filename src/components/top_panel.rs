@@ -1,6 +1,7 @@
 use leptos::*;
 use leptos_router::*;
 use crate::docs_data::DOCS;
+use crate::components::SearchModal;
 
 #[component]
 pub fn TopPanel(
@@ -9,6 +10,8 @@ pub fn TopPanel(
     set_open: WriteSignal<bool>,
     set_tools_open: WriteSignal<bool>,
 ) -> impl IntoView {
+    let is_light = use_context::<ReadSignal<bool>>().expect("is_light signal not provided");
+    let set_is_light = use_context::<WriteSignal<bool>>().expect("set_is_light signal not provided");
     let location = use_location();
 
     let breadcrumbs = move || {
@@ -62,6 +65,20 @@ pub fn TopPanel(
             <div class="panel-right">
                 <div class="btn-group">
                     <button 
+                        class=move || format!("mode-btn {}", if !is_light.get() { "active" } else { "" })
+                        on:click=move |_| set_is_light.set(false)
+                    >
+                        "🌙"
+                    </button>
+                    <button 
+                        class=move || format!("mode-btn {}", if is_light.get() { "active" } else { "" })
+                        on:click=move |_| set_is_light.set(true)
+                    >
+                        "☀️"
+                    </button>
+                </div>
+                <div class="btn-group" style="margin-left: 0.5rem;">
+                    <button 
                         class=move || format!("mode-btn {}", if sidebar_width.get() == "0%" { "active" } else { "" })
                         on:click=move |_| set_width.set("0%".to_string())
                     >
@@ -80,6 +97,12 @@ pub fn TopPanel(
                         "50%"
                     </button>
                 </div>
+                <button class="search-trigger-btn" on:click=move |_| {
+                    use_context::<WriteSignal<bool>>().expect("set_is_search_open not provided").set(true);
+                }>
+                    <span class="search-icon">"🔍"</span>
+                    <span class="search-label">"Search"</span>
+                </button>
                 <button class="tools-btn" on:click=move |_| set_tools_open.update(|o| *o = !*o)>
                     "🧰"
                 </button>

@@ -22,7 +22,13 @@
         "level": 2,
         "children": [
           {
-            "Text": "The `.manage()` Method"
+            "Text": "The "
+          },
+          {
+            "InlineCode": ".manage()"
+          },
+          {
+            "Text": " Method"
           }
         ]
       }

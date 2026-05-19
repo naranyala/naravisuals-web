@@ -29,6 +29,7 @@ pub const DOCS: &[DocEntry] = &[
     DocEntry { path: "05-build-and-distribute/00-build-process", title: "The Build Process" },
     DocEntry { path: "05-build-and-distribute/01-target-platforms", title: "Target Platforms" },
     DocEntry { path: "05-build-and-distribute/02-optimization-tips", title: "Optimization Tips" },
+    DocEntry { path: "test_headings", title: "Heading 1" },
 ];
 
 pub fn get_ast(path: &str) -> Option<Node> {
@@ -55,6 +56,7 @@ pub fn get_ast(path: &str) -> Option<Node> {
         "05-build-and-distribute/00-build-process" => include_str!("../generated/json/05-build-and-distribute/00-build-process.json"),
         "05-build-and-distribute/01-target-platforms" => include_str!("../generated/json/05-build-and-distribute/01-target-platforms.json"),
         "05-build-and-distribute/02-optimization-tips" => include_str!("../generated/json/05-build-and-distribute/02-optimization-tips.json"),
+        "test_headings" => include_str!("../generated/json/test_headings.json"),
         _ => return None,
     };
     serde_json::from_str(json).ok()

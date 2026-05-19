@@ -75,34 +75,78 @@
       }
     },
     {
-      "OrderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Single Source of Truth**: If you add a field to `UserProfile`, both the backend and frontend will be updated."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Compile-Time Checking**: If the backend changes a field from a `String` to an `Option<String>`, the frontend code will fail to compile until you handle the `None` case."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Reduced Boilerplate**: No more manual JSON parsing or guessing the shape of the data coming across the bridge."
-              }
-            ]
-          }
-        ]
+      "OrderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Single Source of Truth"
+            }
+          ]
+        },
+        {
+          "Text": ": If you add a field to "
+        },
+        {
+          "InlineCode": "UserProfile"
+        },
+        {
+          "Text": ", both the backend and frontend will be updated."
+        }
+      ]
+    },
+    {
+      "OrderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Compile-Time Checking"
+            }
+          ]
+        },
+        {
+          "Text": ": If the backend changes a field from a "
+        },
+        {
+          "InlineCode": "String"
+        },
+        {
+          "Text": " to an "
+        },
+        {
+          "InlineCode": "Option<String>"
+        },
+        {
+          "Text": ", the frontend code will fail to compile until you handle the "
+        },
+        {
+          "InlineCode": "None"
+        },
+        {
+          "Text": " case."
+        }
+      ]
+    },
+    {
+      "OrderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Reduced Boilerplate"
+            }
+          ]
+        },
+        {
+          "Text": ": No more manual JSON parsing or guessing the shape of the data coming across the bridge."
+        }
       ]
     },
     {

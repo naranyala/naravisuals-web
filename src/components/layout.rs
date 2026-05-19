@@ -30,7 +30,7 @@ pub fn Layout(children: Children) -> impl IntoView {
     });
 
     view! {
-        <div class="app-wrapper">
+        <>
             <style>{SIDEBAR_CSS}</style>
             <TopPanel sidebar_width=sidebar_width set_width=set_sidebar_width set_open=set_is_open set_tools_open=set_is_tools_open />
             <div class="layout" style=move || format!("--sidebar-width: {};", sidebar_width.get())>
@@ -66,6 +66,6 @@ pub fn Layout(children: Children) -> impl IntoView {
             } else {
                 view! { }.into_view()
             }}
-        </div>
+        </>
     }
 }

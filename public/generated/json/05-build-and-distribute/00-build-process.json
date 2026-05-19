@@ -41,43 +41,101 @@
       ]
     },
     {
-      "OrderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Frontend Compilation**: Tauri runs your frontend build script (e.g., `trunk build --release`). This compiles your Leptos Rust code into an optimized WASM binary and generates the HTML/CSS/JS."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Backend Compilation**: Cargo compiles the native Rust core with the `--release` flag, applying heavy optimizations for speed and size."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Asset Bundling**: The WASM and assets are embedded directly into the final native binary."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Installer Generation**: Tauri uses system tools (like WiX on Windows or hdiutil on macOS) to wrap the binary in a standard installer (`.msi`, `.dmg`, `.deb`)."
-              }
-            ]
-          }
-        ]
+      "OrderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Frontend Compilation"
+            }
+          ]
+        },
+        {
+          "Text": ": Tauri runs your frontend build script (e.g., "
+        },
+        {
+          "InlineCode": "trunk build --release"
+        },
+        {
+          "Text": "). This compiles your Leptos Rust code into an optimized WASM binary and generates the HTML/CSS/JS."
+        }
+      ]
+    },
+    {
+      "OrderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Backend Compilation"
+            }
+          ]
+        },
+        {
+          "Text": ": Cargo compiles the native Rust core with the "
+        },
+        {
+          "InlineCode": "--release"
+        },
+        {
+          "Text": " flag, applying heavy optimizations for speed and size."
+        }
+      ]
+    },
+    {
+      "OrderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Asset Bundling"
+            }
+          ]
+        },
+        {
+          "Text": ": The WASM and assets are embedded directly into the final native binary."
+        }
+      ]
+    },
+    {
+      "OrderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Installer Generation"
+            }
+          ]
+        },
+        {
+          "Text": ": Tauri uses system tools (like WiX on Windows or hdiutil on macOS) to wrap the binary in a standard installer ("
+        },
+        {
+          "InlineCode": ".msi"
+        },
+        {
+          "Text": ", "
+        },
+        {
+          "InlineCode": ".dmg"
+        },
+        {
+          "Text": ", "
+        },
+        {
+          "InlineCode": ".deb"
+        },
+        {
+          "Text": ")."
+        }
       ]
     },
     {

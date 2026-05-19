@@ -52,21 +52,68 @@
         {
           "Bold": [
             {
-              "Text": "Capabilities. These are JSON files that specify exactly which commands and plugins the frontend is allowed to use.For example, if you use the "
-            },
-            {
-              "InlineCode": "fs"
-            },
-            {
-              "Text": " plugin, you can restrict the frontend to only read from the "
-            },
-            {
-              "InlineCode": "$APPCONFIG"
-            },
-            {
-              "Text": " folder, preventing it from reading the user's entire home directory.A common security pitfall is creating a \"generic\" command that takes a path as an argument and reads it:The Secure Way: Validate paths on the backend or use pre-defined allowed directories."
+              "Text": "Capabilities"
             }
           ]
+        },
+        {
+          "Text": ". These are JSON files that specify exactly which commands and plugins the frontend is allowed to use."
+        }
+      ]
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "For example, if you use the "
+        },
+        {
+          "InlineCode": "fs"
+        },
+        {
+          "Text": " plugin, you can restrict the frontend to only read from the "
+        },
+        {
+          "InlineCode": "$APPCONFIG"
+        },
+        {
+          "Text": " folder, preventing it from reading the user's entire home directory."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Avoiding \"Dangerous\" Commands"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "A common security pitfall is creating a \"generic\" command that takes a path as an argument and reads it:"
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "// DANGEROUS: Frontend can pass any path on the system!\n#[tauri::command]\nfn read_file(path: String) -> String {\n    std::fs::read_to_string(path).unwrap()\n}"
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "The Secure Way"
+            }
+          ]
+        },
+        {
+          "Text": ": Validate paths on the backend or use pre-defined allowed directories."
         }
       ]
     }

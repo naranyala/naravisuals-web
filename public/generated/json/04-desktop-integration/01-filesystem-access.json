@@ -35,34 +35,42 @@
       ]
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`$APPCONFIG`: The application's configuration directory."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`$APPDATA`: The application's data directory."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`$HOME`: The user's home folder."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "$APPCONFIG"
+        },
+        {
+          "Text": ": The application's configuration directory."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "$APPDATA"
+        },
+        {
+          "Text": ": The application's data directory."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "$HOME"
+        },
+        {
+          "Text": ": The user's home folder."
+        }
       ]
     },
     {
@@ -93,15 +101,38 @@
         {
           "Bold": [
             {
-              "Text": "Example (Rust Backend):Instead of making the user type a path, use the "
-            },
-            {
-              "InlineCode": "dialog"
-            },
-            {
-              "Text": " plugin to show a native \"Open File\" or \"Save As\" window. This is the best practice for user experience and security."
+              "Text": "Example (Rust Backend):"
             }
           ]
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "use tauri_plugin_fs::FsExt;\n\n#[tauri::command]\nfn save_settings(app: tauri::AppHandle, data: String) {\n    let path = app.path().app_config_dir().unwrap().join(\"settings.json\");\n    std::fs::write(path, data).expect(\"Failed to write\");\n}"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Native File Dialogs"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Instead of making the user type a path, use the "
+        },
+        {
+          "InlineCode": "dialog"
+        },
+        {
+          "Text": " plugin to show a native \"Open File\" or \"Save As\" window. This is the best practice for user experience and security."
         }
       ]
     }

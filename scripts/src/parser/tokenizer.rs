@@ -5,16 +5,16 @@ pub enum Token {
     Heading { level: u8, content: String },
     CodeBlock { language: Option<String>, code: String },
     InlineCode(String),
-    BoldStart,
-    BoldEnd,
-    ItalicStart,
-    ItalicEnd,
+    BoldMarker,
+    ItalicMarker,
     LinkStart { url: String },
     LinkEnd,
     Image { url: String, alt: String },
-    UnorderedListItem(String),
-    OrderedListItem(String),
-    Blockquote(String),
+    UnorderedListMarker,
+    OrderedListMarker,
+    TaskListMarker(bool),
+    BlockquoteMarker,
+    TableRow(Vec<String>),
     HorizontalRule,
     BlankLine,
     ExtensionStart { name: String, attributes: Vec<(String, String)> },
@@ -62,9 +62,23 @@ pub fn tokenize(input: &str) -> Vec<Token> {
             continue;
         }
         
+        // Table Row detection
+        if line.trim().starts_with('|') && line.trim().ends_with('|') {
+            let cells = line.trim()
+                .trim_start_matches('|')
+                .trim_end_matches('|')
+                .split('|')
+                .map(|s| s.trim().to_string())
+                .collect();
+            tokens.push(Token::TableRow(cells));
+            continue;
+        }
+
         // Headings
         if let Some(level) = parse_heading(line) {
-            tokens.push(Token::Heading { level, content: line[level as usize..].trim().to_string() });
+            let trimmed = line.trim_start();
+            let content = &trimmed[level as usize..].trim();
+            tokens.push(Token::Heading { level, content: content.to_string() });
             continue;
         }
         
@@ -76,23 +90,58 @@ pub fn tokenize(input: &str) -> Vec<Token> {
         
         // Blockquotes
         if line.starts_with("> ") {
-            tokens.push(Token::Blockquote(line[2..].to_string()));
+            tokens.push(Token::BlockquoteMarker);
+            tokens.extend(tokenize_inline(line[2..].trim()));
+            tokens.push(Token::BlankLine);
             continue;
         }
         
-        // Unordered list
-        if let Some(content) = parse_list_item(line, '-') {
-            tokens.push(Token::UnorderedListItem(content));
+        // Unordered list / Task list
+        if let Some(_) = parse_list_item(line, '-') {
+            let trimmed = line.trim_start();
+            let content = &trimmed[2..].trim_start();
+            if content.starts_with("[ ] ") {
+                tokens.push(Token::TaskListMarker(false));
+                tokens.extend(tokenize_inline(&content[4..]));
+                tokens.push(Token::BlankLine);
+                continue;
+            } else if content.starts_with("[x] ") || content.starts_with("[X] ") {
+                tokens.push(Token::TaskListMarker(true));
+                tokens.extend(tokenize_inline(&content[4..]));
+                tokens.push(Token::BlankLine);
+                continue;
+            }
+            tokens.push(Token::UnorderedListMarker);
+            tokens.extend(tokenize_inline(content));
+            tokens.push(Token::BlankLine);
             continue;
         }
-        if let Some(content) = parse_list_item(line, '*') {
-            tokens.push(Token::UnorderedListItem(content));
+        if let Some(_) = parse_list_item(line, '*') {
+            let trimmed = line.trim_start();
+            let content = &trimmed[2..].trim_start();
+            if content.starts_with("[ ] ") {
+                tokens.push(Token::TaskListMarker(false));
+                tokens.extend(tokenize_inline(&content[4..]));
+                tokens.push(Token::BlankLine);
+                continue;
+            } else if content.starts_with("[x] ") || content.starts_with("[X] ") {
+                tokens.push(Token::TaskListMarker(true));
+                tokens.extend(tokenize_inline(&content[4..]));
+                tokens.push(Token::BlankLine);
+                continue;
+            }
+            tokens.push(Token::UnorderedListMarker);
+            tokens.extend(tokenize_inline(content));
+            tokens.push(Token::BlankLine);
             continue;
         }
         
         // Ordered list
-        if let Some(content) = parse_ordered_list_item(line) {
-            tokens.push(Token::OrderedListItem(content));
+        if let Some(_) = parse_ordered_list_item(line) {
+            tokens.push(Token::OrderedListMarker);
+            let content = line.trim().splitn(2, '.').nth(1).unwrap_or("").trim();
+            tokens.extend(tokenize_inline(content));
+            tokens.push(Token::BlankLine);
             continue;
         }
         
@@ -164,7 +213,7 @@ fn parse_attributes(input: &str) -> Vec<(String, String)> {
     attrs
 }
 
-fn tokenize_inline(text: &str) -> Vec<Token> {
+pub fn tokenize_inline(text: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
     let mut chars = text.chars().peekable();
     let mut current_text = String::new();
@@ -187,31 +236,29 @@ fn tokenize_inline(text: &str) -> Vec<Token> {
             continue;
         }
         
-        // Bold
-        if ch == '*' {
+        // Bold/Italic markers
+        if ch == '*' || ch == '_' {
+            let marker = ch;
             chars.next();
-            if chars.peek() == Some(&'*') {
+            if chars.peek() == Some(&marker) {
                 chars.next();
                 if !current_text.is_empty() {
                     tokens.push(Token::Text(current_text.clone()));
                     current_text.clear();
                 }
-                tokens.push(Token::BoldStart);
+                tokens.push(Token::BoldMarker);
                 continue;
             } else {
-                current_text.push('*');
+                if !current_text.is_empty() && marker == '_' {
+                    // Potential italic start, but we'll just treat as text if not handled by the parser
+                }
+                if !current_text.is_empty() {
+                    tokens.push(Token::Text(current_text.clone()));
+                    current_text.clear();
+                }
+                tokens.push(Token::ItalicMarker);
+                continue;
             }
-        }
-        
-        // Italic
-        if ch == '_' {
-            chars.next();
-            if !current_text.is_empty() {
-                tokens.push(Token::Text(current_text.clone()));
-                current_text.clear();
-            }
-            tokens.push(Token::ItalicStart);
-            continue;
         }
         
         // Links
@@ -240,11 +287,13 @@ fn tokenize_inline(text: &str) -> Vec<Token> {
                 tokens.push(Token::LinkEnd);
                 continue;
             } else {
-                current_text.push('[');
-                current_text.push_str(&link_text);
-                current_text.push(']');
+                if !current_text.is_empty() {
+                    tokens.push(Token::Text(current_text.clone()));
+                    current_text.clear();
+                }
+                tokens.push(Token::Text(format!("[{}]", link_text)));
+                continue;
             }
-            continue;
         }
         
         // Images

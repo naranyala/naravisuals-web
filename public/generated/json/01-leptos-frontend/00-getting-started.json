@@ -81,34 +81,42 @@
       ]
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`src-tauri/`: The Rust backend (Tauri Core)."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`src/`: The Rust frontend (Leptos components)."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "`index.html`: The entry point for the webview."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "src-tauri/"
+        },
+        {
+          "Text": ": The Rust backend (Tauri Core)."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "src/"
+        },
+        {
+          "Text": ": The Rust frontend (Leptos components)."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "InlineCode": "index.html"
+        },
+        {
+          "Text": ": The entry point for the webview."
+        }
       ]
     }
   ]

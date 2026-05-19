@@ -82,25 +82,37 @@
       }
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**LTO**: Allows the compiler to optimize across crate boundaries."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Strip**: Removes debug symbols from the final binary, significantly reducing size."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "LTO"
+            }
+          ]
+        },
+        {
+          "Text": ": Allows the compiler to optimize across crate boundaries."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Strip"
+            }
+          ]
+        },
+        {
+          "Text": ": Removes debug symbols from the final binary, significantly reducing size."
+        }
       ]
     },
     {
@@ -114,34 +126,66 @@
       }
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Lazy Loading**: For very large apps, consider loading certain components only when needed."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Asset Compression**: Compress images and SVGs before embedding them in the app."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Memory Profiling**: Use tools like `heaptrack` or `Valgrind` on the backend to ensure there are no memory leaks in your Rust code."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Lazy Loading"
+            }
+          ]
+        },
+        {
+          "Text": ": For very large apps, consider loading certain components only when needed."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Asset Compression"
+            }
+          ]
+        },
+        {
+          "Text": ": Compress images and SVGs before embedding them in the app."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Memory Profiling"
+            }
+          ]
+        },
+        {
+          "Text": ": Use tools like "
+        },
+        {
+          "InlineCode": "heaptrack"
+        },
+        {
+          "Text": " or "
+        },
+        {
+          "InlineCode": "Valgrind"
+        },
+        {
+          "Text": " on the backend to ensure there are no memory leaks in your Rust code."
+        }
       ]
     }
   ]

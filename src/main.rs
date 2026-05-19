@@ -1,6 +1,7 @@
 mod utils;
 mod components;
 mod docs_data;
+mod search_index;
 mod renderer;
 mod compiler;
 

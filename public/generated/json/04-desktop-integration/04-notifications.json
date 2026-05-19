@@ -58,34 +58,54 @@
       ]
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Icons**: A small image next to the text."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Actions**: Buttons within the notification (e.g., \"Undo\" or \"Open\")."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Urgency**: Marking the notification as critical to bypass \"Do Not Disturb\" modes (where permitted)."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Icons"
+            }
+          ]
+        },
+        {
+          "Text": ": A small image next to the text."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Actions"
+            }
+          ]
+        },
+        {
+          "Text": ": Buttons within the notification (e.g., \"Undo\" or \"Open\")."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Urgency"
+            }
+          ]
+        },
+        {
+          "Text": ": Marking the notification as critical to bypass \"Do Not Disturb\" modes (where permitted)."
+        }
       ]
     },
     {

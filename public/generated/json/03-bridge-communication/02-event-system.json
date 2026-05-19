@@ -80,34 +80,54 @@
       }
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Progress Bars**: Updating a percentage during a large file upload."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Hardware Status**: Notifying the UI when a USB device is plugged in."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Global State Sync**: Updating multiple windows simultaneously when a setting changes."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Progress Bars"
+            }
+          ]
+        },
+        {
+          "Text": ": Updating a percentage during a large file upload."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Hardware Status"
+            }
+          ]
+        },
+        {
+          "Text": ": Notifying the UI when a USB device is plugged in."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Global State Sync"
+            }
+          ]
+        },
+        {
+          "Text": ": Updating multiple windows simultaneously when a setting changes."
+        }
       ]
     }
   ]

@@ -18,9 +18,153 @@
         {
           "Bold": [
             {
-              "Text": "Core Process and the WebView Process.The Core process is a native Rust application. It has full access to the operating system and is responsible for:The WebView process is where your user interface lives. In this stack, it is a Leptos application compiled to WebAssembly (WASM). It is responsible for:Because the Core and WebView processes are isolated for security reasons, they communicate via Inter-Process Communication (IPC). This bridge allows the frontend to \"invoke\" Rust functions and the backend to \"emit\" events to the UI."
+              "Text": "Core Process"
             }
           ]
+        },
+        {
+          "Text": " and the "
+        },
+        {
+          "Bold": [
+            {
+              "Text": "WebView Process"
+            }
+          ]
+        },
+        {
+          "Text": "."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "The Core Process (Rust)"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "The Core process is a native Rust application. It has full access to the operating system and is responsible for:"
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Window management and lifecycle."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Accessing the filesystem, network, and system APIs."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Managing global application state."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Handling security and permissions."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "The WebView Process (Leptos/WASM)"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "The WebView process is where your user interface lives. In this stack, it is a Leptos application compiled to WebAssembly (WASM). It is responsible for:"
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Rendering the HTML/CSS."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Handling user interactions."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Managing local UI state."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "The Bridge (IPC)"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Because the Core and WebView processes are isolated for security reasons, they communicate via "
+        },
+        {
+          "Bold": [
+            {
+              "Text": "Inter-Process Communication (IPC)"
+            }
+          ]
+        },
+        {
+          "Text": ". This bridge allows the frontend to \"invoke\" Rust functions and the backend to \"emit\" events to the UI."
         }
       ]
     }

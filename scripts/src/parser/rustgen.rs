@@ -155,7 +155,7 @@ impl RustGenerator {
     }
     
     fn render_list_item(&mut self, item: &crate::parser::ast::ListItem) -> String {
-        let inner: String = item.0.iter().map(|n| self.render_node(n)).collect();
+        let inner: String = item.children.iter().map(|n| self.render_node(n)).collect();
         format!("{}<li>{}</li>\n", self.indent(), inner)
     }
     

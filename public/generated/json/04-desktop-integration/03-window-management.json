@@ -41,34 +41,66 @@
       ]
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Transparency**: Set `transparent: true` to create non-rectangular windows or glass effects."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Frameless**: Set `decorations: false` to remove the standard OS title bar and borders, allowing you to build a custom, branded header."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Always on Top**: Keep your app visible above all other windows (useful for toolbars or overlays)."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Transparency"
+            }
+          ]
+        },
+        {
+          "Text": ": Set "
+        },
+        {
+          "InlineCode": "transparent: true"
+        },
+        {
+          "Text": " to create non-rectangular windows or glass effects."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Frameless"
+            }
+          ]
+        },
+        {
+          "Text": ": Set "
+        },
+        {
+          "InlineCode": "decorations: false"
+        },
+        {
+          "Text": " to remove the standard OS title bar and borders, allowing you to build a custom, branded header."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Always on Top"
+            }
+          ]
+        },
+        {
+          "Text": ": Keep your app visible above all other windows (useful for toolbars or overlays)."
+        }
       ]
     },
     {
@@ -89,34 +121,33 @@
       ]
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "A main dashboard and a separate \"Settings\" window."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "Tool palettes that can be dragged to a second monitor."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "Splash screens that disappear once the app has finished loading."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "A main dashboard and a separate \"Settings\" window."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Tool palettes that can be dragged to a second monitor."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Splash screens that disappear once the app has finished loading."
+        }
       ]
     },
     {

@@ -1,0 +1,111 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Heading 1"
+          }
+        ]
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Heading 2"
+          }
+        ]
+      }
+    },
+    {
+      "Heading": {
+        "level": 3,
+        "children": [
+          {
+            "Text": "Heading 3"
+          }
+        ]
+      }
+    },
+    {
+      "Heading": {
+        "level": 4,
+        "children": [
+          {
+            "Text": "Heading 4"
+          }
+        ]
+      }
+    },
+    {
+      "Heading": {
+        "level": 5,
+        "children": [
+          {
+            "Text": "Heading 5"
+          }
+        ]
+      }
+    },
+    {
+      "Heading": {
+        "level": 6,
+        "children": [
+          {
+            "Text": "Heading 6"
+          }
+        ]
+      }
+    },
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Indented Heading"
+          }
+        ]
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Indented Heading 2"
+          }
+        ]
+      }
+    },
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Heading with "
+          },
+          {
+            "Bold": [
+              {
+                "Text": "Bold"
+              }
+            ]
+          },
+          {
+            "Text": " and "
+          },
+          {
+            "Italic": [
+              {
+                "Text": "Italic"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

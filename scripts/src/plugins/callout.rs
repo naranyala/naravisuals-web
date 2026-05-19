@@ -71,14 +71,14 @@ fn render_node_rust(node: &Node) -> String {
         Node::Link { url, text } => format!("<a href=\"{}\">\"{}\"</a>", url, escape_rust_string(text)),
         Node::UnorderedList(items) => {
             let items_str = items.iter().map(|item| {
-                let inner = render_children_rust(&item.0);
+                let inner = render_children_rust(&item.children);
                 format!("<li>{}</li>", inner)
             }).collect::<Vec<_>>().join("");
             format!("<ul>{}</ul>", items_str)
         }
         Node::OrderedList(items) => {
             let items_str = items.iter().map(|item| {
-                let inner = render_children_rust(&item.0);
+                let inner = render_children_rust(&item.children);
                 format!("<li>{}</li>", inner)
             }).collect::<Vec<_>>().join("");
             format!("<ol>{}</ol>", items_str)

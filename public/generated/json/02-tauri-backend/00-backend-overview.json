@@ -35,43 +35,71 @@
       ]
     },
     {
-      "UnorderedList": [
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**OS Interop**: Talking to the filesystem, network, and hardware."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Performance**: Running computationally expensive tasks that would freeze the UI."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Security**: Managing sensitive data and API keys that should never be exposed to the frontend."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "Paragraph": [
-              {
-                "Text": "**Lifecycle**: Controlling when the app starts, minimizes, or closes."
-              }
-            ]
-          }
-        ]
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "OS Interop"
+            }
+          ]
+        },
+        {
+          "Text": ": Talking to the filesystem, network, and hardware."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Performance"
+            }
+          ]
+        },
+        {
+          "Text": ": Running computationally expensive tasks that would freeze the UI."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Security"
+            }
+          ]
+        },
+        {
+          "Text": ": Managing sensitive data and API keys that should never be exposed to the frontend."
+        }
+      ]
+    },
+    {
+      "UnorderedList": []
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Lifecycle"
+            }
+          ]
+        },
+        {
+          "Text": ": Controlling when the app starts, minimizes, or closes."
+        }
       ]
     },
     {
