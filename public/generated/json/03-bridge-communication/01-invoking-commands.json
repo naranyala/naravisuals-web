@@ -1,0 +1,108 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Invoking Commands from Leptos"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Invoking a command is the most common way to trigger backend logic."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Using the JavaScript Bridge"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Tauri provides a JS API to call Rust functions. In a Leptos app, you can call these via "
+        },
+        {
+          "InlineCode": "wasm-bindgen"
+        },
+        {
+          "Text": " or by using a small JS helper."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "javascript",
+        "code": "import { invoke } from '@tauri-apps/api/core';\n\nasync function callGreet() {\n  const response = await invoke('greet', { name: 'Leptos User' });\n  console.log(response);\n}"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Integrating with Leptos Actions"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "In Leptos, you should wrap these calls in "
+        },
+        {
+          "InlineCode": "create_action"
+        },
+        {
+          "Text": ". This allows you to track the loading state and handle the result reactively."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "let greet_action = create_action(|name: &String| {\n    // Call JS bridge to invoke 'greet'\n});\n\n// In view:\nview! {\n    <button on:click=move |_| greet_action.dispatch(\"World\".to_string())>\n        \"Greet\"\n    </button>\n    {move || greet_action.value().map(|res| view! { <p>{res}</p> })}\n}"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Error Handling"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Commands can return a "
+        },
+        {
+          "InlineCode": "Result<T, E>"
+        },
+        {
+          "Text": ". If the Rust function returns an "
+        },
+        {
+          "InlineCode": "Err"
+        },
+        {
+          "Text": ", the JS promise will reject, allowing you to catch the error in your frontend UI."
+        }
+      ]
+    }
+  ]
+}

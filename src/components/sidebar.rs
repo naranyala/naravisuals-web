@@ -26,6 +26,10 @@ pub fn Sidebar(class: String, on_close: Callback<()>) -> impl IntoView {
                 {move || {
                     let groups = grouped_docs();
                     
+                    if groups.is_empty() {
+                        return view! { <p class="not-found">"No articles available"</p> }.into_view();
+                    }
+
                     groups.into_iter().map(|(cat_id, entries)| {
                         let category_name = cat_id.split('-').skip(1).collect::<Vec<_>>().join(" ");
                         
@@ -41,7 +45,7 @@ pub fn Sidebar(class: String, on_close: Callback<()>) -> impl IntoView {
                                                 class=move || {
                                                     let current_path = location.pathname.get();
                                                     let mut classes = "sidebar-item".to_string();
-                                                    if current_path == format!("/{}", path) || (current_path == "/" && path == DOCS[0].path) {
+                                                    if current_path == format!("/{}", path) {
                                                         classes.push_str(" active");
                                                     }
                                                     classes

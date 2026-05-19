@@ -1,0 +1,114 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Backend State Management"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Often, your application needs to maintain state that persists across multiple command calls—such as a database connection pool or a user session."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "The `.manage()` Method"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Tauri provides a built-in state management system. You can inject any Rust type into the Tauri context using the "
+        },
+        {
+          "InlineCode": ".manage()"
+        },
+        {
+          "Text": " method."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "struct AppConfig {\n    api_key: String,\n}\n\nfn main() {\n    tauri::Builder::default()\n        .manage(AppConfig { api_key: \"secret_123\".into() })\n        // ...\n}"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Accessing State in Commands"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "To use the managed state inside a command, use the "
+        },
+        {
+          "InlineCode": "tauri::State"
+        },
+        {
+          "Text": " extractor in the function arguments."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "#[tauri::command]\nfn get_config(state: tauri::State<'_, AppConfig>) -> String {\n    state.api_key.clone()\n}"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Mutable State"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Since state is shared across multiple threads (commands), you cannot mutate it directly. You must use thread-safe wrappers like "
+        },
+        {
+          "InlineCode": "Mutex"
+        },
+        {
+          "Text": " or "
+        },
+        {
+          "InlineCode": "RwLock"
+        },
+        {
+          "Text": "."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "struct AppCounter(Mutex<i32>);\n\n#[tauri::command]\nfn increment(state: tauri::State<'_, AppCounter>) {\n    let mut count = state.0.lock().unwrap();\n    *count += 1;\n}"
+      }
+    }
+  ]
+}

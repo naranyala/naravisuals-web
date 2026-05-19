@@ -1,0 +1,136 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "IPC Basics: The Bridge"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Inter-Process Communication (IPC) is the mechanism that allows the Leptos frontend and the Tauri Rust backend to talk to each other."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Why IPC is Necessary"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "The frontend runs in a Webview (a browser-like environment), and the backend runs as a native OS process. They live in different memory spaces. To communicate, they must serialize data into JSON, send it across a bridge, and deserialize it on the other side."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "The Two Communication Patterns"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "There are two primary ways to communicate:"
+        }
+      ]
+    },
+    {
+      "OrderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Invoke (Request-Response)**: The frontend asks the backend to do something and waits for a result."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "UnorderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "*Example*: \"Please calculate the sum of these numbers and tell me the answer.\""
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "OrderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Emit (Event-Driven)**: The backend (or frontend) sends a message without expecting an immediate reply."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "UnorderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "*Example*: \"The download is 50% complete.\""
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Serialization with Serde"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Because data is sent as JSON, every type sent across the bridge must implement "
+        },
+        {
+          "InlineCode": "serde::Serialize"
+        },
+        {
+          "Text": " and "
+        },
+        {
+          "InlineCode": "serde::Deserialize"
+        },
+        {
+          "Text": ". This ensures that the Rust types in the backend match the objects expected by the frontend."
+        }
+      ]
+    }
+  ]
+}

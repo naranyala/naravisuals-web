@@ -1,0 +1,119 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "The Tauri Backend Overview"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "The Tauri backend is where the \"heavy lifting\" of your application happens. Unlike the frontend, which is restricted by the browser's sandbox, the backend is a native Rust process with full access to the operating system."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Role of the Backend"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "The backend serves several critical purposes:"
+        }
+      ]
+    },
+    {
+      "UnorderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**OS Interop**: Talking to the filesystem, network, and hardware."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Performance**: Running computationally expensive tasks that would freeze the UI."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Security**: Managing sensitive data and API keys that should never be exposed to the frontend."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Lifecycle**: Controlling when the app starts, minimizes, or closes."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "The Rust Ecosystem"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Because the backend is standard Rust, you can use any crate from "
+        },
+        {
+          "InlineCode": "crates.io"
+        },
+        {
+          "Text": ". Whether you need a database like "
+        },
+        {
+          "InlineCode": "sqlx"
+        },
+        {
+          "Text": ", a networking library like "
+        },
+        {
+          "InlineCode": "reqwest"
+        },
+        {
+          "Text": ", or a serialization tool like "
+        },
+        {
+          "InlineCode": "serde"
+        },
+        {
+          "Text": ", you have the full power of the Rust ecosystem at your disposal."
+        }
+      ]
+    }
+  ]
+}

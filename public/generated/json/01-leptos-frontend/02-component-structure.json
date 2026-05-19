@@ -1,0 +1,114 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Component Structure"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Components in Leptos are the building blocks of your UI. They are defined using the "
+        },
+        {
+          "InlineCode": "#[component]"
+        },
+        {
+          "Text": " macro, which allows you to pass properties as function arguments."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "The view! Macro"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "The "
+        },
+        {
+          "InlineCode": "view!"
+        },
+        {
+          "Text": " macro is where you define your HTML structure. It looks like HTML but is actually Rust code that generates highly efficient DOM operations."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "#[component]\nfn Welcome(name: String) -> impl IntoView {\n    view! {\n        <div>\n            <h1>\"Welcome, \" {name} \"!\"</h1>\n            <p>\"Enjoy your Tauri app.\"</p>\n        </div>\n    }\n}"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Dynamic Lists"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "To render lists, Leptos provides the "
+        },
+        {
+          "InlineCode": "<For />"
+        },
+        {
+          "Text": " component, which efficiently manages lists of items by tracking them via a key."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "view! {\n    <ul>\n        <For\n            each=move || items()\n            key=|item| item.id\n            children=|item| view! { <li>{item.name}</li> }\n        />\n    </ul>\n}"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Conditional Rendering"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "You can use the "
+        },
+        {
+          "InlineCode": "<Show />"
+        },
+        {
+          "Text": " component or simple Rust match expressions inside the "
+        },
+        {
+          "InlineCode": "view!"
+        },
+        {
+          "Text": " macro to conditionally display elements."
+        }
+      ]
+    }
+  ]
+}

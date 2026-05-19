@@ -1,0 +1,114 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "The Event System"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Events are used for asynchronous, one-way communication. They are perfect for long-running tasks or system notifications."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Emitting Events from Rust"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "The backend can emit an event to all windows or a specific window."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "use tauri::Emitter;\n\n#[tauri::command]\nfn start_process(app: tauri::AppHandle) {\n    std::thread::spawn(move || {\n        for i in 1..=100 {\n            app.emit(\"progress\", i).unwrap();\n            std::thread::sleep(std::time::Duration::from_millis(100));\n        }\n    });\n}"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Listening for Events in Leptos"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "To react to these events in the UI, you set up a listener. In Leptos, you typically do this inside a "
+        },
+        {
+          "InlineCode": "create_effect"
+        },
+        {
+          "Text": "."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "create_effect(move |_| {\n    // Use JS bridge to listen for \"progress\"\n    // When received, update a Leptos signal:\n    // set_progress.set(new_value);\n});"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Use Cases for Events"
+          }
+        ]
+      }
+    },
+    {
+      "UnorderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Progress Bars**: Updating a percentage during a large file upload."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Hardware Status**: Notifying the UI when a USB device is plugged in."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Global State Sync**: Updating multiple windows simultaneously when a setting changes."
+              }
+            ]
+          }
+        ]
+      ]
+    }
+  ]
+}

@@ -29,42 +29,15 @@ pub fn ToolsSidebar(is_open: ReadSignal<bool>, on_close: Callback<()>) -> impl I
         
         for entry in DOCS {
             let mut matched_title = false;
-            let mut matched_heading = false;
-            let mut matched_content = false;
-            let mut snippet: Option<String> = None;
 
             if entry.title.to_lowercase().contains(&q_lower) {
                 matched_title = true;
             }
             
-            for heading in extract_headings_simple(entry.content) {
-                if heading.to_lowercase().contains(&q_lower) {
-                    matched_heading = true;
-                }
-            }
-
-            if !matched_title && !matched_heading && entry.content.to_lowercase().contains(&q_lower) {
-                matched_content = true;
-                snippet = Some(highlight_match(entry.content, &q));
-            }
-
-            if matched_title || matched_heading || matched_content {
+            if matched_title {
                 let highlighted_title = highlight_match(&entry.title, &q);
                 path_matches.entry(entry.path.to_string())
                     .or_insert((highlighted_title.clone(), None, None));
-                
-                if matched_heading {
-                    for heading in extract_headings_simple(entry.content) {
-                        if heading.to_lowercase().contains(&q_lower) {
-                            path_matches.get_mut(&entry.path.to_string()).unwrap().1 = Some(highlight_match(&heading, &q));
-                            break;
-                        }
-                    }
-                }
-                
-                if matched_content {
-                    path_matches.get_mut(&entry.path.to_string()).unwrap().2 = snippet;
-                }
             }
         }
 

@@ -1,0 +1,90 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "System Tray and Menus"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "The system tray (or menu bar on macOS) allows your app to stay active in the background and provides quick access to common actions."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Creating a Tray Icon"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "The tray is configured in the "
+        },
+        {
+          "InlineCode": "main"
+        },
+        {
+          "Text": " function of your Rust backend."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "use tauri::menu::{Menu, MenuItem};\nuse tauri::tray::TrayIconBuilder;\n\nfn main() {\n    tauri::Builder::default()\n        .setup(|app| {\n            let quit_i = MenuItem::with_id(app, \"quit\", \"Quit\", true, None::<&str>)?;\n            let menu = Menu::with_items(app, &[&quit_i])?;\n            \n            let _tray = TrayIconBuilder::new()\n                .menu(&menu)\n                .build(app)?;\n            \n            Ok(())\n        })\n        .run(tauri::generate_context!())\n        .expect(\"error while running tauri application\");\n}"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Handling Tray Events"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "You can listen for clicks on the tray icon or specific menu items to trigger actions, such as showing the main window or performing a \"Quick Action\" without opening the UI."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Global Shortcuts"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Tauri also allows you to register global shortcuts (e.g., "
+        },
+        {
+          "InlineCode": "Ctrl+Shift+P"
+        },
+        {
+          "Text": ") that trigger Rust functions even when your app window is not focused."
+        }
+      ]
+    }
+  ]
+}

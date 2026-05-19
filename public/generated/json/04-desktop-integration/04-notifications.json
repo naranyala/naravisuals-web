@@ -1,0 +1,109 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Native Notifications"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Notifications are the primary way to communicate with the user when the application is minimized or running in the background."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Sending Notifications"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "You can send a notification from the Rust backend using the notification plugin."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "use tauri_plugin_notification::NotificationExt;\n\n#[tauri::command]\nfn send_alert(app: tauri::AppHandle) {\n    app.notification()\n        .builder()\n        .title(\"Update Complete\")\n        .body(\"Your files have been successfully synchronized.\")\n        .show()\n        .unwrap();\n}"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Customizing Notifications"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Depending on the OS, you can add:"
+        }
+      ]
+    },
+    {
+      "UnorderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Icons**: A small image next to the text."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Actions**: Buttons within the notification (e.g., \"Undo\" or \"Open\")."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Urgency**: Marking the notification as critical to bypass \"Do Not Disturb\" modes (where permitted)."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Best Practices"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Avoid \"notification spam\". Users find frequent popups annoying. Instead, use notifications for critical events and use a \"Notification Center\" inside your app for less urgent updates."
+        }
+      ]
+    }
+  ]
+}

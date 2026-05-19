@@ -1,0 +1,90 @@
+[
+  {
+    "path": "00-introduction/00-overview",
+    "title": "Overview of Tauri and Leptos"
+  },
+  {
+    "path": "00-introduction/01-why-this-stack",
+    "title": "Why Choose This Stack?"
+  },
+  {
+    "path": "00-introduction/02-architecture",
+    "title": "Architecture Overview"
+  },
+  {
+    "path": "01-leptos-frontend/00-getting-started",
+    "title": "Getting Started with Leptos in Tauri"
+  },
+  {
+    "path": "01-leptos-frontend/01-reactive-state",
+    "title": "Reactive State in Leptos"
+  },
+  {
+    "path": "01-leptos-frontend/02-component-structure",
+    "title": "Component Structure"
+  },
+  {
+    "path": "02-tauri-backend/00-backend-overview",
+    "title": "The Tauri Backend Overview"
+  },
+  {
+    "path": "02-tauri-backend/01-tauri-commands",
+    "title": "Tauri Commands"
+  },
+  {
+    "path": "02-tauri-backend/02-state-management",
+    "title": "Backend State Management"
+  },
+  {
+    "path": "02-tauri-backend/03-security-and-permissions",
+    "title": "Security and Permissions"
+  },
+  {
+    "path": "03-bridge-communication/00-ipc-basics",
+    "title": "IPC Basics: The Bridge"
+  },
+  {
+    "path": "03-bridge-communication/01-invoking-commands",
+    "title": "Invoking Commands from Leptos"
+  },
+  {
+    "path": "03-bridge-communication/02-event-system",
+    "title": "The Event System"
+  },
+  {
+    "path": "03-bridge-communication/03-type-safe-sharing",
+    "title": "Type-Safe Sharing"
+  },
+  {
+    "path": "04-desktop-integration/00-os-api-overview",
+    "title": "OS API Overview"
+  },
+  {
+    "path": "04-desktop-integration/01-filesystem-access",
+    "title": "Filesystem Access"
+  },
+  {
+    "path": "04-desktop-integration/02-system-tray-menus",
+    "title": "System Tray and Menus"
+  },
+  {
+    "path": "04-desktop-integration/03-window-management",
+    "title": "Window Management"
+  },
+  {
+    "path": "04-desktop-integration/04-notifications",
+    "title": "Native Notifications"
+  },
+  {
+    "path": "05-build-and-distribute/00-build-process",
+    "title": "The Build Process"
+  },
+  {
+    "path": "05-build-and-distribute/01-target-platforms",
+    "title": "Target Platforms"
+  },
+  {
+    "path": "05-build-and-distribute/02-optimization-tips",
+    "title": "Optimization Tips"
+  }
+]

@@ -1,0 +1,28 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Overview of Tauri and Leptos"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Building modern desktop applications typically requires a choice between native performance and web-based flexibility. By combining "
+        },
+        {
+          "Bold": [
+            {
+              "Text": "Tauri, Leptos, and Rust, you get the best of both worlds: a high-performance Rust backend and a reactive, type-safe frontend.This guide will take you through the process of building a production-ready desktop app using this powerful combination."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

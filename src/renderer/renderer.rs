@@ -1,7 +1,10 @@
 use leptos::*;
-use crate::renderer::ast::Node;
+use md_compiler::parser::ast::Node;
 
 pub struct RuntimeRenderer;
+
+#[cfg(test)]
+mod renderer_tests;
 
 impl RuntimeRenderer {
     pub fn render(node: &Node) -> View {
@@ -74,6 +77,10 @@ impl RuntimeRenderer {
                         }).collect::<Vec<_>>()}
                     </ol> 
                 }.into_view()
+            }
+            
+            Node::ListItem(children) => {
+                view! { <li>{Self::render_children(children)}</li> }.into_view()
             }
             
             Node::Blockquote(children) => {

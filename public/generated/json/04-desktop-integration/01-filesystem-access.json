@@ -1,0 +1,109 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Filesystem Access"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Handling files is a core requirement for many desktop apps. Tauri provides a safe way to interact with the user's disk."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Scoped Access"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "For security, Tauri uses \"scopes\". You can define which directories the app is allowed to access in your configuration. Common scopes include:"
+        }
+      ]
+    },
+    {
+      "UnorderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "`$APPCONFIG`: The application's configuration directory."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "`$APPDATA`: The application's data directory."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "`$HOME`: The user's home folder."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Reading and Writing Files"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "You can perform file operations using the "
+        },
+        {
+          "InlineCode": "fs"
+        },
+        {
+          "Text": " plugin."
+        }
+      ]
+    },
+    {
+      "Paragraph": [
+        {
+          "Bold": [
+            {
+              "Text": "Example (Rust Backend):Instead of making the user type a path, use the "
+            },
+            {
+              "InlineCode": "dialog"
+            },
+            {
+              "Text": " plugin to show a native \"Open File\" or \"Save As\" window. This is the best practice for user experience and security."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

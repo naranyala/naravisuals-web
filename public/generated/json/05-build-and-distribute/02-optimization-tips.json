@@ -1,0 +1,148 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Optimization Tips"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "To make your application as professional and lightweight as possible, you should apply several optimization techniques."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Frontend Optimization (WASM)"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "WASM binaries can be large. Use "
+        },
+        {
+          "InlineCode": "wasm-opt"
+        },
+        {
+          "Text": " (provided by the "
+        },
+        {
+          "InlineCode": "binaryen"
+        },
+        {
+          "Text": " package) to shrink the size of your Leptos frontend. This can often reduce the binary size by 20-50%."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Backend Optimization (Rust)"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "In your "
+        },
+        {
+          "InlineCode": "Cargo.toml"
+        },
+        {
+          "Text": ", you can enable Link Time Optimization (LTO) and set the panic strategy to "
+        },
+        {
+          "InlineCode": "abort"
+        },
+        {
+          "Text": " to reduce the binary size further:"
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "toml",
+        "code": "[profile.release]\nlto = true\ncodegen-units = 1\npanic = 'abort'\nstrip = true"
+      }
+    },
+    {
+      "UnorderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**LTO**: Allows the compiler to optimize across crate boundaries."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Strip**: Removes debug symbols from the final binary, significantly reducing size."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Resource Management"
+          }
+        ]
+      }
+    },
+    {
+      "UnorderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Lazy Loading**: For very large apps, consider loading certain components only when needed."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Asset Compression**: Compress images and SVGs before embedding them in the app."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Memory Profiling**: Use tools like `heaptrack` or `Valgrind` on the backend to ensure there are no memory leaks in your Rust code."
+              }
+            ]
+          }
+        ]
+      ]
+    }
+  ]
+}

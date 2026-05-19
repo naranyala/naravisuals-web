@@ -1,0 +1,3 @@
+[build]
+public_dir = "public"
+dist_dir = "dist"

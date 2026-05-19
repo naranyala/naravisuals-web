@@ -1,6 +1,10 @@
 pub mod ast;
 pub mod tokenizer;
 pub mod rustgen;
+#[cfg(test)]
+mod tokenizer_tests;
+#[cfg(test)]
+mod parser_tests;
 
 use ast::{Node, ListItem};
 use tokenizer::{Token, tokenize};
@@ -66,17 +70,19 @@ impl<'a> Parser<'a> {
                 let mut children = Vec::new();
                 let mut content = String::new();
                 loop {
-                    if matches!(self.peek(), Some(Token::ExtensionEnd)) {
-                        self.advance();
+                    let peek = self.peek().cloned();
+                    if peek.is_none() || matches!(peek, Some(Token::ExtensionEnd)) {
+                        if peek.is_some() { self.advance(); }
                         break;
                     }
                     if let Some(node) = self.parse_block() {
                         children.push(node);
+                    } else {
+                        if let Some(Token::Text(t)) = peek {
+                            content.push_str(&t);
+                        }
+                        self.advance();
                     }
-                    if let Some(Token::Text(t)) = self.peek() {
-                        content.push_str(t);
-                    }
-                    self.advance();
                 }
                 Some(Node::Extension { name, attributes, children, content })
             }
@@ -93,6 +99,11 @@ impl<'a> Parser<'a> {
     }
     
     fn parse_paragraph(&mut self) -> Node {
+        let children = self.parse_inline_recursive();
+        Node::Paragraph(children)
+    }
+    
+    fn parse_inline_recursive(&mut self) -> Vec<Node> {
         let mut children = Vec::new();
         let mut text_buffer = String::new();
         
@@ -113,28 +124,35 @@ impl<'a> Parser<'a> {
                 Token::BoldStart => {
                     if !text_buffer.is_empty() {
                         children.push(Node::text(&text_buffer));
-                        text_buffer.clear();
+                        text_//- text_buffer.clear();
                     }
-                    children.push(self.parse_bold());
+                    self.advance(); // consume BoldStart
+                    children.push(Node::Bold(self.parse_inline_recursive_until(Token::BoldEnd)));
                 }
                 Token::ItalicStart => {
                     if !text_buffer.is_empty() {
                         children.push(Node::text(&text_buffer));
                         text_buffer.clear();
                     }
-                    children.push(self.parse_italic());
+                    self.advance(); // consume ItalicStart
+                    children.push(Node::Italic(self.parse_inline_recursive_until(Token::ItalicEnd)));
                 }
                 Token::LinkStart { url } => {
                     if !text_buffer.is_empty() {
                         children.push(Node::text(&text_buffer));
-                        text_buffer.clear();
+                        text_//- text_buffer.clear();
                     }
-                    children.push(self.parse_link(url));
+                    self.advance(); // consume LinkStart
+                    let text_nodes = self.parse_inline_recursive_until(Token::LinkEnd);
+                    let text = text_nodes.iter().filter_map(|n| {
+                        if let Node::Text(t) = n { Some(t.clone()) } else { None }
+                    }).collect::<String>();
+                    children.push(Node::Link { url, text });
                 }
                 Token::Image { url, alt } => {
                     if !text_buffer.is_empty() {
                         children.push(Node::text(&text_buffer));
-                        text_buffer.clear();
+                        text_//- text_buffer.clear();
                     }
                     children.push(Node::Image { url, alt });
                     self.advance();
@@ -152,70 +170,70 @@ impl<'a> Parser<'a> {
             children.push(Node::text(&text_buffer));
         }
         
-        Node::Paragraph(children)
+        children
     }
-    
-    fn parse_bold(&mut self) -> Node {
-        self.advance();
+
+    fn parse_inline_recursive_until(&mut self, end_token: Token) -> Vec<Node> {
         let mut children = Vec::new();
         let mut text_buffer = String::new();
+
         while let Some(token) = self.peek() {
-            match token {
-                Token::BoldEnd => { self.advance(); break; }
-                Token::Text(text) => { text_buffer.push_str(text); self.advance(); }
+            if *token == end_token {
+                self.advance();
+                break;
+            }
+
+            match token.clone() {
+                Token::Text(text) => {
+                    text_buffer.push_str(&text);
+                    self.advance();
+                }
                 Token::InlineCode(code) => {
                     if !text_buffer.is_empty() {
                         children.push(Node::text(&text_buffer));
                         text_buffer.clear();
                     }
-                    children.push(Node::InlineCode(code.clone()));
+                    children.push(Node::InlineCode(code));
                     self.advance();
                 }
-                _ => { self.advance(); }
-            }
-        }
-        if !text_buffer.is_empty() {
-            children.push(Node::text(&text_buffer));
-        }
-        Node::Bold(children)
-    }
-    
-    fn parse_italic(&mut self) -> Node {
-        self.advance();
-        let mut children = Vec::new();
-        let mut text_buffer = String::new();
-        while let Some(token) = self.peek() {
-            match token {
-                Token::Text(text) => { text_buffer.push_str(text); self.advance(); }
-                Token::InlineCode(code) => {
+                Token::BoldStart => {
                     if !text_buffer.is_empty() {
                         children.push(Node::text(&text_buffer));
-                        text_buffer.clear();
+                        text_//- text_buffer.clear();
                     }
-                    children.push(Node::InlineCode(code.clone()));
+                    self.advance();
+                    children.push(Node::Bold(self.parse_inline_recursive_until(Token::BoldEnd)));
+                }
+                Token::ItalicStart => {
+                    if !text_buffer.is_empty() {
+                        children.push(Node::text(&text_buffer));
+                        text_//- text_buffer.clear();
+                    }
+                    self.advance();
+                    children.push(Node::Italic(self.parse_inline_recursive_until(Token::ItalicEnd)));
+                }
+                Token::LinkStart { url } => {
+                    if !text_buffer.is_empty() {
+                        children.push(Node::text(&text_buffer));
+                        text_//- text_buffer.clear();
+                    }
+                    self.advance();
+                    let text_nodes = self.parse_inline_recursive_until(Token::LinkEnd);
+                    let text = text_nodes.iter().filter_map(|n| {
+                        if let Node::Text(t) = n { Some(t.clone()) } else { None }
+                    }).collect::<String>();
+                    children.push(Node::Link { url, text });
+                }
+                _ => {
                     self.advance();
                 }
-                Token::BlankLine | Token::Heading { .. } | Token::CodeBlock { .. } => break,
-                _ => { self.advance(); }
             }
         }
+
         if !text_buffer.is_empty() {
             children.push(Node::text(&text_buffer));
         }
-        Node::Italic(children)
-    }
-    
-    fn parse_link(&mut self, url: String) -> Node {
-        self.advance();
-        let mut text = String::new();
-        while let Some(token) = self.peek() {
-            match token {
-                Token::LinkEnd => { self.advance(); break; }
-                Token::Text(t) => { text.push_str(t); self.advance(); }
-                _ => { self.advance(); }
-            }
-        }
-        Node::Link { url, text }
+        children
     }
     
     fn parse_unordered_list(&mut self) -> Node {

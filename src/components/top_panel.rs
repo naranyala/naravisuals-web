@@ -1,5 +1,6 @@
 use leptos::*;
 use leptos_router::*;
+use crate::docs_data::DOCS;
 
 #[component]
 pub fn TopPanel(
@@ -8,6 +9,42 @@ pub fn TopPanel(
     set_open: WriteSignal<bool>,
     set_tools_open: WriteSignal<bool>,
 ) -> impl IntoView {
+    let location = use_location();
+
+    let breadcrumbs = move || {
+        let pathname = location.pathname.get();
+        let path = pathname.trim_start_matches('/');
+        if path.is_empty() {
+            return view! { <span>"Home"</span> }.into_view();
+        }
+
+        let entry = DOCS.iter().find(|e| e.path == path);
+        let title = entry.map(|e| e.title).unwrap_or("Unknown Page");
+        
+        let category_id = path.split('/').next().unwrap_or("");
+        let category_name = category_id
+            .split('-')
+            .skip(1)
+            .map(|s| {
+                let mut c = s.chars();
+                match c.next() {
+                    None => String::new(),
+                    Some(first) => first.to_uppercase().collect::<String>() + c.as_str(),
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(" ");
+
+        view! {
+            <div class="breadcrumbs">
+                <A href="/" class="breadcrumb-item">"Docs"</A>
+                <span class="breadcrumb-separator">" / "</span>
+                <span class="breadcrumb-item category">{category_name}</span>
+                <span class="breadcrumb-separator">" /, "</span>
+                <span class="breadcrumb-item current">{title}</span>
+            </div>
+        }.into_view()
+    };
 
     view! {
         <div class="top-panel">
@@ -18,6 +55,9 @@ pub fn TopPanel(
                 <A href="/" class="sidebar-logo">
                     <span>"Rigorstarter"</span>
                 </A>
+                <div class="panel-center">
+                    {breadcrumbs}
+                </div>
             </div>
             <div class="panel-right">
                 <div class="btn-group">

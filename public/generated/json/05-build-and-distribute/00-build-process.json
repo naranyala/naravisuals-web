@@ -1,0 +1,101 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "The Build Process"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Turning your code into a distributable application involves several steps of compilation and bundling."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "How Tauri Builds Your App"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "When you run "
+        },
+        {
+          "InlineCode": "cargo tauri build"
+        },
+        {
+          "Text": ", the following happens:"
+        }
+      ]
+    },
+    {
+      "OrderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Frontend Compilation**: Tauri runs your frontend build script (e.g., `trunk build --release`). This compiles your Leptos Rust code into an optimized WASM binary and generates the HTML/CSS/JS."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Backend Compilation**: Cargo compiles the native Rust core with the `--release` flag, applying heavy optimizations for speed and size."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Asset Bundling**: The WASM and assets are embedded directly into the final native binary."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "**Installer Generation**: Tauri uses system tools (like WiX on Windows or hdiutil on macOS) to wrap the binary in a standard installer (`.msi`, `.dmg`, `.deb`)."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Build Times"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "The first build is usually slow because it compiles all dependencies. Subsequent builds are much faster due to Cargo's caching. Use a fast SSD and ensure you have enough RAM to speed up the process."
+        }
+      ]
+    }
+  ]
+}

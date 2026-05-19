@@ -1,0 +1,28 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Architecture Overview"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Understanding how a Tauri + Leptos application is structured is key to building scalable software. The app is split into two primary environments: the "
+        },
+        {
+          "Bold": [
+            {
+              "Text": "Core Process and the WebView Process.The Core process is a native Rust application. It has full access to the operating system and is responsible for:The WebView process is where your user interface lives. In this stack, it is a Leptos application compiled to WebAssembly (WASM). It is responsible for:Because the Core and WebView processes are isolated for security reasons, they communicate via Inter-Process Communication (IPC). This bridge allows the frontend to \"invoke\" Rust functions and the backend to \"emit\" events to the UI."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

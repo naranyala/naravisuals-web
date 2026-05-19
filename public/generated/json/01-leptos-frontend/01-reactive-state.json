@@ -1,0 +1,121 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Reactive State in Leptos"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "At the heart of Leptos is its fine-grained reactivity system. Unlike frameworks that re-render entire components (like React), Leptos only updates the specific parts of the DOM that depend on a piece of state."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Signals"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Signals are the primary way to manage state. A signal consists of a getter and a setter."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "let (count, set_count) = create_signal(0);"
+      }
+    },
+    {
+      "UnorderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "`count()`: Returns the current value."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "`set_count.set(val)`: Updates the value."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "`set_count.update(|n| *n += 1)`: Updates the value using a closure."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Derived Signals (Memos)"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Memos are signals that depend on other signals. They are cached and only re-calculate when their dependencies change."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "let double_count = create_memo(move |_| count() * 2);"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Effects"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Effects allow you to run side-effecting code (like logging or calling a JS API) whenever a signal changes."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "create_effect(move |_| {\n    logging::log!(\"Count is now: {}\", count());\n});"
+      }
+    }
+  ]
+}

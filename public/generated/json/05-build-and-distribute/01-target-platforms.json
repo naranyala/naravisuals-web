@@ -1,0 +1,51 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Target Platforms"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Tauri allows you to target all major desktop operating systems from a single codebase."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Windows"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Tauri uses "
+        },
+        {
+          "Bold": [
+            {
+              "Text": "WebView2 (based on Edge/Chromium).Tauri uses WebKit (the engine behind Safari).Tauri uses WebKitGTK.Cross-compiling (e.g., building a Windows "
+            },
+            {
+              "InlineCode": ".exe"
+            },
+            {
+              "Text": " from a Mac) is complex in Rust. The recommended approach is to use GitHub Actions or other CI/CD pipelines to build the app on native runners for each platform."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

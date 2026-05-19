@@ -1,0 +1,115 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Getting Started with Leptos in Tauri"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Leptos is a full-stack Rust framework that is uniquely suited for Tauri because it can be compiled to WebAssembly (WASM), allowing you to write your frontend logic in Rust."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Installation and Setup"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "To use Leptos in a Tauri project, you typically set up a CSR (Client-Side Rendering) project. This ensures that the Tauri webview can load the WASM binary and render the UI without needing a separate server."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "The WASM Pipeline"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Your Rust code in the frontend is compiled using "
+        },
+        {
+          "InlineCode": "wasm-pack"
+        },
+        {
+          "Text": " or "
+        },
+        {
+          "InlineCode": "trunk"
+        },
+        {
+          "Text": ". Trunk is the most common tool for this, as it handles the HTML entry point, CSS bundling, and WASM compilation in one step."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Project Structure"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "A typical Tauri + Leptos project looks like this:"
+        }
+      ]
+    },
+    {
+      "UnorderedList": [
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "`src-tauri/`: The Rust backend (Tauri Core)."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "`src/`: The Rust frontend (Leptos components)."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "Paragraph": [
+              {
+                "Text": "`index.html`: The entry point for the webview."
+              }
+            ]
+          }
+        ]
+      ]
+    }
+  ]
+}

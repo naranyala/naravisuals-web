@@ -3,6 +3,10 @@ name = "md-compiler"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "md_compiler"
+path = "src/lib.rs"
+
 [[bin]]
 name = "md_compile"
 path = "src/main.rs"

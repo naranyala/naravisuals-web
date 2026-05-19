@@ -1,0 +1,108 @@
+{
+  "Document": [
+    {
+      "Heading": {
+        "level": 1,
+        "children": [
+          {
+            "Text": "Tauri Commands"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "Commands are the primary way for your Leptos frontend to trigger logic in the Rust backend. They work similarly to an API endpoint in a web server."
+        }
+      ]
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Defining a Command"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "A command is simply a Rust function annotated with "
+        },
+        {
+          "InlineCode": "#[tauri::command]"
+        },
+        {
+          "Text": "."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "#[tauri::command]\nfn calculate_stats(data: Vec<f64>) -> f64 {\n    let sum: f64 = data.iter().sum();\n    sum / data.len() as f64\n}"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Registering Commands"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "For a command to be reachable from the frontend, it must be registered in the "
+        },
+        {
+          "InlineCode": "invoke_handler"
+        },
+        {
+          "Text": " during the app builder phase:"
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "fn main() {\n    tauri::Builder::default()\n        .invoke_handler(tauri::generate_handler![calculate_stats])\n        .run(tauri::generate_context!())\n        .expect(\"error while running tauri application\");\n}"
+      }
+    },
+    {
+      "Heading": {
+        "level": 2,
+        "children": [
+          {
+            "Text": "Async Commands"
+          }
+        ]
+      }
+    },
+    {
+      "Paragraph": [
+        {
+          "Text": "If a command needs to perform I/O (like reading a file or calling an API), it should be "
+        },
+        {
+          "InlineCode": "async"
+        },
+        {
+          "Text": ". Tauri automatically handles the async execution so that the main thread is not blocked."
+        }
+      ]
+    },
+    {
+      "CodeBlock": {
+        "language": "rust",
+        "code": "#[tauri::command]\nasync fn fetch_remote_data(url: String) -> Result<String, String> {\n    reqwest::get(url).await\n        .map_err(|e| e.to_string())?\n        .text().await\n        .map_err(|e| e.to_string())\n}"
+      }
+    }
+  ]
+}
