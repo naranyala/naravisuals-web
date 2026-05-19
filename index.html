@@ -4,6 +4,58 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rigorstarter Webpage</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <style>
+        /* Critical CSS to prevent FOUC */
+        :root {
+            --primary-color: #60a5fa;
+            --bg-color: #0f172a;
+            --sidebar-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --hover-bg: #334155;
+        }
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: sans-serif;
+            overflow: hidden;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+        window.applyCodeEnhancements = function() {
+            // 1. Scroll to top of content area
+            const content = document.querySelector('.content');
+            if (content) content.scrollTop = 0;
+
+            // 2. Syntax Highlighting
+            hljs.highlightAll();
+
+            // 3. Copy Buttons
+            document.querySelectorAll('pre').forEach((block) => {
+                if (block.querySelector('.copy-code-btn')) return;
+
+                const button = document.createElement('button');
+                button.className = 'copy-code-btn';
+                button.innerText = 'Copy';
+
+                button.onclick = async () => {
+                    const code = block.querySelector('code').innerText;
+                    await navigator.clipboard.writeText(code);
+                    button.innerText = 'Copied!';
+                    setTimeout(() => {
+                        button.innerText = 'Copy';
+                    }, 2000);
+                };
+
+                block.style.position = 'relative';
+                block.appendChild(button);
+            });
+        };
+    </script>
 </head>
 <body></body>
 </html>
