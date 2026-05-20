@@ -2,7 +2,7 @@
   "Document": [
     {
       "Heading": {
-        "level": 1,
+        "level": "H1",
         "children": [
           {
             "Text": "IPC Basics: The Bridge"
@@ -19,7 +19,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Why IPC is Necessary"
@@ -36,7 +36,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "The Two Communication Patterns"
@@ -52,99 +52,93 @@
       ]
     },
     {
-      "OrderedList": []
-    },
-    {
-      "Paragraph": [
+      "OrderedList": [
         {
-          "Bold": [
+          "checked": null,
+          "children": [
             {
-              "Text": "Invoke (Request-Response)"
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Invoke (Request-Response)"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": The frontend asks the backend to do something and waits for a result."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Italic": [
+                    {
+                      "Text": "Example"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": \"Please calculate the sum of these numbers and tell me the answer.\""
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Emit (Event-Driven)"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": The backend (or frontend) sends a message without expecting an immediate reply."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Italic": [
+                    {
+                      "Text": "Example"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": \"The download is 50% complete.\""
+                }
+              ]
+            },
+            {
+              "Heading": {
+                "level": "H2",
+                "children": [
+                  {
+                    "Text": "Serialization with Serde"
+                  }
+                ]
+              }
+            },
+            {
+              "Paragraph": [
+                {
+                  "InlineCode": "serde::Serialize"
+                },
+                {
+                  "Text": " and "
+                },
+                {
+                  "InlineCode": "serde::Deserialize"
+                },
+                {
+                  "Text": ". This ensures that the Rust types in the backend match the objects expected by the frontend."
+                }
+              ]
             }
           ]
-        },
-        {
-          "Text": ": The frontend asks the backend to do something and waits for a result."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Italic": [
-            {
-              "Text": "Example"
-            }
-          ]
-        },
-        {
-          "Text": ": \"Please calculate the sum of these numbers and tell me the answer.\""
-        }
-      ]
-    },
-    {
-      "OrderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Emit (Event-Driven)"
-            }
-          ]
-        },
-        {
-          "Text": ": The backend (or frontend) sends a message without expecting an immediate reply."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Italic": [
-            {
-              "Text": "Example"
-            }
-          ]
-        },
-        {
-          "Text": ": \"The download is 50% complete.\""
-        }
-      ]
-    },
-    {
-      "Heading": {
-        "level": 2,
-        "children": [
-          {
-            "Text": "Serialization with Serde"
-          }
-        ]
-      }
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Because data is sent as JSON, every type sent across the bridge must implement "
-        },
-        {
-          "InlineCode": "serde::Serialize"
-        },
-        {
-          "Text": " and "
-        },
-        {
-          "InlineCode": "serde::Deserialize"
-        },
-        {
-          "Text": ". This ensures that the Rust types in the backend match the objects expected by the frontend."
         }
       ]
     }

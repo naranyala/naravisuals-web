@@ -1,25 +1,25 @@
-# Project TODOs
+# Project Roadmap and TODOs
 
-## Core Parser and Compiler
-- [ ] Implement full CommonMark specification support.
-- [ ] Add support for markdown tables and task lists.
-- [ ] Implement a build-time full-text search index for faster querying.
-- [ ] Add validation for broken internal links between articles.
+## Compiler and Parser Enhancements
+- Implement full CommonMark specification support for broader compatibility.
+- Extend the AST to support markdown tables and task lists.
+- Develop a build-time full-text search index to enable efficient client-side querying.
+- Integrate a link validator to detect and report broken internal references during the build process.
 
-## User Experience and UI
-- [ ] Implement a dark/light mode theme toggle.
-- [ ] Add smooth page transition animations.
-- [ ] Create a floating Table of Contents for long-form articles.
-- [ ] Improve mobile responsiveness for the Top Panel.
+## Frontend and User Experience
+- Implement a system-aware dark and light mode theme toggle.
+- Integrate smooth page transition animations to improve perceived performance.
+- Develop a floating Table of Contents for better navigation in long-form articles.
+- Optimize the Top Panel and sidebar for mobile devices and small screens.
 
-## Features and Extensions
-- [ ] Integrate Mermaid.js for rendering diagrams and flowcharts.
-- [ ] Add a "Copy to Clipboard" button for all code blocks.
-- [ ] Implement a "Search-as-you-type" interface in the Tools sidebar.
-- [ ] Add support for LaTeX math equations using KaTeX.
+## Feature Extensions
+- Integrate Mermaid.js to allow rendering of diagrams and flowcharts.
+- Add a "Copy to Clipboard" utility for all code blocks.
+- Build a "Search-as-you-type" interface within the Tools sidebar.
+- Implement LaTeX support using KaTeX for mathematical notation.
 
-## Infrastructure and Quality
-- [ ] Set up CI/CD pipeline via GitHub Actions for automated deployment.
-- [ ] Increase test coverage for the RuntimeRenderer views.
-- [ ] Optimize WASM binary size using `wasm-opt`.
-- [ ] Implement a documentation versioning system.
+## Infrastructure and Quality Assurance
+- Configure a CI/CD pipeline using GitHub Actions for automated testing and deployment.
+- Expand the test suite for the RuntimeRenderer to cover all AST node types.
+- Optimize the final WASM binary size using `wasm-opt`.
+- Implement a documentation versioning system to support multiple versions of the docs.

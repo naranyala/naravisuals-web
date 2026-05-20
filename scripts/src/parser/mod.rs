@@ -1,15 +1,16 @@
 pub mod ast;
-pub mod tokenizer;
-pub mod rustgen;
-#[cfg(test)]
-mod tokenizer_tests;
 #[cfg(test)]
 mod parser_tests;
+pub mod rustgen;
+pub mod tokenizer;
+#[cfg(test)]
+mod tokenizer_tests;
 
-use ast::{Node, ListItem};
-use tokenizer::{Token, tokenize};
+use crate::error::{CompilerError, CompilerResult};
+use crate::parser::ast::{HeadingLevel, ListItem, Node};
+use crate::parser::tokenizer::{tokenize, Token};
 
-pub fn parse(input: &str) -> Node {
+pub fn parse(input: &str) -> CompilerResult<Node> {
     let tokens = tokenize(input);
     let mut parser = Parser::new(&tokens);
     parser.parse_document()
@@ -24,36 +25,39 @@ impl<'a> Parser<'a> {
     fn new(tokens: &'a [Token]) -> Self {
         Self { tokens, pos: 0 }
     }
-    
+
     fn peek(&self) -> Option<&Token> {
         self.tokens.get(self.pos)
     }
-    
+
     fn advance(&mut self) -> Option<&Token> {
         let token = self.tokens.get(self.pos);
         self.pos += 1;
         token
     }
-    
-    fn parse_document(&mut self) -> Node {
+
+    fn parse_document(&mut self) -> CompilerResult<Node> {
         let mut children = Vec::new();
         while self.pos < self.tokens.len() {
             if let Some(node) = self.parse_block() {
                 children.push(node);
             }
         }
-        Node::Document(children)
+        Ok(Node::Document(children))
     }
-    
+
     fn parse_block(&mut self) -> Option<Node> {
-        match self.peek()?.clone() {
+        let token = self.peek()?.clone();
+        match token {
             Token::Heading { level, content } => {
                 self.advance();
                 let inline_tokens = tokenizer::tokenize_inline(&content);
                 let mut inline_parser = Parser::new(&inline_tokens);
                 let children = inline_parser.parse_inline_recursive();
+                let level = HeadingLevel::try_from(level).unwrap_or(HeadingLevel::H1);
                 Some(Node::Heading { level, children })
             }
+
             Token::CodeBlock { language, code } => {
                 self.advance();
                 Some(Node::CodeBlock { language, code })
@@ -68,22 +72,13 @@ impl<'a> Parser<'a> {
                 Some(Node::Blockquote(children))
             }
             Token::UnorderedListMarker | Token::TaskListMarker(_) => {
-                let is_task = matches!(self.peek(), Some(Token::TaskListMarker(_)));
-                let checked = if let Some(Token::TaskListMarker(c)) = self.peek() {
-                    Some(*c)
-                } else {
-                    None
-                };
-                self.advance();
-                let items = self.parse_list_recursive(Token::UnorderedListMarker);
-                // Note: if it was a task list, the first item is already marked as checked
-                // But our current parse_list_recursive doesn't handle task lists perfectly.
-                // Let's refine parse_list_recursive.
+                let marker = self.peek()?.clone();
+                let items = self.parse_list_recursive(marker);
                 Some(Node::UnorderedList(items))
             }
             Token::OrderedListMarker => {
-                self.advance();
-                let items = self.parse_list_recursive(Token::OrderedListMarker);
+                let marker = self.peek()?.clone();
+                let items = self.parse_list_recursive(marker);
                 Some(Node::OrderedList(items))
             }
             Token::TableRow(_) => {
@@ -94,7 +89,7 @@ impl<'a> Parser<'a> {
                     Some(Token::TableRow(cells)) => cells.clone(),
                     _ => return None,
                 };
-                
+
                 // Look for the separator row (|---|---|)
                 if let Some(Token::TableRow(cells)) = self.peek() {
                     if cells.iter().all(|c| c.contains('-')) {
@@ -102,16 +97,18 @@ impl<'a> Parser<'a> {
                         // Now collect subsequent data rows
                         while let Some(Token::TableRow(cells)) = self.peek().cloned() {
                             self.advance();
-                            let parsed_cells: Vec<Node> = cells.into_iter()
+                            let parsed_cells: Vec<Node> = cells
+                                .into_iter()
                                 .map(|c| Node::Paragraph(vec![Node::text(&c)]))
                                 .collect();
                             rows.push(parsed_cells);
                         }
-                        
-                        let headers: Vec<Node> = first_row_cells.into_iter()
+
+                        let headers: Vec<Node> = first_row_cells
+                            .into_iter()
                             .map(|c| Node::Paragraph(vec![Node::text(&c)]))
                             .collect();
-                            
+
                         return Some(Node::Table { headers, rows });
                     }
                 }
@@ -124,7 +121,9 @@ impl<'a> Parser<'a> {
                 loop {
                     let peek = self.peek().cloned();
                     if peek.is_none() || matches!(peek, Some(Token::ExtensionEnd)) {
-                        if peek.is_some() { self.advance(); }
+                        if peek.is_some() {
+                            self.advance();
+                        }
                         break;
                     }
                     if let Some(node) = self.parse_block() {
@@ -136,7 +135,12 @@ impl<'a> Parser<'a> {
                         self.advance();
                     }
                 }
-                Some(Node::Extension { name, attributes, children, content })
+                Some(Node::Extension {
+                    name,
+                    attributes,
+                    children,
+                    content,
+                })
             }
             Token::RawHtml(html) => {
                 self.advance();
@@ -149,7 +153,7 @@ impl<'a> Parser<'a> {
             _ => Some(self.parse_paragraph()),
         }
     }
-    
+
     fn parse_block_recursive(&mut self, stop_token: Token) -> Vec<Node> {
         let mut children = Vec::new();
         while let Some(token) = self.peek() {
@@ -165,10 +169,13 @@ impl<'a> Parser<'a> {
         children
     }
 
-    fn parse_list_recursive(&mut self, marker: Token) -> Vec<ListItem> {
+    fn parse_list_recursive(&mut self, _marker: Token) -> Vec<ListItem> {
         let mut items = Vec::new();
         while let Some(token) = self.peek() {
-            let is_marker = *token == marker || matches!(token, Token::TaskListMarker(_));
+            let is_marker = matches!(
+                token,
+                Token::UnorderedListMarker | Token::OrderedListMarker | Token::TaskListMarker(_)
+            );
             if is_marker {
                 let checked = if let Some(Token::TaskListMarker(c)) = self.peek() {
                     Some(*c)
@@ -176,12 +183,17 @@ impl<'a> Parser<'a> {
                     None
                 };
                 self.advance();
-                // A list item can contain multiple blocks (nested)
                 let mut item_content = Vec::new();
                 loop {
                     if let Some(t) = self.peek() {
-                        if *t == marker || matches!(t, Token::TaskListMarker(_)) { break; }
-                        // If we hit a block that isn't this list marker, consume it as part of the item
+                        if matches!(
+                            t,
+                            Token::UnorderedListMarker
+                                | Token::OrderedListMarker
+                                | Token::TaskListMarker(_)
+                        ) {
+                            break;
+                        }
                         if let Some(node) = self.parse_block() {
                             item_content.push(node);
                         } else {
@@ -191,7 +203,10 @@ impl<'a> Parser<'a> {
                         break;
                     }
                 }
-                items.push(ListItem { checked, children: item_content });
+                items.push(ListItem {
+                    checked,
+                    children: item_content,
+                });
             } else {
                 break;
             }
@@ -203,11 +218,11 @@ impl<'a> Parser<'a> {
         let children = self.parse_inline_recursive();
         Node::Paragraph(children)
     }
-    
+
     fn parse_inline_recursive(&mut self) -> Vec<Node> {
         let mut children = Vec::new();
         let mut text_buffer = String::new();
-        
+
         while let Some(token) = self.peek() {
             match token.clone() {
                 Token::Text(text) => {
@@ -228,7 +243,9 @@ impl<'a> Parser<'a> {
                         text_buffer.clear();
                     }
                     self.advance();
-                    children.push(Node::Bold(self.parse_inline_recursive_until(Token::BoldMarker)));
+                    children.push(Node::Bold(
+                        self.parse_inline_recursive_until(Token::BoldMarker),
+                    ));
                 }
                 Token::ItalicMarker => {
                     if !text_buffer.is_empty() {
@@ -236,7 +253,9 @@ impl<'a> Parser<'a> {
                         text_buffer.clear();
                     }
                     self.advance();
-                    children.push(Node::Italic(self.parse_inline_recursive_until(Token::ItalicMarker)));
+                    children.push(Node::Italic(
+                        self.parse_inline_recursive_until(Token::ItalicMarker),
+                    ));
                 }
                 Token::LinkStart { url } => {
                     if !text_buffer.is_empty() {
@@ -245,9 +264,16 @@ impl<'a> Parser<'a> {
                     }
                     self.advance();
                     let text_nodes = self.parse_inline_recursive_until(Token::LinkEnd);
-                    let text = text_nodes.iter().filter_map(|n| {
-                        if let Node::Text(t) = n { Some(t.clone()) } else { None }
-                    }).collect::<String>();
+                    let text = text_nodes
+                        .iter()
+                        .filter_map(|n| {
+                            if let Node::Text(t) = n {
+                                Some(t.clone())
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<String>();
                     children.push(Node::Link { url, text });
                 }
                 Token::Image { url, alt } => {
@@ -258,19 +284,27 @@ impl<'a> Parser<'a> {
                     children.push(Node::Image { url, alt });
                     self.advance();
                 }
-                Token::BlankLine | Token::Heading { .. } | Token::CodeBlock { .. } |
-                Token::HorizontalRule | Token::BlockquoteMarker | Token::UnorderedListMarker |
-                Token::OrderedListMarker | Token::ExtensionStart { .. } | Token::RawHtml(_) => {
+                Token::BlankLine
+                | Token::Heading { .. }
+                | Token::CodeBlock { .. }
+                | Token::HorizontalRule
+                | Token::BlockquoteMarker
+                | Token::UnorderedListMarker
+                | Token::OrderedListMarker
+                | Token::ExtensionStart { .. }
+                | Token::RawHtml(_) => {
                     break;
                 }
-                _ => { self.advance(); }
+                _ => {
+                    self.advance();
+                }
             }
         }
-        
+
         if !text_buffer.is_empty() {
             children.push(Node::text(&text_buffer));
         }
-        
+
         children
     }
 
@@ -303,7 +337,9 @@ impl<'a> Parser<'a> {
                         text_buffer.clear();
                     }
                     self.advance();
-                    children.push(Node::Bold(self.parse_inline_recursive_until(Token::BoldMarker)));
+                    children.push(Node::Bold(
+                        self.parse_inline_recursive_until(Token::BoldMarker),
+                    ));
                 }
                 Token::ItalicMarker => {
                     if !text_buffer.is_empty() {
@@ -311,7 +347,9 @@ impl<'a> Parser<'a> {
                         text_buffer.clear();
                     }
                     self.advance();
-                    children.push(Node::Italic(self.parse_inline_recursive_until(Token::ItalicMarker)));
+                    children.push(Node::Italic(
+                        self.parse_inline_recursive_until(Token::ItalicMarker),
+                    ));
                 }
                 Token::LinkStart { url } => {
                     if !text_buffer.is_empty() {
@@ -320,9 +358,16 @@ impl<'a> Parser<'a> {
                     }
                     self.advance();
                     let text_nodes = self.parse_inline_recursive_until(Token::LinkEnd);
-                    let text = text_nodes.iter().filter_map(|n| {
-                        if let Node::Text(t) = n { Some(t.clone()) } else { None }
-                    }).collect::<String>();
+                    let text = text_nodes
+                        .iter()
+                        .filter_map(|n| {
+                            if let Node::Text(t) = n {
+                                Some(t.clone())
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<String>();
                     children.push(Node::Link { url, text });
                 }
                 _ => {
@@ -336,12 +381,14 @@ impl<'a> Parser<'a> {
         }
         children
     }
-    
+
+    #[allow(dead_code)]
     fn parse_unordered_list(&mut self) -> Node {
         let items = self.parse_list_recursive(Token::UnorderedListMarker);
         Node::UnorderedList(items)
     }
-    
+
+    #[allow(dead_code)]
     fn parse_ordered_list(&mut self) -> Node {
         let items = self.parse_list_recursive(Token::OrderedListMarker);
         Node::OrderedList(items)

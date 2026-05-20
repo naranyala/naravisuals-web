@@ -2,7 +2,7 @@
   "Document": [
     {
       "Heading": {
-        "level": 1,
+        "level": "H1",
         "children": [
           {
             "Text": "System Tray and Menus"
@@ -19,7 +19,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Creating a Tray Icon"
@@ -48,7 +48,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Handling Tray Events"
@@ -65,7 +65,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Global Shortcuts"

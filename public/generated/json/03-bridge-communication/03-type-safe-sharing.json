@@ -2,7 +2,7 @@
   "Document": [
     {
       "Heading": {
-        "level": 1,
+        "level": "H1",
         "children": [
           {
             "Text": "Type-Safe Sharing"
@@ -19,7 +19,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "The Shared Crate Pattern"
@@ -66,7 +66,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Benefits of Shared Types"
@@ -75,106 +75,103 @@
       }
     },
     {
-      "OrderedList": []
-    },
-    {
-      "Paragraph": [
+      "OrderedList": [
         {
-          "Bold": [
+          "checked": null,
+          "children": [
             {
-              "Text": "Single Source of Truth"
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Single Source of Truth"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": If you add a field to "
+                },
+                {
+                  "InlineCode": "UserProfile"
+                },
+                {
+                  "Text": ", both the backend and frontend will be updated."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Compile-Time Checking"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": If the backend changes a field from a "
+                },
+                {
+                  "InlineCode": "String"
+                },
+                {
+                  "Text": " to an "
+                },
+                {
+                  "InlineCode": "Option<String>"
+                },
+                {
+                  "Text": ", the frontend code will fail to compile until you handle the "
+                },
+                {
+                  "InlineCode": "None"
+                },
+                {
+                  "Text": " case."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Reduced Boilerplate"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": No more manual JSON parsing or guessing the shape of the data coming across the bridge."
+                }
+              ]
+            },
+            {
+              "Heading": {
+                "level": "H2",
+                "children": [
+                  {
+                    "Text": "Implementation Tip"
+                  }
+                ]
+              }
+            },
+            {
+              "Paragraph": [
+                {
+                  "InlineCode": "serde"
+                },
+                {
+                  "Text": " and is compatible with "
+                },
+                {
+                  "InlineCode": "wasm32-unknown-unknown"
+                },
+                {
+                  "Text": " so it can be compiled into the Leptos frontend."
+                }
+              ]
             }
           ]
-        },
-        {
-          "Text": ": If you add a field to "
-        },
-        {
-          "InlineCode": "UserProfile"
-        },
-        {
-          "Text": ", both the backend and frontend will be updated."
-        }
-      ]
-    },
-    {
-      "OrderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Compile-Time Checking"
-            }
-          ]
-        },
-        {
-          "Text": ": If the backend changes a field from a "
-        },
-        {
-          "InlineCode": "String"
-        },
-        {
-          "Text": " to an "
-        },
-        {
-          "InlineCode": "Option<String>"
-        },
-        {
-          "Text": ", the frontend code will fail to compile until you handle the "
-        },
-        {
-          "InlineCode": "None"
-        },
-        {
-          "Text": " case."
-        }
-      ]
-    },
-    {
-      "OrderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Reduced Boilerplate"
-            }
-          ]
-        },
-        {
-          "Text": ": No more manual JSON parsing or guessing the shape of the data coming across the bridge."
-        }
-      ]
-    },
-    {
-      "Heading": {
-        "level": 2,
-        "children": [
-          {
-            "Text": "Implementation Tip"
-          }
-        ]
-      }
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Make sure your shared crate uses "
-        },
-        {
-          "InlineCode": "serde"
-        },
-        {
-          "Text": " and is compatible with "
-        },
-        {
-          "InlineCode": "wasm32-unknown-unknown"
-        },
-        {
-          "Text": " so it can be compiled into the Leptos frontend."
         }
       ]
     }

@@ -1,17 +1,17 @@
-pub mod markdown;
-pub mod editor;
-pub mod tools;
-pub mod sidebar;
-pub mod top_panel;
-pub mod layout;
 pub mod app;
+pub mod editor;
+pub mod layout;
+pub mod markdown;
 pub mod search_modal;
+pub mod sidebar;
+pub mod tools;
+pub mod top_panel;
 
 pub use markdown::MarkdownContent;
-pub use editor::MarkdownEditor;
-pub use tools::ToolsSidebar;
-pub use sidebar::Sidebar;
-pub use top_panel::TopPanel;
-pub use layout::Layout;
+// pub use editor::MarkdownEditor;
 pub use app::App;
+pub use layout::Layout;
 pub use search_modal::SearchModal;
+pub use sidebar::Sidebar;
+pub use tools::ToolsSidebar;
+pub use top_panel::TopPanel;

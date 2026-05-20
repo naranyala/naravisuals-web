@@ -1,38 +1,50 @@
 # Rigorstarter Webpage
 
-A high-performance documentation website built with Rust, Leptos, and WebAssembly.
+Rigorstarter is a high-performance documentation framework built with Rust, Leptos, and WebAssembly. It is designed to deliver a seamless reading experience by moving the computational cost of markdown parsing from the client's browser to the build process.
 
-## Overview
+## Core Concept
 
-Rigorstarter is a documentation engine that shifts the heavy lifting of markdown parsing from the browser to the build pipeline. By pre-compiling markdown into a structured Abstract Syntax Tree (AST) and embedding that data directly into the WASM binary, the site achieves near-instant page transitions and zero-latency content loading.
+Unlike traditional documentation sites that fetch markdown files at runtime or render them on the fly, Rigorstarter uses a pre-compilation strategy. Markdown source files are transformed into a structured Abstract Syntax Tree (AST) during the build phase. This AST is then embedded directly into the WebAssembly binary, enabling near-instantaneous page loads and transitions.
 
-## Architecture
+## Technical Architecture
 
-The project utilizes a custom build-time pipeline:
+The system consists of three primary components:
 
-1.  **md-compiler**: A custom Rust tool that scans the `docs/` directory and parses markdown files into a specialized AST.
-2.  **Embedded Storage**: The resulting ASTs are stored as JSON strings and embedded into the final binary using `include_str!`, removing the need for runtime HTTP requests for article content.
-3.  **Leptos Frontend**: A Client-Side Rendered (CSR) application that consumes the embedded ASTs and renders them into the DOM using a custom `RuntimeRenderer`.
+### 1. md-compiler
+A dedicated Rust tool located in the `scripts/` directory. It performs the following steps:
+- Scans the `docs/` directory for markdown files.
+- Parses the content into a custom AST.
+- Generates JSON representations of the ASTs.
+- Produces Rust source files (`src/docs_data.rs` and `src/search_index.rs`) that embed this data using `include_str!`.
+
+### 2. Embedded Data Layer
+By embedding the parsed content directly into the binary, the application eliminates the need for runtime HTTP requests to fetch article content, significantly reducing Time to Interactive (TTI).
+
+### 3. Leptos Frontend
+A Client-Side Rendered (CSR) application that provides:
+- A custom `RuntimeRenderer` that converts the embedded AST nodes into Leptos views.
+- Reactive navigation and state management for a fluid user experience.
+- An integrated Markdown Editor for real-time previewing and testing of AST rendering.
 
 ## Key Features
 
-- **Zero-Latency Content**: Articles are embedded in the WASM binary for instant loading.
-- **Dynamic Navigation**: A reactive sidebar and top-panel breadcrumbs that automatically update based on the article hierarchy.
-- **Custom Extensions**: Support for specialized markdown blocks beyond standard specifications.
-- **Type-Safe Rendering**: The AST is shared between the compiler and the renderer, ensuring structural consistency.
+- Instant Content Loading: Embedded ASTs ensure zero-latency access to documentation.
+- Type-Safe Rendering: The shared AST structure between the compiler and renderer prevents structural regressions.
+- Build-Time Validation: The pipeline can be extended to validate links and structure before deployment.
+- Reactive UI: Built with Leptos for high-performance DOM updates.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Rust toolchain
+- Rust toolchain (latest stable)
 - Trunk (WASM bundler)
 - Wasm-bindgen CLI
 
-### Installation and Build
+### Installation and Development
 
 1. Clone the repository.
-2. Run the build script to compile markdown and the frontend:
+2. Execute the build script to compile markdown assets and build the frontend:
    ```bash
    ./build.sh
    ```
@@ -43,7 +55,7 @@ The project utilizes a custom build-time pipeline:
 
 ## Project Structure
 
-- `docs/`: Source markdown files organized by category.
-- `scripts/`: The `md-compiler` crate responsible for parsing and AST generation.
-- `src/`: The Leptos frontend application.
+- `docs/`: Source markdown articles.
+- `scripts/`: The `md-compiler` source code.
+- `src/`: The Leptos frontend application, including the renderer and components.
 - `styles/`: Global CSS and layout definitions.

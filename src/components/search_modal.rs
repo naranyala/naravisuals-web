@@ -1,18 +1,18 @@
+use crate::docs_data::DOCS;
+use crate::search_index::SEARCH_INDEX;
+use crate::utils::search::{highlight_match, SearchResult};
 use leptos::*;
 use leptos_router::*;
 use std::collections::BTreeMap;
-use crate::utils::search::{SearchResult, highlight_match};
-use crate::docs_data::DOCS;
-use crate::search_index::SEARCH_INDEX;
 
 #[component]
 pub fn SearchModal(is_open: ReadSignal<bool>, on_close: Callback<()>) -> impl IntoView {
     let (query, set_query) = create_signal("".to_string());
-    
+
     // Focus input automatically when opened
     create_effect(move |_| {
         if is_open.get() {
-            // We can't easily get the element here without a NodeRef, 
+            // We can't easily get the element here without a NodeRef,
             // but we can handle it in the view with an autofocus attribute.
         }
     });
@@ -24,8 +24,9 @@ pub fn SearchModal(is_open: ReadSignal<bool>, on_close: Callback<()>) -> impl In
         }
 
         let q_lower = q.to_lowercase();
-        let mut path_matches: BTreeMap<String, (String, Option<String>, Option<String>)> = BTreeMap::new();
-        
+        let mut path_matches: BTreeMap<String, (String, Option<String>, Option<String>)> =
+            BTreeMap::new();
+
         for entry in SEARCH_INDEX {
             let mut matched_title = false;
             let mut matched_content = false;
@@ -39,11 +40,12 @@ pub fn SearchModal(is_open: ReadSignal<bool>, on_close: Callback<()>) -> impl In
             if entry.content.to_lowercase().contains(&q_lower) {
                 matched_content = true;
             }
-            
+
             if matched_title || matched_content {
-                let title = DOCS.iter()
+                let title = DOCS
+                    .iter()
                     .find(|d| d.path == entry.path)
-                    .map(|d| highlight_match(&d.title, &q))
+                    .map(|d| highlight_match(d.title, &q))
                     .unwrap_or_else(|| entry.path.to_string());
 
                 let snippet = if matched_content {
@@ -52,7 +54,8 @@ pub fn SearchModal(is_open: ReadSignal<bool>, on_close: Callback<()>) -> impl In
                     None
                 };
 
-                path_matches.entry(entry.path.to_string())
+                path_matches
+                    .entry(entry.path.to_string())
                     .or_insert((title, None, snippet));
             }
         }
@@ -75,10 +78,10 @@ pub fn SearchModal(is_open: ReadSignal<bool>, on_close: Callback<()>) -> impl In
                 <div class="search-modal-header">
                     <div class="search-input-wrapper">
                         <span class="search-icon">"🔍"</span>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             class="search-modal-input"
-                            placeholder="Search documentation... (Esc to close)" 
+                            placeholder="Search documentation... (Esc to close)"
                             autofocus
                             on:input=move |ev| set_query.set(event_target_value(&ev))
                             on:keydown=move |ev| {

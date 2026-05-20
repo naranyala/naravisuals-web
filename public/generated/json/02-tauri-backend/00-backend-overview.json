@@ -2,7 +2,7 @@
   "Document": [
     {
       "Heading": {
-        "level": 1,
+        "level": "H1",
         "children": [
           {
             "Text": "The Tauri Backend Overview"
@@ -19,7 +19,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Role of the Backend"
@@ -35,111 +35,105 @@
       ]
     },
     {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
+      "UnorderedList": [
         {
-          "Bold": [
+          "checked": null,
+          "children": [
             {
-              "Text": "OS Interop"
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "OS Interop"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Talking to the filesystem, network, and hardware."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Performance"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Running computationally expensive tasks that would freeze the UI."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Security"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Managing sensitive data and API keys that should never be exposed to the frontend."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Lifecycle"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Controlling when the app starts, minimizes, or closes."
+                }
+              ]
+            },
+            {
+              "Heading": {
+                "level": "H2",
+                "children": [
+                  {
+                    "Text": "The Rust Ecosystem"
+                  }
+                ]
+              }
+            },
+            {
+              "Paragraph": [
+                {
+                  "InlineCode": "crates.io"
+                },
+                {
+                  "Text": ". Whether you need a database like "
+                },
+                {
+                  "InlineCode": "sqlx"
+                },
+                {
+                  "Text": ", a networking library like "
+                },
+                {
+                  "InlineCode": "reqwest"
+                },
+                {
+                  "Text": ", or a serialization tool like "
+                },
+                {
+                  "InlineCode": "serde"
+                },
+                {
+                  "Text": ", you have the full power of the Rust ecosystem at your disposal."
+                }
+              ]
             }
           ]
-        },
-        {
-          "Text": ": Talking to the filesystem, network, and hardware."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Performance"
-            }
-          ]
-        },
-        {
-          "Text": ": Running computationally expensive tasks that would freeze the UI."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Security"
-            }
-          ]
-        },
-        {
-          "Text": ": Managing sensitive data and API keys that should never be exposed to the frontend."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Lifecycle"
-            }
-          ]
-        },
-        {
-          "Text": ": Controlling when the app starts, minimizes, or closes."
-        }
-      ]
-    },
-    {
-      "Heading": {
-        "level": 2,
-        "children": [
-          {
-            "Text": "The Rust Ecosystem"
-          }
-        ]
-      }
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Because the backend is standard Rust, you can use any crate from "
-        },
-        {
-          "InlineCode": "crates.io"
-        },
-        {
-          "Text": ". Whether you need a database like "
-        },
-        {
-          "InlineCode": "sqlx"
-        },
-        {
-          "Text": ", a networking library like "
-        },
-        {
-          "InlineCode": "reqwest"
-        },
-        {
-          "Text": ", or a serialization tool like "
-        },
-        {
-          "InlineCode": "serde"
-        },
-        {
-          "Text": ", you have the full power of the Rust ecosystem at your disposal."
         }
       ]
     }

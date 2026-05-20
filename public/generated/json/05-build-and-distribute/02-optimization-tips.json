@@ -2,7 +2,7 @@
   "Document": [
     {
       "Heading": {
-        "level": 1,
+        "level": "H1",
         "children": [
           {
             "Text": "Optimization Tips"
@@ -19,7 +19,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Frontend Optimization (WASM)"
@@ -48,7 +48,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Backend Optimization (Rust)"
@@ -82,109 +82,103 @@
       }
     },
     {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
+      "UnorderedList": [
         {
-          "Bold": [
+          "checked": null,
+          "children": [
             {
-              "Text": "LTO"
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "LTO"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Allows the compiler to optimize across crate boundaries."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Strip"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Removes debug symbols from the final binary, significantly reducing size."
+                }
+              ]
+            },
+            {
+              "Heading": {
+                "level": "H2",
+                "children": [
+                  {
+                    "Text": "Resource Management"
+                  }
+                ]
+              }
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Lazy Loading"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": For very large apps, consider loading certain components only when needed."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Asset Compression"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Compress images and SVGs before embedding them in the app."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Memory Profiling"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Use tools like "
+                },
+                {
+                  "InlineCode": "heaptrack"
+                },
+                {
+                  "Text": " or "
+                },
+                {
+                  "InlineCode": "Valgrind"
+                },
+                {
+                  "Text": " on the backend to ensure there are no memory leaks in your Rust code."
+                }
+              ]
             }
           ]
-        },
-        {
-          "Text": ": Allows the compiler to optimize across crate boundaries."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Strip"
-            }
-          ]
-        },
-        {
-          "Text": ": Removes debug symbols from the final binary, significantly reducing size."
-        }
-      ]
-    },
-    {
-      "Heading": {
-        "level": 2,
-        "children": [
-          {
-            "Text": "Resource Management"
-          }
-        ]
-      }
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Lazy Loading"
-            }
-          ]
-        },
-        {
-          "Text": ": For very large apps, consider loading certain components only when needed."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Asset Compression"
-            }
-          ]
-        },
-        {
-          "Text": ": Compress images and SVGs before embedding them in the app."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Memory Profiling"
-            }
-          ]
-        },
-        {
-          "Text": ": Use tools like "
-        },
-        {
-          "InlineCode": "heaptrack"
-        },
-        {
-          "Text": " or "
-        },
-        {
-          "InlineCode": "Valgrind"
-        },
-        {
-          "Text": " on the backend to ensure there are no memory leaks in your Rust code."
         }
       ]
     }

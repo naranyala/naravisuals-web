@@ -1,5 +1,5 @@
-use wasm_bindgen::prelude::*;
 use md_compiler::parser::parse;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub fn compile_markdown(input: &str) -> String {

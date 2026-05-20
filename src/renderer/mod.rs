@@ -1,3 +1,5 @@
-pub mod renderer;
+pub mod blocks;
+pub mod inlines;
+pub mod runtime;
 
-pub use renderer::RuntimeRenderer;
+pub use runtime::RuntimeRenderer;

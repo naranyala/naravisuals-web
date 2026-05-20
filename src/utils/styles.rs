@@ -129,6 +129,15 @@ pub const SIDEBAR_CSS: &str = r#"
     padding: 0.25rem;
 }
 
+.sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
 .sidebar-overlay {
     position: fixed;
     top: 0;
@@ -410,39 +419,67 @@ pub const SIDEBAR_CSS: &str = r#"
     padding: 1rem;
 }
 
-.tools-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+.tools-section {
+    margin-bottom: 2rem;
 }
 
-.tool-item {
+.tools-section h3 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.tools-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tools-column {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-color);
-    cursor: pointer;
-    transition: all 0.2s;
-    text-decoration: none;
+    gap: 0.5rem;
 }
 
-.tool-item:hover {
+.tool-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--text-color);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tool-btn:hover {
     border-color: var(--primary-color);
     background-color: var(--hover-bg);
 }
 
-.tool-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
+.tool-btn.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--bg-color);
 }
 
-.tool-name {
-    font-size: 0.8rem;
-    color: var(--text-color);
-    text-align: center;
+.tool-btn.action {
+    width: 100%;
+    justify-content: flex-start;
+    padding-left: 1rem;
+    background-color: rgba(96, 165, 250, 0.1);
+    border-color: rgba(96, 165, 250, 0.2);
+}
+
+.tool-btn.action:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-color);
 }
 
 @media (max-width: 768px) {

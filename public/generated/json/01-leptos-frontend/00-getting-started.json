@@ -2,7 +2,7 @@
   "Document": [
     {
       "Heading": {
-        "level": 1,
+        "level": "H1",
         "children": [
           {
             "Text": "Getting Started with Leptos in Tauri"
@@ -19,7 +19,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Installation and Setup"
@@ -36,7 +36,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "The WASM Pipeline"
@@ -65,7 +65,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Project Structure"
@@ -81,41 +81,41 @@
       ]
     },
     {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
+      "UnorderedList": [
         {
-          "InlineCode": "src-tauri/"
-        },
-        {
-          "Text": ": The Rust backend (Tauri Core)."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "InlineCode": "src/"
-        },
-        {
-          "Text": ": The Rust frontend (Leptos components)."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "InlineCode": "index.html"
-        },
-        {
-          "Text": ": The entry point for the webview."
+          "checked": null,
+          "children": [
+            {
+              "Paragraph": [
+                {
+                  "InlineCode": "src-tauri/"
+                },
+                {
+                  "Text": ": The Rust backend (Tauri Core)."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "InlineCode": "src/"
+                },
+                {
+                  "Text": ": The Rust frontend (Leptos components)."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "InlineCode": "index.html"
+                },
+                {
+                  "Text": ": The entry point for the webview."
+                }
+              ]
+            }
+          ]
         }
       ]
     }

@@ -1,30 +1,27 @@
+use crate::docs_data::DOCS;
+use crate::state::AppState;
 use leptos::*;
 use leptos_router::*;
-use crate::docs_data::DOCS;
-use crate::components::SearchModal;
 
 #[component]
-pub fn TopPanel(
-    sidebar_width: ReadSignal<String>,
-    set_width: WriteSignal<String>,
-    set_open: WriteSignal<bool>,
-    set_tools_open: WriteSignal<bool>,
-) -> impl IntoView {
-    let is_light = use_context::<ReadSignal<bool>>().expect("is_light signal not provided");
-    let set_is_light = use_context::<WriteSignal<bool>>().expect("set_is_light signal not provided");
+pub fn TopPanel(set_tools_open: WriteSignal<bool>) -> impl IntoView {
+    let state = AppState::use_state();
+    let set_open = state.sidebar.set_is_open;
     let location = use_location();
 
     let breadcrumbs = move || {
         let pathname = location.pathname.get();
         let path = pathname.trim_start_matches('/');
-        if path.is_empty() {
-            return view! { <span>"Home"</span> }.into_view();
-        }
+        let resolved_path = if path.is_empty() {
+            DOCS.first().map(|e| e.path).unwrap_or_default()
+        } else {
+            path
+        };
 
-        let entry = DOCS.iter().find(|e| e.path == path);
+        let entry = DOCS.iter().find(|e| e.path == resolved_path);
         let title = entry.map(|e| e.title).unwrap_or("Unknown Page");
-        
-        let category_id = path.split('/').next().unwrap_or("");
+
+        let category_id = resolved_path.split('/').next().unwrap_or("");
         let category_name = category_id
             .split('-')
             .skip(1)
@@ -43,10 +40,11 @@ pub fn TopPanel(
                 <A href="/" class="breadcrumb-item">"Docs"</A>
                 <span class="breadcrumb-separator">" / "</span>
                 <span class="breadcrumb-item category">{category_name}</span>
-                <span class="breadcrumb-separator">" /, "</span>
+                <span class="breadcrumb-separator">" / "</span>
                 <span class="breadcrumb-item current">{title}</span>
             </div>
-        }.into_view()
+        }
+        .into_view()
     };
 
     view! {
@@ -63,46 +61,6 @@ pub fn TopPanel(
                 </div>
             </div>
             <div class="panel-right">
-                <div class="btn-group">
-                    <button 
-                        class=move || format!("mode-btn {}", if !is_light.get() { "active" } else { "" })
-                        on:click=move |_| set_is_light.set(false)
-                    >
-                        "🌙"
-                    </button>
-                    <button 
-                        class=move || format!("mode-btn {}", if is_light.get() { "active" } else { "" })
-                        on:click=move |_| set_is_light.set(true)
-                    >
-                        "☀️"
-                    </button>
-                </div>
-                <div class="btn-group" style="margin-left: 0.5rem;">
-                    <button 
-                        class=move || format!("mode-btn {}", if sidebar_width.get() == "0%" { "active" } else { "" })
-                        on:click=move |_| set_width.set("0%".to_string())
-                    >
-                        "No"
-                    </button>
-                    <button 
-                        class=move || format!("mode-btn {}", if sidebar_width.get() == "25%" { "active" } else { "" })
-                        on:click=move |_| set_width.set("25%".to_string())
-                    >
-                        "25%"
-                    </button>
-                    <button 
-                        class=move || format!("mode-btn {}", if sidebar_width.get() == "50%" { "active" } else { "" })
-                        on:click=move |_| set_width.set("50%".to_string())
-                    >
-                        "50%"
-                    </button>
-                </div>
-                <button class="search-trigger-btn" on:click=move |_| {
-                    use_context::<WriteSignal<bool>>().expect("set_is_search_open not provided").set(true);
-                }>
-                    <span class="search-icon">"🔍"</span>
-                    <span class="search-label">"Search"</span>
-                </button>
                 <button class="tools-btn" on:click=move |_| set_tools_open.update(|o| *o = !*o)>
                     "🧰"
                 </button>

@@ -2,7 +2,7 @@
   "Document": [
     {
       "Heading": {
-        "level": 1,
+        "level": "H1",
         "children": [
           {
             "Text": "OS API Overview"
@@ -19,7 +19,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Beyond the Browser"
@@ -36,7 +36,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "The Plugin Architecture"
@@ -52,111 +52,95 @@
       ]
     },
     {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
+      "UnorderedList": [
         {
-          "InlineCode": "tauri-plugin-fs"
-        },
-        {
-          "Text": ": Filesystem access."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "InlineCode": "tauri-plugin-shell"
-        },
-        {
-          "Text": ": Opening URLs or executing external commands."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "InlineCode": "tauri-plugin-http"
-        },
-        {
-          "Text": ": Making native HTTP requests (bypassing CORS)."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "InlineCode": "tauri-plugin-dialog"
-        },
-        {
-          "Text": ": Native save/open file dialogs."
-        }
-      ]
-    },
-    {
-      "Heading": {
-        "level": 2,
-        "children": [
-          {
-            "Text": "Choosing Between Rust and JS APIs"
-          }
-        ]
-      }
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Most Tauri plugins provide both a Rust API (for the backend) and a JS API (for the frontend)."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Use the "
-        },
-        {
-          "Bold": [
+          "checked": null,
+          "children": [
             {
-              "Text": "Rust API"
+              "Paragraph": [
+                {
+                  "InlineCode": "tauri-plugin-fs"
+                },
+                {
+                  "Text": ": Filesystem access."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "InlineCode": "tauri-plugin-shell"
+                },
+                {
+                  "Text": ": Opening URLs or executing external commands."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "InlineCode": "tauri-plugin-http"
+                },
+                {
+                  "Text": ": Making native HTTP requests (bypassing CORS)."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "InlineCode": "tauri-plugin-dialog"
+                },
+                {
+                  "Text": ": Native save/open file dialogs."
+                }
+              ]
+            },
+            {
+              "Heading": {
+                "level": "H2",
+                "children": [
+                  {
+                    "Text": "Choosing Between Rust and JS APIs"
+                  }
+                ]
+              }
+            },
+            {
+              "Paragraph": [
+                {
+                  "Text": "Use the "
+                },
+                {
+                  "Bold": [
+                    {
+                      "Text": "Rust API"
+                    }
+                  ]
+                },
+                {
+                  "Text": " for secure, heavy-duty operations."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Text": "Use the "
+                },
+                {
+                  "Bold": [
+                    {
+                      "Text": "JS API"
+                    }
+                  ]
+                },
+                {
+                  "Text": " for simple UI-driven tasks (like opening a folder picker)."
+                }
+              ]
             }
           ]
-        },
-        {
-          "Text": " for secure, heavy-duty operations."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Use the "
-        },
-        {
-          "Bold": [
-            {
-              "Text": "JS API"
-            }
-          ]
-        },
-        {
-          "Text": " for simple UI-driven tasks (like opening a folder picker)."
         }
       ]
     }

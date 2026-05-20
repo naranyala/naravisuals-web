@@ -2,7 +2,7 @@
   "Document": [
     {
       "Heading": {
-        "level": 1,
+        "level": "H1",
         "children": [
           {
             "Text": "The Event System"
@@ -19,7 +19,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Emitting Events from Rust"
@@ -42,7 +42,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Listening for Events in Leptos"
@@ -71,7 +71,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Use Cases for Events"
@@ -80,53 +80,53 @@
       }
     },
     {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
+      "UnorderedList": [
         {
-          "Bold": [
+          "checked": null,
+          "children": [
             {
-              "Text": "Progress Bars"
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Progress Bars"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Updating a percentage during a large file upload."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Hardware Status"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Notifying the UI when a USB device is plugged in."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Global State Sync"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Updating multiple windows simultaneously when a setting changes."
+                }
+              ]
             }
           ]
-        },
-        {
-          "Text": ": Updating a percentage during a large file upload."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Hardware Status"
-            }
-          ]
-        },
-        {
-          "Text": ": Notifying the UI when a USB device is plugged in."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Global State Sync"
-            }
-          ]
-        },
-        {
-          "Text": ": Updating multiple windows simultaneously when a setting changes."
         }
       ]
     }

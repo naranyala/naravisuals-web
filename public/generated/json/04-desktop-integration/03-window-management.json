@@ -2,7 +2,7 @@
   "Document": [
     {
       "Heading": {
-        "level": 1,
+        "level": "H1",
         "children": [
           {
             "Text": "Window Management"
@@ -19,7 +19,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Customizing the Window"
@@ -41,135 +41,102 @@
       ]
     },
     {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
+      "UnorderedList": [
         {
-          "Bold": [
+          "checked": null,
+          "children": [
             {
-              "Text": "Transparency"
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Transparency"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Set "
+                },
+                {
+                  "InlineCode": "transparent: true"
+                },
+                {
+                  "Text": " to create non-rectangular windows or glass effects."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Frameless"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Set "
+                },
+                {
+                  "InlineCode": "decorations: false"
+                },
+                {
+                  "Text": " to remove the standard OS title bar and borders, allowing you to build a custom, branded header."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Always on Top"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Keep your app visible above all other windows (useful for toolbars or overlays)."
+                }
+              ]
+            },
+            {
+              "Heading": {
+                "level": "H2",
+                "children": [
+                  {
+                    "Text": "Multi-Window Applications"
+                  }
+                ]
+              }
+            },
+            {
+              "Paragraph": [
+                {
+                  "Text": "A main dashboard and a separate \"Settings\" window."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Text": "Tool palettes that can be dragged to a second monitor."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Text": "Splash screens that disappear once the app has finished loading."
+                }
+              ]
+            },
+            {
+              "CodeBlock": {
+                "language": "rust",
+                "code": "let window = tauri::WindowBuilder::new(\n    app, \n    \"settings\", \n    tauri::WindowUrl::App(\"settings.html\".into())\n).build()?;"
+              }
             }
           ]
-        },
-        {
-          "Text": ": Set "
-        },
-        {
-          "InlineCode": "transparent: true"
-        },
-        {
-          "Text": " to create non-rectangular windows or glass effects."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Frameless"
-            }
-          ]
-        },
-        {
-          "Text": ": Set "
-        },
-        {
-          "InlineCode": "decorations: false"
-        },
-        {
-          "Text": " to remove the standard OS title bar and borders, allowing you to build a custom, branded header."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Always on Top"
-            }
-          ]
-        },
-        {
-          "Text": ": Keep your app visible above all other windows (useful for toolbars or overlays)."
-        }
-      ]
-    },
-    {
-      "Heading": {
-        "level": 2,
-        "children": [
-          {
-            "Text": "Multi-Window Applications"
-          }
-        ]
-      }
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Tauri supports creating multiple windows. This is useful for:"
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "A main dashboard and a separate \"Settings\" window."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Tool palettes that can be dragged to a second monitor."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Splash screens that disappear once the app has finished loading."
-        }
-      ]
-    },
-    {
-      "CodeBlock": {
-        "language": "rust",
-        "code": "let window = tauri::WindowBuilder::new(\n    app, \n    \"settings\", \n    tauri::WindowUrl::App(\"settings.html\".into())\n).build()?;"
-      }
-    },
-    {
-      "Heading": {
-        "level": 2,
-        "children": [
-          {
-            "Text": "Window Communication"
-          }
-        ]
-      }
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Windows can communicate with each other by emitting events. One window can tell another window to refresh its data or close itself."
         }
       ]
     }

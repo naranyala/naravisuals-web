@@ -2,7 +2,7 @@
   "Document": [
     {
       "Heading": {
-        "level": 1,
+        "level": "H1",
         "children": [
           {
             "Text": "Native Notifications"
@@ -19,7 +19,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Sending Notifications"
@@ -42,7 +42,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "Customizing Notifications"
@@ -58,70 +58,63 @@
       ]
     },
     {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
+      "UnorderedList": [
         {
-          "Bold": [
+          "checked": null,
+          "children": [
             {
-              "Text": "Icons"
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Icons"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": A small image next to the text."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Actions"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Buttons within the notification (e.g., \"Undo\" or \"Open\")."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Urgency"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Marking the notification as critical to bypass \"Do Not Disturb\" modes (where permitted)."
+                }
+              ]
+            },
+            {
+              "Heading": {
+                "level": "H2",
+                "children": [
+                  {
+                    "Text": "Best Practices"
+                  }
+                ]
+              }
             }
           ]
-        },
-        {
-          "Text": ": A small image next to the text."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Actions"
-            }
-          ]
-        },
-        {
-          "Text": ": Buttons within the notification (e.g., \"Undo\" or \"Open\")."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Urgency"
-            }
-          ]
-        },
-        {
-          "Text": ": Marking the notification as critical to bypass \"Do Not Disturb\" modes (where permitted)."
-        }
-      ]
-    },
-    {
-      "Heading": {
-        "level": 2,
-        "children": [
-          {
-            "Text": "Best Practices"
-          }
-        ]
-      }
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Avoid \"notification spam\". Users find frequent popups annoying. Instead, use notifications for critical events and use a \"Notification Center\" inside your app for less urgent updates."
         }
       ]
     }

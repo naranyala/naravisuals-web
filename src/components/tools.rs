@@ -1,115 +1,136 @@
+use crate::state::AppState;
 use leptos::*;
-use leptos_router::*;
-use std::collections::BTreeMap;
-use crate::utils::search::{SearchResult, highlight_match, extract_headings_simple};
-use crate::docs_data::DOCS;
-use crate::search_index::SEARCH_INDEX;
+
+#[component]
+#[derive(Clone, Copy, PartialEq)]
+enum ToolsSubView {
+    Main,
+    Theme,
+    Layout,
+}
 
 #[component]
 pub fn ToolsSidebar(is_open: ReadSignal<bool>, on_close: Callback<()>) -> impl IntoView {
-    let (query, set_query) = create_signal("".to_string());
-    let (show_search, set_show_search) = create_signal(false);
+    let state = AppState::use_state();
+    let (sub_view, set_sub_view) = create_signal(ToolsSubView::Main);
 
-    let tools: Vec<(&str, &str, &str)> = vec![
-        ("🔧", "CLI Generator", "cli"),
-        ("📦", "Package Builder", "package"),
-        ("🚀", "Deploy", "deploy"),
-        ("📊", "Analytics", "analytics"),
-        ("🔒", "Security", "security"),
-    ];
+    let is_light = state.theme.is_light;
+    let set_is_light = state.theme.set_is_light;
+    let set_is_search_open = state.search.set_is_open;
+    let sidebar_width = state.sidebar.width;
+    let set_width = state.sidebar.set_width;
 
-    let results = move || {
-        let q = query.get();
-        if q.is_empty() {
-            return Vec::<SearchResult>::new();
+    // Reset sub_view when sidebar closes
+    create_effect(move |_| {
+        if !is_open.get() {
+            set_sub_view.set(ToolsSubView::Main);
         }
+    });
 
-        let q_lower = q.to_lowercase();
-        let mut path_matches: BTreeMap<String, (String, Option<String>, Option<String>)> = BTreeMap::new();
-        
-        for entry in SEARCH_INDEX {
-            let mut matched_title = false;
-            let mut matched_content = false;
-
-            if entry.path.contains('/') {
-                // Find the title from DOCS
-                if let Some(doc) = DOCS.iter().find(|d| d.path == entry.path) {
-                    if doc.title.to_lowercase().contains(&q_lower) {
-                        matched_title = true;
-                    }
-                }
-            } else {
-                // Simple path
-                if let Some(doc) = DOCS.iter().find(|d| d.path == entry.path) {
-                    if doc.title.to_lowercase().contains(&q_lower) {
-                        matched_title = true;
-                    }
-                }
-            }
-
-            if entry.content.to_lowercase().contains(&q_lower) {
-                matched_content = true;
-            }
-            
-            if matched_title || matched_content {
-                let title = DOCS.iter()
-                    .find(|d| d.path == entry.path)
-                    .map(|d| highlight_match(&d.title, &q))
-                    .unwrap_or_else(|| entry.path.to_string());
-
-                let snippet = if matched_content {
-                    Some(highlight_match(entry.content, &q))
-                } else {
-                    None
-                };
-
-                path_matches.entry(entry.path.to_string())
-                    .or_insert((title, None, snippet));
-            }
+    let render_header = move |title: &'static str, show_back: bool| {
+        view! {
+            <div class="tools-sidebar-header">
+                <div class="header-left">
+                    {if show_back {
+                        view! {
+                            <button class="back-btn" on:click=move |_| set_sub_view.set(ToolsSubView::Main)>
+                                "←"
+                            </button>
+                        }.into_view()
+                    } else {
+                        view! { }.into_view()
+                    }}
+                    <span class="tools-sidebar-title">{title}</span>
+                </div>
+                <button class="tools-sidebar-close" on:click=move |_| {
+                    on_close.call(());
+                }>"✕"</button>
+            </div>
         }
-
-        let mut all_results = Vec::new();
-        for (path, (title, heading, snippet)) in path_matches {
-            all_results.push(SearchResult {
-                title,
-                path,
-                heading,
-                snippet,
-            });
-        }
-        all_results
     };
 
     view! {
         <div class=move || if is_open.get() { "tools-sidebar open" } else { "tools-sidebar" }>
-            <div class="tools-sidebar-header">
-                <span class="tools-sidebar-title">"Tools"</span>
-                <button class="tools-sidebar-close" on:click=move |_| {
-                    set_show_search.set(false);
-                    on_close.call(());
-                }>"✕"</button>
-            </div>
-            <div class="tools-sidebar-content">
-                {move || {
-                    view! {
-                        <div class="tools-grid">
-                            {tools.iter().map(|(icon, name, id)| {
-                                let icon = *icon;
-                                let name = *name;
-                                let id = *id;
-                                view! {
-                                    <div class="tool-item" on:click=move |_| {
-                                        // Handle specific tool actions here
-                                    }>
-                                        <span class="tool-icon">{icon}</span>
-                                        <span class="tool-name">{name}</span>
-                                    </div>
-                                }
-                            }).collect_view()}
+            {move || match sub_view.get() {
+                ToolsSubView::Main => view! {
+                    <>
+                        {render_header("Quick Controls", false)}
+                        <div class="tools-sidebar-content">
+                            <div class="tools-grid">
+                                <button class="tool-item" on:click=move |_| set_sub_view.set(ToolsSubView::Theme)>
+                                    <span class="tool-icon">"🎨"</span>
+                                    <span class="tool-name">"Theme"</span>
+                                </button>
+                                <button class="tool-item" on:click=move |_| set_sub_view.set(ToolsSubView::Layout)>
+                                    <span class="tool-icon">"📏"</span>
+                                    <span class="tool-name">"Layout"</span>
+                                </button>
+                                <button class="tool-item" on:click=move |_| {
+                                    set_is_search_open.set(true);
+                                    on_close.call(());
+                                }>
+                                    <span class="tool-icon">"🔍"</span>
+                                    <span class="tool-name">"Search"</span>
+                                </button>
+                            </div>
                         </div>
-                    }
-                }}
-            </div>
+                    </>
+                }.into_view(),
+                ToolsSubView::Theme => view! {
+                    <>
+                        {render_header("Theme", true)}
+                        <div class="tools-sidebar-content">
+                            <div class="tools-section">
+                                <h3>"Select Mode"</h3>
+                                <div class="tools-column">
+                                    <button
+                                        class=move || format!("tool-btn {}", if !is_light.get() { "active" } else { "" })
+                                        on:click=move |_| set_is_light.set(false)
+                                    >
+                                        "🌙 Dark Mode"
+                                    </button>
+                                    <button
+                                        class=move || format!("tool-btn {}", if is_light.get() { "active" } else { "" })
+                                        on:click=move |_| set_is_light.set(true)
+                                    >
+                                        "☀️ Light Mode"
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                }.into_view(),
+                ToolsSubView::Layout => view! {
+                    <>
+                        {render_header("Layout", true)}
+                        <div class="tools-sidebar-content">
+                            <div class="tools-section">
+                                <h3>"Sidebar Width"</h3>
+                                <div class="tools-column">
+                                    <button
+                                        class=move || format!("tool-btn {}", if sidebar_width.get() == "0%" { "active" } else { "" })
+                                        on:click=move |_| set_width.set("0%".to_string())
+                                    >
+                                        "None (Hidden)"
+                                    </button>
+                                    <button
+                                        class=move || format!("tool-btn {}", if sidebar_width.get() == "25%" { "active" } else { "" })
+                                        on:click=move |_| set_width.set("25%".to_string())
+                                    >
+                                        "Standard (25%)"
+                                    </button>
+                                    <button
+                                        class=move || format!("tool-btn {}", if sidebar_width.get() == "50%" { "active" } else { "" })
+                                        on:click=move |_| set_width.set("50%".to_string())
+                                    >
+                                        "Wide (50%)"
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                }.into_view(),
+            }}
         </div>
     }
 }

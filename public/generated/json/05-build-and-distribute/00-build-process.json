@@ -2,7 +2,7 @@
   "Document": [
     {
       "Heading": {
-        "level": 1,
+        "level": "H1",
         "children": [
           {
             "Text": "The Build Process"
@@ -19,7 +19,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "How Tauri Builds Your App"
@@ -41,117 +41,107 @@
       ]
     },
     {
-      "OrderedList": []
-    },
-    {
-      "Paragraph": [
+      "OrderedList": [
         {
-          "Bold": [
+          "checked": null,
+          "children": [
             {
-              "Text": "Frontend Compilation"
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Frontend Compilation"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Tauri runs your frontend build script (e.g., "
+                },
+                {
+                  "InlineCode": "trunk build --release"
+                },
+                {
+                  "Text": "). This compiles your Leptos Rust code into an optimized WASM binary and generates the HTML/CSS/JS."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Backend Compilation"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Cargo compiles the native Rust core with the "
+                },
+                {
+                  "InlineCode": "--release"
+                },
+                {
+                  "Text": " flag, applying heavy optimizations for speed and size."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Asset Bundling"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": The WASM and assets are embedded directly into the final native binary."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Installer Generation"
+                    }
+                  ]
+                },
+                {
+                  "Text": ": Tauri uses system tools (like WiX on Windows or hdiutil on macOS) to wrap the binary in a standard installer ("
+                },
+                {
+                  "InlineCode": ".msi"
+                },
+                {
+                  "Text": ", "
+                },
+                {
+                  "InlineCode": ".dmg"
+                },
+                {
+                  "Text": ", "
+                },
+                {
+                  "InlineCode": ".deb"
+                },
+                {
+                  "Text": ")."
+                }
+              ]
+            },
+            {
+              "Heading": {
+                "level": "H2",
+                "children": [
+                  {
+                    "Text": "Build Times"
+                  }
+                ]
+              }
             }
           ]
-        },
-        {
-          "Text": ": Tauri runs your frontend build script (e.g., "
-        },
-        {
-          "InlineCode": "trunk build --release"
-        },
-        {
-          "Text": "). This compiles your Leptos Rust code into an optimized WASM binary and generates the HTML/CSS/JS."
-        }
-      ]
-    },
-    {
-      "OrderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Backend Compilation"
-            }
-          ]
-        },
-        {
-          "Text": ": Cargo compiles the native Rust core with the "
-        },
-        {
-          "InlineCode": "--release"
-        },
-        {
-          "Text": " flag, applying heavy optimizations for speed and size."
-        }
-      ]
-    },
-    {
-      "OrderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Asset Bundling"
-            }
-          ]
-        },
-        {
-          "Text": ": The WASM and assets are embedded directly into the final native binary."
-        }
-      ]
-    },
-    {
-      "OrderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Bold": [
-            {
-              "Text": "Installer Generation"
-            }
-          ]
-        },
-        {
-          "Text": ": Tauri uses system tools (like WiX on Windows or hdiutil on macOS) to wrap the binary in a standard installer ("
-        },
-        {
-          "InlineCode": ".msi"
-        },
-        {
-          "Text": ", "
-        },
-        {
-          "InlineCode": ".dmg"
-        },
-        {
-          "Text": ", "
-        },
-        {
-          "InlineCode": ".deb"
-        },
-        {
-          "Text": ")."
-        }
-      ]
-    },
-    {
-      "Heading": {
-        "level": 2,
-        "children": [
-          {
-            "Text": "Build Times"
-          }
-        ]
-      }
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "The first build is usually slow because it compiles all dependencies. Subsequent builds are much faster due to Cargo's caching. Use a fast SSD and ensure you have enough RAM to speed up the process."
         }
       ]
     }

@@ -1,5 +1,4 @@
 use md_compiler::parser::ast::Node;
-use serde_json;
 
 pub struct DocEntry {
     pub path: &'static str,
@@ -29,7 +28,7 @@ pub const DOCS: &[DocEntry] = &[
     DocEntry { path: "05-build-and-distribute/00-build-process", title: "The Build Process" },
     DocEntry { path: "05-build-and-distribute/01-target-platforms", title: "Target Platforms" },
     DocEntry { path: "05-build-and-distribute/02-optimization-tips", title: "Optimization Tips" },
-    DocEntry { path: "test_headings", title: "Heading 1" },
+    DocEntry { path: "99-test-headings", title: "Heading 1" },
 ];
 
 pub fn get_ast(path: &str) -> Option<Node> {
@@ -56,8 +55,37 @@ pub fn get_ast(path: &str) -> Option<Node> {
         "05-build-and-distribute/00-build-process" => include_str!("../generated/json/05-build-and-distribute/00-build-process.json"),
         "05-build-and-distribute/01-target-platforms" => include_str!("../generated/json/05-build-and-distribute/01-target-platforms.json"),
         "05-build-and-distribute/02-optimization-tips" => include_str!("../generated/json/05-build-and-distribute/02-optimization-tips.json"),
-        "test_headings" => include_str!("../generated/json/test_headings.json"),
+        "99-test-headings" => include_str!("../generated/json/99-test-headings.json"),
         _ => return None,
     };
     serde_json::from_str(json).ok()
+}
+
+pub fn get_raw(path: &str) -> Option<&'static str> {
+    match path {
+        "00-introduction/00-overview" => Some(include_str!("../generated/md/00-introduction/00-overview.md")),
+        "00-introduction/01-why-this-stack" => Some(include_str!("../generated/md/00-introduction/01-why-this-stack.md")),
+        "00-introduction/02-architecture" => Some(include_str!("../generated/md/00-introduction/02-architecture.md")),
+        "01-leptos-frontend/00-getting-started" => Some(include_str!("../generated/md/01-leptos-frontend/00-getting-started.md")),
+        "01-leptos-frontend/01-reactive-state" => Some(include_str!("../generated/md/01-leptos-frontend/01-reactive-state.md")),
+        "01-leptos-frontend/02-component-structure" => Some(include_str!("../generated/md/01-leptos-frontend/02-component-structure.md")),
+        "02-tauri-backend/00-backend-overview" => Some(include_str!("../generated/md/02-tauri-backend/00-backend-overview.md")),
+        "02-tauri-backend/01-tauri-commands" => Some(include_str!("../generated/md/02-tauri-backend/01-tauri-commands.md")),
+        "02-tauri-backend/02-state-management" => Some(include_str!("../generated/md/02-tauri-backend/02-state-management.md")),
+        "02-tauri-backend/03-security-and-permissions" => Some(include_str!("../generated/md/02-tauri-backend/03-security-and-permissions.md")),
+        "03-bridge-communication/00-ipc-basics" => Some(include_str!("../generated/md/03-bridge-communication/00-ipc-basics.md")),
+        "03-bridge-communication/01-invoking-commands" => Some(include_str!("../generated/md/03-bridge-communication/01-invoking-commands.md")),
+        "03-bridge-communication/02-event-system" => Some(include_str!("../generated/md/03-bridge-communication/02-event-system.md")),
+        "03-bridge-communication/03-type-safe-sharing" => Some(include_str!("../generated/md/03-bridge-communication/03-type-safe-sharing.md")),
+        "04-desktop-integration/00-os-api-overview" => Some(include_str!("../generated/md/04-desktop-integration/00-os-api-overview.md")),
+        "04-desktop-integration/01-filesystem-access" => Some(include_str!("../generated/md/04-desktop-integration/01-filesystem-access.md")),
+        "04-desktop-integration/02-system-tray-menus" => Some(include_str!("../generated/md/04-desktop-integration/02-system-tray-menus.md")),
+        "04-desktop-integration/03-window-management" => Some(include_str!("../generated/md/04-desktop-integration/03-window-management.md")),
+        "04-desktop-integration/04-notifications" => Some(include_str!("../generated/md/04-desktop-integration/04-notifications.md")),
+        "05-build-and-distribute/00-build-process" => Some(include_str!("../generated/md/05-build-and-distribute/00-build-process.md")),
+        "05-build-and-distribute/01-target-platforms" => Some(include_str!("../generated/md/05-build-and-distribute/01-target-platforms.md")),
+        "05-build-and-distribute/02-optimization-tips" => Some(include_str!("../generated/md/05-build-and-distribute/02-optimization-tips.md")),
+        "99-test-headings" => Some(include_str!("../generated/md/99-test-headings.md")),
+        _ => None,
+    }
 }

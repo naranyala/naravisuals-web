@@ -25,4 +25,22 @@ mod tests {
         let children = vec![Node::Text("Hello @ World #2024!".to_string())];
         assert_eq!(RuntimeRenderer::generate_id(&children), "hello--world-2024");
     }
+
+    #[test]
+    fn test_generate_id_empty() {
+        let children = vec![];
+        assert_eq!(RuntimeRenderer::generate_id(&children), "");
+    }
+
+    #[test]
+    fn test_generate_id_only_special() {
+        let children = vec![Node::Text("!!! @@@ ###".to_string())];
+        assert_eq!(RuntimeRenderer::generate_id(&children), "");
+    }
+
+    #[test]
+    fn test_generate_id_with_numbers() {
+        let children = vec![Node::Text("Version 2.0.1".to_string())];
+        assert_eq!(RuntimeRenderer::generate_id(&children), "version-201");
+    }
 }

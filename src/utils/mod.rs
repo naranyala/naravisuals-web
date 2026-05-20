@@ -1,3 +1,4 @@
+pub mod ast;
 pub mod search;
 #[cfg(test)]
 mod search_tests;

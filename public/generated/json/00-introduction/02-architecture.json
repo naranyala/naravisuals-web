@@ -2,7 +2,7 @@
   "Document": [
     {
       "Heading": {
-        "level": 1,
+        "level": "H1",
         "children": [
           {
             "Text": "Architecture Overview"
@@ -39,7 +39,7 @@
     },
     {
       "Heading": {
-        "level": 2,
+        "level": "H2",
         "children": [
           {
             "Text": "The Core Process (Rust)"
@@ -55,116 +55,94 @@
       ]
     },
     {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
+      "UnorderedList": [
         {
-          "Text": "Window management and lifecycle."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Accessing the filesystem, network, and system APIs."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Managing global application state."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Handling security and permissions."
-        }
-      ]
-    },
-    {
-      "Heading": {
-        "level": 2,
-        "children": [
-          {
-            "Text": "The WebView Process (Leptos/WASM)"
-          }
-        ]
-      }
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "The WebView process is where your user interface lives. In this stack, it is a Leptos application compiled to WebAssembly (WASM). It is responsible for:"
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Rendering the HTML/CSS."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Handling user interactions."
-        }
-      ]
-    },
-    {
-      "UnorderedList": []
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Managing local UI state."
-        }
-      ]
-    },
-    {
-      "Heading": {
-        "level": 2,
-        "children": [
-          {
-            "Text": "The Bridge (IPC)"
-          }
-        ]
-      }
-    },
-    {
-      "Paragraph": [
-        {
-          "Text": "Because the Core and WebView processes are isolated for security reasons, they communicate via "
-        },
-        {
-          "Bold": [
+          "checked": null,
+          "children": [
             {
-              "Text": "Inter-Process Communication (IPC)"
+              "Paragraph": [
+                {
+                  "Text": "Window management and lifecycle."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Text": "Accessing the filesystem, network, and system APIs."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Text": "Managing global application state."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Text": "Handling security and permissions."
+                }
+              ]
+            },
+            {
+              "Heading": {
+                "level": "H2",
+                "children": [
+                  {
+                    "Text": "The WebView Process (Leptos/WASM)"
+                  }
+                ]
+              }
+            },
+            {
+              "Paragraph": [
+                {
+                  "Text": "Rendering the HTML/CSS."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Text": "Handling user interactions."
+                }
+              ]
+            },
+            {
+              "Paragraph": [
+                {
+                  "Text": "Managing local UI state."
+                }
+              ]
+            },
+            {
+              "Heading": {
+                "level": "H2",
+                "children": [
+                  {
+                    "Text": "The Bridge (IPC)"
+                  }
+                ]
+              }
+            },
+            {
+              "Paragraph": [
+                {
+                  "Bold": [
+                    {
+                      "Text": "Inter-Process Communication (IPC)"
+                    }
+                  ]
+                },
+                {
+                  "Text": ". This bridge allows the frontend to \"invoke\" Rust functions and the backend to \"emit\" events to the UI."
+                }
+              ]
             }
           ]
-        },
-        {
-          "Text": ". This bridge allows the frontend to \"invoke\" Rust functions and the backend to \"emit\" events to the UI."
         }
       ]
     }

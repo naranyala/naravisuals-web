@@ -1,15 +1,19 @@
 use md_compiler::parser::{parse, rustgen::RustGenerator};
-use md_compiler::plugins::{PluginRegistry, callout::CalloutPlugin};
+use md_compiler::plugins::{callout::CalloutPlugin, PluginRegistry};
 use md_compiler::utils::*;
 
+use std::env;
 use std::fs;
 use std::path::Path;
-use std::env;
 
 #[cfg(test)]
 mod build_tests;
 
-pub(crate) fn walk_dir(dir: &Path, base_dir: &Path, entries: &mut Vec<(String, String, md_compiler::parser::ast::Node)>) {
+pub(crate) fn walk_dir(
+    dir: &Path,
+    base_dir: &Path,
+    entries: &mut Vec<(String, String, md_compiler::parser::ast::Node, String)>,
+) {
     if let Ok(read_dir) = fs::read_dir(dir) {
         let mut paths: Vec<_> = read_dir.flatten().collect();
         paths.sort_by_key(|e| e.path());
@@ -20,24 +24,32 @@ pub(crate) fn walk_dir(dir: &Path, base_dir: &Path, entries: &mut Vec<(String, S
 
             if path.is_dir() {
                 if !has_valid_prefix(&filename) {
-                    eprintln!("Warning: Directory '{}' should start with a numeric prefix", filename);
+                    eprintln!(
+                        "Warning: Directory '{}' should start with a numeric prefix",
+                        filename
+                    );
                 }
                 walk_dir(&path, base_dir, entries);
             } else if path.extension().map_or(false, |ext| ext == "md") {
                 if !has_valid_prefix(&filename) {
-                    eprintln!("Warning: Markdown file '{}' should start with a numeric prefix", filename);
+                    eprintln!(
+                        "Warning: Markdown file '{}' should start with a numeric prefix",
+                        filename
+                    );
                 }
-                
+
                 let content = fs::read_to_string(&path).unwrap_or_default();
                 let title = extract_title(&content);
-                let ast = parse(&content);
+                let ast = parse(&content).expect("Failed to parse markdown");
 
-                let relative_path = path.strip_prefix(base_dir).unwrap()
+                let relative_path = path
+                    .strip_prefix(base_dir)
+                    .unwrap()
                     .with_extension("")
                     .to_string_lossy()
                     .into_owned();
 
-                entries.push((relative_path, title, ast));
+                entries.push((relative_path, title, ast, content));
             }
         }
     }
@@ -56,16 +68,19 @@ fn main() {
 
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".to_string());
     let project_root = if manifest_dir.ends_with("scripts") {
-        Path::new(&manifest_dir).parent().unwrap_or(Path::new(".")).to_path_buf()
+        Path::new(&manifest_dir)
+            .parent()
+            .unwrap_or(Path::new("."))
+            .to_path_buf()
     } else {
         Path::new(&manifest_dir).to_path_buf()
     };
-    
+
     let docs_dir = project_root.join("docs");
     let generated_dir = project_root.join("generated");
-    
+
     fs::create_dir_all(&generated_dir).expect("Failed to create generated directory");
-    
+
     let mut entries = Vec::new();
 
     if docs_dir.is_dir() {
@@ -74,32 +89,43 @@ fn main() {
 
     // 1. Generate Rust components
     if do_rust {
-        for (rel_path, _title, ast) in &entries {
+        for (rel_path, _title, ast, _raw) in &entries {
             let component_name = path_to_component_name(rel_path);
-            let rust_code = RustGenerator::new(create_plugin_registry()).generate(ast, &component_name);
+            let rust_code =
+                RustGenerator::new(create_plugin_registry()).generate(ast, &component_name);
             let output_path = generated_dir.join(format!("{}.rs", path_to_module_name(rel_path)));
             fs::write(&output_path, rust_code).expect("Failed to write Rust file");
         }
         generate_rust_mod_files(&generated_dir, &entries);
     }
 
-    // 2. Generate JSON ASTs
+    // 2. Generate JSON ASTs and Markdown copies
     if do_json {
         let json_dir = generated_dir.join("json");
         fs::create_dir_all(&json_dir).expect("Failed to create json directory");
-        
+
+        let md_copy_dir = generated_dir.join("md");
+        fs::create_dir_all(&md_copy_dir).expect("Failed to create md copy directory");
+
         let public_json_dir = project_root.join("public").join("generated").join("json");
         fs::create_dir_all(&public_json_dir).expect("Failed to create public json directory");
 
-        for (rel_path, _title, ast) in &entries {
+        for (rel_path, _title, ast, raw) in &entries {
             let json_content = serde_json::to_string_pretty(ast).expect("Failed to serialize AST");
-            
-            // Save to generated/
+
+            // Save to generated/json/
             let output_path = json_dir.join(format!("{}.json", rel_path));
             if let Some(parent) = output_path.parent() {
                 fs::create_dir_all(parent).expect("Failed to create parent dir");
             }
             fs::write(&output_path, &json_content).expect("Failed to write JSON file");
+
+            // Save to generated/md/
+            let md_output_path = md_copy_dir.join(format!("{}.md", rel_path));
+            if let Some(parent) = md_output_path.parent() {
+                fs::create_dir_all(parent).expect("Failed to create parent md dir");
+            }
+            fs::write(&md_output_path, raw).expect("Failed to write MD copy file");
 
             // Save to public/ (so Trunk serves it)
             let public_path = public_json_dir.join(format!("{}.json", rel_path));
@@ -108,20 +134,20 @@ fn main() {
             }
             fs::write(&public_path, &json_content).expect("Failed to write public JSON file");
         }
-        println!("Generated JSON ASTs in generated/json/ and public/generated/json/");
+        println!("Generated JSON ASTs and MD copies in generated/");
     }
 
     // 3. Generate Embedded Rust Data
     let mut rust_data = String::from("use md_compiler::parser::ast::Node;\n");
-    rust_data.push_str("use serde_json;\n\n");
-    
+    rust_data.push_str("\n");
+
     rust_data.push_str("pub struct DocEntry {\n");
     rust_data.push_str("    pub path: &'static str,\n");
     rust_data.push_str("    pub title: &'static str,\n");
     rust_data.push_str("}\n\n");
 
     rust_data.push_str("pub const DOCS: &[DocEntry] = &[\n");
-    for (rel_path, title, _) in &entries {
+    for (rel_path, title, _, _) in &entries {
         rust_data.push_str(&format!(
             "    DocEntry {{ path: \"{}\", title: \"{}\" }},\n",
             rel_path, title
@@ -131,8 +157,7 @@ fn main() {
 
     rust_data.push_str("pub fn get_ast(path: &str) -> Option<Node> {\n");
     rust_data.push_str("    let json = match path {\n");
-    for (rel_path, _, _) in &entries {
-        // Use include_str! to embed the JSON file generated in Step 2
+    for (rel_path, _, _, _) in &entries {
         rust_data.push_str(&format!(
             "        \"{}\" => include_str!(\"../generated/json/{}.json\"),\n",
             rel_path, rel_path
@@ -141,6 +166,18 @@ fn main() {
     rust_data.push_str("        _ => return None,\n");
     rust_data.push_str("    };\n");
     rust_data.push_str("    serde_json::from_str(json).ok()\n");
+    rust_data.push_str("}\n\n");
+
+    rust_data.push_str("pub fn get_raw(path: &str) -> Option<&'static str> {\n");
+    rust_data.push_str("    match path {\n");
+    for (rel_path, _, _, _) in &entries {
+        rust_data.push_str(&format!(
+            "        \"{}\" => Some(include_str!(\"../generated/md/{}.md\")),\n",
+            rel_path, rel_path
+        ));
+    }
+    rust_data.push_str("        _ => None,\n");
+    rust_data.push_str("    }\n");
     rust_data.push_str("}\n");
 
     let docs_data_path = project_root.join("src").join("docs_data.rs");
@@ -153,7 +190,7 @@ fn main() {
     search_index.push_str("}\n\n");
 
     search_index.push_str("pub const SEARCH_INDEX: &[SearchEntry] = &[\n");
-    for (rel_path, _, ast) in &entries {
+    for (rel_path, _, ast, _) in &entries {
         let content = extract_all_text(ast);
         // Escape quotes and backslashes for the Rust string literal
         let escaped_content = content.replace('\\', "\\\\").replace('"', "\\\"");
@@ -167,13 +204,22 @@ fn main() {
     let search_index_path = project_root.join("src").join("search_index.rs");
     fs::write(&search_index_path, search_index).expect("Failed to write search_index.rs");
 
-    println!("\nMarkdown compilation complete: {} files embedded in src/docs_data.rs", entries.len());
-    println!("Search index generated: {} files in src/search_index.rs", entries.len());
+    println!(
+        "\nMarkdown compilation complete: {} files embedded in src/docs_data.rs",
+        entries.len()
+    );
+    println!(
+        "Search index generated: {} files in src/search_index.rs",
+        entries.len()
+    );
 }
 
-pub(crate) fn generate_rust_mod_files(generated_dir: &Path, entries: &[(String, String, md_compiler::parser::ast::Node)]) {
+pub(crate) fn generate_rust_mod_files(
+    generated_dir: &Path,
+    entries: &[(String, String, md_compiler::parser::ast::Node, String)],
+) {
     let mut root_mod = String::new();
-    for (rel_path, _, _) in entries {
+    for (rel_path, _, _, _) in entries {
         let module_name = path_to_module_name(rel_path);
         root_mod.push_str(&format!("pub mod {};\n", module_name));
     }
