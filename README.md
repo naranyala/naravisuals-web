@@ -1,6 +1,6 @@
-# Rigorstarter Webpage
+# A Webpage
 
-Rigorstarter is a high-performance documentation framework built with Rust, Leptos, and WebAssembly. It is designed to deliver a seamless reading experience by moving the computational cost of markdown parsing from the client's browser to the build process.
+A high-performance documentation framework built with Rust, Leptos, and WebAssembly. It is designed to deliver a seamless reading experience by moving the computational cost of markdown parsing from the client's browser to the build process.
 
 ## Core Concept
 
